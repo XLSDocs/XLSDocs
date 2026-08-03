@@ -1,0 +1,69 @@
+---
+title: "Python in Excel: What You Can (and Can't) Do Yet"
+description: A practical look at what Python in Excel handles well, where it still falls short, and whether it's worth switching from VBA.
+date: "2026-07-28"
+category: Python
+author: Dana Okafor
+readTime: 7 min read
+featured: true
+---
+
+Python in Excel landed with a lot of promise: real pandas, real
+matplotlib, running directly inside a cell. A year and a half in,
+it's genuinely useful for a specific slice of work — and still the
+wrong tool for a lot of what people expect it to do.
+
+## What Python in Excel actually is
+
+Each `=PY()` cell runs in a sandboxed, cloud-hosted Python environment
+— not your local machine, not your local Python install. Data goes
+back and forth between the grid and Python as pandas DataFrames
+automatically, and the result of a `=PY()` formula is either a plain
+value or a DataFrame object you can expand into the grid.
+
+```python title="Python in Excel"
+xl("Sales[Amount]").groupby(xl("Sales[Region]")).sum()
+```
+
+That `xl()` function is the bridge — it's how a Python cell reads
+ranges, tables, and named ranges from the worksheet.
+
+## What works well today
+
+- **Real pandas/statsmodels/matplotlib**, not a cut-down clone — if
+  you already know the Python data stack, it transfers directly.
+- **Statistical and ML work Excel formulas were never good at** —
+  regression, clustering, proper time-series resampling.
+- **One-off cleanup** on messy imported data, without writing a
+  helper column for every transformation step.
+
+## What still trips people up
+
+The sandbox has no internet access and can't read local files — every
+input has to already be on the sheet via `xl()`. There's also a hard
+row limit on what `xl()` will pull in per call, so a `=PY()` formula
+against a 500,000-row table will silently truncate rather than error
+loudly, which is the single most common "why is my answer wrong"
+report we hear.
+
+<Callout type="warn">
+  `=PY()` results don't recalculate automatically the way normal
+  formulas do on every keystroke — Excel batches Python execution to
+  avoid hammering the sandbox. If a chart looks stale, check whether
+  the workbook is actually set to auto-calculate Python cells.
+</Callout>
+
+## Should you switch from VBA?
+
+Not wholesale. VBA still owns anything that needs to touch the Excel
+object model directly — formatting, UI automation, event handlers,
+talking to other Office apps. Python in Excel is for the analysis
+layer sitting on top of your data, not for automating Excel itself.
+The two coexist fine in the same workbook.
+
+## The bottom line
+
+If your job already looks like pandas — grouping, merging, plotting —
+Python in Excel removes a genuinely painful export-to-notebook step.
+If your job looks like "reformat this report every Monday," you still
+want VBA, or a Power Query refresh.

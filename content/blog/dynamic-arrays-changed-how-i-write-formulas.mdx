@@ -1,0 +1,69 @@
+---
+title: Dynamic Arrays Changed How I Write Formulas
+description: FILTER, SORT, and UNIQUE didn't just add three new functions — they changed the shape of formulas worth writing at all.
+date: "2026-05-20"
+category: Tutorials
+author: Dana Okafor
+readTime: 8 min read
+---
+
+For years, "filter this list and show me the results" meant a helper
+column, an AutoFilter, or an array formula entered with
+`Ctrl+Shift+Enter` that everyone was slightly afraid to touch.
+Dynamic arrays removed all three from the equation.
+
+## The shift in one example
+
+Old approach — a helper column plus AutoFilter, or a
+`Ctrl+Shift+Enter` array formula nobody wants to edit later:
+
+<ExcelCode>{`=IFERROR(INDEX($A$2:$A$100, SMALL(IF($B$2:$B$100="West", ROW($B$2:$B$100)-1), ROW()-1)), "")`}</ExcelCode>
+
+New approach — one formula, spills automatically, no helper column:
+
+<ExcelCode>{`=FILTER(A2:C100, B2:B100="West")`}</ExcelCode>
+
+That's not a small readability win. It's a different way of thinking
+about a sheet: formulas that describe *what* you want, not the
+row-by-row mechanics of how to get there.
+
+## Three functions, one habit change
+
+**FILTER** replaced most of what I used to reach for AutoFilter or a
+helper column for. **SORT** and **SORTBY** replaced manually
+re-sorting a range and hoping nothing downstream depended on the old
+row order. **UNIQUE** replaced Remove Duplicates as a *formula*
+instead of a one-time destructive action — the distinct list now
+stays live as source data changes.
+
+## The habit that actually changed
+
+The real shift isn't any single function — it's that I stopped
+building sheets around static, pre-filtered tables and started
+building them around one raw data table plus formulas that reshape it
+on demand. Change a filter condition in one cell, and everything
+downstream — the chart, the summary table, the next FILTER built on
+top of this one — updates without re-running anything manually.
+
+<Callout type="info">
+  Dynamic arrays spill into neighboring cells automatically. If those
+  cells already contain something, the formula throws `#SPILL!`
+  instead of silently overwriting your data — worth knowing before you
+  see it for the first time and assume something's broken.
+</Callout>
+
+## Where it still gets messy
+
+Nesting three or four dynamic array functions inside each other
+(`SORT(FILTER(UNIQUE(...)))`) is powerful but genuinely hard to debug
+— when something's wrong, you can't easily tell which layer produced
+the wrong result. Breaking a long chain into two or three named
+LAMBDA-backed helper formulas, or even just intermediate cells, pays
+for itself the first time you have to fix one at 5pm on a Friday.
+
+## Worth the relearn
+
+If you learned Excel before 2020, dynamic arrays are worth an
+afternoon of deliberate practice — not because the syntax is hard, but
+because the instinct to reach for a helper column is. That instinct is
+the thing actually being replaced.

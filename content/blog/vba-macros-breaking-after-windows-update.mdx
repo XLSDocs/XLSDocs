@@ -1,0 +1,63 @@
+---
+title: Why Your VBA Macros Break After a Windows Update
+description: Windows and Office updates quietly change the things VBA macros depend on. Here's what actually breaks, and how to make macros survive the next one.
+date: "2026-06-02"
+category: VBA
+author: Priya Shah
+readTime: 6 min read
+---
+
+A macro that's run flawlessly for two years suddenly throws
+`Run-time error '429': ActiveX component can't create object` the
+Monday after a Patch Tuesday rollout. Nothing in the workbook changed.
+The environment did.
+
+## The usual suspects
+
+**Trust Center defaults reset.** Some cumulative updates reset macro
+security settings back to "Disable all macros with notification" —
+especially on managed corporate devices where group policy
+re-applies a baseline. Check `File → Options → Trust Center` before
+assuming the code itself is broken.
+
+**Reference library paths shift.** Late-bound references
+(`CreateObject("Scripting.FileSystemObject")`) survive updates fine.
+Early-bound references tied to a specific DLL version — visible as a
+`MISSING:` prefix in the VBA editor's Tools → References dialog — do
+not.
+
+```vb title="Late binding survives version changes"
+Dim fso As Object
+Set fso = CreateObject("Scripting.FileSystemObject")
+```
+
+Swapping early-bound `Dim fso As Scripting.FileSystemObject` for the
+late-bound version above trades compile-time IntelliSense for a macro
+that keeps working across Office updates.
+
+**64-bit vs 32-bit Office.** A workbook built years ago on 32-bit
+Office, opened today on a 64-bit install (increasingly the default),
+can hit `Compile error: The code in this project must be updated for
+use on 64-bit systems` — any API declaration missing `PtrSafe` and the
+right pointer-sized types (`LongPtr` instead of `Long` for handles)
+fails immediately.
+
+<Callout type="warn">
+  `#If VBA7 Then` conditional compilation blocks let one codebase
+  support both 32-bit and 64-bit Office correctly — worth adding
+  proactively to any macro using Windows API calls, not just after it
+  breaks.
+</Callout>
+
+## Making macros update-resistant
+
+- Prefer late binding for anything outside core Excel/VBA objects.
+- Add `PtrSafe` and `#If VBA7` guards to every `Declare` statement.
+- Don't assume Trust Center settings — check and document what your
+  macro actually requires to run.
+- Test on a fresh, fully-patched VM before shipping to a team, not
+  just your own (probably older) install.
+
+None of this is exciting work, but it's the difference between a
+macro that ages gracefully and one that becomes a support ticket every
+few months.

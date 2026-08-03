@@ -1,0 +1,58 @@
+---
+title: "XLOOKUP vs VLOOKUP: When the New Function Actually Wins"
+description: XLOOKUP is the better default, but VLOOKUP isn't obsolete — here's where each one genuinely wins.
+date: "2026-07-14"
+category: Excel
+author: Marcus Webb
+readTime: 5 min read
+---
+
+Every "switch to XLOOKUP" post reads like VLOOKUP is a mistake from
+the past. It isn't. It's just older, and older means it has real
+constraints XLOOKUP doesn't. Here's an honest comparison, not a
+victory lap.
+
+## Where XLOOKUP genuinely wins
+
+**Direction.** VLOOKUP can only look to the right of its search
+column. XLOOKUP doesn't care — the return range can sit anywhere
+relative to the lookup range.
+
+<ExcelCode>{`=XLOOKUP(A2, Products[SKU], Products[Name])`}</ExcelCode>
+
+If `Name` sits to the *left* of `SKU` in the table, that formula still
+works. The equivalent VLOOKUP would need the columns physically
+reordered, or an INDEX/MATCH instead.
+
+**Error handling.** XLOOKUP's fourth argument replaces a
+`IFERROR(VLOOKUP(...), "fallback")` wrapper with one native argument.
+Shorter, and one less function call for Excel to evaluate.
+
+**Default match behavior.** VLOOKUP defaults to approximate match
+(`TRUE`) if you forget the fourth argument — a genuinely dangerous
+default on unsorted data. XLOOKUP defaults to exact match, which fails
+loudly instead of returning a plausible-looking wrong number.
+
+## Where VLOOKUP still holds up
+
+**Compatibility.** XLOOKUP requires Excel 365 or 2021. If a workbook
+needs to open correctly in Excel 2019 or earlier — a lot of corporate
+environments still are — VLOOKUP is the only one of the two that will
+actually work there.
+
+**Familiarity in shared workbooks.** If you're editing a workbook a
+whole team maintains and everyone already reads VLOOKUP fluently,
+introducing XLOOKUP for one column is a small tax on everyone else's
+ability to audit the sheet.
+
+<Callout type="info">
+  Neither point is really about XLOOKUP being worse — they're both
+  about the *environment* the formula has to survive in, not the
+  function itself.
+</Callout>
+
+## The practical rule
+
+Default to XLOOKUP in anything new, 365-only, and yours to maintain.
+Reach for VLOOKUP specifically when compatibility or team familiarity
+is the actual constraint — not out of habit.
