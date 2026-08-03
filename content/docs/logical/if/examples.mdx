@@ -1,0 +1,30 @@
+---
+title: IF examples
+description: Worked examples for IF — basic branching, nested conditions, AND/OR combinations, and dynamic messages.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — pass or fail" formula={`=IF(A2>=60, "Pass", "Fail")`}>
+  Returns "Pass" if the score in A2 is 60 or above, otherwise "Fail".
+</ExampleCard>
+
+<ExampleCard number="02" label="Nested IF — letter grade bands" formula={`=IF(A2>=90,"A",IF(A2>=80,"B",IF(A2>=70,"C",IF(A2>=60,"D","F"))))`}>
+  Each nested IF only runs if the previous conditions were false —
+  works, but IFS is more readable once you're past a couple of levels.
+</ExampleCard>
+
+<ExampleCard number="03" label="IF with AND — multiple conditions must all be true" formula={`=IF(AND(A2>=60, B2="Enrolled"), "Pass", "Not eligible")`}>
+  Only returns "Pass" when the score is high enough **and** the
+  enrollment status matches.
+</ExampleCard>
+
+<ExampleCard number="04" label="IF with OR — any one condition can be true" formula={`=IF(OR(A2="VIP", B2>1000), "Priority", "Standard")`}>
+  Returns "Priority" if either condition holds — VIP status, or an
+  order total over 1000.
+</ExampleCard>
+
+<ExampleCard number="05" label="IF with text concatenation — dynamic message" formula={`=IF(A2>B2, A2-B2 & " over budget", B2-A2 & " under budget")`}>
+  Combining IF with `&` builds a human-readable message instead of a
+  bare number, without needing a helper column.
+</ExampleCard>

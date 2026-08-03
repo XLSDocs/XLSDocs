@@ -1,0 +1,148 @@
+---
+title: FILTER
+description: Return only the rows or columns of a range that match a condition, spilling the results automatically.
+---
+
+Return only the rows (or columns) of a range that match a condition —
+no helper columns, no array-entered formulas, no manual filtering. The
+matching rows spill automatically into the cells below the formula.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=FILTER(array, include, [if_empty])`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `array` | range | Required | The range or array to filter. |
+| `include` | boolean array | Required | A boolean array the same height (or width) as `array` — `TRUE` keeps the row, `FALSE` drops it. Usually a comparison like `Sales[Region]="West"`. |
+| `if_empty` | any | Optional | Value to return if no rows match. Without it, a zero-match result throws `#CALC!`. |
+
+## Return value
+
+A dynamic array of every row (or column) from `array` where `include`
+is `TRUE`, in original order, spilled into the cells below/right of the
+formula.
+
+## Description
+
+FILTER is a dynamic array function — it returns a spill range rather
+than a single value, and the result updates live as the source data
+changes, without re-entering the formula. It replaces the classic
+combination of helper columns plus a manual filter.
+
+<Callout type="warn">
+  FILTER requires **Excel 365 or Excel 2021**, like other dynamic array
+  functions. It is not available in Excel 2019, 2016, or earlier —
+  those versions will show `#NAME?`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: 'Included ✓', east: 'Included ✓', north: 'Excluded ✕', south: 'Excluded ✕' }}
+  defaultValue="West"
+  label={'Live preview — would this row pass Region="West" OR Region="East"?'}
+/>
+
+## Common errors
+
+<ExcelCode>{`// #CALC! – no rows match include, and if_empty wasn't provided
+FILTER(A2:C10, B2:B10="Zzz") → #CALC!
+
+// Fix: always provide an if_empty fallback
+FILTER(A2:C10, B2:B10="Zzz", "No matches")
+
+// #VALUE! – include isn't the same height/width as array
+FILTER(A2:C10, B2:B5="West") → #VALUE!
+
+// #SPILL! – cells below the formula already contain data
+// Clear the spill range, or move the formula somewhere clear
+
+// Combining conditions needs * (AND) or + (OR), not AND()/OR()
+FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}</ExcelCode>
+
+<Callout type="info">
+  To combine multiple conditions inside `include`, multiply boolean
+  arrays together for AND logic (`(cond1)*(cond2)`), or add them for OR
+  logic (`(cond1)+(cond2)`) — the `AND()`/`OR()` functions don't work
+  element-wise across an array the way `*`/`+` do here.
+</Callout>
+
+<Accordions>
+  <Accordion title="Why does FILTER return #CALC!?">
+    No rows in `array` satisfy `include`. Add a third argument
+    (`if_empty`) to return a fallback value instead of an error.
+  </Accordion>
+  <Accordion title="How do I filter on multiple conditions (AND/OR)?">
+    Multiply boolean arrays for AND (`(B2:B10="West")*(C2:C10="Q4")`),
+    or add them for OR (`(B2:B10="West")+(B2:B10="East")`).
+  </Accordion>
+  <Accordion title="Can I sort FILTER's results?">
+    Yes — wrap the whole formula in SORT or SORTBY:
+    `=SORT(FILTER(A2:C10, B2:B10="West"))`.
+  </Accordion>
+  <Accordion title="Why use FILTER instead of a helper column and Excel's built-in Filter?">
+    FILTER is a live formula — it updates automatically as source data
+    changes, and other formulas can reference its spilled results
+    directly. The built-in Filter/AutoFilter only hides rows visually
+    and doesn't recalculate anything.
+  </Accordion>
+</Accordions>
+
+## Working with FILTER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FILTER(Sales[#All], Sales[Region]="West", "No matches")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.Filter( _
+      Range("Sales"), Range("Sales[Region]").Value = "West", "No matches")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    result = df[df["Region"] == "West"]
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: false },
+    { label: '2016', supported: false },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- SORT — often wrapped around FILTER to sort the filtered results.
+  Page coming soon (Arrays category).
+- UNIQUE — returns the distinct values from a range, and combines well
+  with FILTER for "unique values matching a condition." Page coming
+  soon (Arrays category).
+- SORTBY — sorts one array using the order of a separate array, useful
+  when the sort key isn't in the result itself. Page coming soon
+  (Arrays category).
+- [XLOOKUP](/docs/lookup/xlookup) — returns a single matching value;
+  reach for FILTER instead when more than one row can match.

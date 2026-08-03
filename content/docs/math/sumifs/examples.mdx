@@ -1,0 +1,31 @@
+---
+title: SUMIFS examples
+description: Worked examples for SUMIFS — single and multiple conditions, date ranges, wildcards, and dynamic criteria.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — sum sales by region" formula={`=SUMIFS(Sales[Amount], Sales[Region], "West")`}>
+  Sums the Amount column for every row where Region equals "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple conditions — region and product" formula={`=SUMIFS(Sales[Amount], Sales[Region], "West", Sales[Product], "Widget")`}>
+  Both conditions must be true for a row to count — West region **and**
+  Widget product.
+</ExampleCard>
+
+<ExampleCard number="03" label="Date range" formula={`=SUMIFS(Sales[Amount], Sales[Date], ">="&DATE(2027,10,1), Sales[Date], "<"&DATE(2028,1,1))`}>
+  Two conditions against the *same* range (`Sales[Date]`) create an
+  inclusive-start, exclusive-end window — here, all of Q4 2027.
+</ExampleCard>
+
+<ExampleCard number="04" label="Wildcard text match" formula={`=SUMIFS(Sales[Amount], Sales[Region], "*East*")`}>
+  `*` matches any number of characters, so this catches "East",
+  "Northeast", and "Southeast" in one condition.
+</ExampleCard>
+
+<ExampleCard number="05" label="Dynamic criteria from a cell" formula={`=SUMIFS(Sales[Amount], Sales[Region], D2, Sales[Quarter], D3)`}>
+  Referencing cells instead of hardcoding "West"/"Q4" lets the same
+  formula answer a different question when D2/D3 change — no need to
+  edit the formula itself.
+</ExampleCard>

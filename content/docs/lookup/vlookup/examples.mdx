@@ -1,0 +1,34 @@
+---
+title: VLOOKUP examples
+description: Worked examples for VLOOKUP — exact match, tiered/approximate match, error handling, cross-sheet lookups, and dynamic column selection.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — find a department by employee ID" formula={`=VLOOKUP(A2, Employees!A:C, 2, FALSE)`}>
+  Searches the first column of `Employees!A:C` for the ID in A2 and
+  returns the value 2 columns in — the exact-match `FALSE` at the end
+  is what keeps this safe on unsorted data.
+</ExampleCard>
+
+<ExampleCard number="02" label="Approximate match — commission tier" formula={`=VLOOKUP(B2, Tiers!A:B, 2, TRUE)`}>
+  With `Tiers!A:B` sorted ascending by the first column, `TRUE` finds
+  the largest tier threshold that is less than or equal to B2 — useful
+  for commission bands or shipping-rate tables.
+</ExampleCard>
+
+<ExampleCard number="03" label="With error handling" formula={`=IFERROR(VLOOKUP(A2, Products!A:C, 3, FALSE), "Not found")`}>
+  VLOOKUP has no built-in fallback argument like XLOOKUP does — wrap it
+  in `IFERROR` to replace `#N/A` with a friendlier message.
+</ExampleCard>
+
+<ExampleCard number="04" label="Lookup across sheets" formula={`=VLOOKUP(A2, 'Q4 Sales'!A:D, 4, FALSE)`}>
+  `table_array` can point at any other sheet in the workbook — sheet
+  names containing spaces need single quotes around them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Dynamic column with MATCH" formula={`=VLOOKUP(A2, Products!A:F, MATCH(B2, Products!A1:F1, 0), FALSE)`}>
+  Nesting `MATCH` inside `col_index_num` looks up the column position
+  by header name (from B2) instead of hardcoding a column number — the
+  formula keeps working even if columns get reordered.
+</ExampleCard>

@@ -1,0 +1,31 @@
+---
+title: FILTER examples
+description: Worked examples for FILTER — single and multiple conditions, fallback values, and combining with SORT.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — rows matching a single criterion" formula={`=FILTER(Sales[#All], Sales[Region]="West")`}>
+  Returns every row of the Sales table where Region equals "West",
+  spilling below the formula.
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple AND conditions" formula={`=FILTER(Sales[#All], (Sales[Region]="West")*(Sales[Status]="Open"))`}>
+  Multiplying the two boolean arrays keeps only rows where **both**
+  conditions are true.
+</ExampleCard>
+
+<ExampleCard number="03" label="Multiple OR conditions" formula={`=FILTER(Sales[#All], (Sales[Region]="West")+(Sales[Region]="East"))`}>
+  Adding the two boolean arrays keeps rows where **either** condition
+  is true.
+</ExampleCard>
+
+<ExampleCard number="04" label="With an if_empty fallback" formula={`=FILTER(Sales[#All], Sales[Region]="Antarctica", "No matching rows")`}>
+  Without the third argument, zero matches would throw `#CALC!` —
+  `if_empty` returns a friendly message instead.
+</ExampleCard>
+
+<ExampleCard number="05" label="Filtered and sorted" formula={`=SORT(FILTER(Sales[#All], Sales[Region]="West"), 3, -1)`}>
+  Wrapping FILTER in SORT returns the West-region rows sorted by the
+  3rd column, largest first.
+</ExampleCard>

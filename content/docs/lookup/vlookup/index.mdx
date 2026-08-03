@@ -1,0 +1,150 @@
+---
+title: VLOOKUP
+description: Search the first column of a range and return a value from another column in the same row.
+---
+
+Search the first column of a range and return a value from a column to
+its right, in the same row. The classic Excel lookup function — still
+the most common formula in real-world workbooks, even with XLOOKUP now
+available.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `lookup_value` | any | Required | The value to search for. |
+| `table_array` | range | Required | The range to search. `lookup_value` must be in the **first column** of this range. |
+| `col_index_num` | number | Required | Which column to return a value from, counted from the left of `table_array` (1 = first column). |
+| `range_lookup` | boolean | Optional | `FALSE` for an exact match, `TRUE` (default) for an approximate match on sorted data. |
+
+## Return value
+
+The value from the `col_index_num` column of the matching row. Returns
+`#N/A` if no match is found (with `range_lookup` set to `FALSE`), or a
+possibly wrong value if `range_lookup` is `TRUE` and the data isn't
+sorted.
+
+## Description
+
+VLOOKUP searches down the first column of `table_array` for
+`lookup_value`, then returns the value from the same row in the column
+`col_index_num` columns to the right. The lookup column must be the
+**leftmost** column of `table_array` — VLOOKUP can only look to the
+right, never to the left.
+
+<Callout type="warn">
+  `range_lookup` defaults to `TRUE` (approximate match) if omitted —
+  this is the single most common VLOOKUP mistake. On unsorted data it
+  silently returns the wrong value instead of an error. Pass `FALSE`
+  explicitly unless you specifically want an approximate, tiered match.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ e101: 'Engineering', e102: 'Sales', e103: 'Finance', e104: 'Support', e105: 'Design' }}
+  defaultValue="E103"
+  label="Live preview — VLOOKUP(id, table, 2, FALSE)"
+/>
+
+## Common errors
+
+<ExcelCode>{`// #N/A – lookup_value isn't in the first column of table_array
+VLOOKUP("SKU-9", A1:C10, 2, FALSE) → #N/A
+
+// #REF! – col_index_num is larger than the number of columns in table_array
+VLOOKUP(A2, A1:B10, 3, FALSE) → #REF!
+
+// Wrong value, no error – range_lookup omitted or TRUE on unsorted data
+VLOOKUP(A2, A1:B10, 2) → returns a plausible-looking but incorrect value
+
+// Fix: always pass FALSE unless you mean to do an approximate match
+VLOOKUP(A2, A1:B10, 2, FALSE)`}</ExcelCode>
+
+<Callout type="info">
+  VLOOKUP can only look to the **right** of its lookup column. If the
+  value you need to return sits to the left of the value you're
+  searching for, use XLOOKUP or INDEX/MATCH instead.
+</Callout>
+
+<Accordions>
+  <Accordion title="Why does VLOOKUP return the wrong value instead of #N/A?">
+    `range_lookup` is `TRUE` (the default) and your data isn't sorted
+    in ascending order by the lookup column. Pass `FALSE` as the fourth
+    argument to force an exact match.
+  </Accordion>
+  <Accordion title="Can VLOOKUP look to the left?">
+    No — the lookup column must be the leftmost column of
+    `table_array`. To return a value from a column to the left, use
+    XLOOKUP, INDEX/MATCH, or rearrange the columns.
+  </Accordion>
+  <Accordion title="VLOOKUP vs XLOOKUP — which should I use?">
+    XLOOKUP is more flexible (searches any direction, cleaner
+    not-found handling) but requires Excel 365 or 2021. Use VLOOKUP if
+    your workbook needs to open in Excel 2019 or earlier.
+  </Accordion>
+  <Accordion title="Does VLOOKUP work across sheets or workbooks?">
+    Yes — `table_array` can reference another sheet (`Sheet2!A1:C10`)
+    or, with both files open, another workbook
+    (`[Workbook.xlsx]Sheet2!A1:C10`).
+  </Accordion>
+</Accordions>
+
+## Working with VLOOKUP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VLOOKUP(A2, Products!A:C, 3, FALSE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.VLookup( _
+      Range("A2").Value, Sheets("Products").Range("A:C"), 3, False)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Products")
+    match = df.loc[df["SKU"] == "SKU-9", "Price"]
+    result = match.iloc[0] if not match.empty else "#N/A"
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: true },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- [XLOOKUP](/docs/lookup/xlookup) — the modern replacement that can
+  search in any direction and handles missing values more cleanly.
+- HLOOKUP — the same idea as VLOOKUP, but searches across a row
+  instead of down a column. Page coming soon (Lookup category).
+- INDEX/MATCH — the traditional flexible-lookup combo that can search
+  in any direction, unlike VLOOKUP. Page coming soon (Lookup category).
+- IFERROR — wraps VLOOKUP to catch `#N/A` and return a fallback value.
+  Page coming soon (Logical category).

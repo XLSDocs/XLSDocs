@@ -1,0 +1,148 @@
+---
+title: IF
+description: Return one value if a condition is true, another if it's false.
+---
+
+Return one value if a condition is true, and a different value (or
+nothing) if it's false. The most fundamental branching function in
+Excel, and the building block behind most "if this, then that" logic.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=IF(logical_test, value_if_true, [value_if_false])`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `logical_test` | boolean | Required | Any expression that evaluates to `TRUE` or `FALSE`, e.g. `A2>100` or `B2="Yes"`. |
+| `value_if_true` | any | Required | The value returned when `logical_test` is `TRUE`. |
+| `value_if_false` | any | Optional | The value returned when `logical_test` is `FALSE`. If omitted, returns the boolean `FALSE` rather than a blank. |
+
+## Return value
+
+`value_if_true` or `value_if_false`, depending on `logical_test`. If
+`value_if_false` is omitted and the condition is false, IF returns the
+literal boolean `FALSE` — not an empty string.
+
+## Description
+
+IF evaluates `logical_test` and branches on the result. It can be
+nested inside `value_if_true` or `value_if_false` to handle more than
+two outcomes, though beyond two or three levels a nested IF chain
+becomes hard to read — IFS or SWITCH are usually clearer at that point.
+
+<Callout type="info">
+  IF has no version requirement — it's available in every version of
+  Excel, including very old ones, unlike newer functions like IFS or
+  XLOOKUP.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ paid: 'Ship order', unpaid: 'Hold order' }}
+  defaultValue="Paid"
+  label={'Live preview — IF(status="Paid", "Ship order", "Hold order")'}
+/>
+
+## Common errors
+
+<ExcelCode>{`// Returns FALSE unexpectedly – value_if_false omitted
+IF(A2>100, "High") → FALSE (when A2 is not greater than 100)
+
+// Fix: always provide value_if_false, even if it's just ""
+IF(A2>100, "High", "")
+
+// #NAME? – text conditions need quotes
+IF(A2=Yes, "OK", "No") → #NAME?
+
+// Fix: quote text values being compared
+IF(A2="Yes", "OK", "No")
+
+// Deeply nested IF is hard to read and maintain
+IF(A2>=90,"A",IF(A2>=80,"B",IF(A2>=70,"C",IF(A2>=60,"D","F"))))`}</ExcelCode>
+
+<Callout type="info">
+  A nested IF chain with more than 2–3 levels is a sign to switch to
+  IFS (one condition/result pair per argument, no nesting) or SWITCH
+  (for matching against a fixed list of exact values).
+</Callout>
+
+<Accordions>
+  <Accordion title="Why does my IF formula return FALSE instead of blank or my expected value?">
+    `value_if_false` was omitted. IF returns the literal boolean
+    `FALSE` when the condition doesn't match and no third argument is
+    given — pass `""` or another explicit value instead.
+  </Accordion>
+  <Accordion title="How many IF statements can I nest?">
+    Up to 64 in modern Excel, but readability breaks down long before
+    that. Prefer IFS or SWITCH once you're past 2–3 nested conditions.
+  </Accordion>
+  <Accordion title="IF vs IFS vs SWITCH — which should I use?">
+    Use IF for a single true/false branch. Use IFS when you have
+    several independent conditions to check in order. Use SWITCH when
+    you're comparing one value against a fixed list of exact matches.
+  </Accordion>
+  <Accordion title="Can I use IF with AND/OR for multiple conditions?">
+    Yes — nest AND() or OR() as the `logical_test`, e.g.
+    `IF(AND(A2>50, B2="Active"), "Qualified", "Not qualified")`.
+  </Accordion>
+</Accordions>
+
+## Working with IF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(A2>=90, "A", "Not an A")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim grade As String
+    If Range("A2").Value >= 90 Then
+      grade = "A"
+    Else
+      grade = "Not an A"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Grade"] = df["Score"].apply(lambda s: "A" if s >= 90 else "Not an A")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: true },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- IFS — checks several conditions in order without nesting, returning
+  the first true match's result. Page coming soon (Logical category).
+- SWITCH — compares one value against a list of exact matches, similar
+  to a switch statement in code. Page coming soon (Logical category).
+- IFERROR — returns a fallback value when a formula errors, instead of
+  branching on a true/false condition. Page coming soon (Logical
+  category).
+- [XLOOKUP](/docs/lookup/xlookup) — its `if_not_found` argument covers
+  a common IF+IFERROR use case (missing-lookup fallback) natively.

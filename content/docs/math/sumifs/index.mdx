@@ -1,0 +1,150 @@
+---
+title: SUMIFS
+description: Sum a range where every one of several conditions is met.
+---
+
+Sum a range of values, but only for rows that match **all** of one or
+more conditions — sales in the West region during Q4, invoices over
+$500 that are still unpaid, and so on.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=SUMIFS(sum_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `sum_range` | range | Required | The values to sum. |
+| `criteria_range1` | range | Required | The first range to evaluate a condition against. |
+| `criteria1` | any | Required | The condition applied to `criteria_range1` (a value, comparison string, or wildcard). |
+| `criteria_range2, criteria2, ...` | range, any | Optional | Up to 126 more range/condition pairs. All conditions must be true for a row to be included (AND logic). |
+
+## Return value
+
+The sum of `sum_range` values in rows where every criteria pair
+matches. Returns `0` if no rows match — not an error.
+
+## Description
+
+SUMIFS extends SUMIF to support multiple conditions, all combined with
+AND logic — a row is only included if **every** criteria pair matches.
+Each `criteria_range` must be the same size and shape as `sum_range`.
+
+<Callout type="warn">
+  SUMIFS puts `sum_range` **first**, but its single-condition sibling
+  SUMIF puts it **last** (`=SUMIF(range, criteria, [sum_range])`).
+  Switching between the two without noticing the argument-order swap
+  is a common source of `#VALUE!` errors and wrong totals.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '$12,400', east: '$9,800', north: '$5,300', south: '$7,150' }}
+  defaultValue="West"
+  label="Live preview — SUMIFS by region"
+/>
+
+## Common errors
+
+<ExcelCode>{`// #VALUE! – a criteria_range isn't the same size as sum_range
+SUMIFS(A2:A10, B2:B9, "West") → #VALUE!
+
+// Returns 0 – criteria text needs quotes
+SUMIFS(A:A, B:B, West) → #NAME? (missing quotes around "West")
+
+// Returns 0 – comparison operators need to be a quoted string
+// concatenated with the cell reference, not compared directly
+SUMIFS(A:A, B:B, >D2) → #NAME?
+
+// Fix: wrap the operator in quotes and concatenate with &
+SUMIFS(A:A, B:B, ">"&D2)`}</ExcelCode>
+
+<Callout type="info">
+  Comparison operators (`>`, `<`, `>=`, `<=`, `<>`) always need to be a
+  quoted string. To compare against a cell's value, concatenate the
+  operator with the reference: `">"&D2`, not `>D2`.
+</Callout>
+
+<Accordions>
+  <Accordion title="Why does SUMIFS return 0 when I expect a total?">
+    Either no rows match every condition, or a criteria value is
+    missing its quotes (text and operators must be quoted strings). Check
+    each `criteria_range`/`criteria` pair is genuinely the same size as
+    `sum_range`.
+  </Accordion>
+  <Accordion title="How do I use 'greater than' comparisons in SUMIFS?">
+    Quote the operator and concatenate it with the value:
+    `">="&DATE(2027,1,1)` or `">"&D2`.
+  </Accordion>
+  <Accordion title="Can SUMIFS match multiple values in one column (OR logic within a field)?">
+    Not directly — SUMIFS only ANDs conditions across ranges. For "West
+    OR East", sum two separate SUMIFS calls
+    (`SUMIFS(...,"West") + SUMIFS(...,"East")`), or use SUMPRODUCT with
+    an array of allowed values.
+  </Accordion>
+  <Accordion title="SUMIFS vs SUMPRODUCT — which should I use?">
+    SUMIFS is simpler and faster for straightforward AND conditions.
+    Reach for SUMPRODUCT when you need OR logic, calculations inside
+    the condition, or row-by-row multiplication.
+  </Accordion>
+</Accordions>
+
+## Working with SUMIFS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUMIFS(Sales[Amount], Sales[Region], "West", Sales[Quarter], "Q4")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double
+    total = Application.WorksheetFunction.SumIfs( _
+      Range("Sales[Amount]"), Range("Sales[Region]"), "West", _
+      Range("Sales[Quarter]"), "Q4")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = df.loc[
+        (df["Region"] == "West") & (df["Quarter"] == "Q4"), "Amount"
+    ].sum()
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: true },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- SUMIF — the single-condition version of SUMIFS, with `sum_range` as
+  the *last* argument instead of the first. Page coming soon (Math
+  category).
+- COUNTIFS — same multi-condition AND logic, but counts matching rows
+  instead of summing a range. Page coming soon (Math category).
+- AVERAGEIFS — same idea, but averages the matching rows instead of
+  summing them. Page coming soon (Math category).
+- IFERROR — useful alongside SUMIFS when dividing a sum by a count that
+  might be zero. Page coming soon (Logical category).
