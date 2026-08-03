@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface AskClaudeRequestBody {
+  messages: { role: 'user' | 'assistant'; content: string }[];
+  pageTitle: string;
+}
+
+interface AnthropicMessagesResponse {
+  error?: { message: string };
+  content?: { type: string; text: string }[];
+}
+
 export async function POST(req: NextRequest) {
-  const { messages, pageTitle } = await req.json();
+  const { messages, pageTitle } = (await req.json()) as AskClaudeRequestBody;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -29,7 +39,7 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    const data = await res.json();
+    const data = (await res.json()) as AnthropicMessagesResponse;
     if (data.error) {
       return NextResponse.json({ error: data.error.message }, { status: 500 });
     }

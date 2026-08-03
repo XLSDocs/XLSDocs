@@ -1,4 +1,5 @@
 import { createMDX } from 'fumadocs-mdx/next';
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 
 const withMDX = createMDX();
 
@@ -6,5 +7,7 @@ const withMDX = createMDX();
 const config = {
   reactStrictMode: true,
 };
+
+initOpenNextCloudflareForDev();
 
 export default withMDX(config);

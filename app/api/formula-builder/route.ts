@@ -13,8 +13,17 @@ Respond with ONLY a JSON object (no markdown fences, no prose outside the JSON) 
 
 Keep the breakdown to the meaningful parts only (function names, key arguments) — not every character. Use a realistic, idiomatic Excel formula referencing plausible cell ranges (e.g. A2:A100, B2).`;
 
+interface FormulaBuilderRequestBody {
+  prompt: string;
+}
+
+interface AnthropicMessagesResponse {
+  error?: { message: string };
+  content?: { type: string; text: string }[];
+}
+
 export async function POST(req: NextRequest) {
-  const { prompt } = await req.json();
+  const { prompt } = (await req.json()) as FormulaBuilderRequestBody;
 
   if (typeof prompt !== 'string' || !prompt.trim()) {
     return NextResponse.json({ error: 'A prompt is required.' }, { status: 400 });
@@ -44,7 +53,7 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    const data = await res.json();
+    const data = (await res.json()) as AnthropicMessagesResponse;
     if (data.error) {
       return NextResponse.json({ error: data.error.message }, { status: 500 });
     }

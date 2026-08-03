@@ -48,15 +48,20 @@ export function FormulaBuilder() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: trimmed }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as {
+        error?: string;
+        formula?: string;
+        explanation?: string;
+        breakdown?: BreakdownItem[];
+      };
       if (data.error) {
         setError(data.error);
       } else {
         const build: Build = {
           prompt: trimmed,
-          formula: data.formula,
-          explanation: data.explanation,
-          breakdown: data.breakdown,
+          formula: data.formula ?? '',
+          explanation: data.explanation ?? '',
+          breakdown: data.breakdown ?? [],
         };
         setResult(build);
         setRecent((prev) => [build, ...prev.filter((b) => b.prompt !== trimmed)].slice(0, 8));

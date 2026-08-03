@@ -11,6 +11,11 @@
 /build
 *.tsbuildinfo
 
+# cloudflare / opennext
+/.open-next/
+.dev.vars
+.wrangler/
+
 # misc
 .DS_Store
 *.pem

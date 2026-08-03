@@ -173,11 +173,11 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: next, pageTitle }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as { reply?: string; error?: string };
       if (data.error) {
         setMessages([...next, { role: 'assistant', content: `Error: ${data.error}` }]);
       } else {
-        setMessages([...next, { role: 'assistant', content: data.reply }]);
+        setMessages([...next, { role: 'assistant', content: data.reply ?? '' }]);
       }
     } catch {
       setMessages([...next, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
