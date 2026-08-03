@@ -24,6 +24,7 @@
     "@types/node": "^26.1.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "playwright": "^1.62.1",
     "postcss": "^8.5.24",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
