@@ -7,6 +7,11 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: <Logo />,
     },
+    links: [
+      { text: 'Functions', url: '/functions' },
+      { text: 'Blog', url: '/blog' },
+      { text: 'Formula Builder', url: '/tools/formula-builder' },
+    ],
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
 }
