@@ -1,0 +1,154 @@
+---
+title: XLOOKUP
+description: Search any direction and return matching values — the modern replacement for VLOOKUP.
+---
+
+Search any direction and return matching values. XLOOKUP replaces both
+VLOOKUP and HLOOKUP, and is generally cleaner to read than an
+INDEX/MATCH combination.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `lookup_value` | any | Required | The value to search for. |
+| `lookup_array` | range | Required | The range to search. Can be any row or column — unlike VLOOKUP, it does not need to be the leftmost column. |
+| `return_array` | range | Required | The range to return a value from, once a match is found. |
+| `if_not_found` | any | Optional | Value to return if no match is found. Defaults to `#N/A`. |
+| `match_mode` | number | Optional | `0` exact (default) · `-1` exact or next smaller · `1` exact or next larger · `2` wildcard. |
+| `search_mode` | number | Optional | `1` first-to-last (default) · `-1` last-to-first · `2`/`-2` binary search (sorted data only). |
+
+## Return value
+
+The matched value from `return_array`. Returns `#N/A` on no match, or
+your custom `if_not_found` value if provided.
+
+## Description
+
+XLOOKUP searches a range or array and returns the corresponding item
+from another range or array. Unlike VLOOKUP, the lookup column doesn't
+need to be the leftmost column — you can look in any direction and
+return values to the left, right, above, or below the lookup column.
+
+<Callout type="warn">
+  XLOOKUP requires **Excel 365 or Excel 2021**. It is not available in
+  Excel 2019, 2016, or earlier — those versions will show `#NAME?`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ apple: "$1.20", banana: "$0.50", mango: "$2.40", orange: "$0.90", grape: "$3.10" }}
+  defaultValue="Mango"
+/>
+
+## Common errors
+
+<ExcelCode>{`// #N/A – no match and if_not_found not set
+XLOOKUP("missing", A1:A10, B1:B10) → #N/A
+
+// Fix: always provide the if_not_found argument
+XLOOKUP("missing", A1:A10, B1:B10, "Not found")
+
+// #VALUE! – lookup_array and return_array are different sizes
+XLOOKUP(A2, A1:A5, B1:B4) → #VALUE!
+
+// #SPILL! – cells below the formula are blocked by existing data
+// Clear the spill range, or use @ to return one value only
+@XLOOKUP(A2, A1:A10, B1:C10)
+
+// Wildcard match – find partial text (needs match_mode = 2)
+XLOOKUP("*A2*", Names, Prices, "No match", 2)`}</ExcelCode>
+
+<Callout type="info">
+  VLOOKUP's `range_lookup` defaults to `TRUE` (approximate match),
+  which silently returns wrong values when data isn't sorted. XLOOKUP
+  defaults to exact match — a much safer starting point.
+</Callout>
+
+<Accordions>
+  <Accordion title="Why does XLOOKUP return #N/A instead of my fallback value?">
+    Check that the fourth argument (`if_not_found`) is actually being
+    passed, and that it isn't wrapped inside another argument by
+    mistake — a common cause is a misplaced parenthesis that closes
+    `XLOOKUP` before `if_not_found` is reached.
+  </Accordion>
+  <Accordion title="Can I use XLOOKUP with wildcards?">
+    Yes — set `match_mode` to `2` and use `*` (any number of
+    characters) or `?` (a single character) in `lookup_value`.
+  </Accordion>
+  <Accordion title="Does XLOOKUP work with whole-column references like A:A?">
+    Yes, but it's slower on large sheets than a bounded range, since
+    Excel scans every row in the column. Prefer a table reference
+    (like `Products[Name]`) or a bounded range where possible.
+  </Accordion>
+  <Accordion title="XLOOKUP vs INDEX/MATCH — which should I use?">
+    XLOOKUP is shorter and handles missing values natively, but
+    INDEX/MATCH still works in Excel 2019 and earlier. If your
+    workbook needs to open in older Excel versions, use INDEX/MATCH.
+  </Accordion>
+</Accordions>
+
+## Working with XLOOKUP from code
+
+If you're automating Excel from VBA or reading/writing files with
+Python, here's the equivalent lookup logic in each.
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=XLOOKUP(A2, Products[Name], Products[Price], "Not found")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.XLookup( _
+      Range("A2").Value, Range("Products[Name]"), Range("Products[Price]"), "Not found")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Products")
+    match = df.loc[df["Name"] == "Widget", "Price"]
+    result = match.iloc[0] if not match.empty else "Not found"
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: false },
+    { label: '2016', supported: false },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- [VLOOKUP](/docs/lookup/vlookup) — the classic vertical lookup that
+  XLOOKUP replaces. Still worth knowing since it shows up constantly in
+  older workbooks.
+- [HLOOKUP](/docs/lookup/hlookup) — same idea as VLOOKUP, but searches
+  across a row instead of down a column.
+- INDEX/MATCH — the traditional flexible-lookup combo XLOOKUP was
+  designed to simplify. Pages coming soon (Lookup category).
+- [IFERROR](/docs/logical/iferror) — wraps a formula to catch `#N/A`,
+  as an alternative to XLOOKUP's own `if_not_found` argument. Pages
+  coming soon (Logical category).

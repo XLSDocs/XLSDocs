@@ -1,0 +1,35 @@
+---
+title: XLOOKUP examples
+description: Worked examples for XLOOKUP — exact match, fallback values, approximate match, direction flexibility, and wildcards.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — find a price by product name" formula={`=XLOOKUP(A2, Products[Name], Products[Price])`}>
+  Searches the Name column of the Products table for the value in A2.
+  Returns the matching Price. Returns `#N/A` if not found.
+</ExampleCard>
+
+<ExampleCard number="02" label="With fallback — return text instead of #N/A" formula={`=XLOOKUP(A2, Products[Name], Products[Price], "Not found")`}>
+  Fourth argument handles the not-found case natively — no `IFERROR`
+  wrapper needed.
+</ExampleCard>
+
+<ExampleCard number="03" label="Approximate match — tiered pricing" formula={`=XLOOKUP(B2, Tiers[Min qty], Tiers[Discount], 0, -1)`}>
+  `match_mode -1` finds the largest `Min qty` that is less than or
+  equal to B2 and returns the matching `Discount` — useful for tiered
+  pricing or commission bands where the table lists thresholds rather
+  than exact quantities.
+</ExampleCard>
+
+<ExampleCard number="04" label="Return a column to the left" formula={`=XLOOKUP(A2, Products[SKU], Products[Name])`}>
+  `Products[Name]` can sit before `Products[SKU]` in the table —
+  unlike VLOOKUP, XLOOKUP doesn't care which side the return column is
+  on.
+</ExampleCard>
+
+<ExampleCard number="05" label="Wildcard match" formula={`=XLOOKUP("Cam*", Products[Name], Products[Price], "Not found", 2)`}>
+  `match_mode 2` matches the first product name starting with "Cam"
+  (e.g. "Camera Bag") using `*` as a wildcard for any number of
+  characters.
+</ExampleCard>
