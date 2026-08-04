@@ -45,12 +45,12 @@ export function Feedback({ editUrl, reportIssueUrl }: FeedbackProps = {}) {
   }
 
   return (
-    <div className="not-prose rounded-xl border bg-fd-card px-4 py-3 text-sm">
-      <div className="flex items-center gap-3">
-        <span className="text-fd-muted-foreground">
-          {voted ? 'Thanks for the feedback!' : 'Was this page helpful?'}
+    <div className="not-prose flex flex-col gap-3 border-t border-fd-border pt-4 text-sm">
+      <div className="flex flex-col gap-2">
+        <span className="text-[11px] font-medium uppercase tracking-wide text-fd-muted-foreground">
+          {voted ? 'Thanks for the feedback!' : 'Was this helpful?'}
         </span>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => vote('up')}
             disabled={Boolean(voted) || submitting}
@@ -80,7 +80,7 @@ export function Feedback({ editUrl, reportIssueUrl }: FeedbackProps = {}) {
         </div>
       </div>
       {(editUrl || reportIssueUrl) && (
-        <div className="mt-3 flex flex-col gap-2 border-t border-fd-border pt-3">
+        <div className="flex flex-col gap-2">
           {editUrl && (
             <a
               href={editUrl}

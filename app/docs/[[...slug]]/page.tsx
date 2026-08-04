@@ -27,7 +27,12 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const reportIssueUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/issues/new?title=${encodeURIComponent(`Docs issue: ${page.data.title}`)}&body=${encodeURIComponent(`Page: https://xlsdocs.com${page.url}\n\nWhat's wrong:`)}`;
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full} breadcrumb={{ includePage: true }}>
+    <DocsPage
+      toc={page.data.toc}
+      full={true}
+      breadcrumb={{ includePage: true }}
+      tableOfContent={{ enabled: true, footer: <Feedback editUrl={githubUrl} reportIssueUrl={reportIssueUrl} /> }}
+    >
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       {page.data.lastModified && <PageLastUpdate date={page.data.lastModified} />}
@@ -44,7 +49,12 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           })}
         />
       </DocsBody>
-      <Feedback editUrl={githubUrl} reportIssueUrl={reportIssueUrl} />
+      {/* The TOC sidebar (and its Feedback footer above) is hidden below Tailwind's
+          xl breakpoint, so this duplicate covers everything from mobile through
+          small laptops — never shown alongside the sidebar version. */}
+      <div className="not-prose xl:hidden">
+        <Feedback editUrl={githubUrl} reportIssueUrl={reportIssueUrl} />
+      </div>
     </DocsPage>
   );
 }
