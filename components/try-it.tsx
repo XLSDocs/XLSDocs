@@ -18,6 +18,9 @@ export function TryIt({ data, defaultValue = '', label = 'Live preview', fieldLa
   }, [value, data]);
 
   const found = result !== '#N/A';
+  const tryValues = Object.keys(data)
+    .map((k) => k.charAt(0).toUpperCase() + k.slice(1))
+    .join(', ');
 
   return (
     <div className="not-prose rounded-xl border bg-fd-card overflow-hidden my-4">
@@ -34,6 +37,9 @@ export function TryIt({ data, defaultValue = '', label = 'Live preview', fieldLa
             onChange={(e) => setValue(e.target.value)}
           />
         </div>
+        <p className="pl-[118px] text-[11px] text-fd-muted-foreground">
+          Edit the field above — try {tryValues}
+        </p>
         <div className="grid grid-cols-[110px_1fr] items-center gap-2 border-t pt-2.5 mt-1">
           <span className="font-mono text-[10px] uppercase tracking-wide text-fd-muted-foreground">
             Result

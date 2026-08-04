@@ -23,6 +23,8 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`;
+  const reportIssueUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/issues/new?title=${encodeURIComponent(`Docs issue: ${page.data.title}`)}&body=${encodeURIComponent(`Page: https://xlsdocs.com${page.url}\n\nWhat's wrong:`)}`;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full} breadcrumb={{ includePage: true }}>
@@ -31,10 +33,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       {page.data.lastModified && <PageLastUpdate date={page.data.lastModified} />}
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
-        <ViewOptionsPopover
-          markdownUrl={markdownUrl}
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
-        />
+        <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
          <AskClaude pageTitle={page.data.title} />
       </div>
       <DocsBody>
@@ -45,7 +44,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           })}
         />
       </DocsBody>
-      <Feedback />
+      <Feedback editUrl={githubUrl} reportIssueUrl={reportIssueUrl} />
     </DocsPage>
   );
 }

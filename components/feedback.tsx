@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Pencil, Bug } from 'lucide-react';
 
 type Vote = 'up' | 'down';
 
@@ -10,7 +10,12 @@ function storageKey(path: string) {
   return `xlsdocs-feedback:${path}`;
 }
 
-export function Feedback() {
+interface FeedbackProps {
+  editUrl?: string;
+  reportIssueUrl?: string;
+}
+
+export function Feedback({ editUrl, reportIssueUrl }: FeedbackProps = {}) {
   const pathname = usePathname();
   const [voted, setVoted] = useState<Vote | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -40,38 +45,66 @@ export function Feedback() {
   }
 
   return (
-    <div className="not-prose flex items-center gap-3 rounded-xl border bg-fd-card px-4 py-3 text-sm">
-      <span className="text-fd-muted-foreground">
-        {voted ? 'Thanks for the feedback!' : 'Was this page helpful?'}
-      </span>
-      <div className="ml-auto flex items-center gap-2">
-        <button
-          onClick={() => vote('up')}
-          disabled={Boolean(voted) || submitting}
-          aria-label="This page was helpful"
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
-            voted === 'up'
-              ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
-              : 'text-fd-muted-foreground hover:bg-fd-muted disabled:opacity-40'
-          }`}
-        >
-          <ThumbsUp className="size-4" />
-          Yes
-        </button>
-        <button
-          onClick={() => vote('down')}
-          disabled={Boolean(voted) || submitting}
-          aria-label="This page was not helpful"
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
-            voted === 'down'
-              ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
-              : 'text-fd-muted-foreground hover:bg-fd-muted disabled:opacity-40'
-          }`}
-        >
-          <ThumbsDown className="size-4" />
-          No
-        </button>
+    <div className="not-prose rounded-xl border bg-fd-card px-4 py-3 text-sm">
+      <div className="flex items-center gap-3">
+        <span className="text-fd-muted-foreground">
+          {voted ? 'Thanks for the feedback!' : 'Was this page helpful?'}
+        </span>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={() => vote('up')}
+            disabled={Boolean(voted) || submitting}
+            aria-label="This page was helpful"
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
+              voted === 'up'
+                ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
+                : 'text-fd-muted-foreground hover:bg-fd-muted disabled:opacity-40'
+            }`}
+          >
+            <ThumbsUp className="size-4" />
+            Yes
+          </button>
+          <button
+            onClick={() => vote('down')}
+            disabled={Boolean(voted) || submitting}
+            aria-label="This page was not helpful"
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
+              voted === 'down'
+                ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
+                : 'text-fd-muted-foreground hover:bg-fd-muted disabled:opacity-40'
+            }`}
+          >
+            <ThumbsDown className="size-4" />
+            No
+          </button>
+        </div>
       </div>
+      {(editUrl || reportIssueUrl) && (
+        <div className="mt-3 flex flex-col gap-2 border-t border-fd-border pt-3">
+          {editUrl && (
+            <a
+              href={editUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex w-fit items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+            >
+              <Pencil className="size-3.5" />
+              Edit this page
+            </a>
+          )}
+          {reportIssueUrl && (
+            <a
+              href={reportIssueUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex w-fit items-center gap-2 text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+            >
+              <Bug className="size-3.5" />
+              Report an issue
+            </a>
+          )}
+        </div>
+      )}
     </div>
   );
 }
