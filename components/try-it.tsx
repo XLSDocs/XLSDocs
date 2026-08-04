@@ -5,12 +5,17 @@ import { useState, useMemo } from 'react';
 interface TryItProps {
   data: Record<string, string>;
   defaultValue?: string;
+  /** Use the literal token `{value}` anywhere in the string to have it
+   *  swapped for the current input value — labels can't be functions
+   *  since this renders as a Client Component and MDX bodies are
+   *  Server Components; functions can't cross that boundary as props. */
   label?: string;
   fieldLabel?: string;
 }
 
 export function TryIt({ data, defaultValue = '', label = 'Live preview', fieldLabel = 'lookup_value' }: TryItProps) {
   const [value, setValue] = useState(defaultValue);
+  const resolvedLabel = label.includes('{value}') ? label.replaceAll('{value}', value) : label;
 
   const result = useMemo(() => {
     const match = data[value.trim().toLowerCase()];
@@ -26,7 +31,7 @@ export function TryIt({ data, defaultValue = '', label = 'Live preview', fieldLa
     <div className="not-prose rounded-xl border bg-fd-card overflow-hidden my-4">
       <div className="flex items-center gap-2 px-3.5 py-2 bg-fd-muted border-b text-[11px] font-mono uppercase tracking-wider text-fd-muted-foreground">
         <span className="w-1.5 h-1.5 rounded-full bg-fd-primary" />
-        {label}
+        {resolvedLabel}
       </div>
       <div className="p-4 flex flex-col gap-2">
         <div className="grid grid-cols-[110px_1fr] items-center gap-2">
