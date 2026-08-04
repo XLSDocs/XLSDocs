@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
   "name": "xlsdocs",
+  "workers_dev": true,
   "compatibility_date": "2026-08-03",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
@@ -22,5 +23,9 @@
       "binding": "FEEDBACK",
       "id": "925daacb91134dfa9c6835a256e52e08"
     }
+  ],
+  "routes": [
+    { "pattern": "xlsdocs.com", "custom_domain": true },
+    { "pattern": "www.xlsdocs.com", "custom_domain": true }
   ]
 }

@@ -49,25 +49,27 @@ export function Feedback() {
           onClick={() => vote('up')}
           disabled={Boolean(voted) || submitting}
           aria-label="This page was helpful"
-          className={`rounded-md border p-1.5 transition-colors ${
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
             voted === 'up'
               ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
               : 'text-fd-muted-foreground hover:bg-fd-muted disabled:opacity-40'
           }`}
         >
           <ThumbsUp className="size-4" />
+          Yes
         </button>
         <button
           onClick={() => vote('down')}
           disabled={Boolean(voted) || submitting}
           aria-label="This page was not helpful"
-          className={`rounded-md border p-1.5 transition-colors ${
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
             voted === 'down'
               ? 'border-fd-primary/40 bg-fd-primary/10 text-fd-primary'
               : 'text-fd-muted-foreground hover:bg-fd-muted disabled:opacity-40'
           }`}
         >
           <ThumbsDown className="size-4" />
+          No
         </button>
       </div>
     </div>
