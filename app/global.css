@@ -11,6 +11,15 @@
  * closed vocabulary worth making visually distinct.
  */
 :root {
+  /* Fumadocs' docs layout caps the whole sidebar+content+toc block at this
+     total width. Sized so the content column itself lands close to ~800px
+     (sidebar/toc are ~268px each) — matched against real reference sites
+     (Bolt ~650px, Cloudflare ~784px reading column) rather than guessed.
+     Large empty margins on very wide monitors are normal here — every
+     reference site checked has them too; the reading column is what
+     needed to be narrower, not the overall page. */
+  --fd-layout-width: 84rem;
+
   /* emerald-600 — light-mode counterpart to the .dark block's emerald-500 accent below. Previously unset in light mode, so accent-colored UI (buttons, active nav, this file's --excel-fn) fell back to Fumadocs' near-black default. */
   --color-fd-primary: oklch(0.596 0.145 163.23);
   --color-fd-primary-foreground: #ffffff;

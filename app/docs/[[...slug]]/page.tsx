@@ -29,7 +29,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   return (
     <DocsPage
       toc={page.data.toc}
-      full={true}
+      full={page.data.full}
       breadcrumb={{ includePage: true }}
       tableOfContent={{ enabled: true, footer: <Feedback editUrl={githubUrl} reportIssueUrl={reportIssueUrl} /> }}
     >
