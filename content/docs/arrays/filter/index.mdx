@@ -40,14 +40,6 @@ combination of helper columns plus a manual filter.
   those versions will show `#NAME?`.
 </Callout>
 
-## Try it
-
-<TryIt
-  data={{ west: 'Included ✓', east: 'Included ✓', north: 'Excluded ✕', south: 'Excluded ✕' }}
-  defaultValue="West"
-  label={'Live preview — would this row pass Region="West" OR Region="East"?'}
-/>
-
 ## Common errors
 
 <ExcelCode>{`// #CALC! – no rows match include, and if_empty wasn't provided

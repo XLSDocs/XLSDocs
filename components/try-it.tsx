@@ -6,9 +6,10 @@ interface TryItProps {
   data: Record<string, string>;
   defaultValue?: string;
   label?: string;
+  fieldLabel?: string;
 }
 
-export function TryIt({ data, defaultValue = '', label = 'Live preview' }: TryItProps) {
+export function TryIt({ data, defaultValue = '', label = 'Live preview', fieldLabel = 'lookup_value' }: TryItProps) {
   const [value, setValue] = useState(defaultValue);
 
   const result = useMemo(() => {
@@ -26,7 +27,7 @@ export function TryIt({ data, defaultValue = '', label = 'Live preview' }: TryIt
       </div>
       <div className="p-4 flex flex-col gap-2">
         <div className="grid grid-cols-[110px_1fr] items-center gap-2">
-          <span className="font-mono text-xs text-fd-primary">lookup_value</span>
+          <span className="font-mono text-xs text-fd-primary">{fieldLabel}</span>
           <input
             className="bg-fd-muted border rounded px-2.5 py-1.5 font-mono text-xs outline-none focus:border-fd-primary"
             value={value}
