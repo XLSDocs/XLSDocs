@@ -45,9 +45,9 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search functions — try XLOOKUP, SUMIFS, IF..."
-              className="w-full rounded-full border border-fd-border bg-fd-card/80 px-5 py-3 pr-28 text-sm outline-none focus:border-fd-primary"
+              className="w-full rounded-full border border-fd-border bg-fd-card/80 px-5 py-3 text-sm outline-none focus:border-fd-primary sm:pr-28"
             />
-            <span className="absolute top-1/2 right-4 -translate-y-1/2 font-mono text-xs text-fd-muted-foreground">
+            <span className="mt-2 block text-center font-mono text-xs text-fd-muted-foreground sm:absolute sm:top-1/2 sm:right-4 sm:mt-0 sm:-translate-y-1/2 sm:text-right">
               {matchCount} function{matchCount === 1 ? '' : 's'}
             </span>
           </div>
