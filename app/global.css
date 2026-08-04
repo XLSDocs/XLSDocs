@@ -11,14 +11,18 @@
  * closed vocabulary worth making visually distinct.
  */
 :root {
-  /* Fumadocs' docs layout caps the whole sidebar+content+toc block at this
-     total width. Sized so the content column itself lands close to ~800px
-     (sidebar/toc are ~268px each) — matched against real reference sites
-     (Bolt ~650px, Cloudflare ~784px reading column) rather than guessed.
-     Large empty margins on very wide monitors are normal here — every
-     reference site checked has them too; the reading column is what
-     needed to be narrower, not the overall page. */
-  --fd-layout-width: 84rem;
+  /* Fumadocs' default centers the WHOLE sidebar+content+toc block as one
+     unit within a capped --fd-layout-width, leaving equal blank margins
+     outside the sidebar and TOC on wide screens. Reference sites checked
+     (Supabase, Bolt, Cloudflare) don't do that — their sidebar and TOC
+     sit flush against the browser edges with zero outer margin, and only
+     the reading column in the middle is width-constrained. Set very large
+     here so it never binds: the main grid track then expands to fill all
+     space between the (edge-to-edge) sidebar and TOC, and #nd-page's own
+     max-width + mx-auto (below) centers just the reading column within
+     that, matching the reference layout structure instead of the number
+     both were originally guessed as. */
+  --fd-layout-width: 200rem;
 
   /* emerald-600 — light-mode counterpart to the .dark block's emerald-500 accent below. Previously unset in light mode, so accent-colored UI (buttons, active nav, this file's --excel-fn) fell back to Fumadocs' near-black default. */
   --color-fd-primary: oklch(0.596 0.145 163.23);
@@ -49,6 +53,15 @@
 @theme {
   --font-serif: 'Instrument Serif', Georgia, serif;
   --font-mono: 'DM Mono', 'Fira Code', monospace;
+}
+
+/* Now that --fd-layout-width (above) no longer caps the main grid track,
+   this is what actually keeps the reading column narrow — Fumadocs'
+   article container already has mx-auto, this just sets the number to
+   match the reference sites (~800px) instead of Fumadocs' own 900/1168px
+   defaults. */
+#nd-page {
+  max-width: 808px;
 }
 
 /* Headings use the serif display face — matches the original xlsdocs design */
