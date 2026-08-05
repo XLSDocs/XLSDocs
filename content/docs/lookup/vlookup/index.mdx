@@ -73,28 +73,30 @@ VLOOKUP(A2, A1:B10, 2, FALSE)`}</ExcelCode>
   searching for, use XLOOKUP or INDEX/MATCH instead.
 </Callout>
 
-<Accordions>
-  <Accordion title="Why does VLOOKUP return the wrong value instead of #N/A?">
-    `range_lookup` is `TRUE` (the default) and your data isn't sorted
-    in ascending order by the lookup column. Pass `FALSE` as the fourth
-    argument to force an exact match.
-  </Accordion>
-  <Accordion title="Can VLOOKUP look to the left?">
-    No — the lookup column must be the leftmost column of
-    `table_array`. To return a value from a column to the left, use
-    XLOOKUP, INDEX/MATCH, or rearrange the columns.
-  </Accordion>
-  <Accordion title="VLOOKUP vs XLOOKUP — which should I use?">
-    XLOOKUP is more flexible (searches any direction, cleaner
-    not-found handling) but requires Excel 365 or 2021. Use VLOOKUP if
-    your workbook needs to open in Excel 2019 or earlier.
-  </Accordion>
-  <Accordion title="Does VLOOKUP work across sheets or workbooks?">
-    Yes — `table_array` can reference another sheet (`Sheet2!A1:C10`)
-    or, with both files open, another workbook
-    (`[Workbook.xlsx]Sheet2!A1:C10`).
-  </Accordion>
-</Accordions>
+export const faqs = [
+  {
+    question: 'Why does VLOOKUP return the wrong value instead of #N/A?',
+    answer:
+      '`range_lookup` is `TRUE` (the default) and your data isn\'t sorted in ascending order by the lookup column. Pass `FALSE` as the fourth argument to force an exact match.',
+  },
+  {
+    question: 'Can VLOOKUP look to the left?',
+    answer:
+      'No — the lookup column must be the leftmost column of `table_array`. To return a value from a column to the left, use XLOOKUP, INDEX/MATCH, or rearrange the columns.',
+  },
+  {
+    question: 'VLOOKUP vs XLOOKUP — which should I use?',
+    answer:
+      'XLOOKUP is more flexible (searches any direction, cleaner not-found handling) but requires Excel 365 or 2021. Use VLOOKUP if your workbook needs to open in Excel 2019 or earlier.',
+  },
+  {
+    question: 'Does VLOOKUP work across sheets or workbooks?',
+    answer:
+      "Yes — `table_array` can reference another sheet (`Sheet2!A1:C10`) or, with both files open, another workbook (`[Workbook.xlsx]Sheet2!A1:C10`).",
+  },
+];
+
+<Faq items={faqs} />
 
 ## Working with VLOOKUP from code
 
@@ -148,3 +150,8 @@ VLOOKUP(A2, A1:B10, 2, FALSE)`}</ExcelCode>
   in any direction, unlike VLOOKUP. Page coming soon (Lookup category).
 - IFERROR — wraps VLOOKUP to catch `#N/A` and return a fallback value.
   Page coming soon (Logical category).
+
+## Further reading
+
+- [XLOOKUP vs VLOOKUP: When the New Function Actually Wins](/blog/xlookup-vs-vlookup-when-new-function-wins) —
+  where VLOOKUP still genuinely holds up against XLOOKUP.

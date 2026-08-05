@@ -7,6 +7,7 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { FunctionNav } from './function-nav';
 import { ExampleCard } from './example-card';
 import { Compatibility } from './compatibility';
+import { Faq } from './faq';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -20,6 +21,7 @@ export function getMDXComponents(components?: MDXComponents) {
     FunctionNav,
     ExampleCard,
     Compatibility,
+    Faq,
     ...components,
   } satisfies MDXComponents;
 }

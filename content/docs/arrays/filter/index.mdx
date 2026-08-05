@@ -64,26 +64,31 @@ FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}</ExcelCode>
   element-wise across an array the way `*`/`+` do here.
 </Callout>
 
-<Accordions>
-  <Accordion title="Why does FILTER return #CALC!?">
-    No rows in `array` satisfy `include`. Add a third argument
-    (`if_empty`) to return a fallback value instead of an error.
-  </Accordion>
-  <Accordion title="How do I filter on multiple conditions (AND/OR)?">
-    Multiply boolean arrays for AND (`(B2:B10="West")*(C2:C10="Q4")`),
-    or add them for OR (`(B2:B10="West")+(B2:B10="East")`).
-  </Accordion>
-  <Accordion title="Can I sort FILTER's results?">
-    Yes — wrap the whole formula in SORT or SORTBY:
-    `=SORT(FILTER(A2:C10, B2:B10="West"))`.
-  </Accordion>
-  <Accordion title="Why use FILTER instead of a helper column and Excel's built-in Filter?">
-    FILTER is a live formula — it updates automatically as source data
-    changes, and other formulas can reference its spilled results
-    directly. The built-in Filter/AutoFilter only hides rows visually
-    and doesn't recalculate anything.
-  </Accordion>
-</Accordions>
+export const faqs = [
+  {
+    question: 'Why does FILTER return #CALC!?',
+    answer:
+      "No rows in `array` satisfy `include`. Add a third argument (`if_empty`) to return a fallback value instead of an error.",
+  },
+  {
+    question: 'How do I filter on multiple conditions (AND/OR)?',
+    answer:
+      'Multiply boolean arrays for AND (`(B2:B10="West")*(C2:C10="Q4")`), or add them for OR (`(B2:B10="West")+(B2:B10="East")`).',
+  },
+  {
+    question: "Can I sort FILTER's results?",
+    answer:
+      'Yes — wrap the whole formula in SORT or SORTBY: `=SORT(FILTER(A2:C10, B2:B10="West"))`.',
+  },
+  {
+    question:
+      "Why use FILTER instead of a helper column and Excel's built-in Filter?",
+    answer:
+      "FILTER is a live formula — it updates automatically as source data changes, and other formulas can reference its spilled results directly. The built-in Filter/AutoFilter only hides rows visually and doesn't recalculate anything.",
+  },
+];
+
+<Faq items={faqs} />
 
 ## Working with FILTER from code
 
@@ -138,3 +143,8 @@ FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}</ExcelCode>
   (Arrays category).
 - [XLOOKUP](/docs/lookup/xlookup) — returns a single matching value;
   reach for FILTER instead when more than one row can match.
+
+## Further reading
+
+- [Dynamic Arrays Changed How I Write Formulas](/blog/dynamic-arrays-changed-how-i-write-formulas) —
+  how FILTER, SORT, and UNIQUE change the shape of formulas worth writing.

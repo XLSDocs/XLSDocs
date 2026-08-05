@@ -70,29 +70,31 @@ SUMIFS(A:A, B:B, ">"&D2)`}</ExcelCode>
   operator with the reference: `">"&D2`, not `>D2`.
 </Callout>
 
-<Accordions>
-  <Accordion title="Why does SUMIFS return 0 when I expect a total?">
-    Either no rows match every condition, or a criteria value is
-    missing its quotes (text and operators must be quoted strings). Check
-    each `criteria_range`/`criteria` pair is genuinely the same size as
-    `sum_range`.
-  </Accordion>
-  <Accordion title="How do I use 'greater than' comparisons in SUMIFS?">
-    Quote the operator and concatenate it with the value:
-    `">="&DATE(2027,1,1)` or `">"&D2`.
-  </Accordion>
-  <Accordion title="Can SUMIFS match multiple values in one column (OR logic within a field)?">
-    Not directly — SUMIFS only ANDs conditions across ranges. For "West
-    OR East", sum two separate SUMIFS calls
-    (`SUMIFS(...,"West") + SUMIFS(...,"East")`), or use SUMPRODUCT with
-    an array of allowed values.
-  </Accordion>
-  <Accordion title="SUMIFS vs SUMPRODUCT — which should I use?">
-    SUMIFS is simpler and faster for straightforward AND conditions.
-    Reach for SUMPRODUCT when you need OR logic, calculations inside
-    the condition, or row-by-row multiplication.
-  </Accordion>
-</Accordions>
+export const faqs = [
+  {
+    question: 'Why does SUMIFS return 0 when I expect a total?',
+    answer:
+      'Either no rows match every condition, or a criteria value is missing its quotes (text and operators must be quoted strings). Check each `criteria_range`/`criteria` pair is genuinely the same size as `sum_range`.',
+  },
+  {
+    question: "How do I use 'greater than' comparisons in SUMIFS?",
+    answer:
+      'Quote the operator and concatenate it with the value: `">="&DATE(2027,1,1)` or `">"&D2`.',
+  },
+  {
+    question:
+      'Can SUMIFS match multiple values in one column (OR logic within a field)?',
+    answer:
+      'Not directly — SUMIFS only ANDs conditions across ranges. For "West OR East", sum two separate SUMIFS calls (`SUMIFS(...,"West") + SUMIFS(...,"East")`), or use SUMPRODUCT with an array of allowed values.',
+  },
+  {
+    question: 'SUMIFS vs SUMPRODUCT — which should I use?',
+    answer:
+      'SUMIFS is simpler and faster for straightforward AND conditions. Reach for SUMPRODUCT when you need OR logic, calculations inside the condition, or row-by-row multiplication.',
+  },
+];
+
+<Faq items={faqs} />
 
 ## Working with SUMIFS from code
 

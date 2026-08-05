@@ -72,26 +72,31 @@ IF(A2>=90,"A",IF(A2>=80,"B",IF(A2>=70,"C",IF(A2>=60,"D","F"))))`}</ExcelCode>
   (for matching against a fixed list of exact values).
 </Callout>
 
-<Accordions>
-  <Accordion title="Why does my IF formula return FALSE instead of blank or my expected value?">
-    `value_if_false` was omitted. IF returns the literal boolean
-    `FALSE` when the condition doesn't match and no third argument is
-    given — pass `""` or another explicit value instead.
-  </Accordion>
-  <Accordion title="How many IF statements can I nest?">
-    Up to 64 in modern Excel, but readability breaks down long before
-    that. Prefer IFS or SWITCH once you're past 2–3 nested conditions.
-  </Accordion>
-  <Accordion title="IF vs IFS vs SWITCH — which should I use?">
-    Use IF for a single true/false branch. Use IFS when you have
-    several independent conditions to check in order. Use SWITCH when
-    you're comparing one value against a fixed list of exact matches.
-  </Accordion>
-  <Accordion title="Can I use IF with AND/OR for multiple conditions?">
-    Yes — nest AND() or OR() as the `logical_test`, e.g.
-    `IF(AND(A2>50, B2="Active"), "Qualified", "Not qualified")`.
-  </Accordion>
-</Accordions>
+export const faqs = [
+  {
+    question:
+      'Why does my IF formula return FALSE instead of blank or my expected value?',
+    answer:
+      '`value_if_false` was omitted. IF returns the literal boolean `FALSE` when the condition doesn\'t match and no third argument is given — pass `""` or another explicit value instead.',
+  },
+  {
+    question: 'How many IF statements can I nest?',
+    answer:
+      "Up to 64 in modern Excel, but readability breaks down long before that. Prefer IFS or SWITCH once you're past 2–3 nested conditions.",
+  },
+  {
+    question: 'IF vs IFS vs SWITCH — which should I use?',
+    answer:
+      "Use IF for a single true/false branch. Use IFS when you have several independent conditions to check in order. Use SWITCH when you're comparing one value against a fixed list of exact matches.",
+  },
+  {
+    question: 'Can I use IF with AND/OR for multiple conditions?',
+    answer:
+      'Yes — nest AND() or OR() as the `logical_test`, e.g. `IF(AND(A2>50, B2="Active"), "Qualified", "Not qualified")`.',
+  },
+];
+
+<Faq items={faqs} />
 
 ## Working with IF from code
 

@@ -73,28 +73,30 @@ XLOOKUP("*A2*", Names, Prices, "No match", 2)`}</ExcelCode>
   defaults to exact match — a much safer starting point.
 </Callout>
 
-<Accordions>
-  <Accordion title="Why does XLOOKUP return #N/A instead of my fallback value?">
-    Check that the fourth argument (`if_not_found`) is actually being
-    passed, and that it isn't wrapped inside another argument by
-    mistake — a common cause is a misplaced parenthesis that closes
-    `XLOOKUP` before `if_not_found` is reached.
-  </Accordion>
-  <Accordion title="Can I use XLOOKUP with wildcards?">
-    Yes — set `match_mode` to `2` and use `*` (any number of
-    characters) or `?` (a single character) in `lookup_value`.
-  </Accordion>
-  <Accordion title="Does XLOOKUP work with whole-column references like A:A?">
-    Yes, but it's slower on large sheets than a bounded range, since
-    Excel scans every row in the column. Prefer a table reference
-    (like `Products[Name]`) or a bounded range where possible.
-  </Accordion>
-  <Accordion title="XLOOKUP vs INDEX/MATCH — which should I use?">
-    XLOOKUP is shorter and handles missing values natively, but
-    INDEX/MATCH still works in Excel 2019 and earlier. If your
-    workbook needs to open in older Excel versions, use INDEX/MATCH.
-  </Accordion>
-</Accordions>
+export const faqs = [
+  {
+    question: "Why does XLOOKUP return #N/A instead of my fallback value?",
+    answer:
+      "Check that the fourth argument (`if_not_found`) is actually being passed, and that it isn't wrapped inside another argument by mistake — a common cause is a misplaced parenthesis that closes `XLOOKUP` before `if_not_found` is reached.",
+  },
+  {
+    question: 'Can I use XLOOKUP with wildcards?',
+    answer:
+      'Yes — set `match_mode` to `2` and use `*` (any number of characters) or `?` (a single character) in `lookup_value`.',
+  },
+  {
+    question: 'Does XLOOKUP work with whole-column references like A:A?',
+    answer:
+      "Yes, but it's slower on large sheets than a bounded range, since Excel scans every row in the column. Prefer a table reference (like `Products[Name]`) or a bounded range where possible.",
+  },
+  {
+    question: 'XLOOKUP vs INDEX/MATCH — which should I use?',
+    answer:
+      'XLOOKUP is shorter and handles missing values natively, but INDEX/MATCH still works in Excel 2019 and earlier. If your workbook needs to open in older Excel versions, use INDEX/MATCH.',
+  },
+];
+
+<Faq items={faqs} />
 
 ## Working with XLOOKUP from code
 
@@ -153,3 +155,8 @@ Python, here's the equivalent lookup logic in each.
 - [IFERROR](/docs/logical/iferror) — wraps a formula to catch `#N/A`,
   as an alternative to XLOOKUP's own `if_not_found` argument. Pages
   coming soon (Logical category).
+
+## Further reading
+
+- [XLOOKUP vs VLOOKUP: When the New Function Actually Wins](/blog/xlookup-vs-vlookup-when-new-function-wins) —
+  where VLOOKUP still genuinely holds up against XLOOKUP.

@@ -15,6 +15,13 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
 import { AskClaude } from '@/components/ask-claude';
 import { Feedback } from '@/components/feedback';
+import type { FaqItem } from '@/components/faq';
+
+// FAQ answers are stored with markdown (`code`, **bold**) for on-page rendering,
+// but FAQPage structured data wants plain text.
+function stripMarkdown(text: string) {
+  return text.replace(/[`*]/g, '');
+}
 
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
@@ -26,6 +33,22 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`;
   const reportIssueUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/issues/new?title=${encodeURIComponent(`Docs issue: ${page.data.title}`)}&body=${encodeURIComponent(`Page: https://xlsdocs.com${page.url}\n\nWhat's wrong:`)}`;
 
+  const faqs = page.data._exports?.faqs as FaqItem[] | undefined;
+  const faqJsonLd = faqs?.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+          '@type': 'Question',
+          name: stripMarkdown(faq.question),
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: stripMarkdown(faq.answer),
+          },
+        })),
+      }
+    : null;
+
   return (
     <DocsPage
       toc={page.data.toc}
@@ -33,6 +56,12 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       breadcrumb={{ includePage: true }}
       tableOfContent={{ enabled: true, footer: <Feedback editUrl={githubUrl} reportIssueUrl={reportIssueUrl} /> }}
     >
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       {page.data.lastModified && <PageLastUpdate date={page.data.lastModified} />}
