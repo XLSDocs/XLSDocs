@@ -133,6 +133,16 @@
   font-weight: 500;
 }
 
+/* Parameters/Compatibility/etc tables — row highlight on hover, scoped to
+   tbody so the header row doesn't pick up the tint too. */
+.prose table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.prose table tbody tr:hover {
+  background-color: color-mix(in srgb, var(--color-fd-primary) 7%, transparent);
+}
+
 /* Home page formula ticker (components/home/formula-ticker.tsx) — the item list is duplicated, so -50% is exactly one full loop */
 @keyframes xlsdocs-ticker {
   from {
