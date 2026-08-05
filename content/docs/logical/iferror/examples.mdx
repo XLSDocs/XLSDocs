@@ -1,0 +1,33 @@
+---
+title: IFERROR examples
+description: Worked examples for IFERROR — lookup fallbacks, division-by-zero guards, nested formulas, and chained fallbacks.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — lookup with a friendly fallback" formula={`=IFERROR(VLOOKUP(A2, Products!A:C, 3, FALSE), "Not found")`}>
+  Replaces the raw `#N/A` VLOOKUP returns on a missing product ID with
+  a message that makes sense to whoever's reading the sheet.
+</ExampleCard>
+
+<ExampleCard number="02" label="Guarding a division" formula={`=IFERROR(B2/C2, 0)`}>
+  Returns `0` instead of `#DIV/0!` when `C2` is empty or zero — common
+  when averaging a sum by a count that might not exist yet.
+</ExampleCard>
+
+<ExampleCard number="03" label="Wrapping a nested formula" formula={`=IFERROR(INDEX(Prices!B:B, MATCH(A2, Prices!A:A, 0)), "No price set")`}>
+  IFERROR only needs to wrap the *outermost* call — if MATCH fails to
+  find A2, the resulting `#N/A` propagates up through INDEX and gets
+  caught here.
+</ExampleCard>
+
+<ExampleCard number="04" label="Chained fallbacks across two tables" formula={`=IFERROR(VLOOKUP(A2, ThisYear!A:B, 2, FALSE), IFERROR(VLOOKUP(A2, LastYear!A:B, 2, FALSE), "Not found"))`}>
+  Nesting a second IFERROR inside the first `value_if_error` tries a
+  second table before finally falling back to a plain message.
+</ExampleCard>
+
+<ExampleCard number="05" label="IFNA instead, to only catch a missing match" formula={`=IFNA(VLOOKUP(A2, Products!A:C, 3, FALSE), "Not found")`}>
+  If A2's product ID being missing is the *only* failure you want to
+  handle — and a genuine `#REF!` or `#VALUE!` elsewhere should still
+  surface — swap in IFNA, which only catches `#N/A`.
+</ExampleCard>

@@ -1,0 +1,157 @@
+---
+title: INDEX
+description: Return the value at a given position within a range or array.
+---
+
+Return the value at a given row and column position within a range
+or array. INDEX doesn't search for anything by itself — paired with
+MATCH, it becomes one of the most flexible lookup patterns in Excel,
+searching and returning in any direction.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=INDEX(array, row_num, [column_num])`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `array` | range | Required | The range or array to pull a value from. |
+| `row_num` | number | Required | Which row within `array` to return (1 = first row). `0` returns the entire column as an array. |
+| `column_num` | number | Optional | Which column within `array` to return (1 = first column). Required if `array` spans more than one column and you want a single cell back. `0` returns the entire row. |
+
+## Return value
+
+The value at the intersection of `row_num` and `column_num` within
+`array`. Returns `#REF!` if either argument points outside the bounds
+of `array`.
+
+## Description
+
+INDEX is a pure position-to-value lookup: give it a row (and
+optionally a column) number, and it returns whatever is there. Unlike
+VLOOKUP or XLOOKUP, it never searches for anything itself — that's
+what makes it useful paired with MATCH, which finds a position by
+searching, so `INDEX(array, MATCH(...))` can return a value from any
+column relative to the lookup column, including to its left, which
+VLOOKUP can't do.
+
+<Callout type="info">
+  If `array` is a single row or single column, `row_num` alone is
+  enough — Excel treats it as the position along whichever dimension
+  actually varies, so `INDEX(A1:A10, 3)` and
+  `INDEX(A1:A10, 1, 3)` for a single-column range both work.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': 'Apple', '2': 'Banana', '3': 'Mango', '4': 'Orange', '5': 'Grape' }}
+  defaultValue="3"
+  label={'Live preview — INDEX(A1:A5, "{value}")'}
+  fieldLabel="row_num"
+  errorValue="#REF!"
+/>
+
+## Common errors
+
+<ExcelCode>{`// #REF! – row_num is outside the range of array
+INDEX(A1:A5, 8) → #REF!
+
+// #REF! – column_num is outside the range of array
+INDEX(A1:C10, 2, 5) → #REF!
+
+// #VALUE! – row_num or column_num isn't a number
+INDEX(A1:C10, "two") → #VALUE!
+
+// Common pairing – MATCH supplies the position INDEX needs
+INDEX(B1:B10, MATCH("Widget", A1:A10, 0))`}</ExcelCode>
+
+<Callout type="warn">
+  INDEX's row/column numbers are **positions within `array`**, not
+  worksheet row/column numbers. `INDEX(C5:C10, 2)` returns the value
+  in `C6` — the 2nd row of the range, not row 2 of the sheet.
+</Callout>
+
+export const faqs = [
+  {
+    question: "What's the difference between INDEX and VLOOKUP?",
+    answer:
+      "VLOOKUP searches for a value and returns another value from the same row. INDEX doesn't search at all — it just returns whatever is at a position you give it. They're usually combined: MATCH searches and finds the position, INDEX returns the value there.",
+  },
+  {
+    question: 'Why does INDEX return #REF! instead of a value?',
+    answer:
+      '`row_num` or `column_num` points outside the bounds of `array` — for example, asking for row 8 of a range that only has 5 rows. Double-check the position is within `array`, not a worksheet row/column number.',
+  },
+  {
+    question: 'Can INDEX return an entire row or column instead of one cell?',
+    answer:
+      'Yes — pass `0` for `row_num` to get the entire column at `column_num`, or `0` for `column_num` to get the entire row at `row_num`. Useful when the result feeds into another array formula.',
+  },
+  {
+    question: 'Does INDEX work with dynamic arrays?',
+    answer:
+      "Yes — `array` can be the spilled result of FILTER, SORT, or UNIQUE, letting you pull a specific position out of a dynamic array's results.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with INDEX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=INDEX(Products!B:B, MATCH("Widget", Products!A:A, 0))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.Index( _
+      Range("Products!B:B"), Application.WorksheetFunction.Match( _
+        "Widget", Range("Products!A:A"), 0))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Products")
+    match = df.index[df["Name"] == "Widget"]
+    result = df.loc[match[0], "Price"] if len(match) else "#REF!"
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: true },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- [MATCH](/docs/lookup/match) — finds the position INDEX needs by
+  searching a range; the two are almost always used together.
+- [XLOOKUP](/docs/lookup/xlookup) — largely replaces the INDEX/MATCH
+  combo with one function, though INDEX/MATCH still works in Excel
+  2019 and earlier.
+- [VLOOKUP](/docs/lookup/vlookup) — a more constrained lookup that
+  can only search its own leftmost column and return to the right;
+  INDEX/MATCH has no such direction restriction.
+- [IFERROR](/docs/logical/iferror) — wraps `INDEX(..., MATCH(...))`
+  to catch a `#N/A` from a failed MATCH.

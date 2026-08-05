@@ -1,0 +1,152 @@
+---
+title: MATCH
+description: Find a value's position within a range, instead of the value itself.
+---
+
+Search a range for a value and return its **position** within that
+range, not the value itself. The complement to INDEX (which does the
+reverse — position to value): together they form one of Excel's most
+flexible lookup patterns.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=MATCH(lookup_value, lookup_array, [match_type])`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `lookup_value` | any | Required | The value to search for. |
+| `lookup_array` | range | Required | A single row or column to search — MATCH doesn't work across a 2D range. |
+| `match_type` | number | Optional | `1` (default) largest value ≤ `lookup_value`, requires `lookup_array` sorted ascending · `0` exact match, any order · `-1` smallest value ≥ `lookup_value`, requires descending sort. |
+
+## Return value
+
+The 1-based position of `lookup_value` within `lookup_array` — a
+number, not the matching value. Returns `#N/A` if no match is found.
+
+## Description
+
+MATCH searches `lookup_array` and returns where `lookup_value` sits,
+counting from 1. On its own that position number isn't usually
+useful — it becomes powerful wrapped inside INDEX, which turns "where
+is it" into "what's there", or inside functions like VLOOKUP's
+`col_index_num` to look up a column by header name instead of a
+hardcoded number.
+
+<Callout type="warn">
+  `match_type` defaults to `1` (approximate match, requires ascending
+  sort) if omitted — the same kind of default-argument trap as
+  VLOOKUP's `range_lookup`. Most uses of MATCH want an exact match:
+  pass `0` explicitly unless you specifically need a sorted,
+  tiered lookup.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ apple: '1', banana: '2', mango: '3', orange: '4', grape: '5' }}
+  defaultValue="Mango"
+  label={'Live preview — MATCH("{value}", Products!A1:A5, 0)'}
+/>
+
+## Common errors
+
+<ExcelCode>{`// #N/A – lookup_value isn't found in lookup_array
+MATCH("Zzz", A1:A10, 0) → #N/A
+
+// Wrong position, no error – match_type omitted or 1 on unsorted data
+MATCH(85, A1:A10) → returns a plausible-looking but incorrect position
+
+// Fix: pass 0 explicitly for an exact match
+MATCH(85, A1:A10, 0)
+
+// #N/A – lookup_array is a 2D range, not a single row or column
+MATCH("Widget", A1:C10, 0) → #N/A`}</ExcelCode>
+
+<Callout type="info">
+  MATCH only searches a single row or a single column at a time. To
+  search a full 2D table, use two MATCH calls — one for the row, one
+  for the column — inside INDEX.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Why does MATCH return the wrong position instead of #N/A?',
+    answer:
+      '`match_type` is `1` (the default) and `lookup_array` isn\'t sorted in ascending order. Pass `0` as the third argument to force an exact match — this is the same class of mistake as VLOOKUP\'s `range_lookup` defaulting to `TRUE`.',
+  },
+  {
+    question: 'MATCH returns a number — how do I get the actual value?',
+    answer:
+      "Wrap it in INDEX: `INDEX(return_range, MATCH(lookup_value, lookup_array, 0))` uses the position MATCH finds to pull the actual value from a different range.",
+  },
+  {
+    question: 'Can MATCH search a 2D range like A1:C10?',
+    answer:
+      'No — `lookup_array` must be a single row or a single column. For a two-dimensional table, use two separate MATCH calls (one per axis) nested inside INDEX.',
+  },
+  {
+    question: 'Does MATCH support wildcards?',
+    answer:
+      'Yes, with `match_type` set to `0` — `*` matches any number of characters and `?` matches a single character, the same wildcard rules as VLOOKUP and XLOOKUP.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MATCH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MATCH("Widget", Products!A:A, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim position As Variant
+    position = Application.WorksheetFunction.Match( _
+      "Widget", Range("Products!A:A"), 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Products")
+    match = df.index[df["Name"] == "Widget"]
+    position = match[0] + 1 if len(match) else "#N/A"  # +1 for 1-based position
+    print(position)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: true },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- [INDEX](/docs/lookup/index) — turns the position MATCH finds back
+  into an actual value; almost always used together.
+- [XLOOKUP](/docs/lookup/xlookup) — combines searching and returning
+  into one function, largely replacing INDEX/MATCH in modern Excel.
+- [VLOOKUP](/docs/lookup/vlookup) — a common place to nest MATCH,
+  looking up `col_index_num` by header name instead of a fixed
+  number.
+- [IFERROR](/docs/logical/iferror) — wraps MATCH (or INDEX/MATCH
+  together) to catch `#N/A` from a failed search.

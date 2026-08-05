@@ -1,0 +1,155 @@
+---
+title: HLOOKUP
+description: Search the first row of a range and return a value from another row in the same column.
+---
+
+Search the first row of a range and return a value from a row below
+it, in the same column. The horizontal counterpart to VLOOKUP — used
+when data is laid out across columns instead of down rows, like a
+table with dates or categories running along the top.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=HLOOKUP(lookup_value, table_array, row_index_num, [range_lookup])`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `lookup_value` | any | Required | The value to search for, in the **first row** of `table_array`. |
+| `table_array` | range | Required | The range to search. `lookup_value` must be in the first row of this range. |
+| `row_index_num` | number | Required | Which row to return a value from, counted from the top of `table_array` (1 = first row). |
+| `range_lookup` | boolean | Optional | `FALSE` for an exact match, `TRUE` (default) for an approximate match on sorted data. |
+
+## Return value
+
+The value from the `row_index_num` row of the matching column.
+Returns `#N/A` if no match is found (with `range_lookup` set to
+`FALSE`), or a possibly wrong value if `range_lookup` is `TRUE` and
+the data isn't sorted.
+
+## Description
+
+HLOOKUP searches across the first row of `table_array` for
+`lookup_value`, then returns the value from the same column, counting
+down `row_index_num` rows. It's the mirror image of VLOOKUP — VLOOKUP
+searches down a column and returns across a row; HLOOKUP searches
+across a row and returns down a column.
+
+<Callout type="warn">
+  `range_lookup` defaults to `TRUE` (approximate match) if omitted —
+  the same mistake that trips people up with VLOOKUP. On unsorted
+  data it silently returns the wrong value instead of an error. Pass
+  `FALSE` explicitly unless you specifically want an approximate,
+  tiered match.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ q1: '$42,000', q2: '$51,500', q3: '$47,200', q4: '$63,900' }}
+  defaultValue="Q3"
+  label={'Live preview — HLOOKUP("{value}", Revenue!A1:D2, 2, FALSE)'}
+  fieldLabel="quarter"
+/>
+
+## Common errors
+
+<ExcelCode>{`// #N/A – lookup_value isn't in the first row of table_array
+HLOOKUP("SKU-9", A1:J3, 2, FALSE) → #N/A
+
+// #REF! – row_index_num is larger than the number of rows in table_array
+HLOOKUP(A2, A1:J2, 3, FALSE) → #REF!
+
+// Wrong value, no error – range_lookup omitted or TRUE on unsorted data
+HLOOKUP(A2, A1:J2, 2) → returns a plausible-looking but incorrect value
+
+// Fix: always pass FALSE unless you mean to do an approximate match
+HLOOKUP(A2, A1:J2, 2, FALSE)`}</ExcelCode>
+
+<Callout type="info">
+  HLOOKUP can only look **below** its lookup row. If the value you
+  need to return sits above the row you're searching, use XLOOKUP or
+  INDEX/MATCH instead.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Why does HLOOKUP return the wrong value instead of #N/A?',
+    answer:
+      '`range_lookup` is `TRUE` (the default) and your data isn\'t sorted in ascending order by the lookup row. Pass `FALSE` as the fourth argument to force an exact match.',
+  },
+  {
+    question: 'Can HLOOKUP look above its lookup row?',
+    answer:
+      'No — the lookup row must be the topmost row of `table_array`. To return a value from a row above it, use XLOOKUP, INDEX/MATCH, or rearrange the rows.',
+  },
+  {
+    question: 'HLOOKUP vs VLOOKUP — which should I use?',
+    answer:
+      "They're the same function rotated 90 degrees. Use HLOOKUP when your data's varying dimension runs across columns (e.g. dates or categories along the top row); use VLOOKUP for the far more common case of data running down rows.",
+  },
+  {
+    question: 'Is there a modern replacement for HLOOKUP?',
+    answer:
+      'XLOOKUP handles both directions with the same syntax, has cleaner not-found handling, and defaults to an exact match — but it requires Excel 365 or 2021.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HLOOKUP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HLOOKUP(A2, Revenue!A1:D2, 2, FALSE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.HLookup( _
+      Range("A2").Value, Sheets("Revenue").Range("A1:D2"), 2, False)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Revenue", header=0)
+    result = df.loc[0, "Q3"] if "Q3" in df.columns else "#N/A"
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: true },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- [VLOOKUP](/docs/lookup/vlookup) — the same idea, searching down a
+  column instead of across a row. Far more common in practice, since
+  most real-world data runs vertically.
+- [XLOOKUP](/docs/lookup/xlookup) — replaces both HLOOKUP and VLOOKUP
+  with one function that searches either direction.
+- [INDEX](/docs/lookup/index) and [MATCH](/docs/lookup/match) — the
+  traditional flexible-lookup combo, useful when neither HLOOKUP nor
+  VLOOKUP's fixed search direction fits.
+- [IFERROR](/docs/logical/iferror) — wraps HLOOKUP to catch `#N/A`
+  and return a fallback value.

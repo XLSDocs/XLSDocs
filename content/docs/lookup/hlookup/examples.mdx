@@ -1,0 +1,34 @@
+---
+title: HLOOKUP examples
+description: Worked examples for HLOOKUP — exact match, tiered/approximate match, error handling, and dynamic row selection.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — find Q3 revenue by quarter" formula={`=HLOOKUP(A2, Revenue!A1:D2, 2, FALSE)`}>
+  Searches the first row of `Revenue!A1:D2` for the quarter label in A2
+  and returns the value 1 row down — the exact-match `FALSE` at the
+  end keeps this safe if the quarter columns ever get reordered.
+</ExampleCard>
+
+<ExampleCard number="02" label="Approximate match — pricing tier by volume" formula={`=HLOOKUP(B2, Tiers!A1:E2, 2, TRUE)`}>
+  With `Tiers!A1:E2`'s header row sorted ascending, `TRUE` finds the
+  largest volume threshold that is less than or equal to B2 — useful
+  for tiered pricing tables laid out horizontally.
+</ExampleCard>
+
+<ExampleCard number="03" label="With error handling" formula={`=IFERROR(HLOOKUP(A2, Regions!A1:F3, 3, FALSE), "Not found")`}>
+  HLOOKUP has no built-in fallback argument — wrap it in `IFERROR` to
+  replace `#N/A` with a friendlier message.
+</ExampleCard>
+
+<ExampleCard number="04" label="Lookup across sheets" formula={`=HLOOKUP(A2, 'FY26 Budget'!A1:M4, 4, FALSE)`}>
+  `table_array` can point at any other sheet in the workbook — sheet
+  names containing spaces need single quotes around them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Dynamic row with MATCH" formula={`=HLOOKUP(A2, Metrics!A1:F10, MATCH(B2, Metrics!A1:A10, 0), FALSE)`}>
+  Nesting `MATCH` inside `row_index_num` looks up the row position by
+  a label in column A (from B2) instead of hardcoding a row number —
+  the formula keeps working even if rows get reordered.
+</ExampleCard>

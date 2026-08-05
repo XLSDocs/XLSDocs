@@ -1,0 +1,160 @@
+---
+title: IFS
+description: Check several conditions in order and return the result for the first one that's true.
+---
+
+Check up to 127 conditions in order, and return the result for the
+first one that's true — no nesting required. A flatter, more
+readable alternative to a long chain of nested IF calls.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=IFS(logical_test1, value_if_true1, [logical_test2, value_if_true2], ...)`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `logical_test1` | boolean | Required | The first condition to check. |
+| `value_if_true1` | any | Required | The result if `logical_test1` is `TRUE`. |
+| `logical_test2, value_if_true2, ...` | boolean, any | Optional | Up to 126 more condition/result pairs, checked in order. |
+
+## Return value
+
+`value_if_trueN` for the first `logical_testN` that evaluates to
+`TRUE`, checked left to right. Returns `#N/A` if **none** of the
+conditions are true.
+
+## Description
+
+IFS evaluates each condition in order and stops at the first one
+that's true, returning its paired result. Unlike a nested IF chain,
+there's no nesting to keep track of — each condition/result pair
+sits at the same level, which stays readable even with several
+conditions.
+
+<Callout type="warn">
+  Unlike nested IF, **IFS has no implicit "else"**. If none of the
+  conditions match, it returns `#N/A` instead of a default value. Add
+  a final `TRUE, "default"` pair at the end if you want a catch-all —
+  `TRUE` always evaluates true, so it only fires when nothing earlier
+  matched.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ high: 'Pass with distinction', mid: 'Pass', low: 'Needs improvement' }}
+  defaultValue="Mid"
+  label={'Live preview — IFS(tier="{value}", ...)'}
+  fieldLabel="tier"
+/>
+
+## Common errors
+
+<ExcelCode>{`// #N/A – no condition matched, and there's no catch-all
+IFS(A2>90, "A", A2>80, "B") → #N/A (when A2 is 75)
+
+// Fix: add a final TRUE, "default" pair
+IFS(A2>90, "A", A2>80, "B", TRUE, "C or below")
+
+// Wrong result – conditions checked in order, first TRUE wins
+IFS(A2>60, "Pass", A2>90, "Pass with distinction") → "Pass" even when A2 is 95
+
+// Fix: put the more specific/restrictive condition first
+IFS(A2>90, "Pass with distinction", A2>60, "Pass")`}</ExcelCode>
+
+<Callout type="info">
+  IFS checks conditions **in order** and stops at the first match —
+  put the most specific condition first, the same way you'd order a
+  nested IF chain. A broad condition placed too early will shadow
+  every more specific one that follows it.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Why does IFS return #N/A instead of a value?',
+    answer:
+      "None of the conditions evaluated to TRUE, and IFS has no built-in default (unlike nested IF, which returns value_if_false when nothing else matches). Add a final `TRUE, \"default\"` pair to catch anything that falls through.",
+  },
+  {
+    question: 'IFS vs nested IF — which should I use?',
+    answer:
+      'IFS is flatter and easier to read once you have more than 2-3 conditions, since each condition/result pair sits at the same level instead of nesting deeper each time. Nested IF still works in every Excel version; IFS requires Excel 2019 or Microsoft 365.',
+  },
+  {
+    question: 'IFS vs SWITCH — which should I use?',
+    answer:
+      "Use IFS when each branch has its own independent condition (ranges, comparisons, AND/OR logic). Use SWITCH when you're comparing one single value against a fixed list of exact matches — it's shorter for that specific case.",
+  },
+  {
+    question: 'Does the order of conditions in IFS matter?',
+    answer:
+      "Yes — IFS stops at the first TRUE condition. If an earlier, broader condition would also be true for a case a later, more specific condition is meant to catch, the earlier one wins and the later one never runs.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IFS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IFS(A2>=90, "A", A2>=80, "B", A2>=70, "C", TRUE, "F")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim grade As String
+    Select Case Range("A2").Value
+      Case Is >= 90: grade = "A"
+      Case Is >= 80: grade = "B"
+      Case Is >= 70: grade = "C"
+      Case Else: grade = "F"
+    End Select
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    def grade(score):
+        if score >= 90: return "A"
+        if score >= 80: return "B"
+        if score >= 70: return "C"
+        return "F"
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Grade"] = df["Score"].apply(grade)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: false },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- [IF](/docs/logical/if) — the building block IFS replaces once
+  nesting gets past 2-3 levels deep.
+- SWITCH — compares one value against a fixed list of exact matches,
+  shorter than IFS for that specific case. Page coming soon (Logical
+  category).
+- [IFERROR](/docs/logical/iferror) — catches a formula *error*;
+  IFS branches on *conditions* instead, and needs an explicit
+  `TRUE` default to avoid returning `#N/A`.

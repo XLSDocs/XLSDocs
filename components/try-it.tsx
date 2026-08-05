@@ -11,18 +11,29 @@ interface TryItProps {
    *  Server Components; functions can't cross that boundary as props. */
   label?: string;
   fieldLabel?: string;
+  /** Shown in place of the default `#N/A` when the input doesn't match —
+   *  lets a function whose real behavior is "replace the error with a
+   *  fallback" (e.g. IFERROR) demo that fallback honestly instead of
+   *  always showing the raw unwrapped error. */
+  errorValue?: string;
 }
 
-export function TryIt({ data, defaultValue = '', label = 'Live preview', fieldLabel = 'lookup_value' }: TryItProps) {
+export function TryIt({
+  data,
+  defaultValue = '',
+  label = 'Live preview',
+  fieldLabel = 'lookup_value',
+  errorValue = '#N/A',
+}: TryItProps) {
   const [value, setValue] = useState(defaultValue);
   const resolvedLabel = label.includes('{value}') ? label.replaceAll('{value}', value) : label;
 
   const result = useMemo(() => {
     const match = data[value.trim().toLowerCase()];
-    return match ?? '#N/A';
-  }, [value, data]);
+    return match ?? errorValue;
+  }, [value, data, errorValue]);
 
-  const found = result !== '#N/A';
+  const found = result !== errorValue;
   const tryValues = Object.keys(data)
     .map((k) => k.charAt(0).toUpperCase() + k.slice(1))
     .join(', ');

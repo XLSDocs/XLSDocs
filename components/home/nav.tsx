@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { MobileNav } from './mobile-nav';
+import { NavSearchButton } from './nav-search-button';
 
 const NAV_LINKS = [
   { href: '/functions', label: 'Functions' },
@@ -33,9 +34,10 @@ export function HomeNav() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <NavSearchButton />
           <Link
             href="/docs"
-            className="rounded-full bg-fd-primary px-4 py-2 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90"
+            className="hidden rounded-full bg-fd-primary px-4 py-2 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90 sm:inline-flex"
           >
             Try for free →
           </Link>

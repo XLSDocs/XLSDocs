@@ -1,0 +1,160 @@
+---
+title: IFERROR
+description: Catch any formula error and return a fallback value instead.
+---
+
+Evaluate a formula, and if it returns *any* error — `#N/A`, `#VALUE!`,
+`#REF!`, `#DIV/0!`, or otherwise — return a fallback value instead.
+The standard way to wrap a risky lookup or calculation so a broken
+input doesn't surface a raw error to whoever reads the sheet.
+
+<FunctionNav />
+
+## Syntax
+
+<ExcelCode>{`=IFERROR(value, value_if_error)`}</ExcelCode>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `value` | any | Required | The formula or expression to evaluate. |
+| `value_if_error` | any | Required | The value returned if `value` evaluates to an error of any kind. |
+
+## Return value
+
+The result of `value` if it isn't an error, otherwise
+`value_if_error`.
+
+## Description
+
+IFERROR evaluates `value` once and checks whether the result is an
+error. If it is — regardless of which error type — it returns
+`value_if_error` instead. This makes it the standard wrapper around
+lookups (`VLOOKUP`, `XLOOKUP`, `INDEX`/`MATCH`) and calculations
+(division, `IF` chains) that can fail on unexpected input.
+
+<Callout type="info">
+  IFERROR catches **every** error type, which also means it can hide a
+  genuine formula mistake, not just an expected "no match" case. If
+  you only want to catch a missing lookup (`#N/A`) and let other
+  errors surface normally, use **IFNA** instead — same shape, narrower
+  net.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ e101: 'Engineering', e102: 'Sales', e103: 'Finance' }}
+  defaultValue="E101"
+  label={'Live preview — IFERROR(VLOOKUP("{value}", Employees!A:B, 2, FALSE), "Not found")'}
+  fieldLabel="employee_id"
+  errorValue="Not found"
+/>
+
+## Common errors
+
+<ExcelCode>{`// value_if_error is missing – IFERROR needs both arguments
+IFERROR(VLOOKUP(A2, B:C, 2, FALSE)) → #VALUE! (wrong number of arguments)
+
+// Fix: always provide a fallback, even if it's just ""
+IFERROR(VLOOKUP(A2, B:C, 2, FALSE), "")
+
+// Swallows a real bug, not just a missing lookup
+IFERROR(A2/B2, 0) → hides both a genuine #DIV/0! and any other formula mistake
+
+// Fix: catch only the specific error you expect, if it matters
+IF(B2=0, 0, A2/B2)`}</ExcelCode>
+
+<Callout type="warn">
+  Wrapping a formula in IFERROR too early, before it's working
+  correctly, can hide the real problem while you're building it —
+  every error just silently becomes `value_if_error`. Get the formula
+  working unwrapped first, then add IFERROR once you know what
+  failure case it's actually there to catch.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'IFERROR vs IFNA — which should I use?',
+    answer:
+      'Use IFNA when you only want to catch a missing lookup (`#N/A`) and let genuine formula errors like `#DIV/0!` or `#VALUE!` surface normally. Use IFERROR when any error type should fall back to the same value.',
+  },
+  {
+    question: 'Does IFERROR re-run the formula twice?',
+    answer:
+      "No — `value` is evaluated once internally and the result is checked for an error, unlike the older `IF(ISERROR(...), ..., ...)` pattern it replaced, which genuinely did evaluate the formula twice (once inside ISERROR, once for the real result).",
+  },
+  {
+    question: 'Can value_if_error be a formula too, not just a literal?',
+    answer:
+      'Yes — `value_if_error` can be any expression, including another formula, as long as it doesn\'t itself throw an error you need to handle.',
+  },
+  {
+    question: 'Why did my error disappear even though something is genuinely broken?',
+    answer:
+      "IFERROR catches every error type, including ones caused by real mistakes elsewhere in the formula — not just the \"no match\" case you were expecting. If results look wrong instead of erroring, temporarily remove the IFERROR wrapper to see the real error underneath.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IFERROR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IFERROR(VLOOKUP(A2, Employees!A:B, 2, FALSE), "Not found")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    On Error Resume Next
+    result = Application.WorksheetFunction.VLookup( _
+      Range("A2").Value, Range("Employees!A:B"), 2, False)
+    If Err.Number <> 0 Then result = "Not found"
+    On Error GoTo 0
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Employees")
+    match = df.loc[df["ID"] == "E101", "Department"]
+    result = match.iloc[0] if not match.empty else "Not found"
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+<Compatibility
+  items={[
+    { label: '365', supported: true },
+    { label: '2021', supported: true },
+    { label: '2019', supported: true },
+    { label: '2016', supported: true },
+    { label: 'Web', supported: true },
+  ]}
+/>
+
+## Related functions
+
+- IFNA — same shape as IFERROR, but only catches `#N/A` specifically,
+  leaving other error types to surface normally. Page coming soon
+  (Logical category).
+- [XLOOKUP](/docs/lookup/xlookup) — its `if_not_found` argument covers
+  the most common IFERROR use case (missing lookup) natively, without
+  a separate wrapper.
+- [VLOOKUP](/docs/lookup/vlookup) and [HLOOKUP](/docs/lookup/hlookup) —
+  neither has a built-in fallback, so IFERROR is the standard way to
+  handle a missing match.
+- IFS — like IFERROR, evaluates a series of things in order and stops
+  at the first one that applies, but branches on conditions rather
+  than errors. Page coming soon (Logical category).

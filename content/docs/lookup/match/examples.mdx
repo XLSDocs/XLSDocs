@@ -1,0 +1,32 @@
+---
+title: MATCH examples
+description: Worked examples for MATCH — exact and approximate position lookups, nested in INDEX and VLOOKUP, and error handling.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — position of a product name" formula={`=MATCH("Widget", Products!A:A, 0)`}>
+  Returns the row position of "Widget" within column A — a number
+  like `4`, not the value itself.
+</ExampleCard>
+
+<ExampleCard number="02" label="Approximate match — commission tier" formula={`=MATCH(B2, Tiers!A:A, 1)`}>
+  With `Tiers!A:A` sorted ascending, `1` finds the position of the
+  largest tier threshold that is less than or equal to B2.
+</ExampleCard>
+
+<ExampleCard number="03" label="Nested in INDEX" formula={`=INDEX(Products!C:C, MATCH("Widget", Products!A:A, 0))`}>
+  MATCH finds the position, INDEX returns the value at that position
+  from a different column — the classic INDEX/MATCH combo.
+</ExampleCard>
+
+<ExampleCard number="04" label="Dynamic column lookup inside VLOOKUP" formula={`=VLOOKUP(A2, Products!A:F, MATCH(B2, Products!A1:F1, 0), FALSE)`}>
+  MATCH looks up a column position by header name (from B2) instead
+  of a hardcoded number, so `col_index_num` keeps working even if
+  columns get reordered.
+</ExampleCard>
+
+<ExampleCard number="05" label="With error handling" formula={`=IFERROR(MATCH("Zzz", Products!A:A, 0), "Not found")`}>
+  Replaces the raw `#N/A` MATCH returns on no match with a friendlier
+  message.
+</ExampleCard>

@@ -1,0 +1,32 @@
+---
+title: IFS examples
+description: Worked examples for IFS — grading tiers, a default catch-all, text conditions, and combined AND/OR logic.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — letter grade with a default" formula={`=IFS(A2>=90, "A", A2>=80, "B", A2>=70, "C", TRUE, "F")`}>
+  Checks each threshold in order; the final `TRUE, "F"` pair catches
+  everything below 70 that no earlier condition matched.
+</ExampleCard>
+
+<ExampleCard number="02" label="Text conditions" formula={`=IFS(A2="West", "Region 1", A2="East", "Region 2", A2="North", "Region 3", TRUE, "Unassigned")`}>
+  Works just as well matching exact text values as it does numeric
+  thresholds — still evaluated top to bottom.
+</ExampleCard>
+
+<ExampleCard number="03" label="Combined with AND for compound conditions" formula={`=IFS(AND(A2>=90, B2="Active"), "Priority", A2>=90, "Qualified", TRUE, "Standard")`}>
+  Each `logical_test` can be any boolean expression, including
+  `AND()`/`OR()` — put the more specific compound condition first.
+</ExampleCard>
+
+<ExampleCard number="04" label="Shipping cost tiers" formula={`=IFS(A2<10, 5, A2<50, 10, A2<100, 15, TRUE, 0)`}>
+  A common tiered-pricing pattern — the final `TRUE, 0` pair means
+  orders of 100 or more ship free, since nothing above matched.
+</ExampleCard>
+
+<ExampleCard number="05" label="No default — deliberately returning #N/A" formula={`=IFS(A2="Yes", "Approved", A2="No", "Rejected")`}>
+  Leaving out the final `TRUE` pair is sometimes intentional — here,
+  any value other than "Yes"/"No" surfaces as `#N/A`, flagging bad
+  input instead of silently guessing a default.
+</ExampleCard>

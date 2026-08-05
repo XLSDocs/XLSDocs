@@ -1,0 +1,34 @@
+---
+title: INDEX examples
+description: Worked examples for INDEX — paired with MATCH, returning whole rows, dynamic arrays, and error handling.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — Nth item in a list" formula={`=INDEX(A1:A10, 3)`}>
+  Returns the value in the 3rd row of `A1:A10` — a plain position
+  lookup, no searching involved.
+</ExampleCard>
+
+<ExampleCard number="02" label="Paired with MATCH — price by name" formula={`=INDEX(Products!C:C, MATCH("Widget", Products!A:A, 0))`}>
+  MATCH finds where "Widget" sits in column A; INDEX returns the
+  corresponding value from column C — works even though C is to the
+  right of A, or would work just as well if it were to the left.
+</ExampleCard>
+
+<ExampleCard number="03" label="Returning an entire row" formula={`=INDEX(A1:D10, 4, 0)`}>
+  `0` for `column_num` returns the whole 4th row as an array, useful
+  when you need every field for a matched record, not just one.
+</ExampleCard>
+
+<ExampleCard number="04" label="Two-way lookup" formula={`=INDEX(B2:F10, MATCH(A2, A2:A10, 0), MATCH(B1, B1:F1, 0))`}>
+  Two nested MATCH calls find both the row (by a value in column A)
+  and the column (by a header in row 1) — a full two-dimensional
+  lookup with no VLOOKUP or HLOOKUP involved.
+</ExampleCard>
+
+<ExampleCard number="05" label="With error handling" formula={`=IFERROR(INDEX(Prices!B:B, MATCH(A2, Prices!A:A, 0)), "No price set")`}>
+  If MATCH can't find A2 in `Prices!A:A`, it returns `#N/A`, which
+  propagates through INDEX and gets caught by the surrounding
+  IFERROR.
+</ExampleCard>
