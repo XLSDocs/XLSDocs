@@ -16,6 +16,7 @@ import { gitConfig } from '@/lib/shared';
 import { AskClaude } from '@/components/ask-claude';
 import { Feedback } from '@/components/feedback';
 import type { FaqItem } from '@/components/faq';
+import { VersionBadges, type CompatibilityItem } from '@/components/version-badges';
 
 // FAQ answers are stored with markdown (`code`, **bold**) for on-page rendering,
 // but FAQPage structured data wants plain text.
@@ -34,6 +35,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const reportIssueUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/issues/new?title=${encodeURIComponent(`Docs issue: ${page.data.title}`)}&body=${encodeURIComponent(`Page: https://xlsdocs.com${page.url}\n\nWhat's wrong:`)}`;
 
   const faqs = page.data._exports?.faqs as FaqItem[] | undefined;
+  const compatibility = page.data._exports?.compatibility as CompatibilityItem[] | undefined;
   const faqJsonLd = faqs?.length
     ? {
         '@context': 'https://schema.org',
@@ -63,6 +65,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         />
       )}
       <DocsTitle>{page.data.title}</DocsTitle>
+      {compatibility && <VersionBadges items={compatibility} />}
       <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
       {page.data.lastModified && <PageLastUpdate date={page.data.lastModified} />}
       <div className="flex flex-row gap-2 items-center border-b pb-6">

@@ -9,17 +9,45 @@ readable alternative to a long chain of nested IF calls.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Flatter than nested IF', type: 'check' },
+  { text: 'Checks conditions in order', type: 'check' },
+  { text: 'No built-in default — add a final TRUE pair', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IFS(logical_test1, value_if_true1, ...)'}
+  facts={quickAnswerFacts}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=IFS(logical_test1, value_if_true1, [logical_test2, value_if_true2], ...)`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `logical_test1` | boolean | Required | The first condition to check. |
-| `value_if_true1` | any | Required | The result if `logical_test1` is `TRUE`. |
-| `logical_test2, value_if_true2, ...` | boolean, any | Optional | Up to 126 more condition/result pairs, checked in order. |
+export const parameters = [
+  {
+    name: 'logical_test1',
+    type: 'boolean',
+    required: true,
+    description: 'The first condition to check.',
+  },
+  {
+    name: 'value_if_true1',
+    type: 'any',
+    required: true,
+    description: 'The result if `logical_test1` is `TRUE`.',
+  },
+  {
+    name: 'logical_test2, value_if_true2, ...',
+    type: 'boolean, any',
+    required: false,
+    description: 'Up to 126 more condition/result pairs, checked in order.',
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -54,17 +82,23 @@ conditions.
 
 ## Common errors
 
-<ExcelCode>{`// #N/A – no condition matched, and there's no catch-all
-IFS(A2>90, "A", A2>80, "B") → #N/A (when A2 is 75)
+### #N/A — no condition matched
 
-// Fix: add a final TRUE, "default" pair
-IFS(A2>90, "A", A2>80, "B", TRUE, "C or below")
+<ExcelCode>{`IFS(A2>90, "A", A2>80, "B") → #N/A (when A2 is 75)`}</ExcelCode>
 
-// Wrong result – conditions checked in order, first TRUE wins
-IFS(A2>60, "Pass", A2>90, "Pass with distinction") → "Pass" even when A2 is 95
+None of the conditions were true, and there's no catch-all. Add a
+final `TRUE, "default"` pair:
 
-// Fix: put the more specific/restrictive condition first
-IFS(A2>90, "Pass with distinction", A2>60, "Pass")`}</ExcelCode>
+<ExcelCode>{`IFS(A2>90, "A", A2>80, "B", TRUE, "C or below")`}</ExcelCode>
+
+### Wrong result from condition order
+
+<ExcelCode>{`IFS(A2>60, "Pass", A2>90, "Pass with distinction") → "Pass" even when A2 is 95`}</ExcelCode>
+
+Conditions are checked in order, and the first `TRUE` wins. Put the
+more specific/restrictive condition first:
+
+<ExcelCode>{`IFS(A2>90, "Pass with distinction", A2>60, "Pass")`}</ExcelCode>
 
 <Callout type="info">
   IFS checks conditions **in order** and stops at the first match —
@@ -138,15 +172,15 @@ export const faqs = [
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: true },
-    { label: '2016', supported: false },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 

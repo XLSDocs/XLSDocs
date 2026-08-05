@@ -9,20 +9,76 @@ INDEX/MATCH combination.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Replaces VLOOKUP', type: 'check' },
+  { text: 'Looks left or right', type: 'check' },
+  { text: 'Exact match by default', type: 'check' },
+  { text: 'Excel 365 & 2021 only', type: 'warn' },
+];
+
+export const quickAnswerMigration = {
+  prompt: "Migrating from VLOOKUP? Here's the direct equivalent:",
+  from: '=VLOOKUP(A2, Products!A:C, 2, FALSE)',
+  to: '=XLOOKUP(A2, Products!A:A, Products!B:B, "Not found")',
+  explanation:
+    'Key differences: separate lookup and return arrays instead of a table + column number. No more hardcoded column index that breaks when you insert columns.',
+};
+
+<QuickAnswer
+  formula={'=XLOOKUP(lookup_value, lookup_array, return_array, "Not found")'}
+  facts={quickAnswerFacts}
+  migration={quickAnswerMigration}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found], [match_mode], [search_mode])`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `lookup_value` | any | Required | The value to search for. |
-| `lookup_array` | range | Required | The range to search. Can be any row or column — unlike VLOOKUP, it does not need to be the leftmost column. |
-| `return_array` | range | Required | The range to return a value from, once a match is found. |
-| `if_not_found` | any | Optional | Value to return if no match is found. Defaults to `#N/A`. |
-| `match_mode` | number | Optional | `0` exact (default) · `-1` exact or next smaller · `1` exact or next larger · `2` wildcard. |
-| `search_mode` | number | Optional | `1` first-to-last (default) · `-1` last-to-first · `2`/`-2` binary search (sorted data only). |
+export const parameters = [
+  {
+    name: 'lookup_value',
+    type: 'any',
+    required: true,
+    description: 'The value to search for.',
+  },
+  {
+    name: 'lookup_array',
+    type: 'range',
+    required: true,
+    description:
+      'The range to search. Can be any row or column — unlike VLOOKUP, it does not need to be the leftmost column.',
+  },
+  {
+    name: 'return_array',
+    type: 'range',
+    required: true,
+    description: 'The range to return a value from, once a match is found.',
+  },
+  {
+    name: 'if_not_found',
+    type: 'any',
+    required: false,
+    description: 'Value to return if no match is found. Defaults to `#N/A`.',
+  },
+  {
+    name: 'match_mode',
+    type: 'number',
+    required: false,
+    description:
+      '`0` exact (default) · `-1` exact or next smaller · `1` exact or next larger · `2` wildcard.',
+  },
+  {
+    name: 'search_mode',
+    type: 'number',
+    required: false,
+    description:
+      '`1` first-to-last (default) · `-1` last-to-first · `2`/`-2` binary search (sorted data only).',
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -51,21 +107,38 @@ return values to the left, right, above, or below the lookup column.
 
 ## Common errors
 
-<ExcelCode>{`// #N/A – no match and if_not_found not set
-XLOOKUP("missing", A1:A10, B1:B10) → #N/A
+### #N/A — no match found
 
-// Fix: always provide the if_not_found argument
-XLOOKUP("missing", A1:A10, B1:B10, "Not found")
+<ExcelCode>{`XLOOKUP("missing", A1:A10, B1:B10) → #N/A`}</ExcelCode>
 
-// #VALUE! – lookup_array and return_array are different sizes
-XLOOKUP(A2, A1:A5, B1:B4) → #VALUE!
+`if_not_found` wasn't provided. Add a fourth argument to return a
+fallback value instead of an error:
 
-// #SPILL! – cells below the formula are blocked by existing data
-// Clear the spill range, or use @ to return one value only
-@XLOOKUP(A2, A1:A10, B1:C10)
+<ExcelCode>{`XLOOKUP("missing", A1:A10, B1:B10, "Not found")`}</ExcelCode>
 
-// Wildcard match – find partial text (needs match_mode = 2)
-XLOOKUP("*A2*", Names, Prices, "No match", 2)`}</ExcelCode>
+### #VALUE! — mismatched array sizes
+
+<ExcelCode>{`XLOOKUP(A2, A1:A5, B1:B4) → #VALUE!`}</ExcelCode>
+
+`lookup_array` and `return_array` must be the same size — here one
+is 5 rows and the other is 4.
+
+### #SPILL! — blocked spill range
+
+<ExcelCode>{`XLOOKUP(A2, A1:A10, B1:C10)`}</ExcelCode>
+
+Returning more than one column spills the result, but cells below the
+formula already contain data. Clear the spill range, or prefix with
+`@` to force a single value:
+
+<ExcelCode>{`@XLOOKUP(A2, A1:A10, B1:C10)`}</ExcelCode>
+
+### Wildcard matching
+
+<ExcelCode>{`XLOOKUP("*A2*", Names, Prices, "No match", 2)`}</ExcelCode>
+
+Set `match_mode` to `2` to match partial text using `*` and `?`
+wildcards.
 
 <Callout type="info">
   VLOOKUP's `range_lookup` defaults to `TRUE` (approximate match),
@@ -133,15 +206,15 @@ Python, here's the equivalent lookup logic in each.
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: false },
-    { label: '2016', supported: false },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 

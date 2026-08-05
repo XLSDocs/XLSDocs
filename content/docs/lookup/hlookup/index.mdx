@@ -10,18 +10,63 @@ table with dates or categories running along the top.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Same idea as VLOOKUP, rotated 90°', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Looks below only — no upward lookups', type: 'warn' },
+  { text: 'range_lookup defaults to TRUE', type: 'warn' },
+];
+
+export const quickAnswerMigration = {
+  prompt: 'Have Excel 365 or 2021? XLOOKUP searches either direction:',
+  from: '=HLOOKUP(A2, Revenue!A1:D2, 2, FALSE)',
+  to: '=XLOOKUP(A2, Revenue!A1:D1, Revenue!A2:D2, "Not found")',
+  explanation:
+    'One function replaces both HLOOKUP and VLOOKUP, regardless of which way your data runs.',
+};
+
+<QuickAnswer
+  formula={'=HLOOKUP(lookup_value, table_array, row_index_num, FALSE)'}
+  facts={quickAnswerFacts}
+  migration={quickAnswerMigration}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=HLOOKUP(lookup_value, table_array, row_index_num, [range_lookup])`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `lookup_value` | any | Required | The value to search for, in the **first row** of `table_array`. |
-| `table_array` | range | Required | The range to search. `lookup_value` must be in the first row of this range. |
-| `row_index_num` | number | Required | Which row to return a value from, counted from the top of `table_array` (1 = first row). |
-| `range_lookup` | boolean | Optional | `FALSE` for an exact match, `TRUE` (default) for an approximate match on sorted data. |
+export const parameters = [
+  {
+    name: 'lookup_value',
+    type: 'any',
+    required: true,
+    description: "The value to search for, in the **first row** of `table_array`.",
+  },
+  {
+    name: 'table_array',
+    type: 'range',
+    required: true,
+    description: 'The range to search. `lookup_value` must be in the first row of this range.',
+  },
+  {
+    name: 'row_index_num',
+    type: 'number',
+    required: true,
+    description:
+      'Which row to return a value from, counted from the top of `table_array` (1 = first row).',
+  },
+  {
+    name: 'range_lookup',
+    type: 'boolean',
+    required: false,
+    description:
+      '`FALSE` for an exact match, `TRUE` (default) for an approximate match on sorted data.',
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -57,17 +102,29 @@ across a row and returns down a column.
 
 ## Common errors
 
-<ExcelCode>{`// #N/A – lookup_value isn't in the first row of table_array
-HLOOKUP("SKU-9", A1:J3, 2, FALSE) → #N/A
+### #N/A — lookup_value not in the first row
 
-// #REF! – row_index_num is larger than the number of rows in table_array
-HLOOKUP(A2, A1:J2, 3, FALSE) → #REF!
+<ExcelCode>{`HLOOKUP("SKU-9", A1:J3, 2, FALSE) → #N/A`}</ExcelCode>
 
-// Wrong value, no error – range_lookup omitted or TRUE on unsorted data
-HLOOKUP(A2, A1:J2, 2) → returns a plausible-looking but incorrect value
+`lookup_value` must exist in the **first row** of `table_array` —
+HLOOKUP never searches any other row.
 
-// Fix: always pass FALSE unless you mean to do an approximate match
-HLOOKUP(A2, A1:J2, 2, FALSE)`}</ExcelCode>
+### #REF! — row_index_num out of range
+
+<ExcelCode>{`HLOOKUP(A2, A1:J2, 3, FALSE) → #REF!`}</ExcelCode>
+
+`table_array` only has 2 rows here, but `row_index_num` asks for the
+3rd.
+
+### Wrong value, no error
+
+<ExcelCode>{`HLOOKUP(A2, A1:J2, 2) → returns a plausible-looking but incorrect value`}</ExcelCode>
+
+`range_lookup` was omitted or `TRUE` on data that isn't sorted
+ascending. Always pass `FALSE` unless you specifically want an
+approximate match:
+
+<ExcelCode>{`HLOOKUP(A2, A1:J2, 2, FALSE)`}</ExcelCode>
 
 <Callout type="info">
   HLOOKUP can only look **below** its lookup row. If the value you
@@ -131,15 +188,15 @@ export const faqs = [
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: true },
-    { label: '2016', supported: true },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 

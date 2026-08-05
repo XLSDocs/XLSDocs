@@ -9,17 +9,46 @@ matching rows spill automatically into the cells below the formula.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Live formula — updates automatically', type: 'check' },
+  { text: 'Returns multiple rows, not just one', type: 'check' },
+  { text: 'Excel 365 & 2021 only', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FILTER(array, include, [if_empty])'}
+  facts={quickAnswerFacts}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=FILTER(array, include, [if_empty])`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `array` | range | Required | The range or array to filter. |
-| `include` | boolean array | Required | A boolean array the same height (or width) as `array` — `TRUE` keeps the row, `FALSE` drops it. Usually a comparison like `Sales[Region]="West"`. |
-| `if_empty` | any | Optional | Value to return if no rows match. Without it, a zero-match result throws `#CALC!`. |
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array to filter.',
+  },
+  {
+    name: 'include',
+    type: 'boolean array',
+    required: true,
+    description:
+      'A boolean array the same height (or width) as `array` — `TRUE` keeps the row, `FALSE` drops it. Usually a comparison like `Sales[Region]="West"`.',
+  },
+  {
+    name: 'if_empty',
+    type: 'any',
+    required: false,
+    description: 'Value to return if no rows match. Without it, a zero-match result throws `#CALC!`.',
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -42,20 +71,33 @@ combination of helper columns plus a manual filter.
 
 ## Common errors
 
-<ExcelCode>{`// #CALC! – no rows match include, and if_empty wasn't provided
-FILTER(A2:C10, B2:B10="Zzz") → #CALC!
+### #CALC! — no rows match
 
-// Fix: always provide an if_empty fallback
-FILTER(A2:C10, B2:B10="Zzz", "No matches")
+<ExcelCode>{`FILTER(A2:C10, B2:B10="Zzz") → #CALC!`}</ExcelCode>
 
-// #VALUE! – include isn't the same height/width as array
-FILTER(A2:C10, B2:B5="West") → #VALUE!
+No rows in `array` satisfy `include`, and `if_empty` wasn't
+provided. Add a third argument for a fallback value instead:
 
-// #SPILL! – cells below the formula already contain data
-// Clear the spill range, or move the formula somewhere clear
+<ExcelCode>{`FILTER(A2:C10, B2:B10="Zzz", "No matches")`}</ExcelCode>
 
-// Combining conditions needs * (AND) or + (OR), not AND()/OR()
-FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}</ExcelCode>
+### #VALUE! — mismatched sizes
+
+<ExcelCode>{`FILTER(A2:C10, B2:B5="West") → #VALUE!`}</ExcelCode>
+
+`include` must be the same height (or width) as `array` — here one
+is 9 rows and the other is 4.
+
+### #SPILL! — blocked spill range
+
+Cells below the formula already contain data. Clear the spill range,
+or move the formula somewhere clear.
+
+### Combining multiple conditions
+
+<ExcelCode>{`FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}</ExcelCode>
+
+Multiply boolean arrays together for AND logic, or add them for OR —
+`AND()`/`OR()` don't work element-wise across an array this way.
 
 <Callout type="info">
   To combine multiple conditions inside `include`, multiply boolean
@@ -121,15 +163,15 @@ export const faqs = [
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: false },
-    { label: '2016', supported: false },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 

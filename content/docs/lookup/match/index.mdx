@@ -10,17 +10,46 @@ flexible lookup patterns.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Returns a position, not a value', type: 'check' },
+  { text: 'match_type defaults to 1 (approximate)', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MATCH(lookup_value, lookup_array, 0)'}
+  facts={quickAnswerFacts}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=MATCH(lookup_value, lookup_array, [match_type])`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `lookup_value` | any | Required | The value to search for. |
-| `lookup_array` | range | Required | A single row or column to search — MATCH doesn't work across a 2D range. |
-| `match_type` | number | Optional | `1` (default) largest value ≤ `lookup_value`, requires `lookup_array` sorted ascending · `0` exact match, any order · `-1` smallest value ≥ `lookup_value`, requires descending sort. |
+export const parameters = [
+  {
+    name: 'lookup_value',
+    type: 'any',
+    required: true,
+    description: 'The value to search for.',
+  },
+  {
+    name: 'lookup_array',
+    type: 'range',
+    required: true,
+    description: "A single row or column to search — MATCH doesn't work across a 2D range.",
+  },
+  {
+    name: 'match_type',
+    type: 'number',
+    required: false,
+    description:
+      '`1` (default) largest value ≤ `lookup_value`, requires `lookup_array` sorted ascending · `0` exact match, any order · `-1` smallest value ≥ `lookup_value`, requires descending sort.',
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -54,17 +83,28 @@ hardcoded number.
 
 ## Common errors
 
-<ExcelCode>{`// #N/A – lookup_value isn't found in lookup_array
-MATCH("Zzz", A1:A10, 0) → #N/A
+### #N/A — no match found
 
-// Wrong position, no error – match_type omitted or 1 on unsorted data
-MATCH(85, A1:A10) → returns a plausible-looking but incorrect position
+<ExcelCode>{`MATCH("Zzz", A1:A10, 0) → #N/A`}</ExcelCode>
 
-// Fix: pass 0 explicitly for an exact match
-MATCH(85, A1:A10, 0)
+`lookup_value` doesn't exist anywhere in `lookup_array`.
 
-// #N/A – lookup_array is a 2D range, not a single row or column
-MATCH("Widget", A1:C10, 0) → #N/A`}</ExcelCode>
+### Wrong position, no error
+
+<ExcelCode>{`MATCH(85, A1:A10) → returns a plausible-looking but incorrect position`}</ExcelCode>
+
+`match_type` was omitted or left at its default (`1`), and
+`lookup_array` isn't sorted ascending. Pass `0` explicitly for an
+exact match:
+
+<ExcelCode>{`MATCH(85, A1:A10, 0)`}</ExcelCode>
+
+### #N/A — lookup_array is two-dimensional
+
+<ExcelCode>{`MATCH("Widget", A1:C10, 0) → #N/A`}</ExcelCode>
+
+`lookup_array` must be a single row or a single column — MATCH can't
+search across a 2D range.
 
 <Callout type="info">
   MATCH only searches a single row or a single column at a time. To
@@ -129,15 +169,15 @@ export const faqs = [
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: true },
-    { label: '2016', supported: true },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 

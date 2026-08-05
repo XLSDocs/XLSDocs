@@ -9,17 +9,56 @@ Excel, and the building block behind most "if this, then that" logic.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'The building block of Excel logic', type: 'check' },
+  { text: 'Returns FALSE, not blank, if value_if_false is omitted', type: 'warn' },
+];
+
+export const quickAnswerMigration = {
+  prompt: 'Have a long nested IF chain? Consider IFS:',
+  from: '=IF(A2>=90,"A",IF(A2>=80,"B",IF(A2>=70,"C",IF(A2>=60,"D","F"))))',
+  to: '=IFS(A2>=90,"A",A2>=80,"B",A2>=70,"C",A2>=60,"D",TRUE,"F")',
+  explanation:
+    'IFS lays out each condition/result pair at the same level instead of nesting deeper each time — easier to read past 2-3 conditions.',
+};
+
+<QuickAnswer
+  formula={'=IF(logical_test, value_if_true, value_if_false)'}
+  facts={quickAnswerFacts}
+  migration={quickAnswerMigration}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=IF(logical_test, value_if_true, [value_if_false])`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `logical_test` | boolean | Required | Any expression that evaluates to `TRUE` or `FALSE`, e.g. `A2>100` or `B2="Yes"`. |
-| `value_if_true` | any | Required | The value returned when `logical_test` is `TRUE`. |
-| `value_if_false` | any | Optional | The value returned when `logical_test` is `FALSE`. If omitted, returns the boolean `FALSE` rather than a blank. |
+export const parameters = [
+  {
+    name: 'logical_test',
+    type: 'boolean',
+    required: true,
+    description:
+      'Any expression that evaluates to `TRUE` or `FALSE`, e.g. `A2>100` or `B2="Yes"`.',
+  },
+  {
+    name: 'value_if_true',
+    type: 'any',
+    required: true,
+    description: 'The value returned when `logical_test` is `TRUE`.',
+  },
+  {
+    name: 'value_if_false',
+    type: 'any',
+    required: false,
+    description:
+      'The value returned when `logical_test` is `FALSE`. If omitted, returns the boolean `FALSE` rather than a blank.',
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -51,20 +90,28 @@ becomes hard to read — IFS or SWITCH are usually clearer at that point.
 
 ## Common errors
 
-<ExcelCode>{`// Returns FALSE unexpectedly – value_if_false omitted
-IF(A2>100, "High") → FALSE (when A2 is not greater than 100)
+### Returns FALSE unexpectedly
 
-// Fix: always provide value_if_false, even if it's just ""
-IF(A2>100, "High", "")
+<ExcelCode>{`IF(A2>100, "High") → FALSE (when A2 is not greater than 100)`}</ExcelCode>
 
-// #NAME? – text conditions need quotes
-IF(A2=Yes, "OK", "No") → #NAME?
+`value_if_false` was omitted. Always provide it, even if it's just
+`""`:
 
-// Fix: quote text values being compared
-IF(A2="Yes", "OK", "No")
+<ExcelCode>{`IF(A2>100, "High", "")`}</ExcelCode>
 
-// Deeply nested IF is hard to read and maintain
-IF(A2>=90,"A",IF(A2>=80,"B",IF(A2>=70,"C",IF(A2>=60,"D","F"))))`}</ExcelCode>
+### #NAME? — unquoted text condition
+
+<ExcelCode>{`IF(A2=Yes, "OK", "No") → #NAME?`}</ExcelCode>
+
+Text values being compared need quotes:
+
+<ExcelCode>{`IF(A2="Yes", "OK", "No")`}</ExcelCode>
+
+### Deeply nested IF chains
+
+<ExcelCode>{`IF(A2>=90,"A",IF(A2>=80,"B",IF(A2>=70,"C",IF(A2>=60,"D","F"))))`}</ExcelCode>
+
+Technically correct, but hard to read and maintain past 2-3 levels.
 
 <Callout type="info">
   A nested IF chain with more than 2–3 levels is a sign to switch to
@@ -131,15 +178,15 @@ export const faqs = [
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: true },
-    { label: '2016', supported: true },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 

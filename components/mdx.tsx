@@ -8,6 +8,8 @@ import { FunctionNav } from './function-nav';
 import { ExampleCard } from './example-card';
 import { Compatibility } from './compatibility';
 import { Faq } from './faq';
+import { QuickAnswer } from './quick-answer';
+import { ParametersTable } from './parameters-table';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -22,6 +24,8 @@ export function getMDXComponents(components?: MDXComponents) {
     ExampleCard,
     Compatibility,
     Faq,
+    QuickAnswer,
+    ParametersTable,
     ...components,
   } satisfies MDXComponents;
 }

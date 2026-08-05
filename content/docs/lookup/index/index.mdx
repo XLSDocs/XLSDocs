@@ -10,17 +10,47 @@ searching and returning in any direction.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Pairs with MATCH for flexible lookups', type: 'check' },
+  { text: 'Can return a whole row or column', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=INDEX(array, row_num, [column_num])'}
+  facts={quickAnswerFacts}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=INDEX(array, row_num, [column_num])`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `array` | range | Required | The range or array to pull a value from. |
-| `row_num` | number | Required | Which row within `array` to return (1 = first row). `0` returns the entire column as an array. |
-| `column_num` | number | Optional | Which column within `array` to return (1 = first column). Required if `array` spans more than one column and you want a single cell back. `0` returns the entire row. |
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array to pull a value from.',
+  },
+  {
+    name: 'row_num',
+    type: 'number',
+    required: true,
+    description:
+      'Which row within `array` to return (1 = first row). `0` returns the entire column as an array.',
+  },
+  {
+    name: 'column_num',
+    type: 'number',
+    required: false,
+    description:
+      'Which column within `array` to return (1 = first column). Required if `array` spans more than one column and you want a single cell back. `0` returns the entire row.',
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -57,17 +87,27 @@ VLOOKUP can't do.
 
 ## Common errors
 
-<ExcelCode>{`// #REF! – row_num is outside the range of array
-INDEX(A1:A5, 8) → #REF!
+### #REF! — position outside the array
 
-// #REF! – column_num is outside the range of array
-INDEX(A1:C10, 2, 5) → #REF!
+<ExcelCode>{`INDEX(A1:A5, 8) → #REF!
+INDEX(A1:C10, 2, 5) → #REF!`}</ExcelCode>
 
-// #VALUE! – row_num or column_num isn't a number
-INDEX(A1:C10, "two") → #VALUE!
+Either `row_num` or `column_num` points outside the bounds of
+`array` — 8 rows into a 5-row range, or column 5 of a 3-column range.
 
-// Common pairing – MATCH supplies the position INDEX needs
-INDEX(B1:B10, MATCH("Widget", A1:A10, 0))`}</ExcelCode>
+### #VALUE! — position isn't a number
+
+<ExcelCode>{`INDEX(A1:C10, "two") → #VALUE!`}</ExcelCode>
+
+`row_num` and `column_num` must be numbers, not text.
+
+### Common pairing with MATCH
+
+<ExcelCode>{`INDEX(B1:B10, MATCH("Widget", A1:A10, 0))`}</ExcelCode>
+
+MATCH supplies the position INDEX needs — this combination is how
+INDEX usually appears in real formulas, rather than a hardcoded
+position number.
 
 <Callout type="warn">
   INDEX's row/column numbers are **positions within `array`**, not
@@ -133,15 +173,15 @@ export const faqs = [
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: true },
-    { label: '2016', supported: true },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 

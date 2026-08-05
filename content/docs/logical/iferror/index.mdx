@@ -10,16 +10,39 @@ input doesn't surface a raw error to whoever reads the sheet.
 
 <FunctionNav />
 
+export const quickAnswerFacts = [
+  { text: 'Catches every error type', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Can hide real bugs, not just expected errors', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IFERROR(value, value_if_error)'}
+  facts={quickAnswerFacts}
+/>
+
 ## Syntax
 
 <ExcelCode>{`=IFERROR(value, value_if_error)`}</ExcelCode>
 
 ## Parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `value` | any | Required | The formula or expression to evaluate. |
-| `value_if_error` | any | Required | The value returned if `value` evaluates to an error of any kind. |
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The formula or expression to evaluate.',
+  },
+  {
+    name: 'value_if_error',
+    type: 'any',
+    required: true,
+    description: "The value returned if `value` evaluates to an error of any kind.",
+  },
+];
+
+<ParametersTable items={parameters} />
 
 ## Return value
 
@@ -54,17 +77,23 @@ lookups (`VLOOKUP`, `XLOOKUP`, `INDEX`/`MATCH`) and calculations
 
 ## Common errors
 
-<ExcelCode>{`// value_if_error is missing – IFERROR needs both arguments
-IFERROR(VLOOKUP(A2, B:C, 2, FALSE)) → #VALUE! (wrong number of arguments)
+### Missing the second argument
 
-// Fix: always provide a fallback, even if it's just ""
-IFERROR(VLOOKUP(A2, B:C, 2, FALSE), "")
+<ExcelCode>{`IFERROR(VLOOKUP(A2, B:C, 2, FALSE)) → #VALUE! (wrong number of arguments)`}</ExcelCode>
 
-// Swallows a real bug, not just a missing lookup
-IFERROR(A2/B2, 0) → hides both a genuine #DIV/0! and any other formula mistake
+IFERROR needs both arguments — always provide a fallback, even if
+it's just `""`:
 
-// Fix: catch only the specific error you expect, if it matters
-IF(B2=0, 0, A2/B2)`}</ExcelCode>
+<ExcelCode>{`IFERROR(VLOOKUP(A2, B:C, 2, FALSE), "")`}</ExcelCode>
+
+### Swallowing a real bug
+
+<ExcelCode>{`IFERROR(A2/B2, 0) → hides both a genuine #DIV/0! and any other formula mistake`}</ExcelCode>
+
+Wrapping too broadly hides more than the intended error. If it
+matters which error you're catching, check for it explicitly instead:
+
+<ExcelCode>{`IF(B2=0, 0, A2/B2)`}</ExcelCode>
 
 <Callout type="warn">
   Wrapping a formula in IFERROR too early, before it's working
@@ -134,15 +163,15 @@ export const faqs = [
 
 ## Compatibility
 
-<Compatibility
-  items={[
-    { label: '365', supported: true },
-    { label: '2021', supported: true },
-    { label: '2019', supported: true },
-    { label: '2016', supported: true },
-    { label: 'Web', supported: true },
-  ]}
-/>
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
 
 ## Related functions
 
