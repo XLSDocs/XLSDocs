@@ -1,0 +1,177 @@
+---
+title: MID
+description: Extract a given number of characters from any position within a text string.
+---
+
+Extract a chunk of text starting at any position, not just the start
+or end — the middle section of a fixed-format code, or a portion of
+text you've already located with FIND or SEARCH.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Extracts from any position, not just the ends', type: 'check' },
+  { text: 'start_num and num_chars are both required', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MID(text, start_num, num_chars)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MID(text, start_num, num_chars)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to extract characters from.',
+  },
+  {
+    name: 'start_num',
+    type: 'number',
+    required: true,
+    description: 'The position of the first character to extract, counting from 1.',
+  },
+  {
+    name: 'num_chars',
+    type: 'number',
+    required: true,
+    description: 'How many characters to extract, starting at `start_num`.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`num_chars` characters of `text`, starting at position `start_num`.
+Returns an empty string if `start_num` is beyond the length of
+`text`, and returns fewer than `num_chars` characters (not an error)
+if the string ends before `num_chars` is reached.
+
+## Description
+
+MID is LEFT and RIGHT generalized — instead of always starting at
+one end, you give it any starting position. It's most useful either
+for fixed-format text (like extracting the middle segment of a
+structured ID) or combined with FIND/SEARCH to locate a dynamic
+starting point first.
+
+<Callout type="info">
+  `LEFT(text, n)` is equivalent to `MID(text, 1, n)`, and `RIGHT`
+  can be written with MID plus LEN — LEFT and RIGHT exist mainly
+  because they're shorter to write for the two most common cases.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'inv-2027-0042': '2027', 'inv-2026-0891': '2026', 'inv-2025-0013': '2025' }}
+  defaultValue="INV-2027-0042"
+  label={'Live preview — MID(code, 5, 4)'}
+  fieldLabel="code"
+/>
+
+## Common errors
+
+### #VALUE! — invalid start_num
+
+<ExcelCode>{`MID(A2, 0, 3) → #VALUE!`}</ExcelCode>
+
+`start_num` must be `1` or greater — `0` or a negative number throws
+an error.
+
+### Empty result — start_num beyond the text length
+
+<ExcelCode>{`MID(A2, 50, 3) → "" (when A2 is shorter than 50 characters)`}</ExcelCode>
+
+Not an error — MID just returns nothing if there's no text left at
+that position.
+
+### Extracting from a dynamic starting point
+
+<ExcelCode>{`MID(A2, FIND(" ", A2) + 1, 10)`}</ExcelCode>
+
+Nesting FIND inside `start_num` locates the position dynamically
+(here, right after the first space) instead of assuming a fixed
+position.
+
+export const faqs = [
+  {
+    question: 'MID vs LEFT/RIGHT — which should I use?',
+    answer:
+      'Use LEFT or RIGHT when you need characters from one specific end — they\'re shorthand for the most common MID cases. Use MID for anything starting in the middle of the string.',
+  },
+  {
+    question: 'How do I extract text between two delimiters?',
+    answer:
+      'Combine MID with FIND twice — once to locate the starting position, once to work out the length by finding the second delimiter and subtracting the starting position.',
+  },
+  {
+    question: 'What happens if start_num is beyond the length of text?',
+    answer: 'MID returns an empty string — no error, even if start_num is far past the end of the text.',
+  },
+  {
+    question: 'Does MID work on numbers, not just text?',
+    answer:
+      'Yes — Excel converts the number to text first, same as LEFT and RIGHT. The result is always text.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MID from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MID(A2, 5, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim segment As String
+    segment = Mid(Range("A2").Value, 5, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Year"] = df["Code"].str[4:8]  # 0-indexed: start_num-1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LEFT](/docs/text/left) and [RIGHT](/docs/text/right) — the
+  fixed-end special cases MID generalizes.
+- FIND and SEARCH — locate a dynamic starting position to feed into
+  MID's `start_num`. Pages coming soon (Text category).
+- [SUBSTITUTE](/docs/text/substitute) — sometimes used alongside MID
+  when the delimiter you're extracting around appears more than
+  once.

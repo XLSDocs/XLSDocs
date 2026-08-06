@@ -1,0 +1,160 @@
+---
+title: VALUE
+description: Convert a text string that looks like a number into a real number.
+---
+
+Convert a text string that looks like a number, date, or time into
+its actual numeric value — the reverse of what TEXT does, and the
+standard fix for "numbers stored as text" that won't sum or sort
+correctly.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Converts a number-like text string into a real number', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: "#VALUE! if the text can't be parsed as a number", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VALUE(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VALUE(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'A text string that represents a number, date, or time.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The numeric equivalent of `text`. Returns `#VALUE!` if `text` can't
+be interpreted as a number, date, or time.
+
+## Description
+
+Cells formatted or entered as text look like numbers but behave like
+text — they won't sum, sort numerically, or compare correctly against
+real numbers. VALUE converts that text into an actual number Excel
+can calculate with. It also works on text dates and times, returning
+their serial number equivalent.
+
+<Callout type="info">
+  Older workbooks sometimes use `--text` (double unary minus) or
+  `text*1` instead of `VALUE(text)` — all three do the same
+  conversion. VALUE is the clearer, documented way to write it.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '123': '123', '1,234': '1234', '45.67': '45.67' }}
+  defaultValue="1,234"
+  label={'Live preview — VALUE(text)'}
+  fieldLabel="text"
+  errorValue="#VALUE!"
+/>
+
+## Common errors
+
+### #VALUE! — text isn't a recognizable number
+
+<ExcelCode>{`VALUE("abc") → #VALUE!`}</ExcelCode>
+
+The text doesn't match any number, date, or time format Excel
+recognizes.
+
+### #VALUE! — extra non-numeric characters
+
+<ExcelCode>{`VALUE("123 units") → #VALUE!`}</ExcelCode>
+
+Trailing text like `" units"` breaks the parse. Strip the non-numeric
+part first, e.g. with LEFT combined with FIND to locate where the
+number ends.
+
+export const faqs = [
+  {
+    question: 'VALUE vs --text or text*1 — which should I use?',
+    answer:
+      'They all produce the same result — `--` (double unary minus) and `*1` are older tricks for coercing a text-number into a real number. VALUE() is the clearer, self-documenting way to write the same conversion.',
+  },
+  {
+    question: 'Why does VALUE return #VALUE!?',
+    answer:
+      "The text doesn't match a number, date, or time format Excel recognizes — often because of extra non-numeric characters mixed in. Isolate just the numeric part first if that's the issue.",
+  },
+  {
+    question: 'Does VALUE convert dates too, not just plain numbers?',
+    answer:
+      'Yes — a text date like `"1/5/2027"` converts to its date serial number, the same way `TEXT()` works in reverse for dates.',
+  },
+  {
+    question: 'VALUE vs NUMBERVALUE — what’s the difference?',
+    answer:
+      "NUMBERVALUE lets you specify the decimal and thousands separators explicitly, which matters for text formatted with international number conventions. VALUE relies on your system's locale settings instead.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VALUE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VALUE(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim num As Double
+    num = CDbl(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Amount"] = pd.to_numeric(df["AmountText"].str.replace(",", ""))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TEXT](/docs/text/text) — the reverse conversion, turning a number
+  into formatted text.
+- [LEFT](/docs/text/left), [RIGHT](/docs/text/right), and
+  [MID](/docs/text/mid) — often combined with VALUE to isolate a
+  numeric substring before converting it.
+- NUMBERVALUE — like VALUE, but with explicit control over decimal
+  and thousands separators for international number formats. Page
+  coming soon (Text category).

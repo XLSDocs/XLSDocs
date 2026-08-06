@@ -1,0 +1,32 @@
+---
+title: CLEAN examples
+description: Worked examples for CLEAN — combining with TRIM, handling non-breaking spaces, and preserving intentional line breaks.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — remove control characters" formula={`=CLEAN(A2)`}>
+  Strips non-printable control characters from an imported or
+  pasted value.
+</ExampleCard>
+
+<ExampleCard number="02" label="Combined with TRIM" formula={`=TRIM(CLEAN(A2))`}>
+  The standard one-two punch for messy imported text — CLEAN removes
+  control characters, TRIM removes extra spaces.
+</ExampleCard>
+
+<ExampleCard number="03" label="Also handling non-breaking spaces" formula={`=TRIM(SUBSTITUTE(CLEAN(A2), CHAR(160), " "))`}>
+  Adds a SUBSTITUTE step to catch non-breaking spaces, which neither
+  CLEAN nor TRIM removes on their own.
+</ExampleCard>
+
+<ExampleCard number="04" label="Preserving intentional line breaks" formula={`=SUBSTITUTE(CLEAN(SUBSTITUTE(A2, CHAR(10), "|")), "|", CHAR(10))`}>
+  Temporarily swaps line breaks for a placeholder character before
+  cleaning, then restores them afterward — so CLEAN doesn't strip
+  out line breaks you wanted to keep.
+</ExampleCard>
+
+<ExampleCard number="05" label="Checking if cleaning changed anything" formula={`=IF(CLEAN(A2)=A2, "Clean", "Had control characters")`}>
+  Compares the cleaned version against the original to flag which
+  rows had hidden control characters in the first place.
+</ExampleCard>

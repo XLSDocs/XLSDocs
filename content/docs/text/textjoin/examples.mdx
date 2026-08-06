@@ -1,0 +1,31 @@
+---
+title: TEXTJOIN examples
+description: Worked examples for TEXTJOIN — comma-separated lists, skipping blanks, formatted values, and nested delimiters.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — comma-separated list" formula={`=TEXTJOIN(", ", TRUE, A1:A5)`}>
+  Joins every value in A1:A5 with ", " between them, skipping any
+  blank cells along the way.
+</ExampleCard>
+
+<ExampleCard number="02" label="Keeping blanks as empty entries" formula={`=TEXTJOIN(", ", FALSE, A1:A5)`}>
+  With `ignore_empty` set to `FALSE`, a blank cell still produces an
+  empty entry — you'll see doubled-up separators where it was.
+</ExampleCard>
+
+<ExampleCard number="03" label="Line breaks instead of commas" formula={`=TEXTJOIN(CHAR(10), TRUE, A1:A5)`}>
+  Using `CHAR(10)` as the delimiter puts each item on its own line
+  within the cell (requires "Wrap Text" enabled to display properly).
+</ExampleCard>
+
+<ExampleCard number="04" label="Formatting each value before joining" formula={`=TEXTJOIN(", ", TRUE, TEXT(A1:A5, "$#,##0"))`}>
+  Wrapping the range in TEXT() formats every value as currency
+  before TEXTJOIN combines them into one string.
+</ExampleCard>
+
+<ExampleCard number="05" label="Joining across multiple non-adjacent ranges" formula={`=TEXTJOIN(", ", TRUE, A1:A3, C1:C3)`}>
+  TEXTJOIN accepts more than one range argument, joining all of them
+  together as if they were one combined list.
+</ExampleCard>

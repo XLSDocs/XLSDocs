@@ -1,0 +1,176 @@
+---
+title: SUBSTITUTE
+description: Replace one piece of text with another, based on matching the text itself.
+---
+
+Replace occurrences of one piece of text with another, by matching
+the text content — swap hyphens for slashes, fix a recurring typo
+across a column, or strip out a specific unwanted character.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Replaces all occurrences by default', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Case-sensitive — "Text" and "text" are different', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SUBSTITUTE(text, old_text, new_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUBSTITUTE(text, old_text, new_text, [instance_num])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to search within.',
+  },
+  {
+    name: 'old_text',
+    type: 'text',
+    required: true,
+    description: 'The text to find and replace. Matching is case-sensitive.',
+  },
+  {
+    name: 'new_text',
+    type: 'text',
+    required: true,
+    description: 'The text to replace `old_text` with.',
+  },
+  {
+    name: 'instance_num',
+    type: 'number',
+    required: false,
+    description:
+      'Which occurrence to replace. If omitted, every occurrence of `old_text` is replaced.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with `old_text` replaced by `new_text` — every occurrence by
+default, or just the `instance_num`-th one if specified.
+
+## Description
+
+SUBSTITUTE finds and replaces based on matching **text content**,
+unlike REPLACE, which replaces based on a fixed position and length.
+Use SUBSTITUTE when you know what text you're looking for; use
+REPLACE when you know exactly where it sits in the string.
+
+<Callout type="warn">
+  SUBSTITUTE is case-sensitive — `SUBSTITUTE(A2, "Text", "Word")`
+  won't match a lowercase `"text"` in A2. There's no case-insensitive
+  option built in.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2027-01-15': '2027/01/15', '2026-12-25': '2026/12/25', '2025-07-04': '2025/07/04' }}
+  defaultValue="2027-01-15"
+  label={'Live preview — SUBSTITUTE(date, "-", "/")'}
+  fieldLabel="date"
+/>
+
+## Common errors
+
+### Nothing changes — case doesn't match
+
+<ExcelCode>{`SUBSTITUTE(A2, "Text", "Word") → no change if A2 contains lowercase "text"`}</ExcelCode>
+
+SUBSTITUTE is case-sensitive. Match the exact case, or normalize both
+sides first with UPPER/LOWER if the case genuinely varies.
+
+### Replacing every occurrence when only one was wanted
+
+<ExcelCode>{`SUBSTITUTE(A2, "-", "/") → replaces every hyphen, not just the first`}</ExcelCode>
+
+Without `instance_num`, every match gets replaced. Add it to target
+just one:
+
+<ExcelCode>{`SUBSTITUTE(A2, "-", "/", 1)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'SUBSTITUTE vs REPLACE — which should I use?',
+    answer:
+      "Use SUBSTITUTE when you know the text you're looking for, regardless of where it sits. Use REPLACE when you know the exact position and length to replace, regardless of what text is there.",
+  },
+  {
+    question: 'Is SUBSTITUTE case-sensitive?',
+    answer:
+      'Yes — `"Text"` won\'t match `"text"`. There\'s no built-in case-insensitive option; you\'d need to normalize the case first with UPPER or LOWER if that matters.',
+  },
+  {
+    question: 'How do I replace only the Nth occurrence?',
+    answer:
+      'Pass a number as the fourth argument, `instance_num` — `SUBSTITUTE(A2, "-", "/", 2)` replaces only the second hyphen, leaving the rest untouched.',
+  },
+  {
+    question: 'Is SUBSTITUTE the right way to remove non-breaking spaces?',
+    answer:
+      'Yes — `SUBSTITUTE(text, CHAR(160), " ")` is the standard fix, since neither TRIM nor CLEAN removes a non-breaking space on its own.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUBSTITUTE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUBSTITUTE(A2, "-", "/")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Replace(Range("A2").Value, "-", "/")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Formatted"] = df["Date"].str.replace("-", "/")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- REPLACE — replaces based on position and length instead of
+  matching text content. Page coming soon (Text category).
+- [TRIM](/docs/text/trim) — for regular extra spaces; SUBSTITUTE is
+  what handles the non-breaking spaces TRIM can't.
+- [CLEAN](/docs/text/clean) — removes non-printable control
+  characters, a different kind of cleanup than SUBSTITUTE's targeted
+  find-and-replace.

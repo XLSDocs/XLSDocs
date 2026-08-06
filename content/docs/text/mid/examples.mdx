@@ -1,0 +1,31 @@
+---
+title: MID examples
+description: Worked examples for MID — fixed-position extraction, dynamic positions with FIND, and text between two delimiters.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — extract a fixed segment" formula={`=MID(A2, 5, 4)`}>
+  Returns 4 characters starting at position 5 — useful for a
+  structured code where the year always sits in the same spot.
+</ExampleCard>
+
+<ExampleCard number="02" label="Dynamic start position with FIND" formula={`=MID(A2, FIND(" ", A2) + 1, 10)`}>
+  Starts right after the first space, wherever it happens to fall,
+  instead of assuming a fixed position.
+</ExampleCard>
+
+<ExampleCard number="03" label="Text between two delimiters" formula={`=MID(A2, FIND("(", A2) + 1, FIND(")", A2) - FIND("(", A2) - 1)`}>
+  Extracts whatever sits between a pair of parentheses, regardless of
+  how long the text before or inside them is.
+</ExampleCard>
+
+<ExampleCard number="04" label="Middle initial from a full name" formula={`=MID(A2, FIND(" ", A2) + 1, 1)`}>
+  Grabs a single character right after the first space — a quick way
+  to pull a middle initial when names are formatted consistently.
+</ExampleCard>
+
+<ExampleCard number="05" label="Combined with VALUE for a numeric segment" formula={`=VALUE(MID(A2, 5, 4))`}>
+  MID always returns text — wrap it in VALUE() to convert an
+  extracted numeric segment (like a year) back into a real number.
+</ExampleCard>

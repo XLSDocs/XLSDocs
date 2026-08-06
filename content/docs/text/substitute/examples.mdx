@@ -1,0 +1,31 @@
+---
+title: SUBSTITUTE examples
+description: Worked examples for SUBSTITUTE — date formatting, one specific occurrence, non-breaking spaces, and nested replacements.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — reformat a date separator" formula={`=SUBSTITUTE(A2, "-", "/")`}>
+  Replaces every hyphen with a slash — "2027-01-15" becomes
+  "2027/01/15".
+</ExampleCard>
+
+<ExampleCard number="02" label="Replacing only one occurrence" formula={`=SUBSTITUTE(A2, "-", "/", 1)`}>
+  With `instance_num` set to `1`, only the first hyphen is replaced,
+  leaving any others untouched.
+</ExampleCard>
+
+<ExampleCard number="03" label="Removing non-breaking spaces" formula={`=SUBSTITUTE(A2, CHAR(160), " ")`}>
+  Converts non-breaking spaces (common in web-pasted text) into
+  regular ones — often chained with TRIM afterward.
+</ExampleCard>
+
+<ExampleCard number="04" label="Nested SUBSTITUTE for multiple replacements" formula={`=SUBSTITUTE(SUBSTITUTE(A2, "-", "/"), " ", "_")`}>
+  Nesting SUBSTITUTE calls chains multiple find-and-replace
+  operations in one formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="Removing a character entirely" formula={`=SUBSTITUTE(A2, "$", "")`}>
+  Passing an empty string as `new_text` deletes every occurrence of
+  `old_text` instead of replacing it with something else.
+</ExampleCard>

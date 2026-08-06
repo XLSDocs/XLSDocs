@@ -1,0 +1,152 @@
+---
+title: CLEAN
+description: Remove non-printable control characters from text.
+---
+
+Strip non-printable control characters from text — the kind of
+invisible junk that shows up when data is exported from an older
+system, scraped from a PDF, or pasted from a terminal, rather than
+typed directly into Excel.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Removes non-printable control characters', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: "Doesn't remove regular or non-breaking spaces", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CLEAN(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CLEAN(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to remove non-printable characters from.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with non-printable characters (the first 32 characters of the
+ASCII set — things like line feeds and other control codes) removed.
+Printable characters, including regular spaces, are left untouched.
+
+## Description
+
+CLEAN targets a different kind of mess than TRIM. TRIM removes extra
+*space* characters; CLEAN removes *control* characters that don't
+print at all — often invisible in the cell but disruptive to
+formulas, exports, or further text processing. The two are commonly
+used together: `TRIM(CLEAN(A2))`.
+
+<Callout type="warn">
+  CLEAN doesn't touch the non-breaking space (`CHAR(160)`), even
+  though it's often the actual cause of "invisible junk" in
+  web-pasted data — that one is printable, just not a regular space,
+  so it needs `SUBSTITUTE` instead.
+</Callout>
+
+## Common errors
+
+### Text still looks messy after CLEAN
+
+<ExcelCode>{`CLEAN(A2) → still has extra spacing`}</ExcelCode>
+
+The leftover issue is very likely a non-breaking space, not a
+control character — CLEAN won't touch it. Combine with SUBSTITUTE:
+
+<ExcelCode>{`CLEAN(SUBSTITUTE(A2, CHAR(160), " "))`}</ExcelCode>
+
+### CLEAN removes line breaks you wanted to keep
+
+<ExcelCode>{`CLEAN(A2) → intentional line breaks (Alt+Enter) are gone too`}</ExcelCode>
+
+CLEAN removes every control character indiscriminately, including a
+line break you may have wanted to preserve. If that matters,
+substitute the line break for a placeholder first, clean, then
+substitute it back.
+
+export const faqs = [
+  {
+    question: 'CLEAN vs TRIM — what’s the difference?',
+    answer:
+      'TRIM removes extra space characters. CLEAN removes non-printable control characters (like stray line feeds from a system export). Different jobs, often combined: `TRIM(CLEAN(A2))`.',
+  },
+  {
+    question: 'Does CLEAN remove regular or non-breaking spaces?',
+    answer:
+      "No — spaces of any kind are printable characters, outside what CLEAN targets. Use TRIM for regular spaces, or SUBSTITUTE(text, CHAR(160), \" \") for non-breaking ones.",
+  },
+  {
+    question: 'When would I actually need CLEAN?',
+    answer:
+      'Most commonly with data imported or pasted from another system — a database export, a PDF-to-text conversion, or a legacy mainframe file — that carries embedded control characters Excel didn\'t generate itself.',
+  },
+  {
+    question: 'Can CLEAN accidentally remove something I wanted to keep?',
+    answer:
+      'Yes — it removes every control character it finds, including intentional line breaks entered with Alt+Enter. If you need to preserve those, substitute them for a placeholder before cleaning, then substitute them back afterward.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CLEAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TRIM(CLEAN(A2))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim cleaned As String
+    cleaned = Application.WorksheetFunction.Clean(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+    import re
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Cleaned"] = df["Text"].apply(lambda s: re.sub(r"[\x00-\x1f]", "", s))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TRIM](/docs/text/trim) — removes extra space characters, the
+  complementary cleanup job to CLEAN's control-character removal.
+- [SUBSTITUTE](/docs/text/substitute) — handles non-breaking spaces
+  and other specific characters CLEAN doesn't touch.

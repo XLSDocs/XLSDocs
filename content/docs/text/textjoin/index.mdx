@@ -1,0 +1,177 @@
+---
+title: TEXTJOIN
+description: Join text from multiple cells or ranges with a separator between each one.
+---
+
+Join text from multiple cells or ranges the way CONCAT does, but with
+a separator inserted between every item — and the option to skip
+blank cells automatically instead of leaving gaps.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Inserts a separator between every joined item', type: 'check' },
+  { text: 'Can skip blank cells automatically', type: 'check' },
+  { text: 'Requires Excel 2019, 2021, or 365 — not 2016', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TEXTJOIN(delimiter, ignore_empty, text1, ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TEXTJOIN(delimiter, ignore_empty, text1, [text2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'delimiter',
+    type: 'text',
+    required: true,
+    description: 'The text to insert between each joined item, e.g. `", "`.',
+  },
+  {
+    name: 'ignore_empty',
+    type: 'boolean',
+    required: true,
+    description: '`TRUE` skips blank cells instead of joining them in as empty strings.',
+  },
+  {
+    name: 'text1',
+    type: 'text or range',
+    required: true,
+    description: 'The first item to join — a literal string, a cell, or a whole range.',
+  },
+  {
+    name: 'text2, ...',
+    type: 'text or range',
+    required: false,
+    description: 'Up to 252 more items to join, in order.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single text string with every item joined together, separated by
+`delimiter`, with blank cells skipped if `ignore_empty` is `TRUE`.
+
+## Description
+
+TEXTJOIN is CONCAT with two extra abilities: a separator between
+every joined item, and the option to automatically skip blanks so
+you don't end up with a string full of doubled-up separators from
+empty cells.
+
+<Callout type="warn">
+  `delimiter` and `ignore_empty` come **before** the list of items to
+  join — easy to mix up if you're expecting the text arguments
+  first, the way CONCAT works.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'apple,banana,cherry': 'Apple, Banana, Cherry', 'one item': 'One Item' }}
+  defaultValue="Apple,Banana,Cherry"
+  label={'Live preview — TEXTJOIN(", ", TRUE, items)'}
+  fieldLabel="items"
+/>
+
+## Common errors
+
+### Blank cells still create extra delimiters
+
+<ExcelCode>{`TEXTJOIN(", ", FALSE, A1:A5) → extra ", " where cells are blank`}</ExcelCode>
+
+`ignore_empty` was set to `FALSE`. Pass `TRUE` to skip blanks
+automatically:
+
+<ExcelCode>{`TEXTJOIN(", ", TRUE, A1:A5)`}</ExcelCode>
+
+### Mixing up the argument order
+
+<ExcelCode>{`TEXTJOIN(A1:A5, ", ", TRUE) → wrong — delimiter and ignore_empty come first`}</ExcelCode>
+
+Unlike CONCAT, TEXTJOIN's first two arguments are always `delimiter`
+and `ignore_empty`, before any actual text to join.
+
+export const faqs = [
+  {
+    question: 'TEXTJOIN vs CONCAT — which should I use?',
+    answer:
+      "Use TEXTJOIN when you need a separator between joined items, or want to automatically skip blank cells. CONCAT has neither — it just joins everything with nothing in between.",
+  },
+  {
+    question: 'Does TEXTJOIN skip blank cells automatically?',
+    answer:
+      'Only if `ignore_empty` is set to `TRUE`. With `FALSE`, blank cells still get joined in as empty strings, which shows up as doubled-up delimiters.',
+  },
+  {
+    question: 'Can TEXTJOIN use different delimiters between different items?',
+    answer:
+      "Not with a single delimiter argument — it uses the same one throughout. For genuinely different separators in different spots, you'd need to build the string with CONCAT and multiple TEXTJOIN calls instead.",
+  },
+  {
+    question: 'How many items can TEXTJOIN join?',
+    answer:
+      'Up to 252 individual text arguments — but each argument can itself be an entire range containing many cells, so in practice there\'s effectively no limit for most uses.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TEXTJOIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TEXTJOIN(", ", TRUE, A1:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim joined As String
+    joined = Application.WorksheetFunction.TextJoin( _
+      ", ", True, Range("A1:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", header=None)
+    values = df.iloc[:, 0].dropna().astype(str)
+    joined = ", ".join(values)
+    print(joined)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CONCAT](/docs/text/concat) — joins the same way, but with no
+  separator and no blank-skipping option.
+- [TEXT](/docs/text/text) — often nested inside TEXTJOIN to format
+  each value before joining it.
+- [SUBSTITUTE](/docs/text/substitute) — useful for cleaning up
+  individual items before joining them.
