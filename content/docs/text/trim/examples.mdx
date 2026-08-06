@@ -1,0 +1,32 @@
+---
+title: TRIM examples
+description: Worked examples for TRIM — basic cleanup, non-breaking spaces, and combining with other text functions.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — clean up copy-pasted text" formula={`=TRIM(A2)`}>
+  Removes leading/trailing spaces and collapses any doubled-up
+  spaces between words to one.
+</ExampleCard>
+
+<ExampleCard number="02" label="Removing non-breaking spaces from web-pasted data" formula={`=TRIM(SUBSTITUTE(A2, CHAR(160), " "))`}>
+  Converts non-breaking spaces (common when pasting from a browser)
+  into regular spaces first, so TRIM can then collapse them
+  normally.
+</ExampleCard>
+
+<ExampleCard number="03" label="Cleaning before a lookup" formula={`=VLOOKUP(TRIM(A2), Products!A:B, 2, FALSE)`}>
+  Wrapping the lookup value in TRIM guards against a failed match
+  caused by stray spaces the user typed or pasted in.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combined with UPPER for consistent formatting" formula={`=UPPER(TRIM(A2))`}>
+  Trims first, then uppercases — useful for standardizing codes or
+  IDs entered inconsistently across a sheet.
+</ExampleCard>
+
+<ExampleCard number="05" label="Checking if trimming actually changed anything" formula={`=IF(TRIM(A2)=A2, "Clean", "Had extra spaces")`}>
+  Compares the trimmed version against the original to flag which
+  rows had whitespace problems in the first place.
+</ExampleCard>

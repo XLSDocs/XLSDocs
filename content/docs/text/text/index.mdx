@@ -1,0 +1,167 @@
+---
+title: TEXT
+description: Format a number or date as text using a format code.
+---
+
+Convert a number or date into text, formatted exactly the way you
+specify — the standard way to keep a formatted value looking right
+when it's concatenated into a sentence instead of sitting in its own
+cell.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Converts a number/date into formatted text', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: "Result is text — can't be used in further math", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TEXT(value, format_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TEXT(value, format_text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'number',
+    required: true,
+    description: 'The number or date to format.',
+  },
+  {
+    name: 'format_text',
+    type: 'text',
+    required: true,
+    description:
+      'A format code string, e.g. `"mm/dd/yyyy"`, `"$#,##0.00"`, or `"0%"` — the same codes used in Excel\'s Format Cells dialog.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`value` formatted as text according to `format_text`. The result is
+always a text string, even though `value` was a number.
+
+## Description
+
+Cell formatting (Format Cells) changes how a number *displays*
+without changing the underlying value — great on its own, but that
+formatting disappears the moment the value is concatenated into a
+sentence, since concatenation always uses the raw underlying number.
+TEXT solves that by producing an actual formatted text string you can
+join into a larger piece of text.
+
+<Callout type="warn">
+  TEXT's result is text, not a number — you can concatenate it, but
+  you can't do further math on it. If you need the formatted-looking
+  value back as a number, convert it with `VALUE()`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.00': '1234.50', '#,##0': '1,235', '0%': '123450%' }}
+  defaultValue="0.00"
+  label={'Live preview — TEXT(1234.5, format_text)'}
+  fieldLabel="format_text"
+/>
+
+## Common errors
+
+### Using the result in further calculations
+
+<ExcelCode>{`TEXT(A2, "0.00") + 5 → #VALUE!`}</ExcelCode>
+
+TEXT's output is a string, not a number — adding to it directly
+fails. Only use TEXT for display or concatenation; for math, work
+with the original numeric value instead.
+
+### Using cell-formatting codes that don't apply to formulas
+
+<ExcelCode>{`TEXT(A2, "General") → often not what you expect`}</ExcelCode>
+
+`format_text` needs a real format code (`"0.00"`, `"mm/dd/yyyy"`,
+`"$#,##0.00"`) — the same codes from Format Cells' "Custom" category,
+not a vague description of the format you want.
+
+export const faqs = [
+  {
+    question: 'TEXT vs cell formatting (Format Cells) — which should I use?',
+    answer:
+      "Cell formatting only changes how a value displays — the underlying number is untouched, and concatenating it uses the raw number instead. TEXT actually produces a formatted text string, which is what you need when building a sentence like \"Total: \" & TEXT(A2, \"$#,##0.00\").",
+  },
+  {
+    question: 'Can I use the result of TEXT in further math?',
+    answer:
+      "Not directly — it's a text string. Wrap it in VALUE() to convert back to a number if you need to calculate with it afterward.",
+  },
+  {
+    question: 'What are some common format codes?',
+    answer:
+      '`"0.00"` for 2 decimal places, `"$#,##0.00"` for currency, `"0%"` for a percentage, `"mm/dd/yyyy"` for a date, and `"@"` as a plain text placeholder.',
+  },
+  {
+    question: 'TEXT vs TEXTJOIN — what’s the difference?',
+    answer:
+      'TEXT formats a single number or date as text. TEXTJOIN joins multiple values together with a separator — different jobs, though they\'re often used together, e.g. TEXTJOIN(", ", TRUE, TEXT(A1:A5, "mm/dd")).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TEXT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CONCAT("Total: ", TEXT(A2, "$#,##0.00"))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim summary As String
+    summary = "Total: " & Format(Range("A2").Value, "$#,##0.00")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Summary"] = "Total: $" + df["Amount"].map("{:,.2f}".format)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CONCAT](/docs/text/concat) — TEXT's most common companion, used
+  to keep a number or date readable when joined into a sentence.
+- VALUE — converts a text string (including TEXT's own output) back
+  into a real number. Page coming soon (Text category).
+- TEXTJOIN — joins multiple values with a separator, often paired
+  with TEXT for formatting each one first. Page coming soon (Text
+  category).

@@ -1,0 +1,32 @@
+---
+title: CONCAT examples
+description: Worked examples for CONCAT — joining names, ranges, formatted dates, and building full addresses.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — full name from two cells" formula={`=CONCAT(A2, " ", B2)`}>
+  Joins a first and last name with a literal space between them.
+</ExampleCard>
+
+<ExampleCard number="02" label="Joining an entire range" formula={`=CONCAT(A1:A5)`}>
+  CONCAT flattens the range and joins every value inside it — no
+  need to list `A1, A2, A3, A4, A5` individually like CONCATENATE
+  would require.
+</ExampleCard>
+
+<ExampleCard number="03" label="Including a formatted date" formula={`=CONCAT("Order placed on ", TEXT(A2, "mmmm d, yyyy"))`}>
+  Wrapping the date in `TEXT()` keeps it readable ("January 5,
+  2027") instead of showing a raw serial number.
+</ExampleCard>
+
+<ExampleCard number="04" label="Building a full address" formula={`=CONCAT(A2, ", ", B2, ", ", C2, " ", D2)`}>
+  Mixes cell references and literal strings (the commas and spaces)
+  to build a one-line address from separate street/city/state/zip
+  columns.
+</ExampleCard>
+
+<ExampleCard number="05" label="With a separator via TEXTJOIN instead" formula={`=TEXTJOIN(", ", TRUE, A1:A5)`}>
+  When every joined item needs the same separator between it, reach
+  for TEXTJOIN instead — CONCAT never inserts one automatically.
+</ExampleCard>

@@ -1,0 +1,164 @@
+---
+title: RIGHT
+description: Extract a given number of characters from the end of a text string.
+---
+
+Pull a set number of characters from the **end** of a text string —
+the last 4 digits of an account number, a file extension, or the
+last name from a "Last, First" formatted string.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'num_chars defaults to 1 if omitted', type: 'check' },
+  { text: 'Counts characters, not words', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=RIGHT(text, num_chars)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RIGHT(text, [num_chars])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to extract characters from.',
+  },
+  {
+    name: 'num_chars',
+    type: 'number',
+    required: false,
+    description: 'How many characters to extract from the end. Defaults to `1` if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The rightmost `num_chars` characters of `text`, as a text string. If
+`num_chars` is greater than the length of `text`, the whole string is
+returned — not an error.
+
+## Description
+
+RIGHT counts back from the very last character of `text` and returns
+however many characters `num_chars` asks for — the mirror image of
+LEFT. For extracting text after a variable-position delimiter (like
+everything after the last space), combine it with FIND, SEARCH, and
+LEN.
+
+<Callout type="info">
+  RIGHT counts **characters**, not words — it has no concept of
+  "the last word." For that, you need to locate the last space first
+  (typically with a `FIND`/`SUBSTITUTE` combination) and extract from
+  there.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'invoice-2024': '2024', 'invoice-2025': '2025', 'invoice-2026': '2026' }}
+  defaultValue="Invoice-2026"
+  label={'Live preview — RIGHT(text, 4)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### #VALUE! — negative num_chars
+
+<ExcelCode>{`RIGHT(A2, -1) → #VALUE!`}</ExcelCode>
+
+`num_chars` must be zero or a positive number.
+
+### Extracting text after a variable-length start
+
+<ExcelCode>{`RIGHT(A2, LEN(A2) - FIND(" ", A2))`}</ExcelCode>
+
+RIGHT alone only extracts a fixed count from the end. This combines
+LEN (total length) and FIND (position of the first space) to work
+out how many characters remain after it — useful when the text
+before the delimiter isn't always the same length.
+
+export const faqs = [
+  {
+    question: 'RIGHT vs MID vs LEFT — which should I use?',
+    answer:
+      'RIGHT extracts from the end, LEFT from the start, and MID from any position you specify in the middle. Pick based on where the characters you need sit relative to the ends of the string.',
+  },
+  {
+    question: 'How do I extract everything after the last space or delimiter?',
+    answer:
+      'Combine RIGHT with LEN and FIND: `RIGHT(A2, LEN(A2) - FIND(" ", A2))` returns everything after the first space. For the *last* occurrence of a delimiter, SUBSTITUTE is usually combined in as well to locate it.',
+  },
+  {
+    question: 'What happens if num_chars is longer than the text?',
+    answer:
+      'RIGHT just returns the whole string — no error, even if you ask for more characters than exist.',
+  },
+  {
+    question: 'Does RIGHT work on numbers, not just text?',
+    answer:
+      'Yes — Excel converts the number to text first. The result is always text, even if the input was a number.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RIGHT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RIGHT(A2, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim suffix As String
+    suffix = Right(Range("A2").Value, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Suffix"] = df["Code"].str[-4:]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LEFT](/docs/text/left) — the mirror image of RIGHT, extracting
+  from the start of the text instead of the end.
+- MID — extracts from any position, not just the start or end. Page
+  coming soon (Text category).
+- [TRIM](/docs/text/trim) — often used alongside LEFT/RIGHT to clean
+  up stray whitespace before or after extracting a substring.

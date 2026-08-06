@@ -1,0 +1,162 @@
+---
+title: TRIM
+description: Remove extra spaces from text, leaving single spaces between words.
+---
+
+Strip leading and trailing spaces from a text string, and collapse
+multiple spaces between words down to one — the standard cleanup
+step for messy, copy-pasted, or exported data.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Collapses multiple internal spaces to one', type: 'check' },
+  { text: "Doesn't remove non-breaking spaces from pasted web data", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TRIM(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TRIM(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to remove extra spaces from.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with leading and trailing spaces removed, and any run of
+multiple spaces between words collapsed to a single space.
+
+## Description
+
+TRIM only touches the regular space character — it removes it from
+both ends of the string entirely, and reduces any internal stretch of
+several spaces in a row down to exactly one. It's the standard first
+step when cleaning up text pulled from another system, a form, or a
+paste from the web.
+
+<Callout type="warn">
+  TRIM does **not** remove a non-breaking space (`CHAR(160)`), which
+  is what web pages often use instead of a regular space. If a cell
+  still looks like it has extra space after TRIM, that's usually
+  the culprit — combine TRIM with SUBSTITUTE to remove it explicitly.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '  extra   spaces  ': 'Extra   Spaces', 'clean text': 'Clean Text' }}
+  defaultValue="  Extra   Spaces  "
+  label={'Live preview — TRIM(text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### TRIM doesn't seem to remove all the spaces
+
+<ExcelCode>{`TRIM(A2) → still looks like it has a gap, even after trimming`}</ExcelCode>
+
+Likely a non-breaking space (`CHAR(160)`), common in text pasted from
+a website — TRIM only removes regular spaces. Strip it explicitly
+first:
+
+<ExcelCode>{`TRIM(SUBSTITUTE(A2, CHAR(160), " "))`}</ExcelCode>
+
+### Tabs or line breaks remain
+
+<ExcelCode>{`TRIM(A2) → tab or line-break characters are still there`}</ExcelCode>
+
+TRIM only affects the space character — it doesn't touch tabs
+(`CHAR(9)`) or line breaks (`CHAR(10)`). Combine with SUBSTITUTE or
+CLEAN to remove those.
+
+export const faqs = [
+  {
+    question: 'Why does TRIM leave what looks like extra space?',
+    answer:
+      "It's almost always a non-breaking space (CHAR(160)) rather than a regular one — common in text copied from a web page. TRIM only removes regular spaces, so combine it with SUBSTITUTE(text, CHAR(160), \" \") first.",
+  },
+  {
+    question: 'TRIM vs CLEAN — what’s the difference?',
+    answer:
+      'TRIM removes extra space characters specifically. CLEAN removes non-printable control characters (like line feeds from a system export) but leaves spaces alone. They\'re often used together: `TRIM(CLEAN(A2))`.',
+  },
+  {
+    question: 'Does TRIM remove tabs or line breaks?',
+    answer:
+      "No — only the regular space character. Use SUBSTITUTE to replace tabs (CHAR(9)) or line breaks (CHAR(10)) with a space, then wrap the result in TRIM to clean up what's left.",
+  },
+  {
+    question: 'Does TRIM affect numbers?',
+    answer:
+      "TRIM expects text, so a number passed in gets converted to text first. It's meant for cleaning up text data, not for working with numeric values directly.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TRIM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TRIM(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim cleaned As String
+    cleaned = Application.WorksheetFunction.Trim(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+    import re
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Cleaned"] = df["Text"].apply(lambda s: re.sub(r"\s+", " ", s.strip()))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- CLEAN — removes non-printable control characters, complementing
+  TRIM's whitespace cleanup. Page coming soon (Text category).
+- SUBSTITUTE — replaces one character or string with another,
+  useful for stripping non-breaking spaces or other characters TRIM
+  can't touch. Page coming soon (Text category).
+- [LEFT](/docs/text/left) and [RIGHT](/docs/text/right) — often
+  combined with TRIM to extract a clean substring.

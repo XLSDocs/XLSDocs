@@ -1,0 +1,30 @@
+---
+title: TEXT examples
+description: Worked examples for TEXT — currency, percentages, dates, leading zeros, and building formatted sentences.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — currency formatting" formula={`=TEXT(A2, "$#,##0.00")`}>
+  Formats 1234.5 as "$1,234.50" — as text, ready to concatenate into
+  a sentence.
+</ExampleCard>
+
+<ExampleCard number="02" label="Percentage" formula={`=TEXT(A2, "0.0%")`}>
+  Formats 0.4567 as "45.7%".
+</ExampleCard>
+
+<ExampleCard number="03" label="Formatted date" formula={`=TEXT(A2, "mmmm d, yyyy")`}>
+  Formats a date serial number as "January 5, 2027" instead of a raw
+  number.
+</ExampleCard>
+
+<ExampleCard number="04" label="Leading zeros" formula={`=TEXT(A2, "00000")`}>
+  Formats 42 as "00042" — useful for zip codes or IDs that need a
+  fixed digit count.
+</ExampleCard>
+
+<ExampleCard number="05" label="Building a formatted sentence" formula={`=CONCAT("Revenue grew ", TEXT(A2, "0.0%"), " to ", TEXT(B2, "$#,##0"))`}>
+  Combines two TEXT calls inside CONCAT to build a fully formatted
+  sentence from raw numeric cells.
+</ExampleCard>

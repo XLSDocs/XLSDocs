@@ -1,0 +1,31 @@
+---
+title: LEFT examples
+description: Worked examples for LEFT — fixed-length prefixes, variable-length extraction with FIND, and combining with VALUE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — first 3 characters" formula={`=LEFT(A2, 3)`}>
+  Returns the first 3 characters of A2 — useful for pulling a fixed
+  prefix like a SKU category code.
+</ExampleCard>
+
+<ExampleCard number="02" label="Default num_chars (1 character)" formula={`=LEFT(A2)`}>
+  Omitting `num_chars` returns just the first character — handy for
+  grabbing an initial.
+</ExampleCard>
+
+<ExampleCard number="03" label="Extract text before the first space" formula={`=LEFT(A2, FIND(" ", A2) - 1)`}>
+  Works for names or labels of any length, since FIND locates the
+  space dynamically instead of assuming a fixed position.
+</ExampleCard>
+
+<ExampleCard number="04" label="Extracting a number for math" formula={`=VALUE(LEFT(A2, 4))`}>
+  LEFT always returns text — wrap it in VALUE() to convert back to a
+  real number before using it in a calculation.
+</ExampleCard>
+
+<ExampleCard number="05" label="Combined with TRIM for messy data" formula={`=LEFT(TRIM(A2), 5)`}>
+  Trimming first avoids counting leading spaces as part of the first
+  5 characters.
+</ExampleCard>

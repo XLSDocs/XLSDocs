@@ -1,0 +1,165 @@
+---
+title: CONCAT
+description: Join text from multiple cells or ranges into one string.
+---
+
+Join text from multiple cells, ranges, or literal strings into one
+combined string. The modern replacement for CONCATENATE — same idea,
+but it accepts whole ranges instead of listing every cell by hand.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Accepts ranges directly, unlike CONCATENATE', type: 'check' },
+  { text: 'Replaces the older CONCATENATE function', type: 'check' },
+  { text: 'No separator between items — use TEXTJOIN for that', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CONCAT(text1, [text2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CONCAT(text1, [text2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text1',
+    type: 'text or range',
+    required: true,
+    description: 'The first item to join — a literal string, a cell, or a whole range.',
+  },
+  {
+    name: 'text2, ...',
+    type: 'text or range',
+    required: false,
+    description: 'Up to 253 more items to join, in order.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single text string with every argument joined together, in order,
+with no separator between them.
+
+## Description
+
+CONCAT joins its arguments into one string. Unlike the older
+CONCATENATE function, an argument can be an entire range
+(`CONCAT(A1:A5)`) rather than requiring every cell to be listed
+individually — Excel flattens the range and joins every value inside
+it.
+
+<Callout type="warn">
+  CONCAT converts every argument to plain text, including numbers and
+  dates — a date loses its formatting and shows as a serial number
+  unless wrapped in `TEXT()` first.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ smith: 'John Smith', doe: 'Jane Doe', lee: 'Sam Lee' }}
+  defaultValue="Smith"
+  label={'Live preview — CONCAT(first_name, " ", last_name)'}
+  fieldLabel="last_name"
+/>
+
+## Common errors
+
+### Dates and numbers lose their formatting
+
+<ExcelCode>{`CONCAT(A2, " - ", B2) → shows a number, not a formatted date, if B2 is a date`}</ExcelCode>
+
+CONCAT converts every value to plain text using its raw underlying
+value. Wrap dates or formatted numbers in `TEXT()` first:
+
+<ExcelCode>{`CONCAT(A2, " - ", TEXT(B2, "mm/dd/yyyy"))`}</ExcelCode>
+
+### No separator between joined values
+
+<ExcelCode>{`CONCAT(A1:A5) → joins every value with nothing between them`}</ExcelCode>
+
+CONCAT never inserts a separator. For a comma- or space-separated
+list, use TEXTJOIN instead:
+
+<ExcelCode>{`TEXTJOIN(", ", TRUE, A1:A5)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'CONCAT vs CONCATENATE — which should I use?',
+    answer:
+      'CONCAT is the newer function and accepts whole ranges directly. CONCATENATE still works, kept for backward compatibility, but Microsoft recommends CONCAT going forward.',
+  },
+  {
+    question: 'CONCAT vs the & operator — which should I use?',
+    answer:
+      'For joining a couple of values, `&` (e.g. `A2&" "&B2`) works everywhere and is just as simple. CONCAT reads more clearly once you\'re joining many items or an entire range at once.',
+  },
+  {
+    question: 'Can CONCAT add a separator between items automatically?',
+    answer:
+      'No — CONCAT always joins with nothing in between. Use TEXTJOIN if you need a delimiter like a comma or space inserted between every item.',
+  },
+  {
+    question: 'Does CONCAT preserve number or date formatting?',
+    answer:
+      "No — every argument becomes plain text from its underlying value. Wrap a date or formatted number in `TEXT()` with an explicit format code to control how it appears.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CONCAT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CONCAT(A2, " ", B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim fullName As String
+    fullName = Range("A2").Value & " " & Range("B2").Value
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["FullName"] = df["FirstName"] + " " + df["LastName"]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- TEXTJOIN — like CONCAT, but inserts a separator between every
+  joined item. Page coming soon (Text category).
+- [TEXT](/docs/text/text) — formats a number or date as text, often
+  used inside CONCAT to control how a value appears.
+- CONCATENATE — the older function CONCAT replaces; still works, but
+  doesn't accept whole ranges as a single argument.
