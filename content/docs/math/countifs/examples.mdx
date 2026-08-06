@@ -1,0 +1,31 @@
+---
+title: COUNTIFS examples
+description: Worked examples for COUNTIFS — single and multi-condition counts, date ranges, and blank-cell counting.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — count paid orders by region" formula={`=COUNTIFS(Sales[Region], "West", Sales[Status], "Paid")`}>
+  Counts rows where the region is "West" **and** the status is
+  "Paid" — both conditions must be true.
+</ExampleCard>
+
+<ExampleCard number="02" label="Date range" formula={`=COUNTIFS(Sales[Date], ">="&DATE(2027,1,1), Sales[Date], "<"&DATE(2027,4,1))`}>
+  Two conditions on the same underlying data (a date column) count
+  rows falling within Q1 2027.
+</ExampleCard>
+
+<ExampleCard number="03" label="Counting blank cells" formula={`=COUNTIFS(Sales[Notes], "")`}>
+  Passing `""` as the criteria counts rows where that column is
+  blank.
+</ExampleCard>
+
+<ExampleCard number="04" label="Wildcard match" formula={`=COUNTIFS(Products[Name], "*Pro*")`}>
+  `*` matches any number of characters — this counts every product
+  whose name contains "Pro" anywhere.
+</ExampleCard>
+
+<ExampleCard number="05" label="Excluding a value" formula={`=COUNTIFS(Sales[Region], "<>West")`}>
+  `<>` means "not equal to" — counts every sale **outside** the West
+  region.
+</ExampleCard>

@@ -1,0 +1,178 @@
+---
+title: COUNTIFS
+description: Count rows where every one of several conditions is met.
+---
+
+Count how many rows match **all** of one or more conditions — orders
+over $500 that are also unpaid, employees in a department hired
+after a given date, and so on.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'All conditions must match (AND logic)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Returns 0, not an error, when nothing matches', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUNTIFS(criteria_range1, criteria1, ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUNTIFS(criteria_range1, criteria1, [criteria_range2, criteria2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'criteria_range1',
+    type: 'range',
+    required: true,
+    description: 'The first range to evaluate a condition against.',
+  },
+  {
+    name: 'criteria1',
+    type: 'any',
+    required: true,
+    description:
+      'The condition applied to `criteria_range1` (a value, comparison string, or wildcard).',
+  },
+  {
+    name: 'criteria_range2, criteria2, ...',
+    type: 'range, any',
+    required: false,
+    description:
+      'Up to 126 more range/condition pairs. All conditions must be true for a row to be counted (AND logic).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of rows where every criteria pair matches. Returns `0` if
+no rows match — not an error.
+
+## Description
+
+COUNTIFS is COUNTIF extended to multiple conditions, combined with
+AND logic — a row only counts if **every** criteria pair matches.
+Unlike SUMIFS/AVERAGEIFS, there's no value range to aggregate; it's a
+pure row count.
+
+<Callout type="info">
+  Every `criteria_range` must be the same size and shape as the
+  others — mixing a 10-row range with a 9-row range throws
+  `#VALUE!`, the same failure mode as SUMIFS and AVERAGEIFS.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '12', east: '8', north: '5', south: '7' }}
+  defaultValue="West"
+  label={'Live preview — COUNTIFS(Sales[Region], "{value}", Sales[Status], "Paid")'}
+  fieldLabel="region"
+/>
+
+## Common errors
+
+### #VALUE! — mismatched range sizes
+
+<ExcelCode>{`COUNTIFS(A2:A10, "West", B2:B9, "Paid") → #VALUE!`}</ExcelCode>
+
+Both criteria ranges must be the same size — here one is 9 rows and
+the other is 10.
+
+### Returns 0 — unquoted criteria
+
+<ExcelCode>{`COUNTIFS(A:A, West) → #NAME? (missing quotes around "West")`}</ExcelCode>
+
+Text criteria need quotes around them.
+
+### Unquoted comparison operator
+
+<ExcelCode>{`COUNTIFS(A:A, >D2) → #NAME?`}</ExcelCode>
+
+Comparison operators need to be a quoted string concatenated with the
+cell reference:
+
+<ExcelCode>{`COUNTIFS(A:A, ">"&D2)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'COUNTIFS vs COUNTIF — which should I use?',
+    answer:
+      'COUNTIF handles a single condition. COUNTIFS handles multiple conditions combined with AND logic — use it as soon as you need more than one criteria range.',
+  },
+  {
+    question: 'Can COUNTIFS use OR logic instead of AND?',
+    answer:
+      'Not directly — like SUMIFS, every condition must be true. For "West OR East", add two separate COUNTIFS calls together, or use SUMPRODUCT with an array of allowed values.',
+  },
+  {
+    question: 'Does COUNTIFS count blank cells?',
+    answer:
+      'Only if a criteria explicitly asks for blanks — pass `""` as the criteria for a range to count its blank cells specifically. Otherwise blanks are excluded unless they happen to satisfy the condition.',
+  },
+  {
+    question: 'Why does COUNTIFS return 0 when I expect a count?',
+    answer:
+      'Either no rows genuinely match every condition, or a criteria value is missing its quotes. Double-check each `criteria_range` is the same size as the others, same as SUMIFS.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUNTIFS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUNTIFS(Sales[Region], "West", Sales[Status], "Paid")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Long
+    total = Application.WorksheetFunction.CountIfs( _
+      Range("Sales[Region]"), "West", Range("Sales[Status]"), "Paid")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = len(df[(df["Region"] == "West") & (df["Status"] == "Paid")])
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMIFS](/docs/math/sumifs) — same multi-condition AND logic, but
+  totals a value range instead of counting rows.
+- [AVERAGEIFS](/docs/math/averageifs) — same AND logic, averaging a
+  value range instead of counting rows.
+- [IFERROR](/docs/logical/iferror) — useful alongside COUNTIFS when
+  dividing a sum by a count that might be zero.

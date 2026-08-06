@@ -1,0 +1,197 @@
+---
+title: SWITCH
+description: Compare one value against a list of exact matches and return the first result that fits.
+---
+
+Compare a single value against a list of exact matches, and return the
+result for the first one that fits — no repeated comparisons against
+the same expression like a nested IF chain needs.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Shorter than IFS for exact-match lists', type: 'check' },
+  { text: 'Checks values in order', type: 'check' },
+  { text: 'Returns #N/A with no default provided', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SWITCH(expression, value1, result1, ..., default)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SWITCH(expression, value1, result1, [value2, result2], ..., [default])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'any',
+    required: true,
+    description: 'The value to compare against each `value1`, `value2`, etc.',
+  },
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: '`expression` is compared against this. Must match exactly.',
+  },
+  {
+    name: 'result1',
+    type: 'any',
+    required: true,
+    description: 'Returned if `expression` matches `value1`.',
+  },
+  {
+    name: 'value2, result2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 126 more value/result pairs, checked in order.',
+  },
+  {
+    name: 'default',
+    type: 'any',
+    required: false,
+    description:
+      'Returned if no value matches. A trailing unpaired argument — omit it and no match returns `#N/A` instead.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`resultN` for the first `valueN` that exactly matches `expression`, or
+`default` if none match. Returns `#N/A` if nothing matches and no
+`default` was provided.
+
+## Description
+
+SWITCH evaluates `expression` once, then compares it against each
+`valueN` in order for an exact match. It's a shorter alternative to
+IFS or nested IF specifically when every branch compares the *same*
+value against a fixed list of exact options — a job IFS can also do,
+but SWITCH does with less repetition since `expression` is only
+written once.
+
+<Callout type="warn">
+  SWITCH only tests for **exact equality** — it can't evaluate a
+  comparison like `A2 > 100`. For conditions like that, use IFS
+  instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: 'W', east: 'E', north: 'N', south: 'S' }}
+  defaultValue="West"
+  label={'Live preview — SWITCH(region, "West","W","East","E","Unknown")'}
+  fieldLabel="region"
+  errorValue="Unknown"
+/>
+
+## Common errors
+
+### #N/A — no match and no default
+
+<ExcelCode>{`SWITCH(A2, "West","W","East","E") → #N/A (when A2 is "North")`}</ExcelCode>
+
+Add a trailing `default` argument to catch anything that doesn't
+match:
+
+<ExcelCode>{`SWITCH(A2, "West","W","East","E","Unknown")`}</ExcelCode>
+
+### Trying to use a comparison instead of a value
+
+<ExcelCode>{`SWITCH(A2, ">100","High") → doesn't work the way you'd expect`}</ExcelCode>
+
+SWITCH tests for exact equality only — `">100"` is compared as
+literal text, not evaluated as a condition. Use IFS for range/
+comparison conditions.
+
+<Callout type="info">
+  SWITCH checks values **in order** and stops at the first exact
+  match, the same as IFS does with conditions.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'SWITCH vs IFS — which should I use?',
+    answer:
+      'Use SWITCH when every branch compares the same value against a fixed list of exact matches. Use IFS when each branch has its own independent condition — ranges, comparisons, or AND/OR logic.',
+  },
+  {
+    question: 'Why does SWITCH return #N/A?',
+    answer:
+      'No value matched `expression`, and no `default` argument was provided. Add a trailing default to return a fallback instead.',
+  },
+  {
+    question: 'Can SWITCH compare ranges like ">100"?',
+    answer:
+      'No — SWITCH only tests exact equality. For a comparison or range condition, use IFS instead.',
+  },
+  {
+    question: 'How many value/result pairs can SWITCH have?',
+    answer: 'Up to 126, plus the optional trailing `default`.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SWITCH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SWITCH(A2, "West","W","East","E","North","N","South","S","Unknown")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim code As String
+    Select Case Range("A2").Value
+      Case "West": code = "W"
+      Case "East": code = "E"
+      Case "North": code = "N"
+      Case "South": code = "S"
+      Case Else: code = "Unknown"
+    End Select
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    codes = {"West": "W", "East": "E", "North": "N", "South": "S"}
+    df = pd.read_excel("workbook.xlsx")
+    df["Code"] = df["Region"].map(codes).fillna("Unknown")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IFS](/docs/logical/ifs) — better fit when branches need independent
+  conditions rather than exact matches against one value.
+- [IF](/docs/logical/if) — the fundamental branching function both IFS
+  and SWITCH build on.
+- [IFERROR](/docs/logical/iferror) — wraps SWITCH to catch `#N/A` from
+  an unmatched value, as an alternative to a trailing `default`.

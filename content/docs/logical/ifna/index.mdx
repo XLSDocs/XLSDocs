@@ -1,0 +1,171 @@
+---
+title: IFNA
+description: Catch a #N/A error specifically and return a fallback value instead.
+---
+
+Evaluate a formula, and if — and only if — it returns `#N/A`, return
+a fallback value instead. The narrower sibling of IFERROR: it leaves
+every other error type (`#VALUE!`, `#REF!`, `#DIV/0!`) to surface
+normally.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Only catches #N/A, not other errors', type: 'check' },
+  { text: "Won't hide a genuine formula bug", type: 'check' },
+  { text: 'value_if_na is required, not optional', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IFNA(value, value_if_na)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IFNA(value, value_if_na)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The formula or expression to evaluate.',
+  },
+  {
+    name: 'value_if_na',
+    type: 'any',
+    required: true,
+    description: 'The value returned if `value` evaluates specifically to `#N/A`.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The result of `value` if it isn't `#N/A`, otherwise `value_if_na`.
+Any other error type (`#VALUE!`, `#REF!`, `#DIV/0!`, etc.) passes
+through unchanged.
+
+## Description
+
+IFNA checks specifically for `#N/A` — the error VLOOKUP, XLOOKUP,
+and MATCH return on a missing match — and replaces only that with a
+fallback. Unlike IFERROR, it won't swallow an unrelated mistake
+elsewhere in the formula, since anything other than `#N/A` still
+surfaces as-is.
+
+<Callout type="info">
+  Use IFNA when a missing lookup is the *only* failure you expect and
+  want to handle. Use IFERROR when any error type should fall back to
+  the same value, accepting that it may also hide a genuine bug.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ e101: 'Engineering', e102: 'Sales', e103: 'Finance' }}
+  defaultValue="E101"
+  label={'Live preview — IFNA(VLOOKUP("{value}", Employees!A:B, 2, FALSE), "Not found")'}
+  fieldLabel="employee_id"
+  errorValue="Not found"
+/>
+
+## Common errors
+
+### Expecting IFNA to catch every error
+
+<ExcelCode>{`IFNA(A2/B2, 0) → still shows #DIV/0! when B2 is 0`}</ExcelCode>
+
+IFNA only catches `#N/A` — a `#DIV/0!` from a plain division error
+passes straight through. Use IFERROR if you want every error type
+caught.
+
+### Missing the second argument
+
+<ExcelCode>{`IFNA(VLOOKUP(A2, B:C, 2, FALSE)) → #VALUE! (wrong number of arguments)`}</ExcelCode>
+
+Both arguments are required — always provide `value_if_na`, even if
+it's just `""`.
+
+export const faqs = [
+  {
+    question: 'IFNA vs IFERROR — which should I use?',
+    answer:
+      'Use IFNA when a missing lookup (`#N/A`) is the only failure you expect and want to handle — genuine errors elsewhere still surface. Use IFERROR when any error type should fall back to the same value.',
+  },
+  {
+    question: 'When does a formula actually return #N/A?',
+    answer:
+      'Most commonly from VLOOKUP, HLOOKUP, XLOOKUP, or MATCH when the lookup value has no match. Any function that documents `#N/A` as its no-match result will trigger IFNA the same way.',
+  },
+  {
+    question: 'Can IFNA wrap something other than a lookup?',
+    answer:
+      "Yes — `value` can be any expression that might produce `#N/A`, not just a lookup function. It's just that lookups are by far the most common source of it.",
+  },
+  {
+    question: 'Does IFNA hide bugs the way IFERROR can?',
+    answer:
+      "Less so — since it only catches `#N/A`, a genuine mistake elsewhere in the formula (like a `#REF!` from a deleted range) still surfaces instead of silently becoming `value_if_na`.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IFNA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IFNA(VLOOKUP(A2, Employees!A:B, 2, FALSE), "Not found")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    On Error Resume Next
+    result = Application.WorksheetFunction.VLookup( _
+      Range("A2").Value, Range("Employees!A:B"), 2, False)
+    If Err.Number = 1004 Then result = "Not found"
+    On Error GoTo 0
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Employees")
+    match = df.loc[df["ID"] == "E101", "Department"]
+    result = match.iloc[0] if not match.empty else "Not found"
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IFERROR](/docs/logical/iferror) — the broader version, catching
+  every error type instead of just `#N/A`.
+- [XLOOKUP](/docs/lookup/xlookup) — its `if_not_found` argument covers
+  the same missing-lookup case natively, without a separate wrapper.
+- [VLOOKUP](/docs/lookup/vlookup) and [MATCH](/docs/lookup/match) —
+  the most common sources of the `#N/A` that IFNA catches.

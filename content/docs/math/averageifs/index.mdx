@@ -1,0 +1,192 @@
+---
+title: AVERAGEIFS
+description: Average a range where every one of several conditions is met.
+---
+
+Average a range of values, but only for rows that match **all** of
+one or more conditions — the same condition-matching shape as
+SUMIFS, just averaging instead of summing.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'All conditions must match (AND logic)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: '#DIV/0! if no rows match — unlike SUMIFS, which returns 0', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=AVERAGEIFS(average_range, criteria_range1, criteria1, ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AVERAGEIFS(average_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'average_range',
+    type: 'range',
+    required: true,
+    description: 'The values to average.',
+  },
+  {
+    name: 'criteria_range1',
+    type: 'range',
+    required: true,
+    description: 'The first range to evaluate a condition against.',
+  },
+  {
+    name: 'criteria1',
+    type: 'any',
+    required: true,
+    description:
+      'The condition applied to `criteria_range1` (a value, comparison string, or wildcard).',
+  },
+  {
+    name: 'criteria_range2, criteria2, ...',
+    type: 'range, any',
+    required: false,
+    description:
+      'Up to 126 more range/condition pairs. All conditions must be true for a row to be included (AND logic).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The average of `average_range` values in rows where every criteria
+pair matches. Returns `#DIV/0!` if no rows match — unlike SUMIFS or
+COUNTIFS, which return `0` on no matches, since averaging zero items
+is a division by zero.
+
+## Description
+
+AVERAGEIFS extends AVERAGE the same way SUMIFS extends SUM — every
+condition must be true for a row to count toward the average (AND
+logic), and each `criteria_range` must be the same size and shape as
+`average_range`.
+
+<Callout type="warn">
+  Unlike SUMIFS and COUNTIFS, AVERAGEIFS throws `#DIV/0!` when no
+  rows match — it isn't a silent `0`. Wrap it in IFERROR if a
+  zero-match result should show `0` or a message instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '$4,200', east: '$3,800', north: '$2,900', south: '$3,150' }}
+  defaultValue="West"
+  label={'Live preview — AVERAGEIFS(Sales[Amount], Sales[Region], "{value}")'}
+  fieldLabel="region"
+/>
+
+## Common errors
+
+### #DIV/0! — no rows match
+
+<ExcelCode>{`AVERAGEIFS(A2:A10, B2:B10, "West") → #DIV/0! (when no row is "West")`}</ExcelCode>
+
+There's nothing to average. Wrap it in IFERROR for a fallback:
+
+<ExcelCode>{`IFERROR(AVERAGEIFS(A2:A10, B2:B10, "West"), 0)`}</ExcelCode>
+
+### #VALUE! — mismatched range sizes
+
+<ExcelCode>{`AVERAGEIFS(A2:A10, B2:B9, "West") → #VALUE!`}</ExcelCode>
+
+`criteria_range` must be the same size as `average_range` — here one
+is 9 rows and the other is 10.
+
+### Unquoted criteria or operator
+
+<ExcelCode>{`AVERAGEIFS(A:A, B:B, West) → #NAME?
+AVERAGEIFS(A:A, B:B, >100) → #NAME?`}</ExcelCode>
+
+Text criteria and comparison operators both need quotes — for a
+cell-driven comparison, concatenate the operator with `&`:
+
+<ExcelCode>{`AVERAGEIFS(A:A, B:B, ">"&D2)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Why does AVERAGEIFS return #DIV/0! instead of 0?',
+    answer:
+      "No rows match every condition, so there's nothing to average — dividing by zero rows is a genuine error, unlike SUMIFS/COUNTIFS which have a sensible zero-match answer (0). Wrap it in IFERROR if you want a 0 or message instead.",
+  },
+  {
+    question: 'AVERAGEIFS vs SUMIFS — which should I use?',
+    answer:
+      'AVERAGEIFS averages the matching rows; SUMIFS totals them. For a weighted average or anything beyond a plain average, combine SUMIFS and COUNTIFS manually instead.',
+  },
+  {
+    question: 'Can AVERAGEIFS match multiple values in one column (OR logic)?',
+    answer:
+      'Not directly — like SUMIFS, it only ANDs conditions across ranges. Average two separate AVERAGEIFS results, or use AVERAGE with an array formula for OR logic.',
+  },
+  {
+    question: 'Does average_range need to be numeric?',
+    answer:
+      'Yes — non-numeric or blank cells within the matching rows are ignored, but `average_range` itself should be a range of numbers for the result to mean anything.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AVERAGEIFS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AVERAGEIFS(Sales[Amount], Sales[Region], "West", Sales[Quarter], "Q4")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim avg As Double
+    avg = Application.WorksheetFunction.AverageIfs( _
+      Range("Sales[Amount]"), Range("Sales[Region]"), "West", _
+      Range("Sales[Quarter]"), "Q4")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    avg = df.loc[
+        (df["Region"] == "West") & (df["Quarter"] == "Q4"), "Amount"
+    ].mean()
+    print(avg)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMIFS](/docs/math/sumifs) — same multi-condition AND logic, but
+  totals the matching rows instead of averaging them.
+- [COUNTIFS](/docs/math/countifs) — same AND logic, counting matching
+  rows instead of averaging a value range.
+- [IFERROR](/docs/logical/iferror) — wraps AVERAGEIFS to replace
+  `#DIV/0!` on a zero-match result with a fallback value.

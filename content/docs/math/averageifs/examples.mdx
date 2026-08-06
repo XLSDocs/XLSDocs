@@ -1,0 +1,31 @@
+---
+title: AVERAGEIFS examples
+description: Worked examples for AVERAGEIFS — single and multi-condition averages, error handling, and dynamic criteria.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — average sales by region" formula={`=AVERAGEIFS(Sales[Amount], Sales[Region], "West")`}>
+  Averages every value in `Sales[Amount]` where the matching row's
+  region is "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple conditions" formula={`=AVERAGEIFS(Sales[Amount], Sales[Region], "West", Sales[Quarter], "Q4")`}>
+  Both conditions must be true (AND logic) — West region **and** Q4.
+</ExampleCard>
+
+<ExampleCard number="03" label="With error handling" formula={`=IFERROR(AVERAGEIFS(Sales[Amount], Sales[Region], "Central"), 0)`}>
+  Returns `0` instead of `#DIV/0!` if no rows match "Central" —
+  useful when the condition might legitimately have zero matches.
+</ExampleCard>
+
+<ExampleCard number="04" label="Comparison operator from a cell" formula={`=AVERAGEIFS(Sales[Amount], Sales[Date], ">="&D2, Sales[Date], "<"&EDATE(D2,1)`}>
+  Averages all sales within a one-month window starting at the date
+  in D2 — the operator is concatenated with `&`, not compared
+  directly.
+</ExampleCard>
+
+<ExampleCard number="05" label="Excluding a value" formula={`=AVERAGEIFS(Sales[Amount], Sales[Region], "<>West")`}>
+  `<>` means "not equal to" — this averages every sale **outside**
+  the West region.
+</ExampleCard>

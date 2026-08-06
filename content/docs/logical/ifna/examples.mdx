@@ -1,0 +1,34 @@
+---
+title: IFNA examples
+description: Worked examples for IFNA — lookup fallbacks, letting other errors through, and nested formulas.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — lookup with a friendly fallback" formula={`=IFNA(VLOOKUP(A2, Products!A:C, 3, FALSE), "Not found")`}>
+  Replaces the raw `#N/A` VLOOKUP returns on a missing product ID,
+  while a genuine `#REF!` or `#VALUE!` elsewhere would still surface.
+</ExampleCard>
+
+<ExampleCard number="02" label="Letting a real error through" formula={`=IFNA(A2/B2, 0)`}>
+  If `B2` is `0`, this still shows `#DIV/0!` — IFNA doesn't catch it,
+  since it's not `#N/A`. Use IFERROR instead if that's the behavior
+  you want.
+</ExampleCard>
+
+<ExampleCard number="03" label="Wrapping a nested MATCH" formula={`=IFNA(INDEX(Prices!B:B, MATCH(A2, Prices!A:A, 0)), "No price set")`}>
+  If MATCH fails to find A2, the resulting `#N/A` propagates up
+  through INDEX and gets caught here — same pattern as IFERROR, just
+  narrower in what it catches.
+</ExampleCard>
+
+<ExampleCard number="04" label="Chained fallbacks across two tables" formula={`=IFNA(VLOOKUP(A2, ThisYear!A:B, 2, FALSE), IFNA(VLOOKUP(A2, LastYear!A:B, 2, FALSE), "Not found"))`}>
+  Nesting a second IFNA inside the first `value_if_na` tries a second
+  table before finally falling back to a plain message.
+</ExampleCard>
+
+<ExampleCard number="05" label="XLOOKUP's built-in alternative" formula={`=XLOOKUP(A2, Products!A:A, Products!C:C, "Not found")`}>
+  If you're already on Excel 365 or 2021, XLOOKUP's `if_not_found`
+  argument covers this exact case natively, without needing IFNA at
+  all.
+</ExampleCard>

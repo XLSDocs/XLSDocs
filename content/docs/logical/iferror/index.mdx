@@ -175,15 +175,14 @@ export const compatibility = [
 
 ## Related functions
 
-- IFNA — same shape as IFERROR, but only catches `#N/A` specifically,
-  leaving other error types to surface normally. Page coming soon
-  (Logical category).
+- [IFNA](/docs/logical/ifna) — same shape as IFERROR, but only catches
+  `#N/A` specifically, leaving other error types to surface normally.
 - [XLOOKUP](/docs/lookup/xlookup) — its `if_not_found` argument covers
   the most common IFERROR use case (missing lookup) natively, without
   a separate wrapper.
 - [VLOOKUP](/docs/lookup/vlookup) and [HLOOKUP](/docs/lookup/hlookup) —
   neither has a built-in fallback, so IFERROR is the standard way to
   handle a missing match.
-- IFS — like IFERROR, evaluates a series of things in order and stops
-  at the first one that applies, but branches on conditions rather
-  than errors. Page coming soon (Logical category).
+- [IFS](/docs/logical/ifs) — like IFERROR, evaluates a series of
+  things in order and stops at the first one that applies, but
+  branches on conditions rather than errors.

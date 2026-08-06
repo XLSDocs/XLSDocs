@@ -1,0 +1,33 @@
+---
+title: SWITCH examples
+description: Worked examples for SWITCH — region codes, day-of-week labels, a default fallback, and error handling.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — region code lookup" formula={`=SWITCH(A2, "West","W","East","E","North","N","South","S")`}>
+  Compares A2 against each region name in turn and returns the
+  matching short code — no `#N/A` handling yet, added in the next
+  example.
+</ExampleCard>
+
+<ExampleCard number="02" label="With a default fallback" formula={`=SWITCH(A2, "West","W","East","E","North","N","South","S","Unassigned")`}>
+  The trailing `"Unassigned"` argument (no paired value before it)
+  catches anything that didn't match one of the four regions.
+</ExampleCard>
+
+<ExampleCard number="03" label="Day-of-week labels" formula={`=SWITCH(WEEKDAY(A2), 1,"Sun", 2,"Mon", 3,"Tue", 4,"Wed", 5,"Thu", 6,"Fri", 7,"Sat")`}>
+  `expression` doesn't have to be a plain cell reference — here it's
+  the result of `WEEKDAY()`, compared against the numbers 1-7.
+</ExampleCard>
+
+<ExampleCard number="04" label="Grading tiers" formula={`=SWITCH(TRUE, A2>=90,"A", A2>=80,"B", A2>=70,"C", TRUE,"F")`}>
+  A common trick: compare against the literal `TRUE`, so each
+  "value" is actually a condition — this makes SWITCH behave like
+  IFS, though IFS is the clearer way to write this directly.
+</ExampleCard>
+
+<ExampleCard number="05" label="With error handling" formula={`=IFERROR(SWITCH(A2, "West","W","East","E"), "Not set")`}>
+  An alternative to a trailing `default` — wrap the whole SWITCH in
+  IFERROR to catch the `#N/A` from an unmatched value.
+</ExampleCard>
