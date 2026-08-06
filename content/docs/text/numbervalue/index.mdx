@@ -1,0 +1,178 @@
+---
+title: NUMBERVALUE
+description: Convert text to a number using explicitly specified decimal and thousands separators.
+---
+
+Convert a text string into a number, the same job as VALUE, but with
+explicit control over which characters mean "decimal point" and
+"thousands separator" — essential for data formatted with a
+different country's number conventions than your own.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Lets you specify decimal/thousands separators explicitly', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: "#VALUE! if text still doesn't parse with the given separators", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NUMBERVALUE(text, decimal_separator, group_separator)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NUMBERVALUE(text, [decimal_separator], [group_separator])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to convert into a number.',
+  },
+  {
+    name: 'decimal_separator',
+    type: 'text',
+    required: false,
+    description: 'The character used as the decimal point in `text`. Defaults to your system locale\'s setting.',
+  },
+  {
+    name: 'group_separator',
+    type: 'text',
+    required: false,
+    description: 'The character used as the thousands separator in `text`. Defaults to your system locale\'s setting.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The numeric value of `text`, parsed using `decimal_separator` and
+`group_separator` instead of relying on the system's regional
+settings. Returns `#VALUE!` if `text` can't be parsed that way.
+
+## Description
+
+VALUE relies on your system's regional settings to know whether a
+period or a comma means "decimal point." NUMBERVALUE lets you state
+that explicitly, which matters when working with data exported using
+a different convention than your own — European-formatted numbers
+like `"1.234,56"` (period as thousands separator, comma as decimal),
+for example.
+
+<Callout type="info">
+  For `"1.234,56"` (the European convention, meaning 1234.56), the
+  call is `NUMBERVALUE("1.234,56", ",", ".")` — comma as the decimal
+  separator, period as the group separator, the reverse of the
+  US/UK convention.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.234,56': '1234.56', '9.876,50': '9876.5' }}
+  defaultValue="1.234,56"
+  label={'Live preview — NUMBERVALUE(text, ",", ".")'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### #VALUE! — separators don't match the actual format
+
+<ExcelCode>{`NUMBERVALUE("1.234,56", ".", ",") → #VALUE! (separators reversed)`}</ExcelCode>
+
+Double-check which character is genuinely the decimal point in the
+source data — it's easy to pass `decimal_separator` and
+`group_separator` in the wrong order.
+
+### #VALUE! — leftover non-numeric characters
+
+<ExcelCode>{`NUMBERVALUE("1.234,56 kg", ",", ".") → #VALUE!`}</ExcelCode>
+
+Trailing text like `" kg"` isn't part of any recognized number
+format. Strip it out first with SUBSTITUTE or a text-extraction
+formula.
+
+export const faqs = [
+  {
+    question: 'NUMBERVALUE vs VALUE — which should I use?',
+    answer:
+      "VALUE relies on your system's locale to interpret decimal and thousands separators. NUMBERVALUE lets you specify them explicitly, which is more reliable when importing data formatted with a different country's conventions than your own.",
+  },
+  {
+    question: 'How do I parse a European-formatted number like "1.234,56"?',
+    answer:
+      'Use `NUMBERVALUE("1.234,56", ",", ".")` — comma as the decimal separator, period as the group separator, since that convention reverses the US/UK one.',
+  },
+  {
+    question: 'Why does NUMBERVALUE return #VALUE!?',
+    answer:
+      "Either the separators you passed don't match the actual formatting in the text, or there are leftover non-numeric characters (like a unit label) that break the parse.",
+  },
+  {
+    question: 'Does NUMBERVALUE handle currency symbols?',
+    answer:
+      "It can often ignore some non-numeric characters like currency symbols, but not reliably for every symbol — it's safer to strip them out explicitly first if you hit a #VALUE! error.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NUMBERVALUE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NUMBERVALUE(A2, ",", ".")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim num As Double
+    num = Application.WorksheetFunction.NumberValue( _
+      Range("A2").Value, ",", ".")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Amount"] = (
+        df["AmountText"].str.replace(".", "", regex=False)
+        .str.replace(",", ".", regex=False)
+        .astype(float)
+    )
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VALUE](/docs/text/value) — the simpler version that relies on
+  system locale instead of explicit separators.
+- [TEXT](/docs/text/text) — the reverse direction, formatting a
+  number as text.
+- [SUBSTITUTE](/docs/text/substitute) — useful for stripping units
+  or currency symbols before converting with NUMBERVALUE.

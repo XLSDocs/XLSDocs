@@ -1,0 +1,178 @@
+---
+title: REPLACE
+description: Replace part of a text string based on a fixed position and length.
+---
+
+Replace a chunk of text at a known position and length — the
+position-based counterpart to SUBSTITUTE, which replaces based on
+matching text content instead.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Replaces by position, not by matching text', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Easy to confuse argument order with SUBSTITUTE', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=REPLACE(old_text, start_num, num_chars, new_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=REPLACE(old_text, start_num, num_chars, new_text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'old_text',
+    type: 'text',
+    required: true,
+    description: 'The original text.',
+  },
+  {
+    name: 'start_num',
+    type: 'number',
+    required: true,
+    description: 'The position to start replacing at, counting from 1.',
+  },
+  {
+    name: 'num_chars',
+    type: 'number',
+    required: true,
+    description: 'How many characters to replace, starting at `start_num`.',
+  },
+  {
+    name: 'new_text',
+    type: 'text',
+    required: true,
+    description: 'The text to insert in place of the replaced characters.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`old_text` with the `num_chars` characters starting at `start_num`
+replaced by `new_text`. Everything outside that range is left
+unchanged.
+
+## Description
+
+REPLACE swaps out a segment defined by position and length, without
+caring what text is actually there — the opposite approach from
+SUBSTITUTE, which matches by content and doesn't care where it sits.
+Use REPLACE when you know exactly where the text to change sits;
+use SUBSTITUTE when you know what it says.
+
+<Callout type="warn">
+  REPLACE's arguments are `(old_text, start_num, num_chars,
+  new_text)` — the two numeric position arguments sit in the middle,
+  unlike SUBSTITUTE's `(text, old_text, new_text)`, where everything
+  is text. Mixing up the two functions' argument orders is a common
+  source of errors.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '555-0100': '555-9999', '555-0142': '555-9999' }}
+  defaultValue="555-0100"
+  label={'Live preview — REPLACE(phone, 5, 4, "9999")'}
+  fieldLabel="phone"
+/>
+
+## Common errors
+
+### Wrong characters replaced due to a miscounted position
+
+<ExcelCode>{`REPLACE(A2, 5, 3, "XXX") → replaces the wrong segment if start_num is off`}</ExcelCode>
+
+Double-check `start_num` by counting characters carefully, or use
+FIND to locate the position dynamically instead of guessing a fixed
+number.
+
+### Confusing REPLACE's arguments with SUBSTITUTE's
+
+<ExcelCode>{`REPLACE(A2, "abc", "xyz") → wrong — REPLACE needs numeric position arguments, not text`}</ExcelCode>
+
+That call belongs to SUBSTITUTE, not REPLACE. REPLACE always needs a
+numeric `start_num` and `num_chars` in the middle.
+
+export const faqs = [
+  {
+    question: 'REPLACE vs SUBSTITUTE — which should I use?',
+    answer:
+      'Use REPLACE when you know the exact position and length to replace, regardless of what text is there. Use SUBSTITUTE when you know the text to find, regardless of where it sits.',
+  },
+  {
+    question: 'What happens if num_chars is 0?',
+    answer:
+      'REPLACE inserts new_text at start_num without removing anything — effectively an insert rather than a replace.',
+  },
+  {
+    question: 'Can I use a dynamic position instead of a fixed number?',
+    answer:
+      'Yes — nest FIND or SEARCH inside `start_num` to locate the position first, e.g. `REPLACE(A2, FIND("-", A2), 1, "/")`.',
+  },
+  {
+    question: 'Does REPLACE work on numbers, not just text?',
+    answer:
+      'Yes — Excel converts a number to text first, and the result is always text, same as with LEFT, RIGHT, and MID.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REPLACE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REPLACE(A2, 5, 4, "9999")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Replace( _
+      Range("A2").Value, 5, 4, "9999")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Masked"] = df["Phone"].str[:4] + "9999"  # 0-indexed slice
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUBSTITUTE](/docs/text/substitute) — replaces based on matching
+  text content instead of a fixed position and length.
+- [FIND](/docs/text/find) and [SEARCH](/docs/text/search) — often
+  nested inside `start_num` to locate a dynamic replacement position.
+- [MID](/docs/text/mid) — extracts a segment the same way REPLACE
+  targets one, without replacing it.

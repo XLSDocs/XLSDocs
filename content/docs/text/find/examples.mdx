@@ -1,0 +1,30 @@
+---
+title: FIND examples
+description: Worked examples for FIND — locating delimiters, combining with LEFT/MID, and testing whether text contains a substring.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — locate the first space" formula={`=FIND(" ", A2)`}>
+  Returns the character position of the first space in A2 — a common
+  building block for splitting a full name.
+</ExampleCard>
+
+<ExampleCard number="02" label="Combined with LEFT" formula={`=LEFT(A2, FIND(" ", A2) - 1)`}>
+  Uses FIND's result to extract everything before the first space.
+</ExampleCard>
+
+<ExampleCard number="03" label="Searching from a specific position" formula={`=FIND(" ", A2, FIND(" ", A2) + 1)`}>
+  Passing the first space's position + 1 as `start_num` finds the
+  *second* space instead of the first.
+</ExampleCard>
+
+<ExampleCard number="04" label="Checking whether text contains a substring" formula={`=IFERROR(FIND("Pro", A2) > 0, FALSE)`}>
+  Wraps FIND in IFERROR to turn a potential `#VALUE!` into a clean
+  `TRUE`/`FALSE` "contains" check.
+</ExampleCard>
+
+<ExampleCard number="05" label="Case-sensitive distinction from SEARCH" formula={`=FIND("SKU", A2)`}>
+  Only matches an uppercase "SKU" — a lowercase "sku" in the same
+  cell would throw `#VALUE!`, unlike SEARCH which would match either.
+</ExampleCard>

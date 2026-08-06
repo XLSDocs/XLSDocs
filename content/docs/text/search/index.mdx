@@ -1,0 +1,170 @@
+---
+title: SEARCH
+description: Find the position of one piece of text within another, ignoring case and supporting wildcards.
+---
+
+Find the position of one piece of text inside another, the same job
+as FIND, but ignoring case and supporting `*`/`?` wildcards — useful
+when you don't know or don't care about the exact casing of what
+you're looking for.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Case-insensitive', type: 'check' },
+  { text: 'Supports wildcards (* and ?)', type: 'check' },
+  { text: "#VALUE! if find_text isn't found", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SEARCH(find_text, within_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SEARCH(find_text, within_text, [start_num])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'find_text',
+    type: 'text',
+    required: true,
+    description: 'The text to search for. Can include `*` (any characters) or `?` (single character) wildcards.',
+  },
+  {
+    name: 'within_text',
+    type: 'text',
+    required: true,
+    description: 'The text to search within.',
+  },
+  {
+    name: 'start_num',
+    type: 'number',
+    required: false,
+    description: 'The position to start searching from. Defaults to `1`.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The 1-based position of the first occurrence of `find_text` within
+`within_text`, ignoring case. Returns `#VALUE!` if `find_text`
+doesn't appear.
+
+## Description
+
+SEARCH works like FIND, but with two differences: it ignores case
+entirely, and `find_text` can include wildcards — `*` for any number
+of characters, `?` for exactly one. Use it when you want a looser
+match than FIND's case-sensitive, literal-only behavior.
+
+<Callout type="warn">
+  To search for a literal `*` or `?` character (not as a wildcard),
+  prefix it with a tilde: `SEARCH("~*", A2)` finds a literal
+  asterisk instead of matching any text.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'invoice #4521': '9', 'quote #9981': '7' }}
+  defaultValue="Invoice #4521"
+  label={'Live preview — SEARCH("#", text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### #VALUE! — text not found
+
+<ExcelCode>{`SEARCH("x", A2) → #VALUE! (no "x" anywhere in A2, in any case)`}</ExcelCode>
+
+Wrap it in IFERROR if a missing match is a valid, expected outcome.
+
+### Wildcard characters matching too broadly
+
+<ExcelCode>{`SEARCH("*", A2) → matches the very start of any text, since * means "any characters"`}</ExcelCode>
+
+If you want a literal asterisk or question mark rather than a
+wildcard, escape it with a tilde:
+
+<ExcelCode>{`SEARCH("~*", A2)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'SEARCH vs FIND — which should I use?',
+    answer:
+      'SEARCH ignores case and supports wildcards; FIND is case-sensitive with no wildcards. Use SEARCH when the casing might vary or you need a wildcard match; use FIND when you want a strict, literal, case-sensitive match.',
+  },
+  {
+    question: 'How do I search for a literal * or ? character?',
+    answer:
+      'Prefix it with a tilde: `~*` matches a literal asterisk, `~?` matches a literal question mark, instead of treating them as wildcards.',
+  },
+  {
+    question: 'Why does SEARCH return #VALUE!?',
+    answer:
+      "find_text doesn't appear anywhere in within_text, in any case. Wrap it in IFERROR if that's an expected possibility.",
+  },
+  {
+    question: 'Can I use SEARCH to build a "contains" check?',
+    answer:
+      'Yes — a common pattern is `IFERROR(SEARCH("word", A2) > 0, FALSE)`, which turns SEARCH\'s potential `#VALUE!` into a clean `TRUE`/`FALSE` result.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SEARCH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SEARCH("invoice", A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pos As Long
+    pos = InStr(1, Range("A2").Value, "invoice", vbTextCompare)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Pos"] = df["Text"].str.lower().str.find("invoice") + 1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FIND](/docs/text/find) — the case-sensitive, no-wildcards sibling
+  of SEARCH.
+- [MID](/docs/text/mid), [LEFT](/docs/text/left), and
+  [RIGHT](/docs/text/right) — often combined with SEARCH to extract
+  text starting from a dynamically located position.
+- [SUBSTITUTE](/docs/text/substitute) — useful alongside SEARCH when
+  you need to replace, not just locate, matching text.

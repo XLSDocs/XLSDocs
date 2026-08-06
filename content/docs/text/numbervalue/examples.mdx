@@ -1,0 +1,31 @@
+---
+title: NUMBERVALUE examples
+description: Worked examples for NUMBERVALUE — European number formats, stripping units first, and error handling.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — European decimal format" formula={`=NUMBERVALUE("1.234,56", ",", ".")`}>
+  Parses "1.234,56" (European convention) as the number 1234.56.
+</ExampleCard>
+
+<ExampleCard number="02" label="Space as thousands separator" formula={`=NUMBERVALUE("1 234,56", ",", " ")`}>
+  Some European locales use a space instead of a period for
+  thousands — pass it as `group_separator` explicitly.
+</ExampleCard>
+
+<ExampleCard number="03" label="Stripping a unit label first" formula={`=NUMBERVALUE(SUBSTITUTE(A2, " kg", ""), ",", ".")`}>
+  Removes the trailing " kg" text NUMBERVALUE can't parse on its
+  own, before converting what's left.
+</ExampleCard>
+
+<ExampleCard number="04" label="With error handling" formula={`=IFERROR(NUMBERVALUE(A2, ",", "."), 0)`}>
+  Falls back to `0` instead of `#VALUE!` for any cell that doesn't
+  match the expected format.
+</ExampleCard>
+
+<ExampleCard number="05" label="Default separators (system locale)" formula={`=NUMBERVALUE(A2)`}>
+  Omitting both separator arguments falls back to your system's
+  regional settings — equivalent to using VALUE() for text already
+  matching your own locale's conventions.
+</ExampleCard>

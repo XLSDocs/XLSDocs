@@ -1,0 +1,31 @@
+---
+title: REPLACE examples
+description: Worked examples for REPLACE — masking digits, inserting text, dynamic positions, and comparison with SUBSTITUTE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — mask the last 4 digits" formula={`=REPLACE(A2, 5, 4, "9999")`}>
+  Replaces 4 characters starting at position 5 — useful for masking
+  part of a phone number or account number.
+</ExampleCard>
+
+<ExampleCard number="02" label="Inserting text without removing any" formula={`=REPLACE(A2, 1, 0, "PRE-")`}>
+  With `num_chars` set to `0`, this inserts "PRE-" at the very start
+  without deleting anything.
+</ExampleCard>
+
+<ExampleCard number="03" label="Dynamic position with FIND" formula={`=REPLACE(A2, FIND("-", A2), 1, "/")`}>
+  Locates the hyphen dynamically instead of assuming a fixed
+  position, then replaces just that one character.
+</ExampleCard>
+
+<ExampleCard number="04" label="Removing a trailing segment" formula={`=REPLACE(A2, LEN(A2) - 3, 4, "")`}>
+  Replacing the last 4 characters with an empty string effectively
+  deletes them.
+</ExampleCard>
+
+<ExampleCard number="05" label="SUBSTITUTE instead, when you know the text not the position" formula={`=SUBSTITUTE(A2, "-", "/")`}>
+  If every hyphen (not just one at a known position) needs
+  replacing, SUBSTITUTE is the better fit than REPLACE.
+</ExampleCard>

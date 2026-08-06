@@ -1,0 +1,170 @@
+---
+title: FIND
+description: Find the position of one piece of text within another, using a case-sensitive exact match.
+---
+
+Find the position of one piece of text inside another — the
+character number where a delimiter, a substring, or a specific
+character first appears. Case-sensitive, and often nested inside
+LEFT, RIGHT, or MID to locate a dynamic extraction point.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Case-sensitive, exact match', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: "#VALUE! if find_text isn't found — no default fallback", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FIND(find_text, within_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FIND(find_text, within_text, [start_num])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'find_text',
+    type: 'text',
+    required: true,
+    description: 'The text to search for.',
+  },
+  {
+    name: 'within_text',
+    type: 'text',
+    required: true,
+    description: 'The text to search within.',
+  },
+  {
+    name: 'start_num',
+    type: 'number',
+    required: false,
+    description: 'The position to start searching from. Defaults to `1`.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The 1-based position of the first occurrence of `find_text` within
+`within_text`, searching from `start_num` onward. Returns `#VALUE!`
+if `find_text` doesn't appear.
+
+## Description
+
+FIND locates text by exact, case-sensitive matching, and doesn't
+support wildcards. It's most often used nested inside LEFT, RIGHT, or
+MID to find a dynamic split point — the position of a space, comma,
+or other delimiter — rather than on its own.
+
+<Callout type="warn">
+  FIND is case-sensitive: `FIND("Excel", A2)` won't match a lowercase
+  `"excel"` in A2. Use SEARCH instead if the match should ignore case.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'john smith': '5', 'jane doe': '5', 'sam lee jr': '4' }}
+  defaultValue="John Smith"
+  label={'Live preview — FIND(" ", full_name)'}
+  fieldLabel="full_name"
+/>
+
+## Common errors
+
+### #VALUE! — text not found
+
+<ExcelCode>{`FIND("x", A2) → #VALUE! (no "x" anywhere in A2)`}</ExcelCode>
+
+Wrap it in IFERROR if a missing match is expected and shouldn't break
+the formula:
+
+<ExcelCode>{`IFERROR(FIND("x", A2), 0)`}</ExcelCode>
+
+### #VALUE! — case doesn't match
+
+<ExcelCode>{`FIND("Excel", A2) → #VALUE! (when A2 contains lowercase "excel")`}</ExcelCode>
+
+FIND is case-sensitive. Use SEARCH for a case-insensitive match
+instead.
+
+export const faqs = [
+  {
+    question: 'FIND vs SEARCH — which should I use?',
+    answer:
+      'FIND is case-sensitive and has no wildcard support. SEARCH is case-insensitive and supports `*`/`?` wildcards. Use FIND when case matters or you want an exact literal match; use SEARCH otherwise.',
+  },
+  {
+    question: 'Why does FIND return #VALUE!?',
+    answer:
+      "find_text doesn't appear anywhere in within_text — including due to a case mismatch, since FIND is case-sensitive. Wrap it in IFERROR if a missing match is a valid outcome.",
+  },
+  {
+    question: 'Can FIND use wildcards like * or ??',
+    answer:
+      'No — FIND only matches literal text. For wildcard matching, use SEARCH instead.',
+  },
+  {
+    question: 'How do I find the last occurrence instead of the first?',
+    answer:
+      'FIND always returns the first match. For the last occurrence of a delimiter, a common trick is nesting SUBSTITUTE to replace only the final instance with a unique marker, then finding that marker instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FIND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FIND(" ", A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pos As Long
+    pos = InStr(1, Range("A2").Value, " ", vbBinaryCompare)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["SpacePos"] = df["FullName"].str.find(" ") + 1  # +1 for 1-based position
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SEARCH](/docs/text/search) — the case-insensitive, wildcard-
+  supporting sibling of FIND.
+- [MID](/docs/text/mid), [LEFT](/docs/text/left), and
+  [RIGHT](/docs/text/right) — FIND's most common companions, using
+  the position it finds as a dynamic extraction point.
+- [SUBSTITUTE](/docs/text/substitute) — useful for locating the last
+  occurrence of a delimiter, which FIND alone can't do directly.

@@ -1,0 +1,31 @@
+---
+title: SEARCH examples
+description: Worked examples for SEARCH — case-insensitive matching, wildcards, escaping literal wildcard characters, and contains checks.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — case-insensitive match" formula={`=SEARCH("invoice", A2)`}>
+  Matches "Invoice", "INVOICE", or "invoice" in A2, unlike FIND which
+  would only match the exact case given.
+</ExampleCard>
+
+<ExampleCard number="02" label="Wildcard match" formula={`=SEARCH("inv*2027", A2)`}>
+  `*` matches any number of characters in between — this matches
+  "inv-2027", "invoice-2027", or anything else fitting the pattern.
+</ExampleCard>
+
+<ExampleCard number="03" label="Escaping a literal wildcard character" formula={`=SEARCH("~?", A2)`}>
+  The tilde makes `?` a literal character to search for, instead of
+  a single-character wildcard.
+</ExampleCard>
+
+<ExampleCard number="04" label="Contains check" formula={`=IFERROR(SEARCH("urgent", A2) > 0, FALSE)`}>
+  Turns SEARCH's potential `#VALUE!` into a clean `TRUE`/`FALSE`
+  result for whether A2 contains "urgent" in any case.
+</ExampleCard>
+
+<ExampleCard number="05" label="Combined with MID to extract after a keyword" formula={`=MID(A2, SEARCH("Order #", A2) + 7, 10)`}>
+  Finds where "Order #" starts, then extracts the next 10 characters
+  after it — useful for pulling an ID out of a longer label.
+</ExampleCard>
