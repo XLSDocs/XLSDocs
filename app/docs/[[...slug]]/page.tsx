@@ -17,6 +17,7 @@ import { AskClaude } from '@/components/ask-claude';
 import { Feedback } from '@/components/feedback';
 import type { FaqItem } from '@/components/faq';
 import { VersionBadges, type CompatibilityItem } from '@/components/version-badges';
+import { CategoryBreadcrumb } from '@/components/category-breadcrumb';
 
 // FAQ answers are stored with markdown (`code`, **bold**) for on-page rendering,
 // but FAQPage structured data wants plain text.
@@ -33,6 +34,11 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const markdownUrl = getPageMarkdownUrl(page).url;
   const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`;
   const reportIssueUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/issues/new?title=${encodeURIComponent(`Docs issue: ${page.data.title}`)}&body=${encodeURIComponent(`Page: https://xlsdocs.com${page.url}\n\nWhat's wrong:`)}`;
+
+  const categorySlug = page.slugs[0];
+  const functionSlug = page.slugs[1];
+  const categoryPage = categorySlug ? source.getPage([categorySlug]) : undefined;
+  const functionPage = categorySlug && functionSlug ? source.getPage([categorySlug, functionSlug]) : undefined;
 
   const faqs = page.data._exports?.faqs as FaqItem[] | undefined;
   const compatibility = page.data._exports?.compatibility as CompatibilityItem[] | undefined;
@@ -55,9 +61,15 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
     <DocsPage
       toc={page.data.toc}
       full={page.data.full}
-      breadcrumb={{ includePage: true }}
+      breadcrumb={{ enabled: false }}
       tableOfContent={{ enabled: true, footer: <Feedback editUrl={githubUrl} reportIssueUrl={reportIssueUrl} /> }}
     >
+      {categoryPage && (
+        <CategoryBreadcrumb
+          category={{ title: categoryPage.data.title, url: categoryPage.url }}
+          fn={functionPage ? { title: functionPage.data.title, url: functionPage.url } : undefined}
+        />
+      )}
       {faqJsonLd && (
         <script
           type="application/ld+json"
