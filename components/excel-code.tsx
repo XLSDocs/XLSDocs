@@ -62,7 +62,7 @@ export function ExcelCode({ children }: { children: string }) {
   return (
     <CodeBlock>
       <Pre>
-        <code className="font-mono text-[13px] leading-relaxed">
+        <code className="excel-code font-mono text-[13px] leading-relaxed">
           {lines.map((line, i) => (
             <div key={i} className={`px-4 ${showLineNumbers ? 'flex gap-4' : ''}`}>
               {showLineNumbers && (
@@ -70,7 +70,7 @@ export function ExcelCode({ children }: { children: string }) {
                   {i + 1}
                 </span>
               )}
-              <span>{highlightLine(line)}</span>
+              <span className="min-w-0">{highlightLine(line)}</span>
             </div>
           ))}
         </code>
