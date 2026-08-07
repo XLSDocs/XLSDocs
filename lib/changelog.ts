@@ -12,6 +12,53 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-07',
+    title: 'DATE, TODAY, EDATE, and DATEDIF',
+    description:
+      'A new Date category covers the most common date-math functions — building a date from parts, getting today\'s date, shifting a date by months, and measuring the gap between two dates.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-07',
+    title: 'Cleaner formula blocks and clearer breadcrumbs',
+    description:
+      'Long Excel formulas now wrap instead of forcing a horizontal scroll, and every function page shows a proper "Category > Function" trail instead of just the page name.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-08-06',
+    title: 'A full Text category: 14 more functions',
+    description:
+      'CONCAT, LEFT, RIGHT, MID, TRIM, TEXT, TEXTJOIN, CLEAN, SUBSTITUTE, VALUE, FIND, SEARCH, REPLACE, and NUMBERVALUE — everything for building, extracting, cleaning, and formatting text.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-06',
+    title: 'SWITCH, IFNA, AVERAGEIFS, and COUNTIFS',
+    description:
+      'Four more function pages, closing out every function that other pages already linked to as "coming soon."',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-06',
+    title: 'Quick answers and richer parameter tables on every function page',
+    description:
+      'Each page now leads with a formula, key facts, and a migration path where one genuinely exists, plus a parameters table with required/optional badges and a copy button.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-08-06',
+    title: 'Sitemap and search-engine crawling',
+    description: 'Added a real sitemap and robots.txt, built from the same live function/blog data as the rest of the site.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-08-05',
+    title: 'Row hover on tables, and a real favicon',
+    description: 'Small polish: parameter tables highlight the row you\'re reading, and the browser tab now shows the real xlsdocs mark instead of a generic icon.',
+    tags: ['Improvement'],
+  },
+  {
     date: '2026-08-05',
     title: 'Site-wide search, plus HLOOKUP, IFERROR, INDEX, MATCH, and IFS',
     description:
