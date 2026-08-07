@@ -1,0 +1,156 @@
+---
+title: LOWER
+description: Convert text to all lowercase.
+---
+
+Convert every letter in a text string to lowercase — the mirror
+image of UPPER, commonly used to normalize email addresses, usernames,
+or codes before comparing or storing them.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Leaves numbers and symbols unchanged', type: 'check' },
+  { text: "Doesn't change the source cell — returns a new value", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LOWER(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOWER(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to convert to lowercase.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with every letter converted to lowercase. Numbers, spaces,
+and symbols pass through unchanged.
+
+## Description
+
+LOWER only affects letter casing, the same as UPPER in reverse. It's
+a common normalization step for email addresses and usernames,
+since those are conventionally compared and stored in lowercase
+regardless of how a user originally typed them.
+
+<Callout type="info">
+  LOWER returns a **new** text value — it doesn't change whatever
+  cell `text` came from. To permanently lowercase a column in place,
+  use LOWER in a helper column, then copy and Paste Special → Values
+  back over the original.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ EXCEL: 'excel', 'HELLO WORLD': 'hello world', 'Jane.Doe@Example.com': 'jane.doe@example.com' }}
+  defaultValue="EXCEL"
+  label={'Live preview — LOWER(text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### Expecting LOWER to clean up more than casing
+
+<ExcelCode>{`LOWER("  EXCEL ") → "  excel " — spaces are untouched`}</ExcelCode>
+
+LOWER only changes letter case. Combine with TRIM if extra spaces
+also need removing:
+
+<ExcelCode>{`TRIM(LOWER("  EXCEL "))`}</ExcelCode>
+
+### Result doesn't update the original cell
+
+<ExcelCode>{`=LOWER(A2) → shows lowercase text in the formula's own cell, A2 itself is unchanged`}</ExcelCode>
+
+LOWER produces a new value — copy the formula's result and Paste
+Special → Values over the original cells if the change needs to
+stick permanently.
+
+export const faqs = [
+  {
+    question: 'Does LOWER change the original cell?',
+    answer:
+      'No — it returns a new value wherever the formula is entered. To permanently lowercase a column, copy the LOWER results and Paste Special → Values back over the originals.',
+  },
+  {
+    question: 'LOWER vs UPPER vs PROPER — what’s the difference?',
+    answer: 'LOWER makes everything lowercase, UPPER makes everything uppercase, and PROPER capitalizes the first letter of each word.',
+  },
+  {
+    question: 'Why normalize email addresses with LOWER?',
+    answer:
+      'Email addresses are conventionally treated as case-insensitive, so lowercasing them before comparing or storing avoids treating "Jane@x.com" and "jane@x.com" as different values.',
+  },
+  {
+    question: 'Does LOWER affect numbers?',
+    answer: 'No visible change — a number has no case to convert — but the result becomes a text value rather than a number.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LOWER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LOWER(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = LCase(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Email"] = df["Email"].str.lower()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [UPPER](/docs/text/upper) — converts text to all uppercase
+  instead.
+- [PROPER](/docs/text/proper) — capitalizes only the first letter of
+  each word.
+- [TRIM](/docs/text/trim) — often combined with LOWER to clean up
+  spacing at the same time as casing.

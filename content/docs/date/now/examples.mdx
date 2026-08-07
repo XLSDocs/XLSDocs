@@ -1,0 +1,31 @@
+---
+title: NOW examples
+description: Worked examples for NOW — timestamps, elapsed time, and a static snapshot alternative.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Timestamp a submission" formula={`=NOW()`}>
+  Placed in a "Last updated" column, though remember this keeps
+  changing on every recalculation — see example 5 for a fixed
+  alternative.
+</ExampleCard>
+
+<ExampleCard number="02" label="Time elapsed since a start time" formula={`=NOW() - A2`}>
+  Subtracting a recorded start time from NOW() gives the elapsed
+  duration, formatted as a time value.
+</ExampleCard>
+
+<ExampleCard number="03" label="Formatted date and time" formula={`=TEXT(NOW(), "mmmm d, yyyy h:mm AM/PM")`}>
+  Wraps NOW() in TEXT() to display it as "August 7, 2027 3:45 PM"
+  instead of a raw serial number.
+</ExampleCard>
+
+<ExampleCard number="04" label="Just the time portion" formula={`=TEXT(NOW(), "h:mm:ss AM/PM")`}>
+  Formats only the time-of-day part, discarding the date.
+</ExampleCard>
+
+<ExampleCard number="05" label="A fixed timestamp instead" formula={`Ctrl+; then Space then Ctrl+Shift+; (not a formula)`}>
+  When a timestamp needs to stay fixed, insert it as a static value
+  with these two keyboard shortcuts instead of using NOW().
+</ExampleCard>

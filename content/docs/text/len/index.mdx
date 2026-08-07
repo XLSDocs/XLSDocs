@@ -1,0 +1,158 @@
+---
+title: LEN
+description: Count the number of characters in a text string.
+---
+
+Count how many characters are in a piece of text, including spaces —
+a small building block used constantly alongside MID, RIGHT, and
+data-validation formulas.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Counts every character, including spaces', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'A common way to test for a truly empty cell (LEN=0)', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LEN(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LEN(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to measure the length of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of characters in `text`, counting every character
+including spaces and punctuation.
+
+## Description
+
+LEN is a simple character count, but it's a key building block for
+more advanced text formulas — working out how many characters remain
+after a known prefix (for RIGHT or MID), validating that input
+matches an expected length, or detecting extra whitespace by
+comparing `LEN(text)` against `LEN(TRIM(text))`.
+
+<Callout type="info">
+  `LEN(A2) = 0` is a common, precise way to test whether a cell is
+  genuinely empty — including a cell that *looks* blank but actually
+  contains a zero-length text result from another formula, which
+  `ISBLANK` would not catch.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ excel: '5', 'hello world': '11', '  padded  ': '10' }}
+  defaultValue="excel"
+  label={'Live preview — LEN(text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### Extra spaces inflate the count unexpectedly
+
+<ExcelCode>{`LEN("  excel  ") → 9, not 5`}</ExcelCode>
+
+Leading and trailing spaces count toward the length. Wrap in TRIM
+first if you only want to count meaningful characters:
+
+<ExcelCode>{`LEN(TRIM("  excel  "))`}</ExcelCode>
+
+### Detecting whitespace-only differences
+
+<ExcelCode>{`LEN(A2) <> LEN(TRIM(A2)) → TRUE if A2 has extra spaces`}</ExcelCode>
+
+Comparing a cell's length before and after TRIM is a quick way to
+flag rows with stray whitespace, without needing to inspect them
+visually.
+
+export const faqs = [
+  {
+    question: 'Does LEN count spaces?',
+    answer: 'Yes — every character, including spaces and punctuation, counts toward the length.',
+  },
+  {
+    question: 'How do I count only meaningful characters, ignoring extra spaces?',
+    answer: 'Wrap the text in TRIM first: LEN(TRIM(text)) excludes leading/trailing spaces and collapses internal doubled spaces before counting.',
+  },
+  {
+    question: 'Does LEN work on numbers?',
+    answer:
+      'Yes — Excel converts the number to text first and counts the resulting characters, including a minus sign or decimal point if present.',
+  },
+  {
+    question: 'How do I check if a cell is truly empty using LEN?',
+    answer:
+      'LEN(A2) = 0 tests for a genuinely empty string — including one produced by another formula — which behaves differently from ISBLANK in some edge cases.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LEN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LEN(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim length As Long
+    length = Len(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Length"] = df["Text"].str.len()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TRIM](/docs/text/trim) — often paired with LEN to detect or
+  remove extra whitespace before counting.
+- [RIGHT](/docs/text/right) and [MID](/docs/text/mid) — commonly
+  combined with LEN to extract everything after a known starting
+  point.
+- [FIND](/docs/text/find) — locates a position within text; LEN is
+  often used alongside it to work out how many characters remain.

@@ -1,0 +1,30 @@
+---
+title: LOWER examples
+description: Worked examples for LOWER — normalizing emails, case-insensitive comparisons, and combining with TRIM.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — normalize an email address" formula={`=LOWER(A2)`}>
+  Converts "Jane.Doe@EXAMPLE.com" to "jane.doe@example.com".
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive comparison" formula={`=IF(LOWER(A2)=LOWER(B2), "Match", "No match")`}>
+  Lowercasing both sides before comparing avoids false mismatches
+  caused only by casing differences.
+</ExampleCard>
+
+<ExampleCard number="03" label="Cleaning up spacing and casing together" formula={`=TRIM(LOWER(A2))`}>
+  Removes extra spaces and normalizes casing in one formula.
+</ExampleCard>
+
+<ExampleCard number="04" label="Building a consistent username" formula={`=LOWER(SUBSTITUTE(A2, " ", "."))`}>
+  Combines LOWER with SUBSTITUTE to turn "Jane Doe" into
+  "jane.doe" — a common username-generation pattern.
+</ExampleCard>
+
+<ExampleCard number="05" label="Making a permanent change" formula={`=LOWER(A2:A10) then Paste Special > Values`}>
+  Build the lowercase versions in a helper column, then paste the
+  results back as values to make the change stick without keeping
+  the formula.
+</ExampleCard>

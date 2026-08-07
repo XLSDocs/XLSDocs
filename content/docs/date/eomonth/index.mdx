@@ -1,0 +1,164 @@
+---
+title: EOMONTH
+description: Find the last day of a month, a given number of months from a start date.
+---
+
+Find the last day of a month — either the month a date falls in, or
+a month some number of months before or after it. The standard
+formula behind month-end deadlines, billing dates, and reporting
+periods.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns the last day of a month', type: 'check' },
+  { text: "0 months gives start_date's own month-end", type: 'check' },
+  { text: 'Result is a date serial — format the cell to display it', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=EOMONTH(start_date, months)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EOMONTH(start_date, months)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The date to start counting from.',
+  },
+  {
+    name: 'months',
+    type: 'number',
+    required: true,
+    description:
+      'How many months forward (or back, if negative) to look before finding that month\'s last day. `0` means the month `start_date` itself falls in.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A date serial number representing the last day of the month that is
+`months` months from `start_date`.
+
+## Description
+
+EOMONTH always lands on the final day of a month, regardless of
+what day-of-month `start_date` was — unlike EDATE, which keeps the
+same day-of-month and only adjusts when the target month is too
+short. Use EOMONTH specifically when you want a month boundary
+(billing cutoffs, reporting periods, "last day of the quarter"),
+not a fixed day offset.
+
+<Callout type="info">
+  `EOMONTH(start_date, 0)` is the standard way to get "the last day
+  of this month" from any date. Add `1` to that result to get the
+  first day of the *next* month instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': 'January 31, 2027', '1': 'February 28, 2027', '-1': 'December 31, 2026' }}
+  defaultValue="0"
+  label={'Live preview — EOMONTH(DATE(2027,1,15), "{value}")'}
+  fieldLabel="months"
+/>
+
+## Common errors
+
+### Confusing EOMONTH with EDATE
+
+<ExcelCode>{`EOMONTH(A2, 1) → always the last day of next month, not "A2 plus one month"`}</ExcelCode>
+
+EOMONTH ignores `start_date`'s actual day and always returns a
+month-end. If you want the same day-of-month one month later, use
+EDATE instead.
+
+### Result shows a number instead of a date
+
+<ExcelCode>{`EOMONTH(A2, 0) → 46783 (not formatted as a date)`}</ExcelCode>
+
+EOMONTH returns a serial number — format the cell as a date if
+Excel doesn't apply that formatting automatically.
+
+export const faqs = [
+  {
+    question: 'EOMONTH vs EDATE — which should I use?',
+    answer:
+      'EOMONTH always returns the last day of a month — use it for month-end deadlines or reporting periods. EDATE keeps the same day-of-month — use it for things like subscription renewals or anniversaries that should land on the same date each cycle.',
+  },
+  {
+    question: 'How do I get the first day of the next month?',
+    answer: 'Add 1 to EOMONTH(start_date, 0) — the day after this month\'s last day is the 1st of next month.',
+  },
+  {
+    question: 'How do I get the last day of the current month?',
+    answer: 'EOMONTH(TODAY(), 0).',
+  },
+  {
+    question: 'Can months be negative?',
+    answer: 'Yes — it looks backward that many months before finding that month\'s last day.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EOMONTH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EOMONTH(TODAY(), 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim monthEnd As Date
+    monthEnd = DateSerial(Year(Date), Month(Date) + 1, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+    from pandas.tseries.offsets import MonthEnd
+
+    month_end = pd.Timestamp.today() + MonthEnd(0)
+    print(month_end)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [EDATE](/docs/date/edate) — shifts a date by a fixed number of
+  months while keeping the same day-of-month, instead of always
+  landing on a month-end.
+- [DATE](/docs/date/date) — builds a date from parts; can replicate
+  a month-end lookup with `DATE(year, month + 1, 0)`.
+- [TODAY](/docs/date/today) — a common `start_date` input for
+  "current month-end" style formulas.

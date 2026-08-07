@@ -1,0 +1,141 @@
+---
+title: NOW
+description: Return the current date and time, updating automatically.
+---
+
+Return the current date **and** time, with no arguments — like
+TODAY, but including the time of day, and recalculating every time
+the workbook does.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'No arguments — returns the current date and time', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Volatile — recalculates on every sheet recalculation', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NOW()'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NOW()`}</ExcelCode>
+
+## Parameters
+
+NOW takes no arguments — the parentheses are still required, but
+always empty.
+
+## Return value
+
+The current date and time as a serial number (the integer part is
+the date, the decimal part is the time of day), based on your
+system clock. Updates automatically whenever the workbook
+recalculates.
+
+## Description
+
+NOW is TODAY's sibling, adding the current time to the date. Like
+TODAY, it's a **volatile** function — it recalculates on every
+workbook recalculation (opening the file, editing any cell, or
+pressing F9), not on a timer, so it won't tick forward while you
+watch a static, unedited sheet.
+
+<Callout type="warn">
+  Like TODAY(), NOW() isn't a way to record a fixed timestamp — a
+  cell showing `=NOW()` will show a different time the next time the
+  workbook recalculates. To record a fixed moment, insert a static
+  value instead (see Common errors below).
+</Callout>
+
+## Common errors
+
+### Result shows a number instead of a date and time
+
+<ExcelCode>{`=NOW() → 46876.53472 (not formatted as a date/time)`}</ExcelCode>
+
+NOW returns a serial number — the cell needs a datetime format code
+like `"mm/dd/yyyy hh:mm:ss"` to display it as a readable date and
+time.
+
+### A recorded timestamp keeps changing
+
+<ExcelCode>{`=NOW() → shows a different time every time the sheet recalculates`}</ExcelCode>
+
+NOW() always reflects the current moment — it's not a snapshot. To
+insert a fixed, unchanging timestamp, press **Ctrl+;** for the date,
+then a space, then **Ctrl+Shift+;** for the time, while editing the
+cell.
+
+export const faqs = [
+  {
+    question: 'NOW() vs TODAY() — what’s the difference?',
+    answer: 'NOW() returns the date and the current time together. TODAY() returns just the date.',
+  },
+  {
+    question: 'How do I record a fixed timestamp that won’t change?',
+    answer:
+      'While editing a cell, press Ctrl+; to insert today\'s date, then a space, then Ctrl+Shift+; to insert the current time — both as static values, unlike NOW() which always reflects the current moment.',
+  },
+  {
+    question: 'Why does NOW() show a strange number instead of a date and time?',
+    answer:
+      'NOW() returns a serial number. Format the cell with a datetime format code, such as "mm/dd/yyyy hh:mm:ss", to display it properly.',
+  },
+  {
+    question: 'Does NOW() slow down my workbook?',
+    answer:
+      "It's volatile, same as TODAY() — it recalculates on every sheet recalculation. Usually negligible, but worth being aware of alongside other volatile functions in a very large workbook.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NOW from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NOW()`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim currentMoment As Date
+    currentMoment = Now
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import datetime
+
+    now = datetime.now()
+    print(now)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TODAY](/docs/date/today) — returns just the current date, without
+  the time.
+- [DATE](/docs/date/date) — builds a specific date from year, month,
+  and day, rather than returning the current one.

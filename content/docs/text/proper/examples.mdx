@@ -1,0 +1,30 @@
+---
+title: PROPER examples
+description: Worked examples for PROPER — fixing name casing, the apostrophe quirk, and combining with TRIM.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — fix inconsistent name casing" formula={`=PROPER(A2)`}>
+  Converts "JOHN SMITH" or "john smith" to "John Smith" either way.
+</ExampleCard>
+
+<ExampleCard number="02" label="Cleaning up spacing and casing together" formula={`=TRIM(PROPER(A2))`}>
+  Removes extra spaces and normalizes casing in one formula.
+</ExampleCard>
+
+<ExampleCard number="03" label="Title-casing a full address" formula={`=PROPER(A2)`}>
+  Works just as well on multi-word strings like "123 main street,
+  suite 4" → "123 Main Street, Suite 4".
+</ExampleCard>
+
+<ExampleCard number="04" label="The apostrophe quirk in practice" formula={`=PROPER("o'brien's bakery")`}>
+  Returns "O'Brien'S Bakery" — the capital S after the second
+  apostrophe is a known PROPER limitation, not a formula mistake.
+</ExampleCard>
+
+<ExampleCard number="05" label="Making a permanent change" formula={`=PROPER(A2:A10) then Paste Special > Values`}>
+  Build the title-cased versions in a helper column, then paste the
+  results back as values to make the change stick without keeping
+  the formula.
+</ExampleCard>

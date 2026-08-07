@@ -1,0 +1,31 @@
+---
+title: LEN examples
+description: Worked examples for LEN — validation, detecting extra whitespace, empty-cell checks, and combining with RIGHT.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — count characters" formula={`=LEN(A2)`}>
+  Returns the total number of characters in A2, including any
+  spaces.
+</ExampleCard>
+
+<ExampleCard number="02" label="Validating a fixed-length code" formula={`=IF(LEN(A2)=10, "Valid", "Wrong length")`}>
+  Flags any entry that doesn't match an expected 10-character code
+  format.
+</ExampleCard>
+
+<ExampleCard number="03" label="Detecting extra whitespace" formula={`=LEN(A2) <> LEN(TRIM(A2))`}>
+  Returns TRUE if A2 has leading, trailing, or doubled internal
+  spaces that TRIM would remove.
+</ExampleCard>
+
+<ExampleCard number="04" label="Extracting everything after a known prefix" formula={`=RIGHT(A2, LEN(A2) - 4)`}>
+  Uses LEN to work out how many characters remain after skipping a
+  fixed 4-character prefix.
+</ExampleCard>
+
+<ExampleCard number="05" label="Checking for a truly empty cell" formula={`=IF(LEN(A2)=0, "Empty", "Has content")`}>
+  Catches a genuinely zero-length value, including one produced by
+  another formula, unlike ISBLANK in some edge cases.
+</ExampleCard>

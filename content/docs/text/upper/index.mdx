@@ -1,0 +1,157 @@
+---
+title: UPPER
+description: Convert text to all uppercase.
+---
+
+Convert every letter in a text string to uppercase — the standard
+way to normalize inconsistent casing in codes, IDs, or names before
+comparing or displaying them.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Leaves numbers and symbols unchanged', type: 'check' },
+  { text: "Doesn't change the source cell — returns a new value", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=UPPER(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=UPPER(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to convert to uppercase.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with every letter converted to uppercase. Numbers, spaces,
+and symbols pass through unchanged.
+
+## Description
+
+UPPER only affects letter casing — it doesn't trim spaces, remove
+punctuation, or otherwise clean up text. It's commonly used to
+normalize codes or IDs before comparing them with `=`, since Excel's
+text comparison is case-sensitive in some contexts (like `EXACT`)
+but not others (like a plain `=`).
+
+<Callout type="info">
+  UPPER returns a **new** text value — it doesn't change whatever
+  cell `text` came from. To permanently uppercase a column in place,
+  use UPPER in a helper column, then copy and Paste Special → Values
+  back over the original.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ excel: 'EXCEL', 'hello world': 'HELLO WORLD', 'sku-42': 'SKU-42' }}
+  defaultValue="excel"
+  label={'Live preview — UPPER(text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### Expecting UPPER to clean up more than casing
+
+<ExcelCode>{`UPPER("  excel ") → "  EXCEL " — spaces are untouched`}</ExcelCode>
+
+UPPER only changes letter case. Combine with TRIM if extra spaces
+also need removing:
+
+<ExcelCode>{`TRIM(UPPER("  excel "))`}</ExcelCode>
+
+### Result doesn't update the original cell
+
+<ExcelCode>{`=UPPER(A2) → shows uppercase text in the formula's own cell, A2 itself is unchanged`}</ExcelCode>
+
+UPPER produces a new value — it can't modify `A2` directly. Copy the
+formula's result and Paste Special → Values over the original cells
+if you want the change to stick permanently.
+
+export const faqs = [
+  {
+    question: 'Does UPPER change the original cell?',
+    answer:
+      'No — it returns a new value wherever the formula is entered. To permanently uppercase a column, copy the UPPER results and Paste Special → Values back over the originals.',
+  },
+  {
+    question: 'UPPER vs LOWER vs PROPER — what’s the difference?',
+    answer: 'UPPER makes everything uppercase, LOWER makes everything lowercase, and PROPER capitalizes the first letter of each word.',
+  },
+  {
+    question: 'Does UPPER affect numbers?',
+    answer: "No visible change — a number has no case to convert — but the result becomes a text value rather than a number.",
+  },
+  {
+    question: 'How do I permanently convert a column to uppercase?',
+    answer:
+      'Use UPPER in a helper column next to the original data, then copy the results and use Paste Special → Values to overwrite the original column with the static uppercase text.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with UPPER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=UPPER(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = UCase(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Code"] = df["Code"].str.upper()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LOWER](/docs/text/lower) — converts text to all lowercase
+  instead.
+- [PROPER](/docs/text/proper) — capitalizes only the first letter of
+  each word.
+- [TRIM](/docs/text/trim) — often combined with UPPER to clean up
+  spacing at the same time as casing.

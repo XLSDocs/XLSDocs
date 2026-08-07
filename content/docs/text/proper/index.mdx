@@ -1,0 +1,155 @@
+---
+title: PROPER
+description: Capitalize the first letter of each word in a text string.
+---
+
+Capitalize the first letter of every word and lowercase the rest —
+the standard way to fix inconsistently-typed names ("JOHN SMITH" or
+"john smith" both become "John Smith").
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Capitalizes after any non-letter character, not just spaces', type: 'warn' },
+  { text: "Doesn't preserve intentional acronyms like IBM", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PROPER(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PROPER(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to convert to title case.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with the first letter of each word capitalized and every
+other letter lowercased.
+
+## Description
+
+PROPER treats any character that isn't a letter — spaces, hyphens,
+apostrophes — as the end of one word and the start of the next, then
+capitalizes the first letter after each of those boundaries. That
+works well for most names, but produces genuinely wrong results for
+names containing an apostrophe or an intentional internal capital.
+
+<Callout type="warn">
+  PROPER capitalizes the letter right after an apostrophe too —
+  `"mcdonald's"` becomes `"Mcdonald'S"`, not `"McDonald's"`. It also
+  doesn't know to preserve an intentional acronym: `"IBM"` becomes
+  `"Ibm"`. Both need manual correction or a more targeted formula.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'john smith': 'John Smith', 'JANE DOE': 'Jane Doe', 'new york city': 'New York City' }}
+  defaultValue="john smith"
+  label={'Live preview — PROPER(text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### Apostrophes get incorrectly re-capitalized
+
+<ExcelCode>{`PROPER("mcdonald's") → "Mcdonald'S", not "McDonald's"`}</ExcelCode>
+
+PROPER treats the apostrophe as a word boundary and capitalizes
+whatever follows it. There's no built-in fix — names like this
+usually need a manual correction after applying PROPER.
+
+### Acronyms lose their capitalization
+
+<ExcelCode>{`PROPER("IBM stock report") → "Ibm Stock Report"`}</ExcelCode>
+
+PROPER has no way to know "IBM" should stay all-caps — it lowercases
+every letter after the first in each word, acronym or not.
+
+export const faqs = [
+  {
+    question: 'Why does PROPER capitalize the letter after an apostrophe, like "Mcdonald\'S"?',
+    answer:
+      'PROPER treats any non-letter character, including an apostrophe, as the end of a word — so it capitalizes whatever comes right after it. This is a known, unfixable quirk of the function itself; names like this typically need a manual correction.',
+  },
+  {
+    question: 'Does PROPER preserve acronyms like IBM?',
+    answer:
+      'No — it lowercases every letter after the first in each word, so "IBM" becomes "Ibm". There\'s no built-in way to tell PROPER to leave certain words alone.',
+  },
+  {
+    question: 'PROPER vs UPPER vs LOWER — what’s the difference?',
+    answer: 'PROPER produces Title Case (first letter of each word capitalized). UPPER makes everything uppercase. LOWER makes everything lowercase.',
+  },
+  {
+    question: 'Does PROPER change the original cell?',
+    answer:
+      'No — like UPPER and LOWER, it returns a new value. Copy the result and Paste Special → Values over the original cells to make the change permanent.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PROPER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PROPER(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = StrConv(Range("A2").Value, vbProperCase)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Name"] = df["Name"].str.title()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [UPPER](/docs/text/upper) — converts every letter to uppercase,
+  no word-boundary logic involved.
+- [LOWER](/docs/text/lower) — converts every letter to lowercase.
+- [TRIM](/docs/text/trim) — often combined with PROPER to clean up
+  spacing at the same time as casing.
