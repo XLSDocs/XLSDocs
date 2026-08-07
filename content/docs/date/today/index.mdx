@@ -1,0 +1,141 @@
+---
+title: TODAY
+description: Return the current date, updating automatically.
+---
+
+Return the current date, with no arguments — it recalculates
+automatically every time the workbook does, always showing the real
+"today" whenever the file is opened or edited.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'No arguments — takes nothing, returns today', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Volatile — recalculates on every sheet recalculation', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TODAY()'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TODAY()`}</ExcelCode>
+
+## Parameters
+
+TODAY takes no arguments — the parentheses are still required, but
+always empty.
+
+## Return value
+
+The current date as a serial number, based on your system clock.
+Updates automatically whenever the workbook recalculates.
+
+## Description
+
+TODAY is a **volatile** function — it recalculates every time the
+workbook does, whether that's from opening the file, editing any
+cell, or pressing F9, not on a timer. That makes it ideal for
+anything that should always reflect "right now" (deadlines, ages,
+days-remaining counters), but the wrong choice if you need to record
+a fixed date that shouldn't change tomorrow.
+
+<Callout type="warn">
+  If you need to record a fixed "date submitted" or similar snapshot
+  that shouldn't change the next day, don't use TODAY() — type the
+  date directly, or press <strong>Ctrl+;</strong> to insert the
+  current date as a static, unchanging value.
+</Callout>
+
+## Common errors
+
+### A recorded "snapshot" date keeps changing
+
+<ExcelCode>{`=TODAY() → shows a different date every day, even for a value meant to be fixed`}</ExcelCode>
+
+TODAY() always reflects the current date — it's not a way to record
+a moment in time. Use **Ctrl+;** to insert a static date instead, or
+type it directly.
+
+### Workbook feels slow with many TODAY()/NOW() calls
+
+Both are volatile functions that force a recalculation trigger every
+time the sheet recalculates. A handful is negligible, but hundreds of
+them across a very large workbook can add up — consider whether every
+instance genuinely needs to be live.
+
+export const faqs = [
+  {
+    question: 'Does TODAY() update automatically, or do I need to do something?',
+    answer:
+      "It updates automatically whenever the workbook recalculates — opening the file, editing any cell, or pressing F9. There's nothing to trigger manually.",
+  },
+  {
+    question: "How do I record a fixed date that won't change tomorrow?",
+    answer:
+      'Press Ctrl+; to insert the current date as a static value, or type the date directly — TODAY() itself always reflects whatever "now" is.',
+  },
+  {
+    question: 'TODAY() vs NOW() — what’s the difference?',
+    answer:
+      'TODAY() returns just the date. NOW() returns the date and the current time together.',
+  },
+  {
+    question: 'Does TODAY() slow down my workbook?',
+    answer:
+      "It's volatile, meaning it recalculates on every sheet recalculation — usually negligible, but worth being aware of in very large workbooks with many volatile functions.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TODAY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TODAY()`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim today As Date
+    today = Date
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    today = date.today()
+    print(today)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- NOW — like TODAY, but includes the current time as well as the
+  date. Page coming soon (Date category).
+- [DATE](/docs/date/date) — builds a specific date from year, month,
+  and day, rather than returning the current one.
+- [DATEDIF](/docs/date/datedif) — commonly paired with TODAY to
+  calculate an age or duration up to the present day.

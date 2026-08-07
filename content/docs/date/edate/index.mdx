@@ -1,0 +1,165 @@
+---
+title: EDATE
+description: Add or subtract a number of months from a date.
+---
+
+Shift a date forward or backward by a whole number of months —
+handling month-length differences automatically, so you don't have
+to work out how many days are in each month yourself.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Handles month-length differences automatically', type: 'check' },
+  { text: 'Negative months subtracts instead of adding', type: 'check' },
+  { text: 'Adjusts to the last valid day of a shorter month', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=EDATE(start_date, months)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EDATE(start_date, months)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The date to shift from.',
+  },
+  {
+    name: 'months',
+    type: 'number',
+    required: true,
+    description: 'How many months to add. A negative number subtracts months instead.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A date serial number that is `months` months after `start_date`
+(or before it, if `months` is negative), keeping the same day of
+the month where possible.
+
+## Description
+
+EDATE keeps the same day-of-month when shifting by whole months —
+`EDATE(DATE(2027,1,15), 1)` lands on February 15, not "January 15
+plus roughly 30 days." When the target month is shorter than
+`start_date`'s day would allow (like shifting January 31 forward one
+month, into February), EDATE lands on the last valid day of that
+month instead of overflowing into the next one.
+
+<Callout type="warn">
+  `EDATE(start_date, 1)` adds one **month**, not one day — a common
+  mixup with plain arithmetic like `start_date + 1`, which adds a
+  single day instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': 'February 28, 2027', '2': 'March 31, 2027', '-1': 'December 31, 2026' }}
+  defaultValue="1"
+  label={'Live preview — EDATE(DATE(2027,1,31), "{value}")'}
+  fieldLabel="months"
+/>
+
+## Common errors
+
+### End-of-month rollover confusion
+
+<ExcelCode>{`EDATE(DATE(2027,1,31), 1) → February 28, 2027, not March 3`}</ExcelCode>
+
+February doesn't have 31 days, so EDATE lands on its last valid day
+instead of overflowing into March. This is expected, but easy to
+mistake for a bug the first time you see it.
+
+### #NUM! — invalid start_date or extreme result
+
+<ExcelCode>{`EDATE("not a date", 1) → #NUM!`}</ExcelCode>
+
+`start_date` must be a genuine date value, and the resulting date
+must fall within Excel's supported range.
+
+export const faqs = [
+  {
+    question: 'Why did EDATE(Jan 31, 1) return Feb 28 instead of Mar 3?',
+    answer:
+      "EDATE keeps the same day-of-month when possible, but February doesn't have 31 days, so it lands on the last valid day of February instead of overflowing into March.",
+  },
+  {
+    question: 'EDATE vs adding days directly (start_date + 30) — what’s the difference?',
+    answer:
+      'EDATE shifts by calendar months, respecting each month\'s actual length. Adding a fixed number of days like 30 only equals a month for months that are exactly 30 days long — every other month, the results diverge.',
+  },
+  {
+    question: 'Can months be negative?',
+    answer: 'Yes — a negative number subtracts months instead of adding them.',
+  },
+  {
+    question: 'How do I get the end of a month N months out, not just the same day?',
+    answer:
+      'Combine with DATE: `DATE(YEAR(EDATE(start_date, n)), MONTH(EDATE(start_date, n)) + 1, 0)` gets the last day of the month that EDATE lands in.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EDATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EDATE(A2, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Date
+    result = DateAdd("m", 3, Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+    from dateutil.relativedelta import relativedelta
+
+    df = pd.read_excel("workbook.xlsx")
+    df["NewDate"] = df["Date"] + relativedelta(months=3)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DATE](/docs/date/date) — builds a date from parts, rather than
+  shifting an existing one.
+- [DATEDIF](/docs/date/datedif) — the reverse operation: measures
+  the gap between two dates instead of shifting one by a fixed
+  amount.
+- EOMONTH — like EDATE, but always lands on the last day of the
+  target month. Page coming soon (Date category).

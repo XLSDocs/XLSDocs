@@ -1,0 +1,31 @@
+---
+title: EDATE examples
+description: Worked examples for EDATE — subscription renewals, lookback windows, end-of-month handling, and combining with EOMONTH-style logic.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — subscription renewal date" formula={`=EDATE(A2, 12)`}>
+  Adds 12 months to a start date — a common way to calculate an
+  annual renewal date.
+</ExampleCard>
+
+<ExampleCard number="02" label="Looking back N months" formula={`=EDATE(TODAY(), -3)`}>
+  A negative `months` value shifts backward — this finds the date 3
+  months before today, useful for a rolling lookback window.
+</ExampleCard>
+
+<ExampleCard number="03" label="End-of-month handling" formula={`=EDATE(DATE(2027,1,31), 1)`}>
+  Returns February 28, 2027 — EDATE lands on the last valid day of
+  February rather than overflowing into March.
+</ExampleCard>
+
+<ExampleCard number="04" label="Last day of N months out" formula={`=DATE(YEAR(EDATE(A2,3)), MONTH(EDATE(A2,3)) + 1, 0)`}>
+  Combines EDATE with the month+1/day-0 trick to find the last day
+  of the month 3 months after A2, not just the same day-of-month.
+</ExampleCard>
+
+<ExampleCard number="05" label="Warranty expiration" formula={`=EDATE(A2, 24)`}>
+  Adds 24 months to a purchase date to calculate a 2-year warranty
+  expiration.
+</ExampleCard>

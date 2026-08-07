@@ -1,0 +1,32 @@
+---
+title: TODAY examples
+description: Worked examples for TODAY — deadlines, age calculations, conditional formatting triggers, and a static snapshot alternative.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Days remaining until a deadline" formula={`=A2 - TODAY()`}>
+  Subtracting TODAY() from a future date gives the number of days
+  remaining, updating automatically every day.
+</ExampleCard>
+
+<ExampleCard number="02" label="Flagging overdue items" formula={`=IF(A2 < TODAY(), "Overdue", "On track")`}>
+  Compares a due date against TODAY() to flag anything already past
+  due.
+</ExampleCard>
+
+<ExampleCard number="03" label="Age in complete years" formula={`=DATEDIF(A2, TODAY(), "Y")`}>
+  A common pairing — DATEDIF measures the gap between a birth date
+  and TODAY() in complete years.
+</ExampleCard>
+
+<ExampleCard number="04" label="First day of the current month" formula={`=DATE(YEAR(TODAY()), MONTH(TODAY()), 1)`}>
+  Rebuilds today's date with the day forced to 1, always reflecting
+  the start of the current month.
+</ExampleCard>
+
+<ExampleCard number="05" label="A fixed snapshot instead" formula={`Ctrl+; (not a formula)`}>
+  When a date needs to stay fixed — like "date submitted" — press
+  Ctrl+; to insert today's date as a static value instead of using
+  TODAY().
+</ExampleCard>

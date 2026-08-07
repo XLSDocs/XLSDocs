@@ -1,0 +1,31 @@
+---
+title: DATE examples
+description: Worked examples for DATE — building dates from parts, finding month boundaries, and dynamic year/month math.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — build a date from separate cells" formula={`=DATE(A2, B2, C2)`}>
+  Combines year, month, and day values from three separate columns
+  into one real date.
+</ExampleCard>
+
+<ExampleCard number="02" label="Last day of a month" formula={`=DATE(YEAR(A2), MONTH(A2) + 1, 0)`}>
+  Adding 1 to the month and using day `0` lands on the last day of
+  the original month, regardless of how many days it has.
+</ExampleCard>
+
+<ExampleCard number="03" label="First day of the current month" formula={`=DATE(YEAR(TODAY()), MONTH(TODAY()), 1)`}>
+  Rebuilds today's date with the day forced to 1, giving the first
+  day of the current month.
+</ExampleCard>
+
+<ExampleCard number="04" label="Quarter-end dates" formula={`=DATE(A2, CEILING(B2, 3) + 1, 0)`}>
+  Rounds the month up to the nearest quarter boundary, then finds
+  that quarter's last day using the same month+1/day-0 trick.
+</ExampleCard>
+
+<ExampleCard number="05" label="Adding a fixed number of years" formula={`=DATE(YEAR(A2) + 5, MONTH(A2), DAY(A2))`}>
+  Rebuilds the same month and day, 5 years later — useful for
+  contract renewal or expiration dates.
+</ExampleCard>

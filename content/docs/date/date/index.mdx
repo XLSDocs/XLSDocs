@@ -1,0 +1,181 @@
+---
+title: DATE
+description: Build a date from separate year, month, and day values.
+---
+
+Build a real date value from separate year, month, and day numbers —
+the standard way to construct a date from parts pulled out of other
+cells, rather than typing a date literal.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Rolls over automatically for out-of-range month/day', type: 'check' },
+  { text: "Two-digit years follow Excel's 1900/2000 rule", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DATE(year, month, day)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DATE(year, month, day)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'year',
+    type: 'number',
+    required: true,
+    description:
+      'The year. A 4-digit year is unambiguous; a 2-digit year is interpreted using Excel\'s 1900/2000 rule.',
+  },
+  {
+    name: 'month',
+    type: 'number',
+    required: true,
+    description:
+      'The month, normally 1-12. A value outside that range rolls over into an adjacent year.',
+  },
+  {
+    name: 'day',
+    type: 'number',
+    required: true,
+    description:
+      'The day, normally 1-31. A value outside that range rolls over into an adjacent month.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A date serial number representing the given year, month, and day.
+Displays as a formatted date if the cell has date formatting (Excel
+usually applies this automatically).
+
+## Description
+
+DATE assembles a real, calculable date from three separate numbers —
+useful when year, month, and day come from different cells or
+formulas, rather than existing together as a single date already.
+Out-of-range `month` or `day` values don't error; they roll over
+into the next or previous month/year, which is often used
+deliberately for date arithmetic.
+
+<Callout type="info">
+  `DATE(year, month + 1, 0)` is a common trick for finding the last
+  day of `month` — day `0` means "the day before day 1," which lands
+  on the final day of the previous month.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': 'March 1, 2027', '15': 'March 15, 2027', '31': 'March 31, 2027', '35': 'April 4, 2027' }}
+  defaultValue="15"
+  label={'Live preview — DATE(2027, 3, "{value}")'}
+  fieldLabel="day"
+/>
+
+## Common errors
+
+### #NUM! — year out of range
+
+<ExcelCode>{`DATE(10000, 1, 1) → #NUM!`}</ExcelCode>
+
+Excel's date system only supports years from 1900 through 9999.
+
+### Result shows a number instead of a date
+
+<ExcelCode>{`DATE(2027, 3, 15) → 46461 (not formatted as a date)`}</ExcelCode>
+
+DATE returns a serial number — format the cell as a date if Excel
+doesn't apply that formatting automatically.
+
+### Unexpected month/year rollover
+
+<ExcelCode>{`DATE(2027, 13, 1) → January 1, 2028, not an error`}</ExcelCode>
+
+Month `13` rolls into January of the following year. This is
+expected behavior, often used deliberately, but surprising if you
+weren't counting on it.
+
+export const faqs = [
+  {
+    question: 'Why does DATE(2027, 13, 1) return a date in 2028?',
+    answer:
+      "Excel rolls over out-of-range month or day values automatically — month 13 becomes January of the next year. This is often used deliberately, e.g. DATE(year, month + 1, 0) to get the last day of a month.",
+  },
+  {
+    question: 'Why does my DATE formula show a number instead of a date?',
+    answer:
+      'DATE returns a serial number; the cell needs date formatting to display it as a date. Excel usually applies this automatically, but not always — especially if the cell already had a different format.',
+  },
+  {
+    question: 'How do I get the last day of a month with DATE?',
+    answer:
+      'DATE(year, month + 1, 0) — day 0 means "the day before the 1st," which lands on the last day of the given month.',
+  },
+  {
+    question: 'How are two-digit years interpreted?',
+    answer:
+      "Excel treats 0-29 as 2000-2029 and 30-99 as 1930-1999 by default. To avoid ambiguity entirely, always use a 4-digit year.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DATE(A2, B2, C2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Date
+    result = DateSerial(Range("A2").Value, Range("B2").Value, Range("C2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["Date"] = pd.to_datetime(dict(year=df["Year"], month=df["Month"], day=df["Day"]))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TODAY](/docs/date/today) — returns the current date, no arguments
+  needed.
+- [EDATE](/docs/date/edate) — shifts an existing date forward or
+  back by a number of months.
+- [DATEDIF](/docs/date/datedif) — measures the difference between
+  two dates.
+- [TEXT](/docs/text/text) — formats a date as text with a specific
+  display format.

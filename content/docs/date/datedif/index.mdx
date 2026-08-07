@@ -1,0 +1,172 @@
+---
+title: DATEDIF
+description: Calculate the difference between two dates in years, months, or days.
+---
+
+Calculate the difference between two dates in whichever unit you
+need — complete years for an age, complete months for tenure, or
+total days for a duration. The standard formula behind age and
+anniversary calculations in Excel.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Great for age, tenure, or duration calculations', type: 'check' },
+  { text: 'Several unit codes for different granularities', type: 'check' },
+  { text: 'Undocumented by Microsoft — has a known bug with "MD"', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DATEDIF(start_date, end_date, unit)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DATEDIF(start_date, end_date, unit)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The earlier date. Must not be after `end_date`.',
+  },
+  {
+    name: 'end_date',
+    type: 'date',
+    required: true,
+    description: 'The later date.',
+  },
+  {
+    name: 'unit',
+    type: 'text',
+    required: true,
+    description:
+      '`"Y"` complete years · `"M"` complete months · `"D"` total days · `"MD"` days ignoring months/years · `"YM"` months ignoring years · `"YD"` days ignoring years.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The difference between `start_date` and `end_date`, measured in
+whichever `unit` was specified.
+
+## Description
+
+DATEDIF is a legacy function — kept in Excel for backward
+compatibility with Lotus 1-2-3, and deliberately left out of
+Excel's function autocomplete and Insert Function dialog by
+Microsoft, even though it works fine and remains the simplest way to
+get a "complete years/months between two dates" result.
+
+<Callout type="warn">
+  The `"MD"` unit has long-standing, documented edge-case bugs in
+  Excel — it can return negative or otherwise incorrect results for
+  certain date combinations. `Y`, `M`, `D`, `YM`, and `YD` are
+  reliable; treat `MD` results with suspicion and verify manually if
+  you use it.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ y: '7 years', m: '86 months', d: '2,621 days', md: '5 days', ym: '2 months', yd: '64 days' }}
+  defaultValue="Y"
+  label={'Live preview — DATEDIF(DATE(2020,1,15), DATE(2027,3,20), "{value}")'}
+  fieldLabel="unit"
+/>
+
+## Common errors
+
+### #NUM! — start_date is after end_date
+
+<ExcelCode>{`DATEDIF(DATE(2027,6,1), DATE(2027,1,1), "Y") → #NUM!`}</ExcelCode>
+
+`start_date` must be on or before `end_date` — DATEDIF doesn't
+handle a negative difference.
+
+### Unreliable results with the "MD" unit
+
+<ExcelCode>{`DATEDIF(A2, B2, "MD") → occasionally wrong, a known Excel bug`}</ExcelCode>
+
+If day-level precision matters and `"MD"` looks off, calculate total
+days with `"D"` instead and derive the remainder manually.
+
+export const faqs = [
+  {
+    question: "Why can't I find DATEDIF in Excel's function list?",
+    answer:
+      "It's intentionally left out of autocomplete and the Insert Function dialog by Microsoft — a legacy function kept for compatibility, not actively promoted, but it works correctly (aside from the MD unit's known bug) and can still be typed directly into a formula.",
+  },
+  {
+    question: 'What do the unit codes mean?',
+    answer:
+      '`Y` = complete years, `M` = complete months, `D` = total days, `MD` = days ignoring months and years, `YM` = months ignoring years, `YD` = days ignoring years.',
+  },
+  {
+    question: 'Is DATEDIF reliable?',
+    answer:
+      'Mostly — Y, M, D, YM, and YD are generally trustworthy. The "MD" unit specifically has known edge-case bugs and should be double-checked if you rely on it.',
+  },
+  {
+    question: 'How do I calculate someone\'s age?',
+    answer:
+      'DATEDIF(birth_date, TODAY(), "Y") returns complete years — the standard age formula.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DATEDIF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DATEDIF(A2, TODAY(), "Y")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim years As Long
+    years = DateDiff("yyyy", Range("A2").Value, Date) _
+      - IIf(Format(Date, "mmdd") < Format(Range("A2").Value, "mmdd"), 1, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    birth_date = date(1990, 5, 15)
+    age_years = relativedelta(date.today(), birth_date).years
+    print(age_years)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DATE](/docs/date/date) and [TODAY](/docs/date/today) — the most
+  common sources of the two dates DATEDIF compares.
+- [EDATE](/docs/date/edate) — the reverse operation: shifts a date
+  by a fixed number of months instead of measuring a gap.
