@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-10',
+    title: 'SORT, SORTBY, and UNIQUE',
+    description:
+      'Three more dynamic array functions round out the Arrays category alongside FILTER — sorting a spilled range, sorting by a separate key array, and pulling distinct values live from a range.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-10',
     title: 'AND, OR, and NOT',
     description:
       'The core logical operators, closing out the Logical category — including the common gotcha where AND/OR collapse a whole range to one TRUE/FALSE instead of testing row-by-row inside FILTER or another array formula.',

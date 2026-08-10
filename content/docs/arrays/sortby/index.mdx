@@ -1,0 +1,174 @@
+---
+title: SORTBY
+description: Sort a range or array using the order of one or more separate arrays.
+---
+
+Sort a range or array by a *different* array's values — useful when
+the sort key isn't a column you want in the output, or when the sort
+needs more than one level (region, then amount within region).
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Sort key can live outside the returned array', type: 'check' },
+  { text: 'Supports multi-level sorts natively', type: 'check' },
+  { text: 'Excel 365 & 2021 only', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SORTBY(array, by_array1, [sort_order1], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SORTBY(array, by_array1, [sort_order1], [by_array2, sort_order2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array to return, sorted.',
+  },
+  {
+    name: 'by_array1',
+    type: 'range',
+    required: true,
+    description: 'The array to sort array by. Must have the same height (or width) as array.',
+  },
+  {
+    name: 'sort_order1',
+    type: 'number',
+    required: false,
+    description: '1 for ascending (default), -1 for descending.',
+  },
+  {
+    name: 'by_array2, sort_order2, ...',
+    type: 'range, number',
+    required: false,
+    description: 'Up to 128 more sort-key/order pairs, for a multi-level sort.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A dynamic array containing every row of `array`, reordered according
+to `by_array1` (and any additional sort-key pairs), spilled into the
+cells below/right of the formula. The source data is untouched.
+
+## Description
+
+SORTBY separates *what gets sorted* (`array`) from *what it's sorted
+by* (`by_array1`, `by_array2`, ...) — the sort key doesn't need to be
+part of the returned array at all, and multiple sort levels are
+built in via repeated by_array/sort_order pairs, unlike SORT which
+only takes one sort_index.
+
+<Callout type="warn">
+  SORTBY requires **Excel 365 or Excel 2021**, like other dynamic
+  array functions. It is not available in Excel 2019, 2016, or
+  earlier — those versions will show `#NAME?`.
+</Callout>
+
+## Common errors
+
+### #VALUE! — mismatched sizes
+
+<ExcelCode>{`SORTBY(A2:A10, B2:B9) → #VALUE!`}</ExcelCode>
+
+Every `by_array` must be the same height (or width) as `array` —
+here `array` is 9 rows (A2:A10) and `by_array1` is 8 rows (B2:B9).
+
+### Sort levels applied in the wrong order
+
+<ExcelCode>{`SORTBY(A2:C10, C2:C10, 1, B2:B10, -1)`}</ExcelCode>
+
+Sort-key pairs are applied in the order they're listed, most
+significant first — this sorts by column C ascending *first*, then
+by column B descending as a tiebreaker. Swapping the pairs changes
+which one takes priority.
+
+### #CALC! — empty array
+
+`array` is empty, often because it's fed by a FILTER call that
+matched nothing. Give the upstream FILTER an `if_empty` fallback so
+SORTBY never receives an empty array.
+
+export const faqs = [
+  {
+    question: 'SORTBY vs SORT — which should I use?',
+    answer:
+      "SORT sorts array by one of its own columns. SORTBY sorts array using a separate array as the key — reach for it when the sort key isn't part of the output, or when a multi-level sort is needed.",
+  },
+  {
+    question: 'How do I sort by multiple columns (e.g. Region then Amount)?',
+    answer:
+      'Pass multiple by_array/sort_order pairs: SORTBY(A2:C10, B2:B10, 1, C2:C10, -1) sorts by column B ascending first, then by column C descending within each group of matching B values.',
+  },
+  {
+    question: "Can the sort key be a column not included in array's output?",
+    answer:
+      'Yes — that\'s the main reason to use SORTBY over SORT. by_array1 just needs to be the same height as array; it never has to be one of the columns array itself contains.',
+  },
+  {
+    question: 'Does SORTBY change the original data?',
+    answer: 'No — like SORT, it returns a live, reordered spill range without touching the source data.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SORTBY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SORTBY(Sales[#All], Sales[Region], 1, Sales[Amount], -1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.SortBy( _
+      Range("Sales"), Range("Sales[Region]"), 1, Range("Sales[Amount]"), -1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    result = df.sort_values(by=["Region", "Amount"], ascending=[True, False])
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SORT](/docs/arrays/sort) — sorts array by one of its own columns;
+  simpler when the sort key is already part of the output.
+- [FILTER](/docs/arrays/filter) — often wrapped inside SORTBY to sort
+  only the rows that match a condition.
+- [UNIQUE](/docs/arrays/unique) — combines well with SORTBY when the
+  distinct list also needs a custom sort order.

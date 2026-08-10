@@ -1,0 +1,30 @@
+---
+title: SORT examples
+description: Worked examples for SORT — ascending and descending order, sorting by a specific column, and combining with FILTER and UNIQUE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — ascending by the first column" formula={`=SORT(Sales[#All])`}>
+  Sorts every row by the first column, ascending — the default when
+  no other arguments are given.
+</ExampleCard>
+
+<ExampleCard number="02" label="Descending order" formula={`=SORT(Sales[#All], 1, -1)`}>
+  Passing `-1` as `sort_order` reverses the sort to descending.
+</ExampleCard>
+
+<ExampleCard number="03" label="Sort by a specific column" formula={`=SORT(Sales[#All], 3, -1)`}>
+  `sort_index` picks which column to sort by — here, the 3rd column,
+  largest first.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combined with FILTER" formula={`=SORT(FILTER(Sales[#All], Sales[Region]="West"), 3, -1)`}>
+  Filters to West-region rows first, then sorts the result by the
+  3rd column, largest first.
+</ExampleCard>
+
+<ExampleCard number="05" label="Combined with UNIQUE" formula={`=SORT(UNIQUE(Sales[Region]))`}>
+  Produces an alphabetized list of every distinct region — UNIQUE
+  removes duplicates, SORT alphabetizes what's left.
+</ExampleCard>

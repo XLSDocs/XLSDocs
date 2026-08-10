@@ -1,0 +1,166 @@
+---
+title: UNIQUE
+description: Return the distinct values from a range or array.
+---
+
+Return every distinct value from a range — no helper columns, no
+Remove Duplicates dialog, no manual dedup. The list spills
+automatically and updates live as the source data changes.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Live formula — updates automatically', type: 'check' },
+  { text: 'Returns multiple rows, not just one', type: 'check' },
+  { text: 'exactly_once=TRUE means something different from "distinct"', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=UNIQUE(array, [by_col], [exactly_once])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=UNIQUE(array, [by_col], [exactly_once])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array to pull distinct values from.',
+  },
+  {
+    name: 'by_col',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE to compare columns against each other instead of rows. Defaults to FALSE.',
+  },
+  {
+    name: 'exactly_once',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE to return only values that appear exactly once, excluding anything duplicated. Defaults to FALSE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A dynamic array of the distinct values in `array`, in order of first
+appearance, spilled into the cells below/right of the formula.
+
+## Description
+
+UNIQUE is a dynamic array function — like FILTER and SORT, it returns
+a live spill range rather than a single value. By default it returns
+every value once (true "distinct" — the same idea as Remove
+Duplicates, but as a live formula). Text comparisons ignore case, the
+same convention as COUNTIF/XLOOKUP.
+
+<Callout type="warn">
+  `exactly_once=TRUE` does **not** mean "distinct" — it means "appears
+  exactly one time." A value that shows up 3 times is excluded
+  entirely, not collapsed to one row. For a plain deduplicated list,
+  leave `exactly_once` at its default (`FALSE`).
+</Callout>
+
+## Common errors
+
+### #CALC! — empty result
+
+`array` is empty, or (with `exactly_once=TRUE`) every value in
+`array` happens to be duplicated at least once, leaving nothing that
+qualifies.
+
+### Confusing exactly_once with a plain distinct list
+
+<ExcelCode>{`UNIQUE(A2:A10, FALSE, TRUE) → only values appearing once`}</ExcelCode>
+
+If the goal is a deduplicated list (each value shown once, regardless
+of how many times it appeared), omit the third argument or pass
+`FALSE`:
+
+<ExcelCode>{`UNIQUE(A2:A10)`}</ExcelCode>
+
+### #SPILL! — blocked spill range
+
+Cells below the formula already contain data. Clear the spill range,
+or move the formula somewhere clear.
+
+export const faqs = [
+  {
+    question: 'UNIQUE vs Remove Duplicates — which should I use?',
+    answer:
+      "UNIQUE is a live formula — it updates automatically as source data changes, and other formulas can reference its spilled results. Remove Duplicates is a one-time, destructive edit to the data itself. Use UNIQUE when the source keeps changing.",
+  },
+  {
+    question: 'What does exactly_once actually do?',
+    answer:
+      'It filters to values that appear exactly one time in array, excluding any value that\'s duplicated — different from a plain distinct list, which keeps one copy of every value including duplicates.',
+  },
+  {
+    question: 'How do I get an alphabetized list of distinct values?',
+    answer: 'Wrap UNIQUE in SORT: =SORT(UNIQUE(A2:A10)).',
+  },
+  {
+    question: 'How do I count how many distinct values there are?',
+    answer: 'Wrap UNIQUE in ROWS (or COUNTA for a single column): =ROWS(UNIQUE(A2:A10)).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with UNIQUE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=UNIQUE(Sales[Region])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.Unique( _
+      Range("Sales[Region]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    result = df["Region"].unique()
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SORT](/docs/arrays/sort) — combines with UNIQUE for an
+  alphabetized list of distinct values: `SORT(UNIQUE(...))`.
+- [FILTER](/docs/arrays/filter) — combines with UNIQUE for "distinct
+  values matching a condition": `UNIQUE(FILTER(...))`.
+- [COUNTIF](/docs/math/countif) — useful alongside UNIQUE to count how
+  many times each distinct value occurs.

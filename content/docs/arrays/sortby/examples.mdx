@@ -1,0 +1,31 @@
+---
+title: SORTBY examples
+description: Worked examples for SORTBY — single and multi-level sorts, and sorting by a key not included in the output.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — sort by a separate array" formula={`=SORTBY(Sales[Product], Sales[Amount], -1)`}>
+  Returns the product names, ordered by the (separate) Amount
+  column, largest first.
+</ExampleCard>
+
+<ExampleCard number="02" label="Multi-level sort" formula={`=SORTBY(Sales[#All], Sales[Region], 1, Sales[Amount], -1)`}>
+  Sorts by Region ascending first, then by Amount descending within
+  each region — SORT alone can't do this in one call.
+</ExampleCard>
+
+<ExampleCard number="03" label="Sort key not in the output" formula={`=SORTBY(Products[Name], Products[Rank])`}>
+  Returns just the product names, ordered by a Rank column that
+  never appears in the result itself.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combined with FILTER" formula={`=SORTBY(FILTER(Sales[#All], Sales[Region]="West"), Sales[Amount], -1)`}>
+  Filters to West-region rows first, then sorts the result by
+  Amount, largest first.
+</ExampleCard>
+
+<ExampleCard number="05" label="Descending alphabetical" formula={`=SORTBY(Sales[Product], Sales[Product], -1)`}>
+  Using the same column as both `array` and `by_array1` sorts it by
+  its own values — here, Z to A.
+</ExampleCard>
