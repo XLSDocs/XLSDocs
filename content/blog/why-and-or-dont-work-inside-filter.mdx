@@ -1,0 +1,76 @@
+---
+title: "Why AND() and OR() Don't Work Inside FILTER"
+description: AND and OR collapse a whole range to one TRUE/FALSE instead of testing row by row — here's why that breaks inside FILTER, and the multiply/add trick that actually works.
+date: "2026-08-09"
+category: Tutorials
+author: Dana Okafor
+readTime: 5 min read
+---
+
+The formula reads correctly. `FILTER(table, AND(region="West",
+quarter="Q4"))` looks exactly like what you'd write inside an IF. It
+returns a single value instead of the filtered rows you expected, or
+throws `#VALUE!` outright. AND is the problem, and it's not a typo —
+it's how AND fundamentally works.
+
+## AND and OR always collapse to one value
+
+<ExcelCode>{`=AND(A2:A10>0, B2:B10>0)`}</ExcelCode>
+
+This doesn't test each row independently. It asks one combined
+question — "is every cell in A2:A10 positive **and** every cell in
+B2:B10 positive" — and returns a single `TRUE` or `FALSE` for the
+whole range at once. That's exactly the right behavior inside a
+plain IF, where one answer is what you want. It's exactly the wrong
+behavior inside FILTER, which needs a `TRUE`/`FALSE` for *each row*
+to decide what spills and what doesn't.
+
+<Callout type="warn">
+  This isn't a FILTER-specific quirk — AND and OR behave this way
+  everywhere, including SUMPRODUCT and any other array-formula
+  context. FILTER just happens to be where the mismatch is most
+  visible, because the result is either obviously wrong or an
+  outright error.
+</Callout>
+
+## The fix: multiply for AND, add for OR
+
+Boolean values are just `1` and `0` underneath. Arithmetic operators,
+unlike AND/OR, genuinely operate element-by-element across an array:
+
+<ExcelCode>{`=FILTER(table, (region="West")*(quarter="Q4"))   // AND
+=FILTER(table, (region="West")+(region="East"))  // OR`}</ExcelCode>
+
+Multiplying two boolean arrays keeps a row only if **both**
+conditions are `1` (both true) — a `0` anywhere zeroes out the
+product. Adding them keeps a row if **either** condition is `1` —
+the sum is only `0` (false) when both are false.
+
+## Reading it back once it's second nature
+
+At first, `(region="West")*(quarter="Q4")` looks like it should be
+doing something numeric. It isn't — it's boolean logic wearing
+arithmetic operators, because arithmetic is what actually
+broadcasts across a range the way AND/OR don't. Once that clicks,
+the pattern generalizes to any number of conditions:
+
+<ExcelCode>{`=FILTER(table, (region="West")*(quarter="Q4")*(status="Open"))`}</ExcelCode>
+
+Three conditions, all required, no nesting.
+
+## When AND/OR are still exactly right
+
+None of this means avoid AND/OR — inside a plain IF, or testing a
+handful of individual cells rather than parallel ranges, they're
+still the clearest way to write the logic:
+
+<ExcelCode>{`=IF(AND(B2>0, C2="Approved"), "Ship", "Hold")`}</ExcelCode>
+
+The rule is narrow: reach for multiply/add instead of AND/OR
+specifically when the condition needs to evaluate **row by row**
+inside an array formula — FILTER, SORT's criteria, or any other
+dynamic-array context.
+
+Full reference pages for [AND](/docs/logical/and),
+[OR](/docs/logical/or), and [FILTER](/docs/arrays/filter) cover the
+complete syntax, error cases, and more worked examples.

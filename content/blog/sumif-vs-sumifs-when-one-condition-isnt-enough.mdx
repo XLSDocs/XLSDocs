@@ -1,0 +1,70 @@
+---
+title: "SUMIF vs SUMIFS: When One Condition Isn't Enough"
+description: They look almost identical, but SUMIF and SUMIFS put their arguments in a different order — and that one difference causes more wrong totals than any other conditional-sum mistake.
+date: "2026-08-08"
+category: Excel
+author: Marcus Webb
+readTime: 5 min read
+---
+
+Someone copies a working SUMIF formula, adds a second condition, and
+the total comes back wrong — not an error, just quietly incorrect.
+Nine times out of ten, the culprit is the same thing: SUMIF and
+SUMIFS put `sum_range` in a different position, and Excel won't warn
+you when you get it wrong.
+
+## The argument order actually flips
+
+<ExcelCode>{`=SUMIF(range, criteria, [sum_range])
+=SUMIFS(sum_range, criteria_range1, criteria1, ...)`}</ExcelCode>
+
+SUMIF puts `sum_range` **last and optional** — if it's missing,
+SUMIF just sums `range` itself. SUMIFS puts it **first and
+required**. Upgrading a SUMIF to a SUMIFS by literally adding
+`,S` and a second condition, without re-ordering the arguments, is
+the single most common way this breaks.
+
+<Callout type="warn">
+  `SUMIF(A2:A10, "West", B2:B10)` and `SUMIFS(B2:B10, A2:A10,
+  "West")` return the same result — but they are not
+  interchangeable by just adding an S. Swapping formula types means
+  re-checking every argument's position, not just appending a
+  condition.
+</Callout>
+
+## Why this specific mistake is so easy to make
+
+Both functions look almost identical at a glance, and both are
+genuinely doing "sum this column where that column matches." The
+brain pattern-matches on function name and general shape, not
+argument position — especially when editing a formula that already
+works, under time pressure, with the goal of "just add one more
+condition."
+
+## The one-condition shortcut that avoids the whole problem
+
+If a formula is only ever going to need one condition, SUMIF's
+optional third argument has a shortcut worth knowing: when the
+column being summed *is* the column being tested, skip `sum_range`
+entirely.
+
+<ExcelCode>{`=SUMIF(Sales[Amount], ">1000")`}</ExcelCode>
+
+No `sum_range`, because `range` and the values to total are the same
+column. This only works for SUMIF, not SUMIFS — COUNTIFS-family
+functions never infer a missing sum range.
+
+## A rule of thumb that actually holds
+
+Reach for SUMIF only when a formula is genuinely one condition, one
+time, and unlikely to grow. The moment a second condition shows up —
+which happens more often than the first draft of a spreadsheet
+expects — switch to SUMIFS and rebuild the argument order from
+scratch, rather than patching the SUMIF call in place. It takes the
+same amount of typing either way, and it removes the exact failure
+mode that produces a total that's wrong without ever throwing an
+error.
+
+See the full reference for [SUMIF](/docs/math/sumif) and
+[SUMIFS](/docs/math/sumifs) for the complete argument list, common
+errors, and worked examples.

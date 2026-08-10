@@ -1,0 +1,91 @@
+---
+title: "Excel Formulas vs DAX: The Functions That Look the Same But Aren't"
+description: IF, SWITCH, ISBLANK, and IFERROR all exist in both Excel and DAX with nearly identical names — and just different enough behavior to produce a wrong Power BI measure that looks completely reasonable.
+date: "2026-08-10"
+category: Power BI
+author: Priya Shah
+readTime: 6 min read
+---
+
+Moving from Excel formulas to DAX measures feels deceptively
+familiar at first — `IF`, `SWITCH`, `ISBLANK`, even the syntax
+mostly transfers. Then a measure returns a number that's subtly
+wrong, or a visual shows blank where a real value should be, and the
+DAX looks identical to the Excel formula it was copied from. It
+usually is identical. The functions underneath aren't.
+
+## IF: same name, different blank handling
+
+<ExcelCode>{`Excel:  =IF(A2="", "Missing", A2)
+DAX:    Status = IF(ISBLANK([Amount]), "Missing", [Amount])`}</ExcelCode>
+
+The syntax barely changes. What changes is how blank propagates.
+Excel's `IF` sees an empty cell as one specific thing. DAX's
+`BLANK()` — the value ISBLANK actually tests for — propagates
+through arithmetic in ways a spreadsheet cell never does: `[Amount]
++ BLANK()` returns `[Amount]` unchanged in DAX, while the equivalent
+in Excel (`A2 + ""`) throws `#VALUE!`. A measure built on the
+Excel-formula assumption that blank behaves like an error will
+quietly produce wrong totals instead of visibly failing.
+
+## SWITCH: DAX's version does more, on purpose
+
+Excel's SWITCH and DAX's SWITCH share a name and a rough shape —
+compare one value against a list of exact matches — but DAX's
+version is commonly paired with `TRUE()` as the tested expression to
+get IF-chain behavior out of a SWITCH call:
+
+<ExcelCode>{`DAX:  Tier =
+SWITCH(
+    TRUE(),
+    [Sales] > 100000, "Gold",
+    [Sales] > 50000, "Tier 2",
+    "Standard"
+)`}</ExcelCode>
+
+Excel's SWITCH has no equivalent pattern — it only does exact-match
+comparisons against one value, full stop. A DAX measure written this
+way looks like it should translate directly to Excel's SWITCH; it
+doesn't, because Excel's version was never designed for
+range-based branching in the first place. [IFS](/docs/logical/ifs)
+is the closer Excel equivalent for that specific pattern.
+
+## IFERROR: DAX's is a heavier tool than it looks
+
+<ExcelCode>{`Excel:  =IFERROR(A2/B2, 0)
+DAX:    Ratio = IFERROR([Numerator]/[Denominator], 0)`}</ExcelCode>
+
+Same shape, same intent — but DAX's IFERROR is documented by
+Microsoft as meaningfully more expensive to evaluate than an
+equivalent `DIVIDE()` call, because DIVIDE has a built-in
+zero-denominator handler that avoids the error-catching machinery
+entirely:
+
+<ExcelCode>{`DAX:    Ratio = DIVIDE([Numerator], [Denominator], 0)`}</ExcelCode>
+
+For a measure evaluated across millions of rows in a large model,
+that difference is real. Excel has no DIVIDE equivalent — IFERROR
+wrapping a division is simply the standard, and only, approach
+there.
+
+<Callout type="info">
+  The pattern across all three: DAX functions that share an Excel
+  name were designed for a fundamentally different evaluation model
+  — row context, filter context, and a BLANK() that behaves nothing
+  like an empty Excel cell. Treat a shared function name as a
+  starting point for the DAX syntax, not a guarantee the behavior
+  transfers.
+</Callout>
+
+## The habit worth building
+
+Before assuming an Excel formula translates directly, check what the
+DAX version actually does with blanks, filter context, and error
+propagation specifically — not just what arguments it takes. The
+syntax similarity is real and genuinely useful for a first draft; the
+behavioral differences are exactly the kind of thing that shows up
+three months later as "why is this measure sometimes wrong."
+
+Full reference pages for the Excel side of these functions:
+[IF](/docs/logical/if), [SWITCH](/docs/logical/switch),
+[ISBLANK](/docs/info/isblank), and [IFERROR](/docs/logical/iferror).
