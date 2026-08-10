@@ -1,0 +1,30 @@
+---
+title: ISNUMBER examples
+description: Worked examples for ISNUMBER — basic checks, validation before a calculation, and the substring-search pattern.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — is a value numeric" formula={`=ISNUMBER(A2)`}>
+  Returns `TRUE` if A2 holds a number, date, or time.
+</ExampleCard>
+
+<ExampleCard number="02" label="Validate before calculating" formula={`=IF(ISNUMBER(A2), A2*1.1, "Invalid")`}>
+  Avoids a #VALUE! error by checking A2 is numeric before multiplying
+  it.
+</ExampleCard>
+
+<ExampleCard number="03" label="Does text contain a substring" formula={`=ISNUMBER(SEARCH("urgent", A2))`}>
+  SEARCH returns a number on a match and an error otherwise —
+  wrapping it in ISNUMBER converts that into a clean TRUE/FALSE.
+</ExampleCard>
+
+<ExampleCard number="04" label="Text-formatted numbers return FALSE" formula={`=ISNUMBER("100")`}>
+  Returns `FALSE` — the literal text `"100"` is not a real number to
+  Excel, even though it looks like one.
+</ExampleCard>
+
+<ExampleCard number="05" label="Converting text to a real number" formula={`=ISNUMBER(VALUE("100"))`}>
+  Wrapping the text in VALUE() first converts it to a real number,
+  so this returns `TRUE`.
+</ExampleCard>

@@ -1,0 +1,147 @@
+---
+title: ISNUMBER
+description: Test whether a value is a number.
+---
+
+Test whether a value is numeric — including dates and times, which
+Excel stores internally as numbers. A common validation check before
+running a calculation that would otherwise error on text.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE for numbers, dates, and times', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Text-formatted numbers ("100" as text) return FALSE', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISNUMBER(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISNUMBER(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell or value to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is a number (including dates and times, which are
+stored as numbers internally). `FALSE` for text, blanks, logical
+values, and errors.
+
+## Description
+
+ISNUMBER is a quick validation check — most often used inside IF to
+avoid running a calculation on a cell that might not actually contain
+a number yet, or combined with SEARCH/FIND to test whether a
+substring was found (SEARCH returns a number on a match, `#VALUE!`
+otherwise, so `ISNUMBER(SEARCH(...))` is a common "does this text
+contain that substring" pattern).
+
+<Callout type="warn">
+  A number that's been formatted or imported as **text** (common
+  after a CSV import — often flagged with a small green triangle in
+  the cell's corner) returns `FALSE` from ISNUMBER, even though it
+  visually looks like a number. Use `VALUE()` to convert it to a real
+  number first if needed.
+</Callout>
+
+## Common errors
+
+### FALSE for a text-formatted number
+
+<ExcelCode>{`ISNUMBER("100") → FALSE (it's text, not a real number)`}</ExcelCode>
+
+Convert it first if a real number is needed:
+
+<ExcelCode>{`ISNUMBER(VALUE("100")) → TRUE`}</ExcelCode>
+
+### Confusing ISNUMBER with a numeric formatting check
+
+<ExcelCode>{`ISNUMBER(A1) → tests the underlying value, not its display format`}</ExcelCode>
+
+ISNUMBER checks the actual stored value, not how it's formatted —
+a cell displaying "$100.00" and a cell displaying "100" both return
+`TRUE` if the underlying value is numeric.
+
+export const faqs = [
+  {
+    question: 'Does ISNUMBER return TRUE for dates?',
+    answer: 'Yes — dates and times are stored internally as numbers, so ISNUMBER treats them the same as any other numeric value.',
+  },
+  {
+    question: 'Why does ISNUMBER return FALSE for something that looks like a number?',
+    answer:
+      "It's most likely stored as text, not a real number — common after importing data from another system. Look for a small green triangle in the cell's corner, a common Excel flag for text-formatted numbers, and convert with VALUE() if needed.",
+  },
+  {
+    question: 'How do I test whether text contains a substring?',
+    answer: 'Combine ISNUMBER with SEARCH or FIND: ISNUMBER(SEARCH("word", A1)) is TRUE if "word" appears anywhere in A1, since SEARCH returns a number on a match and an error otherwise.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISNUMBER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISNUMBER(A2), A2*1.1, "Invalid")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If IsNumeric(Range("A2").Value) Then
+      Range("B2").Value = Range("A2").Value * 1.1
+    Else
+      Range("B2").Value = "Invalid"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    is_numeric = pd.to_numeric(df["A"], errors="coerce").notna()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISTEXT](/docs/info/istext) — tests whether a value is text
+  instead of a number.
+- [ISBLANK](/docs/info/isblank) — tests whether a cell is empty.
+- [VALUE](/docs/text/value) — converts a text-formatted number into a
+  real number that ISNUMBER will recognize.

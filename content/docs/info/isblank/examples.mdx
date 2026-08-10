@@ -1,0 +1,31 @@
+---
+title: ISBLANK examples
+description: Worked examples for ISBLANK — basic checks, combining with IF and NOT, and the formula-returning-"" gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — is a cell empty" formula={`=ISBLANK(A2)`}>
+  Returns `TRUE` only if A2 has never held a value or formula.
+</ExampleCard>
+
+<ExampleCard number="02" label="Nested inside IF" formula={`=IF(ISBLANK(A2), "Missing", "Has data")`}>
+  The most common real-world pattern — branch based on whether a
+  cell is filled in.
+</ExampleCard>
+
+<ExampleCard number="03" label="Testing for NOT blank" formula={`=NOT(ISBLANK(A2))`}>
+  Wrapping ISBLANK in NOT flips the test to "does this cell have
+  something in it."
+</ExampleCard>
+
+<ExampleCard number="04" label="Counting blank cells in a range" formula={`=COUNTBLANK(A2:A100)`}>
+  ISBLANK only tests one cell at a time — for a whole range, use
+  COUNTBLANK instead.
+</ExampleCard>
+
+<ExampleCard number="05" label="A formula returning an empty string is not blank" formula={`=ISBLANK(A2)`}>
+  Returns `FALSE` if A2 contains `=IF(B2="","","x")`, even when that
+  formula currently displays as empty — the cell holds a formula, not
+  true blankness.
+</ExampleCard>

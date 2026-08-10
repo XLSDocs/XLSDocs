@@ -1,0 +1,148 @@
+---
+title: ISBLANK
+description: Test whether a cell is truly empty.
+---
+
+Test whether a cell is genuinely empty — no value, no formula, not
+even a formula that evaluates to an empty string. Almost always used
+inside IF, or wrapped in NOT to test the opposite.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE only for a truly empty cell', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'A formula returning "" is NOT blank to ISBLANK', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISBLANK(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISBLANK(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell or value to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is a genuinely empty cell. `FALSE` for everything
+else — including a cell holding a formula that displays nothing.
+
+## Description
+
+ISBLANK is the strictest of the "is this empty" checks — it only
+returns `TRUE` for a cell that has never held a value or formula at
+all. A cell containing a formula that currently evaluates to `""`
+(an empty string) looks empty visually but is **not** blank to
+ISBLANK, the same distinction that affects COUNTA/COUNTBLANK.
+
+<Callout type="warn">
+  ISBLANK returns `FALSE` for a cell holding `=IF(A1="","","x")`,
+  even when that formula's result displays as nothing — the cell
+  contains a formula, not true blankness. Test against `=""`
+  instead if the goal is "does this cell display as empty."
+</Callout>
+
+## Common errors
+
+### Expecting TRUE for a formula that displays blank
+
+<ExcelCode>{`ISBLANK(A1) → FALSE (if A1 = ="")`}</ExcelCode>
+
+The cell isn't truly empty — it holds a formula. Compare against an
+empty string instead if visual blankness is what matters:
+
+<ExcelCode>{`A1=""`}</ExcelCode>
+
+### ISBLANK vs a direct comparison to ""
+
+<ExcelCode>{`ISBLANK(A1) vs A1=""`}</ExcelCode>
+
+These aren't interchangeable — `A1=""` is `TRUE` both for a truly
+empty cell **and** a formula returning `""`, while `ISBLANK` is
+`TRUE` only for the former.
+
+export const faqs = [
+  {
+    question: 'ISBLANK vs comparing to "" — which should I use?',
+    answer:
+      'ISBLANK(A1) is TRUE only for a cell with no content or formula at all. A1="" is also TRUE if A1 holds a formula that evaluates to an empty string. Use ISBLANK when the distinction between "empty" and "formula returning nothing" genuinely matters.',
+  },
+  {
+    question: 'Does ISBLANK work on a range, not just a single cell?',
+    answer:
+      "ISBLANK expects a single value — passed a whole range, it only evaluates the first cell. Use COUNTBLANK(range) to check an entire range for blank cells at once.",
+  },
+  {
+    question: 'How do I test that a cell is NOT blank?',
+    answer: 'Wrap it in NOT: =NOT(ISBLANK(A1)), or compare directly with A1<>"" for the "displays as non-empty" version.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISBLANK from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISBLANK(A2), "Missing", "Has data")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If IsEmpty(Range("A2").Value) Then
+      Range("B2").Value = "Missing"
+    Else
+      Range("B2").Value = "Has data"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["Status"] = df["A"].isna().map({True: "Missing", False: "Has data"})
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISNUMBER](/docs/info/isnumber) — tests whether a value is a
+  number, instead of testing for blankness.
+- [ISTEXT](/docs/info/istext) — tests whether a value is text.
+- [NOT](/docs/logical/not) — often wraps ISBLANK to test "is not
+  blank" instead.
+- [COUNTA](/docs/math/counta) — counts non-blank cells across a whole
+  range, instead of testing a single cell.

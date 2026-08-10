@@ -53,7 +53,7 @@ flipped inline (like `NOT(ISBLANK(A2))`).
   Many uses of NOT can be rewritten more directly with `<>`:
   `NOT(A2="West")` and `A2<>"West"` return the same result, and `<>`
   is usually easier to read. Reach for NOT mainly when wrapping a
-  function like ISBLANK/ISNUMBER/ISERROR, where there's no equivalent
+  function like [ISBLANK](/docs/info/isblank)/[ISNUMBER](/docs/info/isnumber)/[ISERROR](/docs/info/iserror), where there's no equivalent
   comparison operator to flip.
 </Callout>
 
@@ -80,7 +80,7 @@ export const faqs = [
   {
     question: 'NOT vs <> — which should I use?',
     answer:
-      'For a simple comparison, <> is usually clearer: A2<>"West" instead of NOT(A2="West"). Reach for NOT mainly when wrapping a function like ISBLANK or ISNUMBER, which has no direct "not" operator equivalent.',
+      'For a simple comparison, <> is usually clearer: A2<>"West" instead of NOT(A2="West"). Reach for NOT mainly when wrapping a function like ISBLANK or ISNUMBER, which have no direct "not" operator equivalent.',
   },
   {
     question: 'Can NOT take more than one argument?',

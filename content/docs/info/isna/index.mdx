@@ -1,0 +1,155 @@
+---
+title: ISNA
+description: Test whether a value is specifically the #N/A error.
+---
+
+Test whether a formula's result is `#N/A` specifically — the error
+lookup functions like VLOOKUP and MATCH return when nothing matches.
+Unlike ISERROR, it doesn't catch other error types like `#REF!` or
+`#DIV/0!`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE only for #N/A, not other error types', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'IFNA is usually simpler for a fallback-value pattern', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISNA(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISNA(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell, value, or formula result to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is specifically the `#N/A` error. `FALSE` for
+every other value, including other error types like `#REF!` or
+`#VALUE!`.
+
+## Description
+
+ISNA is the narrower, more deliberate sibling of ISERROR — it only
+catches `#N/A`, the error most lookup functions (VLOOKUP, XLOOKUP,
+MATCH) return when nothing matches. Using ISNA instead of ISERROR
+means a genuine formula mistake elsewhere (a broken reference, a
+divide-by-zero) stays visible as an error rather than being silently
+swallowed by a "not found" fallback meant only for missing matches.
+
+<Callout type="warn">
+  For the common "lookup, fall back if not found" pattern,
+  [IFNA](/docs/logical/ifna) is simpler and more efficient than
+  `IF(ISNA(...), ...)` — it evaluates the lookup once instead of
+  twice, and needs no separate ISNA call.
+</Callout>
+
+## Common errors
+
+### Using ISNA when IFNA would be simpler
+
+<ExcelCode>{`IF(ISNA(VLOOKUP(...)), "Not found", VLOOKUP(...)) → works, but evaluates VLOOKUP twice`}</ExcelCode>
+
+Not wrong, just inefficient — IFNA does the same job in one call and
+one evaluation:
+
+<ExcelCode>{`IFNA(VLOOKUP(...), "Not found")`}</ExcelCode>
+
+### Masking a real error by using ISERROR instead
+
+<ExcelCode>{`ISERROR(VLOOKUP(...)) → also TRUE for #REF!, #VALUE!, etc., not just missing matches`}</ExcelCode>
+
+If a genuine formula problem (not just a missing lookup match) should
+stay visible rather than being replaced by a "not found" fallback,
+ISNA is the more precise choice.
+
+export const faqs = [
+  {
+    question: 'ISNA vs ISERROR — which should I use?',
+    answer:
+      'ISNA catches only #N/A. ISERROR catches every error type. Use ISNA when the goal is specifically "handle a missing lookup match" — it leaves other error types (a genuine formula mistake) visible instead of silently masking them.',
+  },
+  {
+    question: 'ISNA vs IFNA — which should I use?',
+    answer:
+      'IFNA is almost always the better choice for a "lookup, fall back if not found" pattern — it evaluates the lookup once and needs no separate IF/ISNA combination. Reach for ISNA directly when a plain TRUE/FALSE flag is needed, not a substitute value.',
+  },
+  {
+    question: 'Which functions typically produce #N/A?',
+    answer: 'VLOOKUP, HLOOKUP, XLOOKUP, MATCH, and similar lookup functions return #N/A when no match is found — ISNA is built specifically to catch this case.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISNA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISNA(VLOOKUP(A2, Table, 2, FALSE)), "Not found", VLOOKUP(A2, Table, 2, FALSE))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.VLookup(Range("A2").Value, Range("Table"), 2, False)
+    If IsError(result) And result = CVErr(xlErrNA) Then
+      Range("B2").Value = "Not found"
+    Else
+      Range("B2").Value = result
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    lookup = pd.read_excel("workbook.xlsx", sheet_name="Table").set_index("Key")["Value"]
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["Result"] = df["A"].map(lookup).fillna("Not found")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISERROR](/docs/info/iserror) — tests for any error type, not just
+  `#N/A`.
+- [IFNA](/docs/logical/ifna) — the modern, more efficient replacement
+  for `IF(ISNA(...), ...)`.
+- [IFERROR](/docs/logical/iferror) — the equivalent shortcut for
+  `IF(ISERROR(...), ...)`.
+- [XLOOKUP](/docs/lookup/xlookup) — its `if_not_found` argument covers
+  this exact pattern natively, without needing ISNA at all.

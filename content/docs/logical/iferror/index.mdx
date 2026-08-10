@@ -180,6 +180,8 @@ export const compatibility = [
 - [XLOOKUP](/docs/lookup/xlookup) — its `if_not_found` argument covers
   the most common IFERROR use case (missing lookup) natively, without
   a separate wrapper.
+- [ISERROR](/docs/info/iserror) — the plain TRUE/FALSE test IFERROR
+  replaces for the "run this, fall back on error" pattern.
 - [VLOOKUP](/docs/lookup/vlookup) and [HLOOKUP](/docs/lookup/hlookup) —
   neither has a built-in fallback, so IFERROR is the standard way to
   handle a missing match.

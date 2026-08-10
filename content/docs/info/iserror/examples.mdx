@@ -1,0 +1,32 @@
+---
+title: ISERROR examples
+description: Worked examples for ISERROR — basic checks, the IFERROR comparison, and combining with SUMPRODUCT.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — is a result an error" formula={`=ISERROR(A2/B2)`}>
+  Returns `TRUE` if dividing A2 by B2 produces any error, such as
+  `#DIV/0!`.
+</ExampleCard>
+
+<ExampleCard number="02" label="The old fallback-value pattern" formula={`=IF(ISERROR(A2/B2), "Invalid", A2/B2)`}>
+  Works, but evaluates the division twice — IFERROR does the same
+  thing in one call and one evaluation.
+</ExampleCard>
+
+<ExampleCard number="03" label="The same thing with IFERROR" formula={`=IFERROR(A2/B2, "Invalid")`}>
+  The modern equivalent of example 2 — simpler, and only evaluates
+  the formula once.
+</ExampleCard>
+
+<ExampleCard number="04" label="Counting errors in a range" formula={`=SUMPRODUCT(--ISERROR(A2:A100))`}>
+  Coercing the array of TRUE/FALSE results to 1/0 with `--` and
+  summing counts how many cells in the range are errors.
+</ExampleCard>
+
+<ExampleCard number="05" label="Catching only #N/A, not every error" formula={`=IF(ISNA(VLOOKUP(A2, Table, 2, FALSE)), "Not found", VLOOKUP(A2, Table, 2, FALSE))`}>
+  Using ISNA instead of ISERROR here means a genuine formula mistake
+  (like a broken range reference) stays visible instead of being
+  silently masked as "Not found."
+</ExampleCard>

@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-10',
+    title: 'A new Info category: ISBLANK, ISNUMBER, ISTEXT, ISERROR, and ISNA',
+    description:
+      'Five type-testing functions, almost always used inside IF or NOT — including the ISERROR vs ISNA distinction (catch every error vs. just a missing lookup) and the ISBLANK gotcha where a formula returning "" still counts as non-blank.',
+    tags: ['New functions', 'Milestone'],
+  },
+  {
+    date: '2026-08-10',
     title: 'SUM, AVERAGE, COUNT, COUNTA, MAX, and MIN',
     description:
       'The most basic — and most-searched — Math functions on Excel, finally on the site: totals, means, counts, and extremes across a range, including the gotchas around blanks vs. zeros and text-formatted numbers.',

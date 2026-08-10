@@ -1,0 +1,142 @@
+---
+title: ISTEXT
+description: Test whether a value is text.
+---
+
+Test whether a value is stored as text — the mirror image of
+ISNUMBER. Useful for catching cells where a number got imported as
+text, or validating that a field is genuinely a text entry.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE only for actual text values', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'A number formatted to display as text-like is still FALSE', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISTEXT(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISTEXT(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell or value to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is text. `FALSE` for numbers, blanks, logical
+values, and errors.
+
+## Description
+
+ISTEXT checks the underlying stored type of a cell, not how it
+displays. It's the flip side of ISNUMBER — useful for catching the
+same "number imported as text" problem from the opposite direction:
+`ISTEXT(A2)` returning `TRUE` on a column that should be numeric is
+a quick way to flag rows that need cleanup.
+
+<Callout type="info">
+  ISTEXT tests the **underlying value**, not the cell's display
+  format. A number cell custom-formatted to show as `"100 units"`
+  still returns `FALSE` from ISTEXT — the stored value is still a
+  number, only the display changed.
+</Callout>
+
+## Common errors
+
+### Confusing display formatting with actual text
+
+<ExcelCode>{`ISTEXT(A1) → FALSE (even if A1 displays as "100 units" via custom formatting)`}</ExcelCode>
+
+Custom number formats change how a value *displays*, not its
+underlying type — ISTEXT sees the real stored value.
+
+### Expecting TRUE for a blank cell
+
+<ExcelCode>{`ISTEXT(A1) → FALSE (if A1 is blank)`}</ExcelCode>
+
+A blank cell isn't text — use ISBLANK to test for emptiness
+specifically.
+
+export const faqs = [
+  {
+    question: 'ISTEXT vs ISNUMBER — how do they relate?',
+    answer:
+      'They test opposite things — ISTEXT is TRUE for text values, ISNUMBER is TRUE for numeric values. A given cell can be neither (blank, logical, error), but never both at once.',
+  },
+  {
+    question: 'How do I find rows where a number was accidentally imported as text?',
+    answer: 'ISTEXT(A2) returning TRUE on a column that should be numeric flags exactly this — combine with COUNTIF or FILTER to find every affected row at once.',
+  },
+  {
+    question: 'Does custom cell formatting affect ISTEXT?',
+    answer: "No — ISTEXT checks the underlying stored value, not how the cell displays. A number custom-formatted to look like text is still a number to ISTEXT.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISTEXT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISTEXT(A2), "Needs cleanup", "OK")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If VarType(Range("A2").Value) = vbString Then
+      Range("B2").Value = "Needs cleanup"
+    Else
+      Range("B2").Value = "OK"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    is_text = df["A"].apply(lambda x: isinstance(x, str))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISNUMBER](/docs/info/isnumber) — tests whether a value is numeric
+  instead of text.
+- [ISBLANK](/docs/info/isblank) — tests whether a cell is empty.
+- [VALUE](/docs/text/value) — converts text that looks like a number
+  into a real number.

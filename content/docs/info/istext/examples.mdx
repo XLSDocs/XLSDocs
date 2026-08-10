@@ -1,0 +1,30 @@
+---
+title: ISTEXT examples
+description: Worked examples for ISTEXT — basic checks, flagging bad imports, and the custom-formatting gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — is a value text" formula={`=ISTEXT(A2)`}>
+  Returns `TRUE` if A2 holds a text value.
+</ExampleCard>
+
+<ExampleCard number="02" label="Flag rows needing cleanup" formula={`=IF(ISTEXT(A2), "Needs cleanup", "OK")`}>
+  Useful on a column that should be numeric — flags rows where a
+  number was accidentally imported as text.
+</ExampleCard>
+
+<ExampleCard number="03" label="Counting text entries in a range" formula={`=SUMPRODUCT(--ISTEXT(A2:A100))`}>
+  Coercing the array of TRUE/FALSE results to 1/0 with `--` and
+  summing counts how many cells in the range are text.
+</ExampleCard>
+
+<ExampleCard number="04" label="Custom formatting doesn't count as text" formula={`=ISTEXT(A2)`}>
+  Returns `FALSE` even if A2 is a number custom-formatted to display
+  as `"100 units"` — the underlying value is still numeric.
+</ExampleCard>
+
+<ExampleCard number="05" label="Validating a required text field" formula={`=IF(ISTEXT(B2), "Valid", "Missing name")`}>
+  Confirms a Name field actually contains text before proceeding with
+  downstream formulas.
+</ExampleCard>

@@ -1,0 +1,31 @@
+---
+title: ISNA examples
+description: Worked examples for ISNA — basic checks, the IFNA comparison, and why ISNA is more precise than ISERROR for lookups.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — is a result #N/A" formula={`=ISNA(VLOOKUP(A2, Table, 2, FALSE))`}>
+  Returns `TRUE` only if the lookup specifically failed to find a
+  match.
+</ExampleCard>
+
+<ExampleCard number="02" label="The old fallback-value pattern" formula={`=IF(ISNA(VLOOKUP(A2, Table, 2, FALSE)), "Not found", VLOOKUP(A2, Table, 2, FALSE))`}>
+  Works, but evaluates the lookup twice — IFNA does the same thing in
+  one call and one evaluation.
+</ExampleCard>
+
+<ExampleCard number="03" label="The same thing with IFNA" formula={`=IFNA(VLOOKUP(A2, Table, 2, FALSE), "Not found")`}>
+  The modern equivalent of example 2 — simpler, and only evaluates
+  the lookup once.
+</ExampleCard>
+
+<ExampleCard number="04" label="Counting missing matches in a range" formula={`=SUMPRODUCT(--ISNA(A2:A100))`}>
+  Coercing the array of TRUE/FALSE results to 1/0 with `--` and
+  summing counts how many lookups in the range came back #N/A.
+</ExampleCard>
+
+<ExampleCard number="05" label="ISNA vs ISERROR — a genuine mistake stays visible" formula={`=IF(ISNA(A2/B2), "Not found", A2/B2)`}>
+  If A2/B2 produces `#DIV/0!` instead of `#N/A`, ISNA returns `FALSE`
+  and the real error stays visible — ISERROR would have masked it.
+</ExampleCard>

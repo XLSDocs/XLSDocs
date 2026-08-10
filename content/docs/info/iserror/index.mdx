@@ -1,0 +1,152 @@
+---
+title: ISERROR
+description: Test whether a value is any Excel error.
+---
+
+Test whether a formula's result is an error — `#N/A`, `#VALUE!`,
+`#REF!`, `#DIV/0!`, or any other error type. For a modern formula
+that just needs a fallback value, IFERROR usually replaces this
+pattern entirely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE for any error type, not just one', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'IFERROR is usually simpler for a fallback-value pattern', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISERROR(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISERROR(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell, value, or formula result to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is any error — `#N/A`, `#VALUE!`, `#REF!`,
+`#DIV/0!`, `#NAME?`, `#NUM!`, or `#NULL!`. `FALSE` for everything
+else, including a genuinely blank cell.
+
+## Description
+
+ISERROR catches every error type in one test, unlike ISNA (which
+only catches `#N/A` specifically). It predates IFERROR, and was
+historically paired with IF to build a fallback-value pattern:
+`IF(ISERROR(formula), fallback, formula)` — the same thing IFERROR
+now does in one call, without evaluating `formula` twice.
+
+<Callout type="warn">
+  For the common "run a formula, show a fallback if it errors"
+  pattern, [IFERROR](/docs/logical/iferror) is simpler and more
+  efficient than `IF(ISERROR(...), ...)` — it evaluates the formula
+  once instead of twice, and needs no separate ISERROR call. Reach
+  for ISERROR directly mainly when the goal is a plain `TRUE`/`FALSE`
+  flag, not a substitute value.
+</Callout>
+
+## Common errors
+
+### Using ISERROR when IFERROR would be simpler
+
+<ExcelCode>{`IF(ISERROR(VLOOKUP(...)), "Not found", VLOOKUP(...)) → works, but evaluates VLOOKUP twice`}</ExcelCode>
+
+Not wrong, just inefficient — IFERROR does the same job in one call
+and one evaluation:
+
+<ExcelCode>{`IFERROR(VLOOKUP(...), "Not found")`}</ExcelCode>
+
+### Catching every error when only #N/A should be handled
+
+<ExcelCode>{`ISERROR(VLOOKUP(...)) → TRUE for #N/A, but also #REF!, #VALUE!, etc.`}</ExcelCode>
+
+If only a missing-match `#N/A` should trigger the fallback (and a
+genuine formula mistake like `#REF!` should stay visible instead of
+being silently hidden), use ISNA instead of ISERROR.
+
+export const faqs = [
+  {
+    question: 'ISERROR vs IFERROR — which should I use?',
+    answer:
+      'IFERROR is almost always the better choice for a "run this, fall back to that on error" pattern — it evaluates the formula once and needs no separate IF/ISERROR combination. Reach for ISERROR directly when a plain TRUE/FALSE flag is needed, not a substitute value.',
+  },
+  {
+    question: 'ISERROR vs ISNA — which should I use?',
+    answer:
+      'ISERROR catches every error type. ISNA catches only #N/A specifically — useful when a missing lookup match should get a fallback, but other error types (like a genuine #REF! from a broken formula) should stay visible rather than being silently masked.',
+  },
+  {
+    question: 'Does ISERROR catch blank cells or 0?',
+    answer: 'No — ISERROR is FALSE for blanks, zeros, and any other non-error value. It only tests for the seven Excel error types.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISERROR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISERROR(A2/B2), "Invalid", A2/B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If IsError(Range("A2").Value / Range("B2").Value) Then
+      Range("C2").Value = "Invalid"
+    Else
+      Range("C2").Value = Range("A2").Value / Range("B2").Value
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+    import numpy as np
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    result = np.where(df["B"] == 0, "Invalid", df["A"] / df["B"])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISNA](/docs/info/isna) — tests for `#N/A` specifically, instead of
+  every error type.
+- [IFERROR](/docs/logical/iferror) — the modern, more efficient
+  replacement for `IF(ISERROR(...), ...)`.
+- [IFNA](/docs/logical/ifna) — the equivalent shortcut for
+  `IF(ISNA(...), ...)`.
