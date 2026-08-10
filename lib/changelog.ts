@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-07',
+    title: 'NOW, EOMONTH, UPPER, LOWER, PROPER, and LEN',
+    description:
+      'Two more date functions rounding out the Date category, plus four text-casing and length functions closing out Text — 38 function pages live across 6 categories.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-07',
     title: 'DATE, TODAY, EDATE, and DATEDIF',
     description:
       'A new Date category covers the most common date-math functions — building a date from parts, getting today\'s date, shifting a date by months, and measuring the gap between two dates.',
