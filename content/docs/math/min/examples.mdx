@@ -1,0 +1,29 @@
+---
+title: MIN examples
+description: Worked examples for MIN — basic ranges, multiple ranges, and combining with MAX.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — smallest value in a range" formula={`=MIN(Sales[Amount])`}>
+  Returns the single smallest amount in the Sales table.
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple ranges" formula={`=MIN(Q1Sales[Amount], Q2Sales[Amount])`}>
+  MIN treats multiple ranges as one combined pool of numbers.
+</ExampleCard>
+
+<ExampleCard number="03" label="Smallest matching a condition" formula={`=MINIFS(Sales[Amount], Sales[Region], "West")`}>
+  MINIFS applies a condition before finding the min — the smallest
+  West-region sale specifically.
+</ExampleCard>
+
+<ExampleCard number="04" label="Range between smallest and largest" formula={`=MAX(Sales[Amount]) - MIN(Sales[Amount])`}>
+  Combining MIN and MAX gives the spread between the lowest and
+  highest values.
+</ExampleCard>
+
+<ExampleCard number="05" label="Second-smallest value" formula={`=SMALL(Sales[Amount], 2)`}>
+  MIN only ever returns the single smallest value — SMALL with `k=2`
+  returns the runner-up instead.
+</ExampleCard>

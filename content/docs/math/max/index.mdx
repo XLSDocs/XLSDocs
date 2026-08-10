@@ -1,0 +1,157 @@
+---
+title: MAX
+description: Find the largest number among a set of values.
+---
+
+Find the largest numeric value among a set of numbers, cells, or
+ranges. For the 2nd, 3rd, or nth largest instead of the single
+biggest, use LARGE.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Ignores text and blank cells within a range', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Returns 0 if every argument is non-numeric', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MAX(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MAX(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to find the largest value within.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The largest numeric value across all arguments. Text and blank cells
+within a range are ignored. If nothing numeric is found, MAX returns
+`0`, not an error.
+
+## Description
+
+MAX scans every argument (literal numbers, cell references, ranges,
+or a mix) and returns the single largest value found, ignoring
+non-numeric cells along the way — the same scanning behavior as
+SUM/AVERAGE/COUNT, just returning the maximum instead of a total,
+mean, or count.
+
+<Callout type="info">
+  MAX quietly returns `0` (not an error) if every argument is
+  non-numeric — worth double-checking the range actually contains
+  numbers if `0` shows up unexpectedly.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a referenced cell contains an error
+
+<ExcelCode>{`MAX(A1:A10) → #VALUE! (if any cell in A1:A10 is itself an error)`}</ExcelCode>
+
+An error value inside the range propagates, unlike text (which MAX
+quietly skips).
+
+### Unexpectedly returns 0
+
+<ExcelCode>{`MAX(A1:A10) → 0 (if every cell is text or blank)`}</ExcelCode>
+
+Not an error — MAX found nothing numeric to compare, so it falls back
+to `0`. Check the range actually has numeric values.
+
+### Wanting the 2nd or 3rd largest, not the biggest
+
+<ExcelCode>{`MAX(A1:A10) → always the single largest value, never 2nd or 3rd`}</ExcelCode>
+
+Use LARGE for that instead: `LARGE(A1:A10, 2)` returns the
+second-largest value.
+
+export const faqs = [
+  {
+    question: 'MAX vs LARGE — which should I use?',
+    answer: 'MAX always returns the single largest value. LARGE(range, k) returns the kth-largest — use it for the 2nd, 3rd, or nth biggest value instead of just the top one.',
+  },
+  {
+    question: 'Can I find the maximum matching a condition?',
+    answer: 'Yes — MAXIFS works the same way SUMIFS/COUNTIFS do, applying one or more conditions before finding the max: MAXIFS(Sales[Amount], Sales[Region], "West").',
+  },
+  {
+    question: 'Why does MAX return 0 instead of an error?',
+    answer: "MAX treats \"no numeric values found\" as 0 rather than an error — double-check the range genuinely contains numbers if 0 shows up unexpectedly.",
+  },
+  {
+    question: 'Does MAX ignore blank cells?',
+    answer: 'Yes — blank cells are skipped entirely, the same as text.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MAX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MAX(Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim highest As Double
+    highest = Application.WorksheetFunction.Max(Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    highest = df["Amount"].max()
+    print(highest)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MIN](/docs/math/min) — the smallest value instead of the largest
+  among the same numbers.
+- [SUM](/docs/math/sum) — the total instead of the largest of the
+  same numbers.
+- [AVERAGE](/docs/math/average) — the mean instead of the largest of
+  the same numbers.

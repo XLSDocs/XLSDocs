@@ -1,0 +1,163 @@
+---
+title: SUM
+description: Add up numbers, cells, or ranges.
+---
+
+Add up numbers — literal values, cell references, ranges, or any mix
+of the three. The most basic Math function, and the building block
+behind SUMIF/SUMIFS for conditional totals.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Ignores text and blank cells within a range', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Text-formatted numbers in a range are silently skipped', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SUM(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUM(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to add.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The total of every numeric value across all arguments. Text and
+blank cells within a range are ignored, not treated as zero or an
+error.
+
+## Description
+
+SUM accepts any mix of literal numbers, single cell references, and
+full ranges in one call — `=SUM(A1, B2:B10, 100)` is valid. It's the
+foundation every conditional/aggregate Math function builds on:
+SUMIF and SUMIFS are SUM with a condition attached.
+
+<Callout type="warn">
+  A cell that *looks* numeric but is actually stored as text (common
+  after importing data from another system) is silently excluded from
+  SUM's total — no error, just a total that's lower than expected.
+  Use `VALUE()` or a paste-special multiply-by-1 trick to convert
+  text-formatted numbers back to real numbers.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a referenced cell contains an error
+
+<ExcelCode>{`SUM(A1:A10) → #VALUE! (if any cell in A1:A10 is itself an error)`}</ExcelCode>
+
+Unlike text (which SUM quietly skips), an error value inside the
+range propagates — track down and fix the source error first.
+
+### Silently low total — text-formatted numbers
+
+<ExcelCode>{`SUM(A1:A10) → skips any cell where the number is stored as text`}</ExcelCode>
+
+Not an error, just a total that's missing some values. Numbers
+imported from CSV/other systems are a common source of this.
+
+### SUM includes hidden/filtered rows — unlike SUBTOTAL
+
+<ExcelCode>{`SUM(A1:A100) → totals every row, even ones hidden by a filter`}</ExcelCode>
+
+If the goal is "total only the currently visible rows," use
+`SUBTOTAL(109, A1:A100)` instead — plain SUM always includes hidden
+and filtered-out rows.
+
+export const faqs = [
+  {
+    question: 'SUM vs SUMIF/SUMIFS — which should I use?',
+    answer:
+      'SUM totals everything unconditionally. As soon as the total needs to depend on a condition (only West-region sales, only paid invoices), switch to SUMIF or SUMIFS.',
+  },
+  {
+    question: 'Why is my SUM total lower than expected?',
+    answer:
+      "Most often, one or more cells in the range are numbers stored as text (common after a CSV import) — SUM silently skips those instead of erroring. Check for a small green triangle in the corner of the affected cells, a common flag Excel uses for text-formatted numbers.",
+  },
+  {
+    question: 'Does SUM ignore blank cells?',
+    answer: 'Yes — blank cells contribute nothing to the total, the same as if they held zero.',
+  },
+  {
+    question: 'How do I sum only the visible rows in a filtered table?',
+    answer: 'Use SUBTOTAL(109, range) instead of SUM — SUBTOTAL with function code 109 excludes rows hidden by a filter.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUM(Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double
+    total = Application.WorksheetFunction.Sum(Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = df["Amount"].sum()
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMIF](/docs/math/sumif) — sums a range only where a single
+  condition is met.
+- [SUMIFS](/docs/math/sumifs) — sums a range only where every one of
+  several conditions is met.
+- [AVERAGE](/docs/math/average) — the mean instead of the total of
+  the same numbers.
+- [COUNT](/docs/math/count) — counts numeric cells instead of adding
+  them.

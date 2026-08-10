@@ -1,0 +1,29 @@
+---
+title: COUNT examples
+description: Worked examples for COUNT — basic ranges, mixed data types, and dates.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — count numeric cells" formula={`=COUNT(Sales[Amount])`}>
+  Counts how many rows in the Amount column contain a number.
+</ExampleCard>
+
+<ExampleCard number="02" label="Mixed data types" formula={`=COUNT(A1:A10)`}>
+  If A1:A10 contains a mix of numbers, text, and blanks, only the
+  numeric cells are counted.
+</ExampleCard>
+
+<ExampleCard number="03" label="Counting dates" formula={`=COUNT(Sales[Date])`}>
+  Dates count as numbers, so this counts every row with a valid date
+  in the Date column.
+</ExampleCard>
+
+<ExampleCard number="04" label="Percent complete" formula={`=COUNT(Tasks[CompletedDate])/COUNTA(Tasks[Task])`}>
+  Dividing the count of completed dates by the count of all tasks
+  gives a percent-complete figure.
+</ExampleCard>
+
+<ExampleCard number="05" label="Multiple ranges" formula={`=COUNT(Q1Sales[Amount], Q2Sales[Amount])`}>
+  COUNT treats multiple ranges as one combined pool to count across.
+</ExampleCard>

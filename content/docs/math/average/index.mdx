@@ -1,0 +1,166 @@
+---
+title: AVERAGE
+description: Find the arithmetic mean of numbers, cells, or ranges.
+---
+
+Find the arithmetic mean of a set of numbers — literal values, cell
+references, ranges, or any mix. The building block behind
+AVERAGEIF/AVERAGEIFS for conditional averages.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Ignores text and blank cells within a range', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Blank cells are excluded, but zeros count', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=AVERAGE(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AVERAGE(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to average.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The arithmetic mean of every numeric value across all arguments.
+Returns `#DIV/0!` if there are no numeric values to average.
+
+## Description
+
+AVERAGE sums the same way SUM does, then divides by how many numeric
+values it found — text and blank cells are excluded entirely from
+both the sum and the count, so they don't drag the average down. A
+cell containing `0`, however, is a real numeric value and is
+included.
+
+<Callout type="warn">
+  Blank cells and cells containing `0` are **not** the same to
+  AVERAGE. A blank cell is skipped entirely (excluded from the count
+  of values), while a `0` is counted and pulls the average down. If
+  a range mixes genuinely-missing data (blank) with genuinely-zero
+  data (0), make sure that distinction is intentional before trusting
+  the result.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — no numeric values to average
+
+<ExcelCode>{`AVERAGE(A1:A10) → #DIV/0! (if every cell is blank or text)`}</ExcelCode>
+
+There's nothing to average. Wrap it in IFERROR for a fallback:
+
+<ExcelCode>{`IFERROR(AVERAGE(A1:A10), 0)`}</ExcelCode>
+
+### #VALUE! — a referenced cell contains an error
+
+<ExcelCode>{`AVERAGE(A1:A10) → #VALUE! (if any cell in A1:A10 is itself an error)`}</ExcelCode>
+
+An error value inside the range propagates, unlike text (which
+AVERAGE quietly skips).
+
+### Unexpected average — blanks vs zeros
+
+<ExcelCode>{`AVERAGE(10, 20, "", 30) → 20 (blank excluded from the count)
+AVERAGE(10, 20, 0, 30) → 15 (zero included in the count)`}</ExcelCode>
+
+Both look similar at a glance, but produce different results — check
+whether a "missing" value should genuinely be blank or should be `0`.
+
+export const faqs = [
+  {
+    question: 'AVERAGE vs AVERAGEIF/AVERAGEIFS — which should I use?',
+    answer:
+      'AVERAGE averages everything unconditionally. As soon as the average needs to depend on a condition, switch to AVERAGEIF or AVERAGEIFS.',
+  },
+  {
+    question: 'Does AVERAGE include zeros?',
+    answer:
+      'Yes — a cell containing 0 is a real numeric value and counts toward both the sum and the count of values. Only blank cells and text are excluded.',
+  },
+  {
+    question: 'Why does AVERAGE return #DIV/0!?',
+    answer:
+      "Every argument was blank, text, or otherwise non-numeric, so there's nothing to divide by. Wrap it in IFERROR if a zero-data result should show 0 or a message instead.",
+  },
+  {
+    question: 'How do I find the median instead of the mean?',
+    answer: 'Use MEDIAN with the same arguments — it returns the middle value instead of the arithmetic mean, which is less skewed by outliers.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AVERAGE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AVERAGE(Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim avg As Double
+    avg = Application.WorksheetFunction.Average(Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    avg = df["Amount"].mean()
+    print(avg)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AVERAGEIF](/docs/math/averageif) — averages a range only where a
+  single condition is met.
+- [AVERAGEIFS](/docs/math/averageifs) — averages a range only where
+  every one of several conditions is met.
+- [SUM](/docs/math/sum) — the total instead of the mean of the same
+  numbers.
+- [COUNT](/docs/math/count) — counts numeric cells, the same values
+  AVERAGE divides by.

@@ -1,0 +1,29 @@
+---
+title: AVERAGE examples
+description: Worked examples for AVERAGE — basic ranges, mixed arguments, and the blank-vs-zero distinction.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — average a range" formula={`=AVERAGE(Sales[Amount])`}>
+  Returns the mean of every value in the Amount column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple ranges" formula={`=AVERAGE(Q1Sales[Amount], Q2Sales[Amount])`}>
+  AVERAGE treats multiple ranges as one combined pool of numbers.
+</ExampleCard>
+
+<ExampleCard number="03" label="With error handling" formula={`=IFERROR(AVERAGE(Sales[Amount]), 0)`}>
+  Returns `0` instead of `#DIV/0!` if the range has no numeric values
+  yet.
+</ExampleCard>
+
+<ExampleCard number="04" label="Blank vs zero" formula={`=AVERAGE(10, 20, "", 30)`}>
+  Returns `20` — the blank cell is excluded from the count entirely,
+  unlike a literal `0` which would pull the average down.
+</ExampleCard>
+
+<ExampleCard number="05" label="Weighted by another column" formula={`=SUMPRODUCT(Sales[Amount], Sales[Weight]) / SUM(Sales[Weight])`}>
+  A weighted average isn't a plain AVERAGE — it needs SUMPRODUCT and
+  SUM combined instead.
+</ExampleCard>

@@ -1,0 +1,154 @@
+---
+title: COUNTA
+description: Count how many cells in a range are non-blank.
+---
+
+Count how many cells contain **anything** — numbers, text, logical
+values, even error values. For counting numeric cells specifically,
+use [COUNT](/docs/math/count) instead.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Counts any non-blank cell, regardless of type', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'A formula returning "" still counts as non-blank', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COUNTA(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUNTA(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'A value, cell reference, or range to count non-blank entries within.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 255 total arguments — more values, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of cells across all arguments that are not truly empty —
+numbers, text, `TRUE`/`FALSE`, and error values all count. Only
+genuinely blank cells are excluded.
+
+## Description
+
+COUNTA answers "how many rows have anything in them," regardless of
+what type of data that is — useful for counting how many rows of a
+table are actually filled in, as opposed to COUNT's narrower "how
+many numbers."
+
+<Callout type="warn">
+  A cell containing a formula that evaluates to an empty string
+  (`=""`) **looks** blank but is **not** blank to COUNTA — it still
+  counts, since the cell technically contains a formula result.
+  This is a common source of a COUNTA total that's higher than
+  expected.
+</Callout>
+
+## Common errors
+
+### Overcounting — formulas returning ""
+
+<ExcelCode>{`COUNTA(A1:A10) → counts a cell holding =IF(B1="","","x") even when it displays blank`}</ExcelCode>
+
+The cell isn't truly empty — it holds a formula, even if that
+formula's result is an empty string. COUNTBLANK also treats these
+cells as non-blank for the same reason.
+
+### Confusing COUNTA with COUNT
+
+<ExcelCode>{`COUNTA(A1:A10) → counts text rows too, unlike COUNT`}</ExcelCode>
+
+If only numeric cells should count, use COUNT instead — COUNTA
+counts every non-blank cell regardless of type.
+
+export const faqs = [
+  {
+    question: 'COUNTA vs COUNT — which should I use?',
+    answer:
+      'COUNTA counts every non-blank cell, any type. COUNT counts only numeric cells. Use COUNTA for "how many rows have data," COUNT for "how many rows have a number."',
+  },
+  {
+    question: 'Why is my COUNTA total higher than the number of rows with visible content?',
+    answer:
+      'One or more cells likely contain a formula returning an empty string (="") — that\'s technically non-blank to COUNTA even though it displays nothing.',
+  },
+  {
+    question: 'Does COUNTA count error values?',
+    answer: 'Yes — a cell containing #N/A, #VALUE!, or any other error is still non-blank, and counts toward the total.',
+  },
+  {
+    question: 'How do I count blank cells instead?',
+    answer: 'Use COUNTBLANK(range) — it counts cells that are truly empty, including cells with a formula returning "".',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUNTA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUNTA(Tasks[Task])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Long
+    total = Application.WorksheetFunction.CountA(Range("Tasks[Task]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Tasks")
+    total = df["Task"].notna().sum()
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUNT](/docs/math/count) — counts numeric cells only, instead of
+  every non-blank cell.
+- [COUNTIF](/docs/math/countif) — counts cells matching a specific
+  condition instead of just "is this non-blank."
+- [COUNTIFS](/docs/math/countifs) — same idea, with multiple
+  conditions combined.

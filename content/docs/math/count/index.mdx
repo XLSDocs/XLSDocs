@@ -1,0 +1,153 @@
+---
+title: COUNT
+description: Count how many cells in a range contain numbers.
+---
+
+Count how many cells contain a number — text, blanks, and logical
+values are all ignored. For counting *anything* non-blank instead,
+use [COUNTA](/docs/math/counta).
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Counts numeric cells only — dates count as numbers', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Text, blanks, and TRUE/FALSE are all ignored', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COUNT(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUNT(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'A value, cell reference, or range to count numeric entries within.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 255 total arguments — more values, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of cells across all arguments that contain a number. Dates
+and times count as numbers (Excel stores them as serial numbers).
+Text, blank cells, and logical (`TRUE`/`FALSE`) values are excluded.
+
+## Description
+
+COUNT is narrowly scoped to numeric data — it's the right choice when
+the question is specifically "how many numbers are here," not "how
+many cells have anything in them" (that's COUNTA) or "how many cells
+are empty" (that's COUNTBLANK).
+
+<Callout type="info">
+  COUNT treats dates and times as numbers, since Excel stores them
+  internally as serial numbers — a range of dates will be counted
+  just like a range of plain numbers.
+</Callout>
+
+## Common errors
+
+### Undercounting — expecting text to be counted too
+
+<ExcelCode>{`COUNT(A1:A10) → only counts numeric cells, skips text like "Pending"`}</ExcelCode>
+
+If the range mixes numbers and text and every non-blank cell should
+count, use COUNTA instead:
+
+<ExcelCode>{`COUNTA(A1:A10)`}</ExcelCode>
+
+### TRUE/FALSE not counted
+
+<ExcelCode>{`COUNT(TRUE, FALSE, 1, 2) → 2 (only 1 and 2 count)`}</ExcelCode>
+
+Logical values are excluded from COUNT even though they're
+technically 1/0 under the hood — use COUNTA if they should count.
+
+export const faqs = [
+  {
+    question: 'COUNT vs COUNTA — which should I use?',
+    answer:
+      'COUNT counts only numeric cells (including dates). COUNTA counts every non-blank cell regardless of type — text, numbers, logical values, even error values. Use COUNTA when the question is "how many rows have anything in them."',
+  },
+  {
+    question: 'Does COUNT count dates?',
+    answer: 'Yes — dates and times are stored as numbers internally, so a range of dates counts the same as a range of plain numbers.',
+  },
+  {
+    question: 'Does COUNT count blank cells?',
+    answer: 'No — blank cells are excluded entirely, the same as text.',
+  },
+  {
+    question: 'How do I count blank cells specifically?',
+    answer: 'Use COUNTBLANK(range), or COUNTIF(range, "") for the same result with more flexibility.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUNT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUNT(Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Long
+    total = Application.WorksheetFunction.Count(Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = df["Amount"].apply(lambda x: isinstance(x, (int, float))).sum()
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUNTA](/docs/math/counta) — counts every non-blank cell,
+  regardless of type, instead of numeric cells only.
+- [COUNTIF](/docs/math/countif) — counts cells matching a specific
+  condition instead of just "is this numeric."
+- [COUNTIFS](/docs/math/countifs) — same idea, with multiple
+  conditions combined.
+- [SUM](/docs/math/sum) — totals the same numeric cells COUNT counts.

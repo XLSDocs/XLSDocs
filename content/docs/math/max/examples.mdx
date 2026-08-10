@@ -1,0 +1,29 @@
+---
+title: MAX examples
+description: Worked examples for MAX — basic ranges, multiple ranges, and combining with IF.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — largest value in a range" formula={`=MAX(Sales[Amount])`}>
+  Returns the single largest amount in the Sales table.
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple ranges" formula={`=MAX(Q1Sales[Amount], Q2Sales[Amount])`}>
+  MAX treats multiple ranges as one combined pool of numbers.
+</ExampleCard>
+
+<ExampleCard number="03" label="Largest matching a condition" formula={`=MAXIFS(Sales[Amount], Sales[Region], "West")`}>
+  MAXIFS applies a condition before finding the max — the largest
+  West-region sale specifically.
+</ExampleCard>
+
+<ExampleCard number="04" label="How far above average" formula={`=MAX(Sales[Amount]) - AVERAGE(Sales[Amount])`}>
+  Combining MAX and AVERAGE shows how far the top value sits above
+  the typical one.
+</ExampleCard>
+
+<ExampleCard number="05" label="Second-largest value" formula={`=LARGE(Sales[Amount], 2)`}>
+  MAX only ever returns the single largest value — LARGE with `k=2`
+  returns the runner-up instead.
+</ExampleCard>

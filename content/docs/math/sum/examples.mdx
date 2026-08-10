@@ -1,0 +1,30 @@
+---
+title: SUM examples
+description: Worked examples for SUM — basic ranges, mixed arguments, and combining with other functions.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — sum a range" formula={`=SUM(Sales[Amount])`}>
+  Adds up every value in the Amount column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple ranges" formula={`=SUM(Q1Sales[Amount], Q2Sales[Amount])`}>
+  SUM accepts more than one range in the same call — this adds two
+  quarters' worth of sales together.
+</ExampleCard>
+
+<ExampleCard number="03" label="Mixed literals, cells, and ranges" formula={`=SUM(A1, B2:B10, 100)`}>
+  A single cell, a range, and a literal number can all appear in the
+  same SUM call.
+</ExampleCard>
+
+<ExampleCard number="04" label="Percentage of a total" formula={`=B2/SUM(Sales[Amount])`}>
+  Dividing one value by SUM of the whole column gives that row's
+  share of the total.
+</ExampleCard>
+
+<ExampleCard number="05" label="Visible rows only, with a filter applied" formula={`=SUBTOTAL(109, Sales[Amount])`}>
+  Unlike plain SUM, SUBTOTAL with function code 109 excludes rows
+  hidden by an active filter.
+</ExampleCard>

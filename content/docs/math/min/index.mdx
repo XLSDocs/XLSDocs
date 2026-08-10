@@ -1,0 +1,158 @@
+---
+title: MIN
+description: Find the smallest number among a set of values.
+---
+
+Find the smallest numeric value among a set of numbers, cells, or
+ranges. For the 2nd, 3rd, or nth smallest instead of the single
+lowest, use SMALL.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Ignores text and blank cells within a range', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Returns 0 if every argument is non-numeric', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MIN(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MIN(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to find the smallest value within.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The smallest numeric value across all arguments. Text and blank cells
+within a range are ignored. If nothing numeric is found, MIN returns
+`0`, not an error.
+
+## Description
+
+MIN scans every argument (literal numbers, cell references, ranges,
+or a mix) and returns the single smallest value found, ignoring
+non-numeric cells along the way — the mirror image of MAX.
+
+<Callout type="info">
+  MIN quietly returns `0` (not an error) if every argument is
+  non-numeric — worth double-checking the range actually contains
+  numbers if `0` shows up unexpectedly, especially since `0` could
+  also be a genuine smallest value in the data.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a referenced cell contains an error
+
+<ExcelCode>{`MIN(A1:A10) → #VALUE! (if any cell in A1:A10 is itself an error)`}</ExcelCode>
+
+An error value inside the range propagates, unlike text (which MIN
+quietly skips).
+
+### Ambiguous 0 — genuine value or no numeric data?
+
+<ExcelCode>{`MIN(A1:A10) → 0 (either a genuine zero, or nothing numeric at all)`}</ExcelCode>
+
+Unlike MAX (where a `0` result is usually a clear signal something's
+wrong), MIN returning `0` can mean either "the smallest real value is
+genuinely 0" or "there's no numeric data at all" — check the range
+directly if this ambiguity matters.
+
+### Wanting the 2nd or 3rd smallest, not the lowest
+
+<ExcelCode>{`MIN(A1:A10) → always the single smallest value, never 2nd or 3rd`}</ExcelCode>
+
+Use SMALL for that instead: `SMALL(A1:A10, 2)` returns the
+second-smallest value.
+
+export const faqs = [
+  {
+    question: 'MIN vs SMALL — which should I use?',
+    answer: 'MIN always returns the single smallest value. SMALL(range, k) returns the kth-smallest — use it for the 2nd, 3rd, or nth lowest value instead of just the bottom one.',
+  },
+  {
+    question: 'Can I find the minimum matching a condition?',
+    answer: 'Yes — MINIFS works the same way SUMIFS/COUNTIFS do, applying one or more conditions before finding the min: MINIFS(Sales[Amount], Sales[Region], "West").',
+  },
+  {
+    question: 'Why does MIN return 0 instead of an error?',
+    answer: "MIN treats \"no numeric values found\" as 0 rather than an error — this is genuinely ambiguous with a real zero value, so check the range directly if it matters.",
+  },
+  {
+    question: 'Does MIN ignore blank cells?',
+    answer: 'Yes — blank cells are skipped entirely, the same as text.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MIN(Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim lowest As Double
+    lowest = Application.WorksheetFunction.Min(Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    lowest = df["Amount"].min()
+    print(lowest)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MAX](/docs/math/max) — the largest value instead of the smallest
+  among the same numbers.
+- [SUM](/docs/math/sum) — the total instead of the smallest of the
+  same numbers.
+- [AVERAGE](/docs/math/average) — the mean instead of the smallest of
+  the same numbers.

@@ -1,0 +1,31 @@
+---
+title: COUNTA examples
+description: Worked examples for COUNTA — basic ranges, mixed data types, and the empty-string formula gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — count non-blank cells" formula={`=COUNTA(Tasks[Task])`}>
+  Counts how many rows in the Task column have anything entered.
+</ExampleCard>
+
+<ExampleCard number="02" label="Mixed data types" formula={`=COUNTA(A1:A10)`}>
+  Unlike COUNT, every non-blank cell counts here — numbers, text, and
+  logical values alike.
+</ExampleCard>
+
+<ExampleCard number="03" label="Total rows in a table" formula={`=COUNTA(Sales[Order ID])`}>
+  A quick way to get a table's row count, assuming the ID column is
+  always filled in.
+</ExampleCard>
+
+<ExampleCard number="04" label="Percent complete" formula={`=COUNT(Tasks[CompletedDate])/COUNTA(Tasks[Task])`}>
+  Dividing a numeric COUNT by a broader COUNTA gives a percent-complete
+  figure across all tasks, regardless of data type.
+</ExampleCard>
+
+<ExampleCard number="05" label="The empty-string gotcha" formula={`=COUNTA(A1:A10)`}>
+  If any cell in A1:A10 holds a formula like `=IF(B1="","","x")`
+  that currently displays blank, it still counts — the cell isn't
+  truly empty.
+</ExampleCard>

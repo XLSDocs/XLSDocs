@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-10',
+    title: 'SUM, AVERAGE, COUNT, COUNTA, MAX, and MIN',
+    description:
+      'The most basic — and most-searched — Math functions on Excel, finally on the site: totals, means, counts, and extremes across a range, including the gotchas around blanks vs. zeros and text-formatted numbers.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-10',
     title: 'SORT, SORTBY, and UNIQUE',
     description:
       'Three more dynamic array functions round out the Arrays category alongside FILTER — sorting a spilled range, sorting by a separate key array, and pulling distinct values live from a range.',
