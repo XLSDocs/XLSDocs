@@ -97,12 +97,12 @@ or move the formula somewhere clear.
 <ExcelCode>{`FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}</ExcelCode>
 
 Multiply boolean arrays together for AND logic, or add them for OR —
-`AND()`/`OR()` don't work element-wise across an array this way.
+[AND](/docs/logical/and)/[OR](/docs/logical/or) don't work element-wise across an array this way.
 
 <Callout type="info">
   To combine multiple conditions inside `include`, multiply boolean
   arrays together for AND logic (`(cond1)*(cond2)`), or add them for OR
-  logic (`(cond1)+(cond2)`) — the `AND()`/`OR()` functions don't work
+  logic (`(cond1)+(cond2)`) — the [AND](/docs/logical/and)/[OR](/docs/logical/or) functions don't work
   element-wise across an array the way `*`/`+` do here.
 </Callout>
 

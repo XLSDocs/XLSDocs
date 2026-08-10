@@ -1,0 +1,30 @@
+---
+title: NOT examples
+description: Worked examples for NOT — wrapping IS-functions, combining with AND/OR, and a readability comparison.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — reverse a comparison" formula={`=NOT(A2="West")`}>
+  Returns `TRUE` for every row where A2 is **not** "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="Wrapping ISBLANK" formula={`=IF(NOT(ISBLANK(A2)), "Has data", "Empty")`}>
+  A common pattern for functions with no direct "not" operator —
+  check the cell isn't blank before proceeding.
+</ExampleCard>
+
+<ExampleCard number="03" label="Wrapping ISERROR" formula={`=IF(NOT(ISERROR(A2/B2)), A2/B2, "Invalid")`}>
+  Runs the division only if it wouldn't error — though IFERROR is
+  usually a cleaner way to write this specific pattern.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combined with AND" formula={`=NOT(AND(B2>0, C2="Approved"))`}>
+  TRUE unless **both** conditions are true — logically equivalent to
+  `OR(NOT(B2>0), NOT(C2="Approved"))`.
+</ExampleCard>
+
+<ExampleCard number="05" label="Rewritten without NOT" formula={`=A2<>"West"`}>
+  The same result as example 1, without NOT — `<>` is usually the
+  more readable choice for a plain comparison.
+</ExampleCard>

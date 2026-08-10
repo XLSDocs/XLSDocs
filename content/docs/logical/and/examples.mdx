@@ -1,0 +1,29 @@
+---
+title: AND examples
+description: Worked examples for AND — combined with IF, multiple conditions, and the array-formula gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — two conditions" formula={`=AND(B2>0, C2="Approved")`}>
+  Returns `TRUE` only if B2 is positive **and** C2 equals "Approved".
+</ExampleCard>
+
+<ExampleCard number="02" label="Nested inside IF" formula={`=IF(AND(B2>0, C2="Approved"), "Ship", "Hold")`}>
+  The most common real-world pattern — branch on the combined result
+  of two or more conditions.
+</ExampleCard>
+
+<ExampleCard number="03" label="More than two conditions" formula={`=AND(B2>0, C2="Approved", D2<=100)`}>
+  AND accepts up to 254 conditions — every one of them must be TRUE.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combined with OR" formula={`=IF(AND(B2>0, OR(C2="Approved", C2="Pending")), "Process", "Hold")`}>
+  Nesting AND and OR together checks "B2 is positive AND (status is
+  Approved OR Pending)."
+</ExampleCard>
+
+<ExampleCard number="05" label="Row-by-row inside FILTER" formula={`=FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}>
+  AND won't work row-by-row inside FILTER — multiply the boolean
+  arrays together instead.
+</ExampleCard>

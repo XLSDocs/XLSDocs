@@ -1,0 +1,162 @@
+---
+title: AND
+description: Return TRUE only if every condition is true.
+---
+
+Test several conditions at once and get back a single `TRUE` or
+`FALSE` — `TRUE` only if **every** condition is true. Most often used
+inside IF to require more than one thing to be true before branching.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE only if every argument is TRUE', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: "Doesn't work element-wise inside array formulas", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=AND(logical1, [logical2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AND(logical1, [logical2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'logical1',
+    type: 'boolean',
+    required: true,
+    description: 'The first condition to test.',
+  },
+  {
+    name: 'logical2, ...',
+    type: 'boolean',
+    required: false,
+    description: 'Up to 254 more conditions, all of which must be TRUE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if every argument evaluates to `TRUE`. `FALSE` if any single
+argument is `FALSE`.
+
+## Description
+
+AND takes any number of conditions and collapses them into one
+boolean — useful on its own, but most commonly nested inside IF to
+require multiple things to be true before returning a result:
+`IF(AND(condition1, condition2), "Ship", "Hold")`.
+
+<Callout type="warn">
+  AND doesn't work **element-wise** across a range inside an array
+  formula the way you might expect. `AND(A2:A10>0, B2:B10>0)`
+  evaluates whether *every* cell in *both* ranges is positive as one
+  combined test, not row-by-row. For row-by-row logic inside FILTER or
+  a similar dynamic array function, multiply boolean arrays instead:
+  `(A2:A10>0)*(B2:B10>0)`.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-boolean argument
+
+<ExcelCode>{`AND("yes", B2>0) → #VALUE!`}</ExcelCode>
+
+Every argument must evaluate to `TRUE`/`FALSE` (or a number, where `0`
+is `FALSE` and anything else is `TRUE`) — plain text like `"yes"`
+isn't a valid logical value.
+
+### Wrong result inside FILTER or an array formula
+
+<ExcelCode>{`FILTER(A2:C10, AND(B2:B10="West", C2:C10="Q4")) → wrong / #VALUE!`}</ExcelCode>
+
+AND collapses its arguments to one single TRUE/FALSE, not a
+row-by-row array — inside FILTER (or any array-formula context),
+multiply the conditions instead:
+
+<ExcelCode>{`FILTER(A2:C10, (B2:B10="West")*(C2:C10="Q4"))`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'AND vs the & operator — is there a difference?',
+    answer:
+      '& concatenates text and has nothing to do with logic. For "and" logic between conditions, use the AND function (or nest them directly inside IF without AND at all, for exactly two conditions: IF(cond1, IF(cond2, ...))).',
+  },
+  {
+    question: 'Can AND take more than 2 conditions?',
+    answer: 'Yes — up to 254 arguments, all of which must be TRUE for the result to be TRUE.',
+  },
+  {
+    question: 'Why does AND(A2:A10>0, B2:B10>0) not work row-by-row?',
+    answer:
+      "AND always collapses its arguments to a single TRUE/FALSE, even when given a range — it checks whether every cell in every range passes, as one combined test. For row-by-row array logic (e.g. inside FILTER), multiply the conditions together instead: (A2:A10>0)*(B2:B10>0).",
+  },
+  {
+    question: 'How is AND different from IFS or nested IFs?',
+    answer:
+      "AND combines multiple conditions into one TRUE/FALSE — it doesn't return different results per condition. IFS/nested IF branch to a different result depending on which condition is met. They're often used together: IF(AND(cond1, cond2), resultIfBothTrue, resultOtherwise).",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(AND(B2>0, C2="Approved"), "Ship", "Hold")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If Range("B2").Value > 0 And Range("C2").Value = "Approved" Then
+      Range("D2").Value = "Ship"
+    Else
+      Range("D2").Value = "Hold"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    df["Status"] = "Hold"
+    df.loc[(df["Amount"] > 0) & (df["Approval"] == "Approved"), "Status"] = "Ship"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [OR](/docs/logical/or) — TRUE if **any** condition is true, instead
+  of requiring all of them.
+- [NOT](/docs/logical/not) — reverses a single TRUE/FALSE result.
+- [IF](/docs/logical/if) — most commonly wraps AND to branch on
+  multiple conditions at once.
+- [FILTER](/docs/arrays/filter) — needs multiplied boolean arrays
+  instead of AND for row-by-row conditions.

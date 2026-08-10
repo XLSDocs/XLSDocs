@@ -1,0 +1,147 @@
+---
+title: NOT
+description: Reverse TRUE to FALSE, or FALSE to TRUE.
+---
+
+Flip a single `TRUE`/`FALSE` value to its opposite. Small on its own,
+but useful for reading a condition as its inverse without rewriting
+the comparison itself.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Takes exactly one argument', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Often skippable by rewriting the comparison directly', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NOT(logical)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NOT(logical)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'logical',
+    type: 'boolean',
+    required: true,
+    description: 'A value or expression that evaluates to TRUE or FALSE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `logical` is `FALSE`. `FALSE` if `logical` is `TRUE`.
+
+## Description
+
+NOT reverses a single logical value — mainly useful when the
+condition reads more naturally as an inverse ("not empty," "not
+approved") than rewritten with a different operator, or when
+wrapping the result of another function whose logic can't easily be
+flipped inline (like `NOT(ISBLANK(A2))`).
+
+<Callout type="warn">
+  Many uses of NOT can be rewritten more directly with `<>`:
+  `NOT(A2="West")` and `A2<>"West"` return the same result, and `<>`
+  is usually easier to read. Reach for NOT mainly when wrapping a
+  function like ISBLANK/ISNUMBER/ISERROR, where there's no equivalent
+  comparison operator to flip.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-boolean argument
+
+<ExcelCode>{`NOT("yes") → #VALUE!`}</ExcelCode>
+
+`logical` must evaluate to `TRUE`/`FALSE` (or a number, where `0` is
+`FALSE` and anything else is `TRUE`) — plain text like `"yes"` isn't
+a valid logical value.
+
+### Double negatives that hurt readability
+
+<ExcelCode>{`IF(NOT(ISBLANK(A2)), "Has data", "Empty")`}</ExcelCode>
+
+Not an error, but "not blank" reads slower than the alternative — a
+plain comparison against `""` is often clearer:
+
+<ExcelCode>{`IF(A2<>"", "Has data", "Empty")`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'NOT vs <> — which should I use?',
+    answer:
+      'For a simple comparison, <> is usually clearer: A2<>"West" instead of NOT(A2="West"). Reach for NOT mainly when wrapping a function like ISBLANK or ISNUMBER, which has no direct "not" operator equivalent.',
+  },
+  {
+    question: 'Can NOT take more than one argument?',
+    answer: 'No — NOT takes exactly one logical value. For multiple conditions, combine AND/OR first, then wrap the result in NOT if needed.',
+  },
+  {
+    question: 'How do I combine NOT with AND or OR?',
+    answer:
+      'Wrap the whole AND/OR call: NOT(AND(cond1, cond2)) is TRUE unless both conditions are true. Often clearer rewritten directly — NOT(AND(a,b)) is logically the same as OR(NOT(a), NOT(b)).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NOT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(NOT(ISBLANK(A2)), "Has data", "Empty")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If Not IsEmpty(Range("A2").Value) Then
+      Range("B2").Value = "Has data"
+    Else
+      Range("B2").Value = "Empty"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["Status"] = df["A"].notna().map({True: "Has data", False: "Empty"})
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AND](/docs/logical/and) — TRUE only if every condition is true.
+- [OR](/docs/logical/or) — TRUE if any condition is true.
+- [IF](/docs/logical/if) — branches on a condition; NOT is often used
+  to flip that condition inline.
+- [IFERROR](/docs/logical/iferror) — a more direct way to handle "is
+  this an error" than `NOT(ISERROR(...))`.

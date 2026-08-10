@@ -1,0 +1,162 @@
+---
+title: OR
+description: Return TRUE if any condition is true.
+---
+
+Test several conditions at once and get back a single `TRUE` or
+`FALSE` — `TRUE` if **any one** condition is true. Most often used
+inside IF to branch when at least one of several things is true.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE if any argument is TRUE', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: "Doesn't work element-wise inside array formulas", type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=OR(logical1, [logical2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=OR(logical1, [logical2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'logical1',
+    type: 'boolean',
+    required: true,
+    description: 'The first condition to test.',
+  },
+  {
+    name: 'logical2, ...',
+    type: 'boolean',
+    required: false,
+    description: 'Up to 254 more conditions — any one of which can be TRUE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if any argument evaluates to `TRUE`. `FALSE` only if every
+argument is `FALSE`.
+
+## Description
+
+OR takes any number of conditions and returns `TRUE` as soon as one
+of them is true — the opposite combination logic from AND. Commonly
+nested inside IF to match multiple acceptable values:
+`IF(OR(status="Approved", status="Pending"), "Process", "Hold")`.
+
+<Callout type="warn">
+  Like AND, OR doesn't work **element-wise** across a range inside an
+  array formula. `OR(A2:A10="West", A2:A10="East")` evaluates whether
+  *any* cell across the whole range matches, not row-by-row. For
+  row-by-row OR logic inside FILTER or a similar dynamic array
+  function, add boolean arrays instead:
+  `(A2:A10="West")+(A2:A10="East")`.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-boolean argument
+
+<ExcelCode>{`OR("yes", B2>0) → #VALUE!`}</ExcelCode>
+
+Every argument must evaluate to `TRUE`/`FALSE` (or a number, where `0`
+is `FALSE` and anything else is `TRUE`) — plain text like `"yes"`
+isn't a valid logical value.
+
+### Wrong result inside FILTER or an array formula
+
+<ExcelCode>{`FILTER(A2:C10, OR(B2:B10="West", B2:B10="East")) → wrong / #VALUE!`}</ExcelCode>
+
+OR collapses its arguments to one single TRUE/FALSE, not a row-by-row
+array — inside FILTER (or any array-formula context), add the
+conditions instead:
+
+<ExcelCode>{`FILTER(A2:C10, (B2:B10="West")+(B2:B10="East"))`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Can OR match multiple values in one column, like an "IN" list?',
+    answer:
+      'For a few values, chain them with OR: OR(A2="West", A2="East"). For a longer list, COUNTIF against a list range is often cleaner: COUNTIF(ValidRegions, A2)>0.',
+  },
+  {
+    question: 'Can OR take more than 2 conditions?',
+    answer: 'Yes — up to 254 arguments, any one of which being TRUE makes the whole result TRUE.',
+  },
+  {
+    question: 'Why does OR(A2:A10="West", A2:A10="East") not work row-by-row?',
+    answer:
+      "OR always collapses its arguments to a single TRUE/FALSE, even when given a range — it checks whether any cell across the whole range matches, as one combined test. For row-by-row array logic (e.g. inside FILTER), add the conditions together instead: (A2:A10=\"West\")+(A2:A10=\"East\").",
+  },
+  {
+    question: 'OR vs nested IF — which is clearer for a few alternatives?',
+    answer:
+      'IF(OR(cond1, cond2), result, otherwise) is almost always clearer than nesting IFs for the same "either/or" logic — reserve nested IF for genuinely different results per condition, which is what IFS is built for.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with OR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(OR(C2="Approved", C2="Pending"), "Process", "Hold")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If Range("C2").Value = "Approved" Or Range("C2").Value = "Pending" Then
+      Range("D2").Value = "Process"
+    Else
+      Range("D2").Value = "Hold"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    df["Status"] = "Hold"
+    df.loc[df["Approval"].isin(["Approved", "Pending"]), "Status"] = "Process"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AND](/docs/logical/and) — TRUE only if **every** condition is
+  true, instead of any one of them.
+- [NOT](/docs/logical/not) — reverses a single TRUE/FALSE result.
+- [IF](/docs/logical/if) — most commonly wraps OR to branch when at
+  least one of several conditions is met.
+- [FILTER](/docs/arrays/filter) — needs added boolean arrays instead
+  of OR for row-by-row conditions.

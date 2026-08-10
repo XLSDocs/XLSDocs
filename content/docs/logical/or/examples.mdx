@@ -1,0 +1,30 @@
+---
+title: OR examples
+description: Worked examples for OR — combined with IF, an "IN list" pattern, and the array-formula gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — two conditions" formula={`=OR(C2="Approved", C2="Pending")`}>
+  Returns `TRUE` if C2 equals "Approved" **or** "Pending".
+</ExampleCard>
+
+<ExampleCard number="02" label="Nested inside IF" formula={`=IF(OR(C2="Approved", C2="Pending"), "Process", "Hold")`}>
+  The most common real-world pattern — branch when at least one
+  acceptable value matches.
+</ExampleCard>
+
+<ExampleCard number="03" label="More than two conditions" formula={`=OR(C2="Approved", C2="Pending", C2="Reviewing")`}>
+  OR accepts up to 254 conditions — any one being TRUE makes the
+  whole result TRUE.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combined with AND" formula={`=IF(AND(B2>0, OR(C2="Approved", C2="Pending")), "Process", "Hold")`}>
+  Nesting OR inside AND checks "B2 is positive AND (status is
+  Approved OR Pending)."
+</ExampleCard>
+
+<ExampleCard number="05" label="Row-by-row inside FILTER" formula={`=FILTER(A2:C10, (B2:B10="West")+(B2:B10="East"))`}>
+  OR won't work row-by-row inside FILTER — add the boolean arrays
+  together instead.
+</ExampleCard>

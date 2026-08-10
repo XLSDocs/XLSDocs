@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-10',
+    title: 'AND, OR, and NOT',
+    description:
+      'The core logical operators, closing out the Logical category — including the common gotcha where AND/OR collapse a whole range to one TRUE/FALSE instead of testing row-by-row inside FILTER or another array formula.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-10',
     title: 'SUMIF, COUNTIF, and AVERAGEIF',
     description:
       'The single-condition companions to SUMIFS, COUNTIFS, and AVERAGEIFS — including the argument-order gotcha between the two families (sum_range/average_range moves from last-and-optional to first-and-required).',
