@@ -1,0 +1,31 @@
+---
+title: AVERAGEIF examples
+description: Worked examples for AVERAGEIF — basic averages, error handling, and dynamic criteria.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — average sales by region" formula={`=AVERAGEIF(Sales[Region], "West", Sales[Amount])`}>
+  Averages every value in `Sales[Amount]` where the matching row's
+  region is "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="No separate average_range" formula={`=AVERAGEIF(Sales[Amount], ">0")`}>
+  When `average_range` is omitted, AVERAGEIF averages `range` itself —
+  this averages every positive value in one condition.
+</ExampleCard>
+
+<ExampleCard number="03" label="With error handling" formula={`=IFERROR(AVERAGEIF(Sales[Region], "Central", Sales[Amount]), 0)`}>
+  Returns `0` instead of `#DIV/0!` if no rows match "Central" —
+  useful when the condition might legitimately have zero matches.
+</ExampleCard>
+
+<ExampleCard number="04" label="Dynamic criteria from a cell" formula={`=AVERAGEIF(Sales[Region], D2, Sales[Amount])`}>
+  Referencing a cell instead of hardcoding "West" lets the same
+  formula answer a different question when D2 changes.
+</ExampleCard>
+
+<ExampleCard number="05" label="Excluding a value" formula={`=AVERAGEIF(Sales[Region], "<>West", Sales[Amount])`}>
+  `<>` means "not equal to" — averages every sale **outside** the
+  West region.
+</ExampleCard>

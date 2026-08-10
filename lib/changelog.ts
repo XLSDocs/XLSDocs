@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-10',
+    title: 'SUMIF, COUNTIF, and AVERAGEIF',
+    description:
+      'The single-condition companions to SUMIFS, COUNTIFS, and AVERAGEIFS — including the argument-order gotcha between the two families (sum_range/average_range moves from last-and-optional to first-and-required).',
+    tags: ['New functions'],
+  },
+  {
     date: '2026-08-07',
     title: 'NOW, EOMONTH, UPPER, LOWER, PROPER, and LEN',
     description:

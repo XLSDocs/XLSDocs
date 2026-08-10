@@ -1,0 +1,174 @@
+---
+title: COUNTIF
+description: Count rows where a single condition is met.
+---
+
+Count how many cells in a range match **one** condition — orders in
+the West region, amounts over $500, and so on. For more than one
+condition, use [COUNTIFS](/docs/math/countifs) instead.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Single condition only — use COUNTIFS for more than one', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'No wildcards means an exact (case-insensitive) match', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COUNTIF(range, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUNTIF(range, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'range',
+    type: 'range',
+    required: true,
+    description: 'The range to evaluate the condition against.',
+  },
+  {
+    name: 'criteria',
+    type: 'any',
+    required: true,
+    description:
+      'The condition applied to `range` (a value, comparison string, or wildcard).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of cells in `range` that match `criteria`. Returns `0` if
+nothing matches — not an error.
+
+## Description
+
+COUNTIF is the simplest of the conditional functions — just a range
+and a condition, with no separate value range to aggregate since it's
+counting matches within `range` itself. It's also the only one of the
+three single-condition functions (alongside SUMIF and AVERAGEIF) that
+never takes a third argument.
+
+<Callout type="info">
+  COUNTIF matches text **exactly** (ignoring case) unless the criteria
+  itself contains a wildcard. `COUNTIF(A:A, "Jan")` will **not** count
+  a cell containing "January" — use `"*Jan*"` if a partial match is
+  what you actually want.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '12', east: '8', north: '5', south: '7' }}
+  defaultValue="West"
+  label={'Live preview — COUNTIF(Sales[Region], "{value}")'}
+  fieldLabel="region"
+/>
+
+## Common errors
+
+### Returns 0 — expecting a partial match
+
+<ExcelCode>{`COUNTIF(A:A, "Jan") → 0 (even if cells contain "January")`}</ExcelCode>
+
+COUNTIF's default text match is exact, not "contains." Add wildcards
+for a substring match:
+
+<ExcelCode>{`COUNTIF(A:A, "*Jan*")`}</ExcelCode>
+
+### #NAME? — unquoted criteria
+
+<ExcelCode>{`COUNTIF(A:A, West) → #NAME? (missing quotes around "West")`}</ExcelCode>
+
+Text criteria need quotes around them.
+
+### #NAME? — unquoted comparison operator
+
+<ExcelCode>{`COUNTIF(A:A, >100) → #NAME?`}</ExcelCode>
+
+Comparison operators need to be a quoted string:
+
+<ExcelCode>{`COUNTIF(A:A, ">100")`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'COUNTIF vs COUNTIFS — which should I use?',
+    answer:
+      'COUNTIF handles exactly one condition. As soon as a count needs to match two or more conditions at once, switch to COUNTIFS.',
+  },
+  {
+    question: 'Does COUNTIF do partial/substring matching?',
+    answer:
+      'Only with an explicit wildcard. Plain text criteria ("Jan") requires an exact match; add asterisks ("*Jan*") to match anywhere within the cell.',
+  },
+  {
+    question: 'Can COUNTIF count blank cells?',
+    answer:
+      'Yes — pass `""` as the criteria to count blank cells in range specifically.',
+  },
+  {
+    question: 'Is COUNTIF case-sensitive?',
+    answer:
+      'No — text matching in COUNTIF (and COUNTIFS) ignores case, so "west" and "West" are treated the same.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUNTIF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUNTIF(Sales[Region], "West")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Long
+    total = Application.WorksheetFunction.CountIf( _
+      Range("Sales[Region]"), "West")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = len(df[df["Region"] == "West"])
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUNTIFS](/docs/math/countifs) — the multi-condition version of
+  COUNTIF, combining several range/criteria pairs with AND logic.
+- [SUMIF](/docs/math/sumif) — same single-condition matching, but
+  totals a value range instead of counting rows.
+- [AVERAGEIF](/docs/math/averageif) — same idea, averaging the
+  matching rows instead of counting them.

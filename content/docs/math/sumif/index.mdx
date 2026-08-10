@@ -1,0 +1,191 @@
+---
+title: SUMIF
+description: Sum a range where a single condition is met.
+---
+
+Sum a range of values, but only for rows that match **one**
+condition — sales in the West region, invoices over $500, and so on.
+For more than one condition, use [SUMIFS](/docs/math/sumifs) instead.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Single condition only — use SUMIFS for more than one', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'sum_range is last and optional — opposite of SUMIFS', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SUMIF(range, criteria, [sum_range])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUMIF(range, criteria, [sum_range])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'range',
+    type: 'range',
+    required: true,
+    description: 'The range to evaluate the condition against.',
+  },
+  {
+    name: 'criteria',
+    type: 'any',
+    required: true,
+    description:
+      'The condition applied to `range` (a value, comparison string, or wildcard).',
+  },
+  {
+    name: 'sum_range',
+    type: 'range',
+    required: false,
+    description:
+      'The values to sum when `criteria` matches. If omitted, `range` itself is summed.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of `sum_range` (or `range`, if `sum_range` is omitted) values
+in rows where `criteria` matches. Returns `0` if no rows match — not
+an error.
+
+## Description
+
+SUMIF is the single-condition version of SUMIFS — pass one range and
+one condition, and optionally a separate range to sum instead of the
+one being tested. Omitting `sum_range` sums `range` itself, which is
+useful for a simple threshold total like "sum every amount over
+$1,000."
+
+<Callout type="warn">
+  SUMIF puts `sum_range` **last and optional**, but its multi-condition
+  sibling SUMIFS puts it **first and required**
+  (`=SUMIFS(sum_range, criteria_range1, criteria1, ...)`). Switching
+  between the two without noticing the argument-order swap is a common
+  source of wrong totals.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '$12,400', east: '$9,800', north: '$5,300', south: '$7,150' }}
+  defaultValue="West"
+  label={'Live preview — SUMIF(Sales[Region], "{value}", Sales[Amount])'}
+  fieldLabel="region"
+/>
+
+## Common errors
+
+### #VALUE! — mismatched range sizes
+
+<ExcelCode>{`SUMIF(A2:A10, "West", B2:B9) → #VALUE!`}</ExcelCode>
+
+`sum_range` must be the same size as `range` — here one is 9 rows and
+the other is 10.
+
+### Silently wrong total — forgetting sum_range
+
+<ExcelCode>{`SUMIF(Sales[Region], "West", Sales[Region]) → sums Region, not Amount`}</ExcelCode>
+
+This doesn't throw an error — it just sums the wrong column, because
+`sum_range` was left out of the third argument by mistake. Always
+double-check the third argument is present when you mean to total a
+*different* column than the one being tested.
+
+### #NAME? — unquoted criteria
+
+<ExcelCode>{`SUMIF(A:A, West, B:B) → #NAME? (missing quotes around "West")`}</ExcelCode>
+
+Text criteria need quotes around them.
+
+<Callout type="info">
+  Comparison operators (`>`, `<`, `>=`, `<=`, `<>`) always need to be a
+  quoted string. To compare against a cell's value, concatenate the
+  operator with the reference: `">"&D2`, not `>D2`.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'SUMIF vs SUMIFS — which should I use?',
+    answer:
+      'SUMIF handles exactly one condition. As soon as a total needs to match two or more conditions at once, switch to SUMIFS — and remember sum_range moves from last to first.',
+  },
+  {
+    question: 'Can SUMIF match multiple values in one column (OR logic)?',
+    answer:
+      'Not directly — a single SUMIF call only tests one condition. For "West OR East", add two SUMIF calls together (`SUMIF(...,"West",...) + SUMIF(...,"East",...)`), or use SUMPRODUCT with an array of allowed values.',
+  },
+  {
+    question: 'Do I always need to specify sum_range?',
+    answer:
+      "No — if you're summing the same range you're testing (e.g. every amount over $1,000), omit sum_range and SUMIF sums range itself.",
+  },
+  {
+    question: 'Why is my SUMIF total wrong even with no error?',
+    answer:
+      "SUMIF doesn't throw an error for a missing or wrong sum_range — it just sums whatever range you actually gave it. A silently wrong total, not a formula error, usually means the third argument is missing or points at the wrong column.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUMIF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUMIF(Sales[Region], "West", Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double
+    total = Application.WorksheetFunction.SumIf( _
+      Range("Sales[Region]"), "West", Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = df.loc[df["Region"] == "West", "Amount"].sum()
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMIFS](/docs/math/sumifs) — the multi-condition version of SUMIF,
+  with `sum_range` as the *first, required* argument instead of last
+  and optional.
+- [COUNTIF](/docs/math/countif) — same single-condition matching, but
+  counts matching rows instead of summing a range.
+- [AVERAGEIF](/docs/math/averageif) — same idea, but averages the
+  matching rows instead of summing them.
+- [IFERROR](/docs/logical/iferror) — useful alongside SUMIF when
+  dividing a sum by a count that might be zero.

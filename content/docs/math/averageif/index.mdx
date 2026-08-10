@@ -1,0 +1,185 @@
+---
+title: AVERAGEIF
+description: Average a range where a single condition is met.
+---
+
+Average a range of values, but only for rows that match **one**
+condition — the same single-condition shape as SUMIF, just averaging
+instead of summing. For more than one condition, use
+[AVERAGEIFS](/docs/math/averageifs) instead.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Single condition only — use AVERAGEIFS for more than one', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: '#DIV/0! if no rows match — unlike SUMIF, which returns 0', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=AVERAGEIF(range, criteria, [average_range])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AVERAGEIF(range, criteria, [average_range])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'range',
+    type: 'range',
+    required: true,
+    description: 'The range to evaluate the condition against.',
+  },
+  {
+    name: 'criteria',
+    type: 'any',
+    required: true,
+    description:
+      'The condition applied to `range` (a value, comparison string, or wildcard).',
+  },
+  {
+    name: 'average_range',
+    type: 'range',
+    required: false,
+    description:
+      'The values to average when `criteria` matches. If omitted, `range` itself is averaged.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The average of `average_range` (or `range`, if `average_range` is
+omitted) values in rows where `criteria` matches. Returns `#DIV/0!`
+if no rows match, since averaging zero items is a division by zero.
+
+## Description
+
+AVERAGEIF is the single-condition version of AVERAGEIFS, and follows
+the same argument shape as SUMIF — `average_range` is the last,
+optional argument, unlike AVERAGEIFS which puts it first and
+required.
+
+<Callout type="warn">
+  Unlike SUMIF, which returns `0` when nothing matches, AVERAGEIF
+  throws `#DIV/0!` — there's no sensible average of zero rows. Wrap
+  it in IFERROR if a zero-match result should show `0` or a message
+  instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '$4,200', east: '$3,800', north: '$2,900', south: '$3,150' }}
+  defaultValue="West"
+  label={'Live preview — AVERAGEIF(Sales[Region], "{value}", Sales[Amount])'}
+  fieldLabel="region"
+/>
+
+## Common errors
+
+### #DIV/0! — no rows match
+
+<ExcelCode>{`AVERAGEIF(A2:A10, "West", B2:B10) → #DIV/0! (when no row is "West")`}</ExcelCode>
+
+There's nothing to average. Wrap it in IFERROR for a fallback:
+
+<ExcelCode>{`IFERROR(AVERAGEIF(A2:A10, "West", B2:B10), 0)`}</ExcelCode>
+
+### #VALUE! — mismatched range sizes
+
+<ExcelCode>{`AVERAGEIF(A2:A10, "West", B2:B9) → #VALUE!`}</ExcelCode>
+
+`average_range` must be the same size as `range` — here one is 9 rows
+and the other is 10.
+
+### Silently wrong average — forgetting average_range
+
+<ExcelCode>{`AVERAGEIF(Sales[Region], "West", Sales[Region]) → averages Region, not Amount`}</ExcelCode>
+
+This doesn't throw an error — it just averages the wrong column,
+because `average_range` was left out of the third argument by
+mistake.
+
+export const faqs = [
+  {
+    question: 'AVERAGEIF vs AVERAGEIFS — which should I use?',
+    answer:
+      'AVERAGEIF handles exactly one condition. As soon as an average needs to match two or more conditions at once, switch to AVERAGEIFS — and remember average_range moves from last to first.',
+  },
+  {
+    question: 'Why does AVERAGEIF return #DIV/0! instead of 0?',
+    answer:
+      "No rows match the condition, so there's nothing to average — dividing by zero rows is a genuine error, unlike SUMIF/COUNTIF which have a sensible zero-match answer (0). Wrap it in IFERROR if you want a 0 or message instead.",
+  },
+  {
+    question: 'Do I always need to specify average_range?',
+    answer:
+      "No — if you're averaging the same range you're testing (e.g. every amount over $0), omit average_range and AVERAGEIF averages range itself.",
+  },
+  {
+    question: 'Does average_range need to be numeric?',
+    answer:
+      'Yes — non-numeric or blank cells within the matching rows are ignored, but average_range itself should be a range of numbers for the result to mean anything.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AVERAGEIF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AVERAGEIF(Sales[Region], "West", Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim avg As Double
+    avg = Application.WorksheetFunction.AverageIf( _
+      Range("Sales[Region]"), "West", Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    avg = df.loc[df["Region"] == "West", "Amount"].mean()
+    print(avg)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AVERAGEIFS](/docs/math/averageifs) — the multi-condition version of
+  AVERAGEIF, with `average_range` as the *first, required* argument
+  instead of last and optional.
+- [SUMIF](/docs/math/sumif) — same single-condition matching, but
+  totals the matching rows instead of averaging them.
+- [COUNTIF](/docs/math/countif) — same idea, counting matching rows
+  instead of averaging a value range.
+- [IFERROR](/docs/logical/iferror) — wraps AVERAGEIF to replace
+  `#DIV/0!` on a zero-match result with a fallback value.
