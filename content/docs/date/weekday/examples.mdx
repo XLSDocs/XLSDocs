@@ -1,0 +1,29 @@
+---
+title: WEEKDAY examples
+description: Worked examples for WEEKDAY — basic lookup, weekend detection, and Monday-based numbering.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — day of the week number" formula={`=WEEKDAY(A2)`}>
+  Returns 1–7 using the default scheme, where Sunday is 1.
+</ExampleCard>
+
+<ExampleCard number="02" label="Monday-based numbering" formula={`=WEEKDAY(A2, 2)`}>
+  Passing `2` as `return_type` makes Monday day 1 instead of Sunday.
+</ExampleCard>
+
+<ExampleCard number="03" label="Weekend detection, default numbering" formula={`=OR(WEEKDAY(A2)=1, WEEKDAY(A2)=7)`}>
+  Catches both Saturday and Sunday using the default (Sunday=1)
+  scheme.
+</ExampleCard>
+
+<ExampleCard number="04" label="Weekend detection, simpler with return_type" formula={`=WEEKDAY(A2, 2)>=6`}>
+  With Monday-based numbering, Saturday and Sunday are always the
+  last two values (6 and 7) — a single comparison covers both.
+</ExampleCard>
+
+<ExampleCard number="05" label="Day name for display" formula={`=TEXT(A2, "dddd")`}>
+  TEXT returns the actual day name ("Friday") — WEEKDAY itself
+  always returns a plain number.
+</ExampleCard>

@@ -1,0 +1,31 @@
+---
+title: NETWORKDAYS examples
+description: Worked examples for NETWORKDAYS — a basic project timeline, holiday exclusion, and combining with WORKDAY.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — business days in a range" formula={`=NETWORKDAYS(A2, B2)`}>
+  Counts weekdays between two dates, excluding Saturdays and Sundays.
+</ExampleCard>
+
+<ExampleCard number="02" label="Excluding company holidays" formula={`=NETWORKDAYS(A2, B2, Holidays[Date])`}>
+  Any date in the Holidays column that falls within the range is
+  subtracted from the count too.
+</ExampleCard>
+
+<ExampleCard number="03" label="Estimating a delivery deadline" formula={`=NETWORKDAYS(TODAY(), B2)`}>
+  Counts how many business days remain between today and a target
+  delivery date.
+</ExampleCard>
+
+<ExampleCard number="04" label="Project duration excluding weekends" formula={`=NETWORKDAYS(Project[Start], Project[End]) - 1`}>
+  Subtracting 1 converts the inclusive day count into a "days of
+  work between the two dates" figure, if the start day itself
+  shouldn't count as a full day of work.
+</ExampleCard>
+
+<ExampleCard number="05" label="Custom weekend schedule" formula={`=NETWORKDAYS.INTL(A2, B2, 11)`}>
+  NETWORKDAYS.INTL's weekend code `11` treats only Sunday as the
+  weekend — useful for a business that works six days a week.
+</ExampleCard>

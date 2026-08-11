@@ -1,0 +1,145 @@
+---
+title: MONTH
+description: Extract the month from a date.
+---
+
+Pull the month out of a date as a number from 1 to 12 — useful for
+grouping data by month, or comparing the month component of two
+dates regardless of year.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns 1–12, not a month name', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Unrecognized text dates return #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MONTH(serial_number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MONTH(serial_number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'date',
+    required: true,
+    description: 'The date to extract the month from — a real date value, cell reference, or recognizable date text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The month as a whole number from 1 (January) to 12 (December).
+
+## Description
+
+MONTH reads the month component straight out of a date's underlying
+serial number. It always returns a plain number, never a month
+name — pair it with `TEXT(date, "mmmm")` if a display string like
+"January" is what's actually needed.
+
+<Callout type="info">
+  MONTH ignores the year entirely, which makes it useful for
+  seasonal comparisons — checking whether two dates fall in the same
+  month regardless of which year each one is in:
+  `MONTH(A2) = MONTH(B2)`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'January 15, 2027': '1', 'June 30, 2027': '6', 'December 25, 2027': '12' }}
+  defaultValue="January 15, 2027"
+  label={'Live preview — MONTH("{value}")'}
+  fieldLabel="date"
+/>
+
+## Common errors
+
+### #VALUE! — text Excel doesn't recognize as a date
+
+<ExcelCode>{`MONTH("not a date") → #VALUE!`}</ExcelCode>
+
+The text needs to be something Excel can actually parse as a date.
+
+### Expecting a month name instead of a number
+
+<ExcelCode>{`MONTH(A2) → 1 (not "January")`}</ExcelCode>
+
+MONTH always returns a number — use TEXT for a display name:
+
+<ExcelCode>{`TEXT(A2, "mmmm")`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'How do I get the month name instead of a number?',
+    answer: 'Use TEXT(date, "mmmm") for the full name ("January") or TEXT(date, "mmm") for the abbreviation ("Jan") — MONTH itself always returns a plain 1–12 number.',
+  },
+  {
+    question: 'How do I group data by month across multiple years?',
+    answer: 'MONTH alone ignores the year, so grouping by MONTH(A2) mixes January 2026 with January 2027. Group by both YEAR(A2) and MONTH(A2) together (or a helper column combining them) if the year matters.',
+  },
+  {
+    question: 'How do I check if a date falls in a specific quarter?',
+    answer: 'ROUNDUP(MONTH(A2)/3, 0) converts a month number to its quarter (1–4) — months 1-3 become 1, 4-6 become 2, and so on.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MONTH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MONTH(Orders[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim orderMonth As Integer
+    orderMonth = Month(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    df["Month"] = pd.to_datetime(df["Date"]).dt.month
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [YEAR](/docs/date/year) — extracts the year instead of the month,
+  from the same date.
+- [DAY](/docs/date/day) — extracts the day of the month.
+- [EOMONTH](/docs/date/eomonth) — finds the last day of a month a
+  given number of months away, using the same underlying date math.

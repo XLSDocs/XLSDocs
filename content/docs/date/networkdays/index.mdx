@@ -1,0 +1,157 @@
+---
+title: NETWORKDAYS
+description: Count the working days between two dates, excluding weekends and optional holidays.
+---
+
+Count the number of working days between two dates — weekends
+excluded automatically, holidays excluded if a list is supplied. The
+standard way to calculate a real project deadline or delivery
+estimate that skips non-working days.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Both start_date and end_date are included in the count', type: 'check' },
+  { text: 'Weekends are always Saturday/Sunday — not configurable', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=NETWORKDAYS(start_date, end_date, [holidays])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NETWORKDAYS(start_date, end_date, [holidays])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The first date of the range.',
+  },
+  {
+    name: 'end_date',
+    type: 'date',
+    required: true,
+    description: 'The last date of the range.',
+  },
+  {
+    name: 'holidays',
+    type: 'range',
+    required: false,
+    description: 'A range of dates to exclude from the count in addition to weekends.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of weekdays (Monday–Friday) between `start_date` and
+`end_date`, inclusive of both endpoints, minus any dates that appear
+in `holidays`.
+
+## Description
+
+NETWORKDAYS answers "how many actual business days are between these
+two dates" — the calculation behind realistic project timelines and
+delivery estimates, as opposed to a raw calendar-day subtraction that
+would incorrectly count weekends as working time.
+
+<Callout type="warn">
+  Weekends are hardcoded to Saturday and Sunday — there's no
+  argument to change that. For a business that operates on a
+  different weekly schedule (e.g. Friday/Saturday off instead of
+  Saturday/Sunday), use `NETWORKDAYS.INTL` instead, which adds a
+  `weekend` argument to customize which days don't count.
+</Callout>
+
+## Common errors
+
+### Off-by-one from expecting an exclusive count
+
+<ExcelCode>{`NETWORKDAYS(DATE(2027,1,4), DATE(2027,1,8)) → 5 (both endpoints included)`}</ExcelCode>
+
+Both `start_date` and `end_date` count as working days if they fall
+on weekdays — this isn't a bug, but it does mean the result is one
+higher than a naive "days between" calculation might expect.
+
+### Holidays not actually excluded
+
+<ExcelCode>{`NETWORKDAYS(A2, B2, "12/25/2027") → holiday not excluded (text, not a real date range)`}</ExcelCode>
+
+`holidays` needs to reference real date cells or values, not text —
+and every holiday date needs to actually fall within
+`start_date`/`end_date` to matter.
+
+export const faqs = [
+  {
+    question: 'Does NETWORKDAYS count start_date and end_date themselves?',
+    answer: 'Yes — both endpoints are included in the count if they fall on a weekday. A Monday-to-Friday range returns 5, not 4.',
+  },
+  {
+    question: 'Can I customize which days count as the weekend?',
+    answer: "Not with NETWORKDAYS itself — it's always Saturday/Sunday. NETWORKDAYS.INTL adds a weekend argument for schedules where different days are off.",
+  },
+  {
+    question: 'What happens if end_date is before start_date?',
+    answer: 'NETWORKDAYS returns a negative number rather than an error — worth guarding against with an IF check if the dates might arrive in the wrong order.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NETWORKDAYS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NETWORKDAYS(Project[Start], Project[End], Holidays[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim businessDays As Long
+    businessDays = Application.WorksheetFunction.NetworkDays( _
+      Range("A2"), Range("B2"), Range("Holidays"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    business_days = np.busday_count("2027-01-04", "2027-01-09", holidays=["2027-01-06"])
+    print(business_days)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [WORKDAY](/docs/date/workday) — the inverse calculation: finds a
+  date a given number of business days away, instead of counting
+  business days between two known dates.
+- [WEEKDAY](/docs/date/weekday) — identifies the day of the week for
+  a single date, the building block NETWORKDAYS uses internally.
+- [DATEDIF](/docs/date/datedif) — counts total calendar days (or
+  months/years) between two dates, without excluding weekends.

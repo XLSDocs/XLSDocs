@@ -1,0 +1,29 @@
+---
+title: DAY examples
+description: Worked examples for DAY — basic extraction, end-of-month checks, and payroll cutoff logic.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — extract the day" formula={`=DAY(A2)`}>
+  Returns just the day-of-month number from whatever date is in A2.
+</ExampleCard>
+
+<ExampleCard number="02" label="Checking for the last day of the month" formula={`=A2=EOMONTH(A2,0)`}>
+  TRUE only when A2 falls exactly on the final day of its month.
+</ExampleCard>
+
+<ExampleCard number="03" label="Flagging early vs late month" formula={`=IF(DAY(A2)<=15, "First half", "Second half")`}>
+  Splits dates into first-half/second-half-of-month buckets based on
+  the day number alone.
+</ExampleCard>
+
+<ExampleCard number="04" label="Payroll cutoff logic" formula={`=IF(DAY(A2)>25, "Next cycle", "This cycle")`}>
+  A common pattern for assigning transactions near month-end to the
+  following processing cycle.
+</ExampleCard>
+
+<ExampleCard number="05" label="Two-digit day for display" formula={`=TEXT(A2, "dd")`}>
+  TEXT pads the day to two digits ("05") — DAY itself returns a
+  plain unpadded number.
+</ExampleCard>

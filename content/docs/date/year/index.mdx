@@ -1,0 +1,150 @@
+---
+title: YEAR
+description: Extract the year from a date.
+---
+
+Pull the year out of a date as a plain number — the building block
+for grouping data by year, calculating someone's age, or comparing
+dates across different years.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a plain number (e.g. 2027), not a date', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Unrecognized text dates return #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=YEAR(serial_number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=YEAR(serial_number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'date',
+    required: true,
+    description: 'The date to extract the year from — a real date value, cell reference, or recognizable date text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The year as a whole number between 1900 and 9999.
+
+## Description
+
+YEAR reads the year component straight out of a date's underlying
+serial number — it doesn't matter how the date is formatted for
+display, only that Excel recognizes the cell as an actual date
+value. Combined with MONTH and DAY, it's the standard way to break a
+date apart into its individual pieces for grouping or comparison.
+
+<Callout type="info">
+  `serial_number` needs to be a real date value, not text that merely
+  *looks* like one. A cell containing the text `"1/15/2027"` that
+  Excel has actually converted to a date works fine; a cell formatted
+  as plain text holding those same characters does not, and returns
+  `#VALUE!`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'January 15, 2027': '2027', 'December 31, 1999': '1999', 'July 4, 2030': '2030' }}
+  defaultValue="January 15, 2027"
+  label={'Live preview — YEAR("{value}")'}
+  fieldLabel="date"
+/>
+
+## Common errors
+
+### #VALUE! — text Excel doesn't recognize as a date
+
+<ExcelCode>{`YEAR("not a date") → #VALUE!`}</ExcelCode>
+
+The text needs to be something Excel can actually parse as a date —
+check the source data isn't stored as plain, unconverted text.
+
+### Comparing years across a mix of real dates and text
+
+<ExcelCode>{`YEAR(A2) → #VALUE! for some rows, a number for others`}</ExcelCode>
+
+A column that mixes real date values with text-formatted "dates"
+(common after importing data) fails inconsistently — fix the whole
+column's type first (e.g. with Data → Text to Columns) rather than
+patching the formula per row.
+
+export const faqs = [
+  {
+    question: 'YEAR vs TEXT(date, "yyyy") — which should I use?',
+    answer: 'YEAR returns a real number, useful for math and comparisons (YEAR(A2) = 2027). TEXT returns a formatted string, useful for display or concatenation (TEXT(A2, "yyyy") gives "2027" as text). Use YEAR unless the result specifically needs to be text.',
+  },
+  {
+    question: 'Can YEAR extract the year from a cell formatted as text?',
+    answer: "Only if Excel can still parse the text as a real date underneath — a genuinely text-formatted cell holding unconvertible text returns #VALUE!. Convert the column to real dates first if this happens across many rows.",
+  },
+  {
+    question: 'How do I calculate someone\'s age from a birthdate?',
+    answer: 'YEAR(TODAY()) - YEAR(birthdate) gets close, but is off by one for anyone who hasn\'t had this year\'s birthday yet — DATEDIF(birthdate, TODAY(), "y") is the more reliable formula for a true age calculation.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with YEAR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=YEAR(Orders[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim orderYear As Integer
+    orderYear = Year(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    df["Year"] = pd.to_datetime(df["Date"]).dt.year
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MONTH](/docs/date/month) — extracts the month instead of the
+  year, from the same date.
+- [DAY](/docs/date/day) — extracts the day of the month instead of
+  the year.
+- [DATEDIF](/docs/date/datedif) — a more reliable way to calculate a
+  precise age or duration than subtracting YEAR results.

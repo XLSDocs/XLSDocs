@@ -1,0 +1,156 @@
+---
+title: WEEKDAY
+description: Get the day of the week from a date, as a number.
+---
+
+Get the day of the week from a date, as a number — the default
+numbering starts the week on Sunday, which trips up almost everyone
+expecting Monday to be day 1.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Default numbering: Sunday = 1, Saturday = 7', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'return_type=2 switches to Monday = 1', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=WEEKDAY(serial_number, [return_type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=WEEKDAY(serial_number, [return_type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'date',
+    required: true,
+    description: 'The date to find the day of the week for.',
+  },
+  {
+    name: 'return_type',
+    type: 'number',
+    required: false,
+    description: 'Which numbering scheme to use. 1 (default): Sunday=1...Saturday=7. 2: Monday=1...Sunday=7. 3: Monday=0...Sunday=6.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A number representing the day of the week, in whichever numbering
+scheme `return_type` selects.
+
+## Description
+
+WEEKDAY converts a date into a number representing which day of the
+week it falls on. The numbering scheme is the single biggest source
+of confusion — the default (`return_type` omitted or `1`) treats
+**Sunday as day 1**, not Monday, which is the opposite of what most
+people expect from a "day of the week" number.
+
+<Callout type="warn">
+  If a formula needs Monday to be day 1 (common outside the US, and
+  in most business-day logic), pass `2` as `return_type`:
+  `WEEKDAY(A2, 2)`. The default scheme (`1`, Sunday=1) is easy to use
+  by accident and silently produce off-by-one weekend logic.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'Fri, Jan 15, 2027': '6', 'Sun, Jan 17, 2027': '1', 'Mon, Jan 18, 2027': '2' }}
+  defaultValue="Fri, Jan 15, 2027"
+  label={'Live preview — WEEKDAY("{value}")'}
+  fieldLabel="date"
+/>
+
+## Common errors
+
+### Weekend logic is off by one day
+
+<ExcelCode>{`IF(WEEKDAY(A2)=1, "Weekend", "Weekday") → wrong (treats only Sunday as weekend)`}</ExcelCode>
+
+Checking `WEEKDAY(A2)=1` alone only catches Sunday. A real weekend
+check needs both ends of the default numbering:
+
+<ExcelCode>{`IF(OR(WEEKDAY(A2)=1, WEEKDAY(A2)=7), "Weekend", "Weekday")`}</ExcelCode>
+
+### Assuming Monday is day 1 without setting return_type
+
+<ExcelCode>{`WEEKDAY(A2) → 2 for a Monday, not 1`}</ExcelCode>
+
+The default scheme makes Monday day **2** (Sunday is 1) — pass `2`
+as `return_type` if the formula's logic assumes Monday is day 1.
+
+export const faqs = [
+  {
+    question: 'Why does WEEKDAY return 2 for what I know is a Monday?',
+    answer: 'The default numbering (return_type omitted, or 1) starts the week on Sunday as day 1, making Monday day 2. Pass 2 as return_type for a Monday=1 scheme instead.',
+  },
+  {
+    question: 'How do I check if a date is a weekend?',
+    answer: 'With the default numbering, weekends are WEEKDAY(A2)=1 (Sunday) or WEEKDAY(A2)=7 (Saturday). Simpler with return_type=2: WEEKDAY(A2, 2) >= 6 catches both Saturday and Sunday in one comparison.',
+  },
+  {
+    question: 'WEEKDAY vs NETWORKDAYS — which should I use?',
+    answer: "WEEKDAY answers 'what day of the week is this single date.' NETWORKDAYS answers 'how many business days fall between two dates' — reach for NETWORKDAYS when counting days, not identifying one.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with WEEKDAY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(WEEKDAY(A2, 2)>=6, "Weekend", "Weekday")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim isWeekend As Boolean
+    isWeekend = Weekday(Range("A2").Value, vbMonday) >= 6
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["IsWeekend"] = pd.to_datetime(df["Date"]).dt.dayofweek >= 5
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DAY](/docs/date/day) — a different question: the day of the
+  *month*, not the day of the week.
+- [NETWORKDAYS](/docs/date/networkdays) — counts business days
+  between two dates, using the same weekday logic internally.
+- [WORKDAY](/docs/date/workday) — finds a date a given number of
+  business days away, the inverse of NETWORKDAYS.

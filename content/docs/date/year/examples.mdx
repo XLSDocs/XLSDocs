@@ -1,0 +1,30 @@
+---
+title: YEAR examples
+description: Worked examples for YEAR — basic extraction, grouping data by year, and a fiscal-year offset.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — extract the year" formula={`=YEAR(A2)`}>
+  Returns just the year number from whatever date is in A2.
+</ExampleCard>
+
+<ExampleCard number="02" label="Grouping orders by year" formula={`=SUMIFS(Orders[Amount], Orders[Date], ">="&DATE(YEAR(A2),1,1), Orders[Date], "<"&DATE(YEAR(A2)+1,1,1))`}>
+  Combining YEAR with DATE builds a clean start/end range for
+  totaling everything within one calendar year.
+</ExampleCard>
+
+<ExampleCard number="03" label="Years until a target date" formula={`=YEAR(B2) - YEAR(A2)`}>
+  A quick approximate year difference — not precise to the day, use
+  DATEDIF instead if exact duration matters.
+</ExampleCard>
+
+<ExampleCard number="04" label="Fiscal year offset from calendar year" formula={`=YEAR(A2) + IF(MONTH(A2)>=7, 1, 0)`}>
+  For an organization whose fiscal year starts in July, this bumps
+  the fiscal year number up by one for any date from July onward.
+</ExampleCard>
+
+<ExampleCard number="05" label="Flagging outdated records" formula={`=IF(YEAR(A2)<YEAR(TODAY()), "Review", "Current")`}>
+  Flags any row whose date is from an earlier calendar year than the
+  current one.
+</ExampleCard>

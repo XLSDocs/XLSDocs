@@ -1,0 +1,151 @@
+---
+title: WORKDAY
+description: Find a date a given number of working days before or after a start date, skipping weekends and optional holidays.
+---
+
+Find the date that's a given number of working days away from a
+start date — weekends skipped automatically, holidays skipped too if
+a list is supplied. The inverse of NETWORKDAYS: instead of counting
+business days between two known dates, this finds the date itself.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Positive days moves forward, negative moves backward', type: 'check' },
+  { text: 'start_date itself is never counted as one of the days', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=WORKDAY(start_date, days, [holidays])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=WORKDAY(start_date, days, [holidays])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The date to count forward or backward from.',
+  },
+  {
+    name: 'days',
+    type: 'number',
+    required: true,
+    description: 'How many working days away the result should be. Positive moves forward, negative moves backward.',
+  },
+  {
+    name: 'holidays',
+    type: 'range',
+    required: false,
+    description: 'A range of dates to also skip, in addition to weekends.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The date that is `days` working days after (or before, if negative)
+`start_date`, skipping weekends and any dates listed in `holidays`.
+
+## Description
+
+WORKDAY answers "what date is 10 business days from now" — the
+calculation behind realistic due-date estimates, shipping timelines,
+and deadline scheduling that needs to account for weekends (and
+optionally holidays) rather than a naive calendar-day addition.
+
+<Callout type="warn">
+  `start_date` itself is **never** counted as one of the `days` — it's
+  purely the starting point. `WORKDAY(A2, 1)` returns the *next*
+  working day after `A2`, not `A2` itself, even if `A2` is a weekday.
+</Callout>
+
+## Common errors
+
+### Off-by-one from expecting start_date to count
+
+<ExcelCode>{`WORKDAY(DATE(2027,1,4), 1) → January 5, 2027 (the next day, not Jan 4 itself)`}</ExcelCode>
+
+`start_date` is the starting point, not counted as day one of the
+result — `days=1` means "one working day after this date."
+
+### Weekends hardcoded to Saturday/Sunday
+
+Like NETWORKDAYS, plain WORKDAY always treats Saturday and Sunday as
+the weekend, with no argument to change that — use
+`WORKDAY.INTL` for a custom weekly schedule.
+
+export const faqs = [
+  {
+    question: 'Does WORKDAY count start_date as one of the days?',
+    answer: 'No — start_date is only the starting point. WORKDAY(A2, 1) returns the next working day after A2, not A2 itself.',
+  },
+  {
+    question: 'How do I find a date before a given date instead of after?',
+    answer: 'Pass a negative number for days: WORKDAY(A2, -5) finds the date 5 working days before A2.',
+  },
+  {
+    question: 'Can I customize which days count as the weekend?',
+    answer: "Not with plain WORKDAY — it's always Saturday/Sunday. WORKDAY.INTL adds a weekend argument for schedules where different days are off, matching NETWORKDAYS.INTL's options.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with WORKDAY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=WORKDAY(Orders[ShipDate], 10, Holidays[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim deliveryDate As Date
+    deliveryDate = Application.WorksheetFunction.WorkDay( _
+      Range("A2"), 10, Range("Holidays"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    delivery_date = np.busday_offset("2027-01-04", 10, roll="forward", holidays=["2027-01-06"])
+    print(delivery_date)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NETWORKDAYS](/docs/date/networkdays) — the inverse calculation:
+  counts business days between two known dates, instead of finding a
+  date a given number of business days away.
+- [EDATE](/docs/date/edate) — shifts a date by a number of *months*
+  instead of business days.
+- [WEEKDAY](/docs/date/weekday) — identifies the day of the week for
+  a single date, the building block WORKDAY uses internally.

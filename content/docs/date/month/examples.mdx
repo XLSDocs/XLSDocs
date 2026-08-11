@@ -1,0 +1,29 @@
+---
+title: MONTH examples
+description: Worked examples for MONTH — basic extraction, quarter calculation, and month-name display.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — extract the month" formula={`=MONTH(A2)`}>
+  Returns just the month number (1–12) from whatever date is in A2.
+</ExampleCard>
+
+<ExampleCard number="02" label="Converting to a quarter" formula={`=ROUNDUP(MONTH(A2)/3, 0)`}>
+  Months 1–3 become quarter 1, 4–6 become quarter 2, and so on.
+</ExampleCard>
+
+<ExampleCard number="03" label="Displaying the month name" formula={`=TEXT(A2, "mmmm")`}>
+  Unlike MONTH, TEXT returns a display string ("January") instead of
+  a number.
+</ExampleCard>
+
+<ExampleCard number="04" label="Same-month comparison across years" formula={`=MONTH(A2)=MONTH(B2)`}>
+  Checks whether two dates fall in the same calendar month,
+  regardless of which year each one is in.
+</ExampleCard>
+
+<ExampleCard number="05" label="Flagging a specific season" formula={`=IF(OR(MONTH(A2)=12, MONTH(A2)<=2), "Winter", "Other")`}>
+  Groups December, January, and February together as one season,
+  independent of year.
+</ExampleCard>

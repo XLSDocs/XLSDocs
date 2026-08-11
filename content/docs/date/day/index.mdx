@@ -1,0 +1,144 @@
+---
+title: DAY
+description: Extract the day of the month from a date.
+---
+
+Pull the day-of-month out of a date as a number from 1 to 31 —
+useful for comparing the day component of two dates, or checking
+whether a date falls near the start or end of its month.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns 1–31, the day within the month', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Unrecognized text dates return #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DAY(serial_number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DAY(serial_number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'date',
+    required: true,
+    description: 'The date to extract the day of the month from — a real date value, cell reference, or recognizable date text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The day of the month as a whole number from 1 to 31.
+
+## Description
+
+DAY reads the day-of-month component straight out of a date's
+underlying serial number — the last of the three basic date-part
+functions alongside YEAR and MONTH. It's not to be confused with
+WEEKDAY, which returns the day *of the week* rather than the day
+*of the month*.
+
+<Callout type="info">
+  DAY and WEEKDAY are easy to mix up by name — DAY returns 1–31 (day
+  within the month), while WEEKDAY returns 1–7 (day within the
+  week). Reach for WEEKDAY specifically when the question is "is
+  this a Monday," not "is this the 15th."
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'January 15, 2027': '15', 'June 1, 2027': '1', 'December 31, 2027': '31' }}
+  defaultValue="January 15, 2027"
+  label={'Live preview — DAY("{value}")'}
+  fieldLabel="date"
+/>
+
+## Common errors
+
+### #VALUE! — text Excel doesn't recognize as a date
+
+<ExcelCode>{`DAY("not a date") → #VALUE!`}</ExcelCode>
+
+The text needs to be something Excel can actually parse as a date.
+
+### Confusing DAY with WEEKDAY
+
+<ExcelCode>{`DAY(A2) → 15 (the 15th of the month, not a day-of-week number)`}</ExcelCode>
+
+If the goal is "which day of the week is this," use WEEKDAY instead
+of DAY.
+
+export const faqs = [
+  {
+    question: 'DAY vs WEEKDAY — how are they different?',
+    answer: 'DAY returns the day of the month (1–31). WEEKDAY returns the day of the week (1–7 by default). They answer completely different questions despite the similar names.',
+  },
+  {
+    question: 'How do I check if a date is the last day of its month?',
+    answer: 'Compare it to EOMONTH: A2 = EOMONTH(A2, 0) is TRUE only when A2 is genuinely the final day of its month.',
+  },
+  {
+    question: 'How do I get just the day number formatted with a leading zero?',
+    answer: 'TEXT(A2, "dd") returns the day as two-digit text ("05" instead of 5) — DAY itself always returns a plain number with no padding.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DAY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DAY(Orders[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim dayOfMonth As Integer
+    dayOfMonth = Day(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    df["Day"] = pd.to_datetime(df["Date"]).dt.day
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [YEAR](/docs/date/year) — extracts the year from the same date.
+- [MONTH](/docs/date/month) — extracts the month from the same date.
+- [WEEKDAY](/docs/date/weekday) — a different question entirely: the
+  day of the *week*, not the day of the month.

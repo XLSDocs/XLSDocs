@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-11',
+    title: 'YEAR, MONTH, DAY, WEEKDAY, NETWORKDAYS, and WORKDAY',
+    description:
+      'Six more Date functions — extracting date parts, finding the day of the week (including the Sunday-is-day-1 gotcha), and business-day math for real project deadlines and delivery estimates.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-11',
     title: 'A new Financial category: PMT, FV, PV, NPV, and RATE',
     description:
       'Loan payments, present and future value, and rate-of-return calculations — including the cash-flow sign convention that trips up almost everyone the first time, and the NPV timing gotcha around upfront investments.',
