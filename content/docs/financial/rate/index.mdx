@@ -1,0 +1,189 @@
+---
+title: RATE
+description: Calculate the interest rate per period of a loan or annuity with constant payments.
+---
+
+Solve for the interest rate per period given a loan or annuity's
+other terms — the payment, the number of periods, and the present
+(and optionally future) value. Useful for checking what rate a
+lender is actually charging, given only the payment schedule.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a rate per period, not automatically an annual rate', type: 'warn' },
+  { text: 'An iterative approximation — can fail to converge without a guess', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RATE(nper, pmt, pv, [fv], [type], [guess])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RATE(nper, pmt, pv, [fv], [type], [guess])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pmt',
+    type: 'number',
+    required: true,
+    description: 'The payment made each period. Negative for money paid out.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The present value — the loan amount received, or the current investment value.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: false,
+    description: 'The desired cash balance after the last payment. Defaults to 0.',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: false,
+    description: '0 for payments due at the end of each period (default), 1 for payments due at the start.',
+  },
+  {
+    name: 'guess',
+    type: 'number',
+    required: false,
+    description: 'A starting estimate for the rate, to help the iterative solver converge. Defaults to 10%.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The interest rate per period that makes the given `pmt`, `pv`, and
+`fv` consistent with each other. Returns `#NUM!` if the underlying
+iterative solver can't converge on an answer.
+
+## Description
+
+Unlike PMT/PV/FV, which solve their target directly, RATE has no
+closed-form solution — Excel approximates it iteratively (Newton's
+method), starting from `guess` and refining from there. Most of the
+time this converges instantly and invisibly; it's only when the
+inputs are unusual that the iteration itself becomes visible, as a
+`#NUM!` error.
+
+<Callout type="warn">
+  Like PMT and PV, RATE expects `pmt` and `pv` to follow the
+  cash-flow sign convention — opposite signs from each other (money
+  received now, positive `pv`; money paid out each period, negative
+  `pmt`). Using the same sign for both is a common cause of `#NUM!`,
+  since it describes a scenario with no valid interest rate.
+</Callout>
+
+## Common errors
+
+### #NUM! — the solver failed to converge
+
+<ExcelCode>{`RATE(360, 1073.64, 200000) → #NUM! (pmt and pv have the same sign)`}</ExcelCode>
+
+Check the sign convention first — `pmt` and `pv` should have opposite
+signs for a normal loan or annuity:
+
+<ExcelCode>{`RATE(360, -1073.64, 200000)`}</ExcelCode>
+
+### #NUM! — a genuinely hard-to-converge case
+
+Even with correct signs, some combinations of inputs converge slowly
+or not at all from the default 10% starting guess. Supplying a
+`guess` closer to the expected real answer often resolves it:
+
+<ExcelCode>{`RATE(360, -1073.64, 200000, 0, 0, 0.5%)`}</ExcelCode>
+
+### Result looks tiny — it's a per-period rate, not annual
+
+<ExcelCode>{`RATE(360, -1073.64, 200000) → 0.417% (a monthly rate, not 5%)`}</ExcelCode>
+
+RATE returns the rate for whatever period `nper`/`pmt` used — for a
+monthly loan, that's a **monthly** rate. Multiply by periods per year
+for the more familiar annual figure:
+
+<ExcelCode>{`RATE(360, -1073.64, 200000) * 12`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Why does RATE return #NUM!?',
+    answer: 'Most often, pmt and pv have the same sign (should be opposite, per the cash-flow convention), or the true rate is far enough from the default 10% guess that the iterative solver can\'t converge — supplying a closer guess as the sixth argument usually fixes the latter.',
+  },
+  {
+    question: 'Is the result from RATE an annual rate?',
+    answer: 'No — it\'s the rate per period, matching whatever period nper and pmt describe. A monthly loan schedule produces a monthly rate; multiply by 12 for the annual equivalent.',
+  },
+  {
+    question: 'RATE vs IRR — how do they relate?',
+    answer: 'RATE assumes equal payments every period (like PMT/PV). IRR solves for a rate given a series of uneven cash flows (like NPV) — use IRR instead of RATE when the payments genuinely vary.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RATE(360, -1073.64, 200000) * 12`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim monthlyRate As Double
+    monthlyRate = Rate(360, -1073.64, 200000)
+    Dim annualRate As Double
+    annualRate = monthlyRate * 12
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    monthly_rate = npf.rate(360, -1073.64, 200000, 0)
+    annual_rate = monthly_rate * 12
+    print(annual_rate)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PMT](/docs/financial/pmt) — solves for the payment instead of the
+  rate, given the other terms.
+- [PV](/docs/financial/pv) — solves for the present value instead of
+  the rate.
+- [NPV](/docs/financial/npv) — a related but different question:
+  the present value of *uneven* cash flows at a known rate.

@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-11',
+    title: 'A new Financial category: PMT, FV, PV, NPV, and RATE',
+    description:
+      'Loan payments, present and future value, and rate-of-return calculations — including the cash-flow sign convention that trips up almost everyone the first time, and the NPV timing gotcha around upfront investments.',
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-08-10',
     title: 'A new Info category: ISBLANK, ISNUMBER, ISTEXT, ISERROR, and ISNA',
     description:

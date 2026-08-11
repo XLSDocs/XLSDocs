@@ -1,0 +1,171 @@
+---
+title: PV
+description: Calculate the present value of a loan or investment with constant payments and a constant interest rate.
+---
+
+Calculate what a series of future payments is worth in today's
+money — the lump sum that, invested now at a given rate, would fund
+that exact stream of payments.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'rate must match the period of nper', type: 'warn' },
+  { text: 'Result sign is opposite pmt — a loan you receive is positive, payments you make are negative', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PV(rate, nper, pmt, [fv], [type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PV(rate, nper, pmt, [fv], [type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period.',
+  },
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pmt',
+    type: 'number',
+    required: true,
+    description: 'The payment made each period. Negative for money paid out.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: false,
+    description: 'The desired cash balance after the last payment. Defaults to 0.',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: false,
+    description: '0 for payments due at the end of each period (default), 1 for payments due at the start.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The present-day value of the future payment stream. Following the
+cash-flow sign convention, the result's sign is opposite `pmt` — a
+series of payments you'll make (negative `pmt`) has a positive
+present value (money you'd need to receive now to fund them).
+
+## Description
+
+PV answers "what's this stream of future payments worth today,"
+given a discount rate — the same math that determines how much a
+lender is willing to give you now in exchange for a promised series
+of loan payments, or what a pension/annuity payout stream is worth
+as a lump sum today.
+
+<Callout type="warn">
+  Like PMT and FV, PV follows the cash-flow sign convention:
+  `pmt` (money you pay out each period) is negative, and the
+  resulting `PV` comes back **positive** — the lump sum you'd need to
+  receive now to exactly fund those payments. This is the reverse of
+  what many people expect from a "present value of my future costs"
+  question.
+</Callout>
+
+## Common errors
+
+### Result sign looks backwards
+
+<ExcelCode>{`PV(5%/12, 30*12, 1073.64) → negative (pmt entered as positive)`}</ExcelCode>
+
+`pmt` should be negative for a payment made — flip the sign to get a
+positive present value:
+
+<ExcelCode>{`PV(5%/12, 30*12, -1073.64)`}</ExcelCode>
+
+### Result is far too large or small
+
+<ExcelCode>{`PV(5%, 30*12, -1073.64) → wildly wrong (annual rate used against a monthly nper)`}</ExcelCode>
+
+`rate` and `nper` must match periods — divide the annual rate to get
+a monthly one:
+
+<ExcelCode>{`PV(5%/12, 30*12, -1073.64)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'PV vs FV — how do they relate?',
+    answer: 'PV discounts a future payment stream back to today\'s value; FV projects contributions forward to a future value. Same time-value-of-money math, opposite direction.',
+  },
+  {
+    question: 'Why is my PV result positive when I expected a cost?',
+    answer: "A positive PV represents money you'd need to receive today to exactly fund the payments described by pmt — the sign convention treats it as an inflow, not a cost, even when the underlying scenario is a series of expenses.",
+  },
+  {
+    question: 'Can PV verify a loan amount from a known payment?',
+    answer: "Yes — given a known monthly payment, rate, and term, PV(rate, nper, -payment) returns the original loan principal, useful for checking a lender's numbers.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PV(5%/12, 30*12, -1073.64)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim presentValue As Double
+    presentValue = Pv(0.05 / 12, 30 * 12, -1073.64)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    present_value = npf.pv(0.05 / 12, 30 * 12, -1073.64)
+    print(present_value)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FV](/docs/financial/fv) — future value of a series of constant
+  payments, the mirror calculation to PV.
+- [PMT](/docs/financial/pmt) — the periodic payment for a given
+  present value, instead of the present value of a given payment.
+- [NPV](/docs/financial/npv) — present value of a series of *uneven*
+  cash flows, instead of PV's constant-payment assumption.

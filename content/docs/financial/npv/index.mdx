@@ -1,0 +1,162 @@
+---
+title: NPV
+description: Calculate the net present value of a series of uneven future cash flows, discounted at a given rate.
+---
+
+Calculate the present-day value of a series of cash flows that don't
+have to be equal — unlike PV, which assumes constant payments. The
+standard way to evaluate whether a project or investment with
+irregular returns is worth its cost.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The first cash flow is discounted as if it occurs one period from now', type: 'warn' },
+  { text: 'An upfront investment (time 0) must be added outside the NPV call', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=NPV(rate, value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NPV(rate, value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The discount rate per period.',
+  },
+  {
+    name: 'value1',
+    type: 'number, range',
+    required: true,
+    description: 'The first cash flow, or a range of cash flows.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 254 more cash flows, in chronological order.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of all cash flows, each discounted back to today's value at
+`rate`, based on how many periods away it occurs.
+
+## Description
+
+NPV discounts a series of cash flows that don't need to be equal —
+unlike PV, PMT, and FV, which all assume a constant payment amount
+every period. This makes it the right tool for evaluating a real
+investment or project where returns vary year to year (or are
+negative in some periods).
+
+<Callout type="warn">
+  NPV assumes `value1` occurs **one full period from now**, not at
+  time zero — it discounts every value you give it. An upfront cost
+  paid today (time 0, like an initial investment) should **not** be
+  included inside the NPV call; add it separately, undiscounted,
+  after the NPV result:
+  `=NPV(rate, year1, year2, year3) - initial_investment`. Including
+  the initial investment as the first argument incorrectly discounts
+  a cost that actually happens now.
+</Callout>
+
+## Common errors
+
+### Result looks too optimistic — the timing mistake
+
+<ExcelCode>{`NPV(10%, -50000, 15000, 18000, 20000) → wrong (the -50000 gets discounted, but it happens today)`}</ExcelCode>
+
+The initial investment shouldn't be inside the NPV call at all — pull
+it out and subtract it undiscounted:
+
+<ExcelCode>{`NPV(10%, 15000, 18000, 20000) - 50000`}</ExcelCode>
+
+### Mismatched cash flow periods
+
+Every value passed to NPV is assumed to be exactly one period apart —
+skipping a year, or mixing monthly and annual figures in the same
+call, silently produces a meaningless result with no error at all.
+
+export const faqs = [
+  {
+    question: 'NPV vs PV — which should I use?',
+    answer: 'PV assumes every payment is the same amount. NPV handles a series of cash flows that vary period to period — use NPV whenever the returns genuinely differ, not just when the numbers happen to look uneven.',
+  },
+  {
+    question: 'Where does the initial investment go in an NPV calculation?',
+    answer: "Outside the NPV call, subtracted afterward: NPV(rate, futureCashFlows...) - initialInvestment. Putting it inside NPV as the first value incorrectly discounts a cost that happens today.",
+  },
+  {
+    question: 'What counts as a good discount rate for rate?',
+    answer: "Typically a company's cost of capital, or the return available from an equally risky alternative investment — not a fixed rule the function itself enforces. NPV just computes the math for whatever rate is supplied.",
+  },
+  {
+    question: 'NPV vs IRR — how do they relate?',
+    answer: "IRR finds the discount rate that makes NPV equal to zero for a given set of cash flows — the two functions solve for opposite unknowns using the same underlying cash-flow timing.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NPV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NPV(10%, Cashflows[Year1_3]) - 50000`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim netPresentValue As Double
+    netPresentValue = Application.WorksheetFunction.Npv( _
+      0.1, Range("Cashflows")) - 50000
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    cash_flows = [15000, 18000, 20000]
+    net_present_value = npf.npv(0.10, cash_flows) - 50000
+    print(net_present_value)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PV](/docs/financial/pv) — present value of a series of *equal*
+  cash flows, simpler when payments genuinely don't vary.
+- [RATE](/docs/financial/rate) — solves for a constant interest rate
+  given equal payments, a different question than NPV's fixed-rate,
+  variable-cash-flow shape.

@@ -1,0 +1,184 @@
+---
+title: PMT
+description: Calculate the periodic payment for a loan or annuity with constant payments and a constant interest rate.
+---
+
+Calculate the fixed payment required each period to pay off a loan
+(or grow an investment to a target value) at a constant interest
+rate — the formula behind every basic loan/mortgage payment
+calculator.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'rate must match the period of nper (monthly rate for monthly payments)', type: 'warn' },
+  { text: 'Result is negative when pv is positive — a cash outflow', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PMT(rate, nper, pv, [fv], [type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PMT(rate, nper, pv, [fv], [type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period (not per year, unless the period is a year).',
+  },
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The present value — the loan amount received now, or the current value of the investment.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: false,
+    description: 'The desired cash balance after the last payment. Defaults to 0 (loan fully paid off).',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: false,
+    description: '0 for payments due at the end of each period (default), 1 for payments due at the start.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The fixed payment amount per period. Following Excel's cash-flow sign
+convention, the result is **negative** when `pv` is positive (money
+received now, like a loan), representing money paid out each period.
+
+## Description
+
+PMT assumes a loan or annuity with equal payments every period at a
+constant interest rate — exactly the shape of a standard mortgage,
+car loan, or fixed-payment amortization schedule. Two details cause
+most of the confusion around this function: the sign convention, and
+matching `rate`/`nper` to the same period length.
+
+<Callout type="warn">
+  Excel's financial functions treat money you **receive** as positive
+  and money you **pay out** as negative. A $20,000 loan is a positive
+  `pv` (you received it); the resulting `PMT` comes back negative
+  (you're paying it out). This is correct, not a bug — wrap the whole
+  formula in a unary minus (`=-PMT(...)`) if a positive payment number
+  is what a spreadsheet actually needs to display.
+</Callout>
+
+## Common errors
+
+### Payment amount is far too high or too low
+
+<ExcelCode>{`PMT(5%, 30, 200000) → wildly wrong (5% used as a monthly rate on an annual term)`}</ExcelCode>
+
+`rate` and `nper` must be in the **same period**. A 30-year mortgage
+at 5% annual interest, paid monthly, needs the rate divided by 12 and
+the term multiplied by 12:
+
+<ExcelCode>{`PMT(5%/12, 30*12, 200000)`}</ExcelCode>
+
+### The result is negative and that looks like an error
+
+<ExcelCode>{`PMT(5%/12, 360, 200000) → -1073.64 (not a bug — see the sign convention above)`}</ExcelCode>
+
+Not an error — `pv` was positive (money received), so the payment is
+negative (money paid out). Negate the whole call if a positive number
+is needed for display:
+
+<ExcelCode>{`=-PMT(5%/12, 360, 200000)`}</ExcelCode>
+
+### #NUM! — inconsistent or impossible inputs
+
+A `rate` of `-100%` or below, or other combinations that make the
+underlying annuity math undefined, return `#NUM!` — check the
+inputs are realistic (a small positive rate, a positive `nper`).
+
+export const faqs = [
+  {
+    question: 'Why does PMT return a negative number?',
+    answer:
+      "Excel's financial functions use a cash-flow sign convention: money received (a positive pv, like a loan) produces a negative payment (money paid out). Negate the result — =-PMT(...) — if the spreadsheet should display a positive payment amount.",
+  },
+  {
+    question: 'How do I convert an annual rate to the right period for PMT?',
+    answer: "Divide the annual rate by the number of periods per year, and multiply nper by the same number. A 6% annual rate paid monthly over 30 years becomes rate=6%/12 and nper=30*12.",
+  },
+  {
+    question: 'What does the type argument actually change?',
+    answer: 'type=0 (default) assumes payments happen at the end of each period — the standard for loans. type=1 assumes payments at the start of each period — more common for things like rent or lease payments paid in advance.',
+  },
+  {
+    question: 'PMT vs a loan amortization schedule — is PMT enough?',
+    answer: "PMT gives the fixed total payment per period, but not the interest/principal split for any individual payment — for that, pair it with IPMT (interest portion) and PPMT (principal portion), which use the same arguments.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PMT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=-PMT(5%/12, 30*12, 200000)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim payment As Double
+    payment = -Pmt(0.05 / 12, 30 * 12, 200000)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    payment = -npf.pmt(0.05 / 12, 30 * 12, 200000)
+    print(payment)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FV](/docs/financial/fv) — future value of a series of constant
+  payments, the mirror calculation to PMT.
+- [PV](/docs/financial/pv) — present value of a series of constant
+  payments.
+- [RATE](/docs/financial/rate) — solves for the interest rate instead
+  of the payment, given the other terms.

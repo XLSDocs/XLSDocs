@@ -1,0 +1,31 @@
+---
+title: RATE examples
+description: Worked examples for RATE — checking a lender's real rate, converting to an annual figure, and fixing the sign-convention error.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Checking a lender's actual monthly rate" formula={`=RATE(360, -1073.64, 200000)`}>
+  Given a known $1,073.64 monthly payment on a $200,000, 360-month
+  loan, returns the actual monthly interest rate being charged.
+</ExampleCard>
+
+<ExampleCard number="02" label="Converting to an annual rate" formula={`=RATE(360, -1073.64, 200000) * 12`}>
+  RATE returns a per-period (monthly) rate — multiplying by 12 gives
+  the more familiar annual figure.
+</ExampleCard>
+
+<ExampleCard number="03" label="Solving with a target future value" formula={`=RATE(10*12, -300, 0, 50000)`}>
+  With `pv` at 0 and `fv` set to a target, RATE finds the rate needed
+  for $300/month contributions to reach $50,000 in 10 years.
+</ExampleCard>
+
+<ExampleCard number="04" label="Fixing a #NUM! from mismatched signs" formula={`=RATE(360, -1073.64, 200000)`}>
+  `pmt` and `pv` have opposite signs here (correct) — the same call
+  with both positive would return `#NUM!` instead.
+</ExampleCard>
+
+<ExampleCard number="05" label="Supplying a guess to help convergence" formula={`=RATE(360, -1073.64, 200000, 0, 0, 1%)`}>
+  A starting `guess` closer to the expected real rate helps the
+  iterative solver converge on genuinely difficult inputs.
+</ExampleCard>

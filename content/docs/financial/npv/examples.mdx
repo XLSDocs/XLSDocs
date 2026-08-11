@@ -1,0 +1,32 @@
+---
+title: NPV examples
+description: Worked examples for NPV — a basic project evaluation, the correct upfront-investment handling, and a range-based version.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — three years of uneven returns" formula={`=NPV(10%, 15000, 18000, 20000)`}>
+  Discounts three different cash flow amounts back to today's value
+  at a 10% rate.
+</ExampleCard>
+
+<ExampleCard number="02" label="Correctly handling an upfront investment" formula={`=NPV(10%, 15000, 18000, 20000) - 50000`}>
+  The $50,000 initial cost is subtracted outside the NPV call,
+  undiscounted, since it happens today rather than one period out.
+</ExampleCard>
+
+<ExampleCard number="03" label="Using a range instead of individual values" formula={`=NPV(10%, Cashflows[Year1_5]) - Cashflows[InitialCost]`}>
+  NPV accepts a range directly — cleaner than listing each year as a
+  separate argument once there are more than a few.
+</ExampleCard>
+
+<ExampleCard number="04" label="A negative NPV means the project loses value" formula={`=NPV(12%, 8000, 8000, 8000) - 30000`}>
+  A negative result means the discounted returns don't cover the
+  upfront cost at that discount rate — the project destroys value at
+  12%, even though the raw cash flows sum to more than $30,000.
+</ExampleCard>
+
+<ExampleCard number="05" label="Finding the rate that makes NPV zero" formula={`=IRR({-50000, 15000, 18000, 20000})`}>
+  IRR answers a related question — what discount rate would make this
+  same cash flow series have an NPV of exactly zero.
+</ExampleCard>

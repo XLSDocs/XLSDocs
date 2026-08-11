@@ -1,0 +1,168 @@
+---
+title: FV
+description: Calculate the future value of an investment with constant payments and a constant interest rate.
+---
+
+Calculate what an investment will be worth after a series of equal
+payments at a constant interest rate — how much a regular
+contribution grows into by a target date.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'rate must match the period of nper (monthly rate for monthly contributions)', type: 'warn' },
+  { text: 'pmt is negative for money you contribute (a cash outflow)', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FV(rate, nper, pmt, [pv], [type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FV(rate, nper, pmt, [pv], [type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period.',
+  },
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pmt',
+    type: 'number',
+    required: true,
+    description: 'The payment made each period. Negative for money contributed (an outflow).',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: false,
+    description: 'The current value the investment already has, if any. Defaults to 0.',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: false,
+    description: '0 for payments due at the end of each period (default), 1 for payments due at the start.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of the investment after `nper` periods. Following the same
+sign convention as PMT/PV, the result is positive when `pmt`/`pv` are
+negative (money you contributed) — it represents money you'd receive.
+
+## Description
+
+FV is the mirror image of PV — instead of discounting future
+payments back to today's value, it projects a series of equal
+contributions (or a lump sum, or both) forward to a future value.
+It's the formula behind "how much will my monthly contribution be
+worth in 20 years" calculators.
+
+<Callout type="warn">
+  `pmt` follows the same sign convention as PMT's `pv` — a regular
+  contribution you make is money leaving your pocket, so it's entered
+  as **negative**. `FV(5%/12, 10*12, -200)` (contributing $200/month)
+  returns a **positive** number — the value you'll have, money you'll
+  effectively receive back later.
+</Callout>
+
+## Common errors
+
+### Result is negative when a positive future value was expected
+
+<ExcelCode>{`FV(5%/12, 10*12, 200) → negative (pmt entered as positive, the opposite of the convention)`}</ExcelCode>
+
+`pmt` should be negative for a contribution — flip its sign:
+
+<ExcelCode>{`FV(5%/12, 10*12, -200)`}</ExcelCode>
+
+### Result is far too large or small
+
+<ExcelCode>{`FV(5%, 10*12, -200) → wildly wrong (5% used as a monthly rate on a term already converted to months)`}</ExcelCode>
+
+`rate` and `nper` must be in the same period — a monthly contribution
+schedule needs a monthly rate:
+
+<ExcelCode>{`FV(5%/12, 10*12, -200)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Why is my FV result negative?',
+    answer: "pmt (and pv, if used) should be negative for money you're contributing — a positive pmt reverses the expected sign of the result. Flip pmt's sign to match the cash-flow convention.",
+  },
+  {
+    question: 'FV vs PV — how do they relate?',
+    answer: 'PV discounts a future amount back to today\'s value; FV projects today\'s contributions forward to a future value. Same underlying time-value-of-money math, opposite direction.',
+  },
+  {
+    question: 'Can FV combine a lump sum and regular contributions?',
+    answer: 'Yes — pv covers an existing lump sum already invested, and pmt covers ongoing regular contributions on top of it. Both compound together over nper periods.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FV(5%/12, 10*12, -200)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim futureValue As Double
+    futureValue = Fv(0.05 / 12, 10 * 12, -200)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    future_value = npf.fv(0.05 / 12, 10 * 12, -200, 0)
+    print(future_value)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PV](/docs/financial/pv) — present value of a series of constant
+  payments, the mirror calculation to FV.
+- [PMT](/docs/financial/pmt) — the periodic payment needed to reach a
+  target value, instead of the value a given payment grows into.
+- [RATE](/docs/financial/rate) — solves for the interest rate instead
+  of the future value, given the other terms.
