@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 const SYSTEM_PROMPT = `You are an Excel formula expert. The user will describe, in plain English, a spreadsheet task. Respond with the exact Excel formula that accomplishes it, plus a breakdown of each part.
 
@@ -23,6 +24,14 @@ interface AnthropicMessagesResponse {
 }
 
 export async function POST(req: NextRequest) {
+  const { allowed } = await checkRateLimit(req, 'formula-builder', 15);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "You've hit the free limit for the Formula Builder this hour — try again later." },
+      { status: 429 },
+    );
+  }
+
   const { prompt } = (await req.json()) as FormulaBuilderRequestBody;
 
   if (typeof prompt !== 'string' || !prompt.trim()) {

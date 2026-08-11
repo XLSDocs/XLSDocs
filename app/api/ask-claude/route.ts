@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 interface AskClaudeRequestBody {
   messages: { role: 'user' | 'assistant'; content: string }[];
@@ -11,6 +12,14 @@ interface AnthropicMessagesResponse {
 }
 
 export async function POST(req: NextRequest) {
+  const { allowed } = await checkRateLimit(req, 'ask-claude', 20);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "You've hit the free limit for Ask Claude this hour — try again later." },
+      { status: 429 },
+    );
+  }
+
   const { messages, pageTitle } = (await req.json()) as AskClaudeRequestBody;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
