@@ -2,12 +2,21 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import { DM_Mono } from 'next/font/google';
 import Script from 'next/script';
+import type { Metadata } from 'next';
 
 const dmMono = DM_Mono({
   subsets: ['latin'],
   weight: ['300', '400', '500'],
   variable: '--font-mono',
 });
+
+export const metadata: Metadata = {
+  verification: {
+    other: {
+      'msvalidate.01': 'D7B9EC9B5210AB7F934CCCC1C1B95DFF',
+    },
+  },
+};
 
 export default function Layout({ children }: LayoutProps<'/'>) {
   return (
