@@ -134,11 +134,25 @@
 }
 
 /* Excel formula blocks (components/excel-code.tsx) wrap instead of
-   horizontal-scrolling — formulas have no indentation semantics (unlike
-   VBA/Python, which keep the default Shiki horizontal-scroll behavior), so
-   wrapping is safe and keeps long nested formulas readable on narrow
-   viewports instead of requiring a side-scroll to read the whole line. */
+   horizontal-scrolling — formulas have no indentation semantics, so wrapping
+   is safe and keeps long nested formulas readable on narrow viewports
+   instead of requiring a side-scroll to read the whole line. */
 .excel-code {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* VBA/Python fenced code blocks (Shiki) also wrap now, same reasoning as
+   Excel formula blocks above — readability without a side-scroll wins over
+   preserving unwrapped indentation, even though these do have real
+   indentation semantics. Fumadocs sizes its <pre> to intrinsic content
+   width via a `w-max` utility class by default, which this overrides so
+   wrapped lines actually have a bounded width to wrap within. */
+figure.shiki pre {
+  width: 100%;
+}
+
+figure.shiki .line {
   white-space: pre-wrap;
   overflow-wrap: break-word;
 }
