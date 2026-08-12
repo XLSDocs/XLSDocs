@@ -7,6 +7,9 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Blog',
   description: 'Practical, non-fluff writing on Excel, VBA, Python, and the tools around a spreadsheet.',
+  alternates: {
+    canonical: '/blog',
+  },
 };
 
 export default function BlogPage() {

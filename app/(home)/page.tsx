@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: { absolute: 'xlsdocs.com — The Excel Reference Built for the AI Era' },
   description:
     'Every Excel function documented, with an AI formula builder built in. Search the full reference, or describe what you need in plain English.',
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function HomePage() {

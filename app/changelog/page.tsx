@@ -7,6 +7,9 @@ import { getChangelog } from '@/lib/changelog';
 export const metadata: Metadata = {
   title: 'Changelog',
   description: 'What changed on xlsdocs.com, and why.',
+  alternates: {
+    canonical: '/changelog',
+  },
 };
 
 export default function ChangelogPage() {

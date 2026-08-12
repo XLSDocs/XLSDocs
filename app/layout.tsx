@@ -11,6 +11,7 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://xlsdocs.com'),
   title: {
     default: 'xlsdocs.com — Excel Function Reference',
     template: '%s | xlsdocs.com',

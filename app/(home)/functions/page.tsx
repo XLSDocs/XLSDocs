@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: 'Excel Function Reference',
   description:
     'Search every Excel function by name or category — syntax, parameters, common errors, and worked examples for each one.',
+  alternates: {
+    canonical: '/functions',
+  },
 };
 
 export default function FunctionsPage() {
