@@ -64,6 +64,12 @@
   max-width: 808px;
 }
 
+/* Bullet lists (Related functions, etc.) use a dash instead of a dot marker */
+.prose ul > li::marker {
+  content: "– ";
+  color: var(--color-fd-muted-foreground);
+}
+
 /* Headings use the serif display face — matches the original xlsdocs design */
 .prose h1,
 .prose h2 {
