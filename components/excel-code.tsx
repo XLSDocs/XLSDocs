@@ -1,4 +1,5 @@
 import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
+import { CodeWrapToggle } from './code-wrap-toggle';
 
 const FN_LIST = [
   'XLOOKUP', 'VLOOKUP', 'HLOOKUP', 'INDEX', 'MATCH', 'XMATCH', 'FILTER',
@@ -60,21 +61,23 @@ export function ExcelCode({ children }: { children: string }) {
   const showLineNumbers = lines.length > 1;
 
   return (
-    <CodeBlock>
-      <Pre>
-        <code className="excel-code font-mono text-[13px] leading-relaxed">
-          {lines.map((line, i) => (
-            <div key={i} className={`px-4 ${showLineNumbers ? 'flex gap-4' : ''}`}>
-              {showLineNumbers && (
-                <span className="w-4 shrink-0 text-right text-fd-muted-foreground/60 select-none">
-                  {i + 1}
-                </span>
-              )}
-              <span className="min-w-0">{highlightLine(line)}</span>
-            </div>
-          ))}
-        </code>
-      </Pre>
-    </CodeBlock>
+    <CodeWrapToggle>
+      <CodeBlock>
+        <Pre>
+          <code className="excel-code font-mono text-[13px] leading-relaxed">
+            {lines.map((line, i) => (
+              <div key={i} className={`px-4 ${showLineNumbers ? 'flex gap-4' : ''}`}>
+                {showLineNumbers && (
+                  <span className="w-4 shrink-0 text-right text-fd-muted-foreground/60 select-none">
+                    {i + 1}
+                  </span>
+                )}
+                <span className="min-w-0">{highlightLine(line)}</span>
+              </div>
+            ))}
+          </code>
+        </Pre>
+      </CodeBlock>
+    </CodeWrapToggle>
   );
 }

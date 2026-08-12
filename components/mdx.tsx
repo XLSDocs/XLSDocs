@@ -1,5 +1,6 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
+import type { ComponentProps } from 'react';
 import { TryIt } from './try-it';
 import { ExcelCode } from './excel-code';
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
@@ -10,10 +11,16 @@ import { Compatibility } from './compatibility';
 import { Faq } from './faq';
 import { QuickAnswer } from './quick-answer';
 import { ParametersTable } from './parameters-table';
+import { CodeWrapToggle } from './code-wrap-toggle';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
+    pre: (props: ComponentProps<'pre'>) => (
+      <CodeWrapToggle>
+        <defaultMdxComponents.pre {...props} />
+      </CodeWrapToggle>
+    ),
     TryIt,
     ExcelCode,
     Tabs,

@@ -157,6 +157,23 @@ figure.shiki .line {
   overflow-wrap: break-word;
 }
 
+/* Per-block wrap toggle (components/code-wrap-toggle.tsx) — code blocks wrap
+   by default (rules above); toggling adds `no-wrap` to the block's own
+   <figure> to fall back to the original horizontal-scroll behavior. */
+figure.no-wrap .excel-code {
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+figure.shiki.no-wrap pre {
+  width: max-content;
+}
+
+figure.shiki.no-wrap .line {
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
 /* Parameters/Compatibility/etc tables — row highlight on hover, scoped to
    tbody so the header row doesn't pick up the tint too. */
 .prose table tbody tr {
