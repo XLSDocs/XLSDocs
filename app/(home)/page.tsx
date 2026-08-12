@@ -1,6 +1,13 @@
 import { Hero } from '@/components/home/hero';
 import { FormulaTicker } from '@/components/home/formula-ticker';
 import { CodeWriterSection } from '@/components/home/code-writer';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: { absolute: 'xlsdocs.com — The Excel Reference Built for the AI Era' },
+  description:
+    'Every Excel function documented, with an AI formula builder built in. Search the full reference, or describe what you need in plain English.',
+};
 
 export default function HomePage() {
   return (

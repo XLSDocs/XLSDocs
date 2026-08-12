@@ -11,6 +11,12 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  title: {
+    default: 'xlsdocs.com — Excel Function Reference',
+    template: '%s | xlsdocs.com',
+  },
+  description:
+    'Every Excel function documented — syntax, examples, and an AI formula builder built in. The Excel reference site power users deserve.',
   verification: {
     other: {
       'msvalidate.01': 'D7B9EC9B5210AB7F934CCCC1C1B95DFF',
