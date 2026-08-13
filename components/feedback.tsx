@@ -1,14 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { ThumbsUp, ThumbsDown, Pencil, Bug } from 'lucide-react';
 
 type Vote = 'up' | 'down';
-
-function storageKey(path: string) {
-  return `xlsdocs-feedback:${path}`;
-}
 
 interface FeedbackProps {
   editUrl?: string;
@@ -20,16 +16,10 @@ export function Feedback({ editUrl, reportIssueUrl }: FeedbackProps = {}) {
   const [voted, setVoted] = useState<Vote | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const stored = window.localStorage.getItem(storageKey(pathname));
-    setVoted(stored === 'up' || stored === 'down' ? stored : null);
-  }, [pathname]);
-
   async function vote(choice: Vote) {
-    if (voted || submitting) return;
+    if (submitting) return;
     setSubmitting(true);
     setVoted(choice);
-    window.localStorage.setItem(storageKey(pathname), choice);
 
     try {
       await fetch('/api/feedback', {
@@ -38,7 +28,7 @@ export function Feedback({ editUrl, reportIssueUrl }: FeedbackProps = {}) {
         body: JSON.stringify({ path: pathname, vote: choice }),
       });
     } catch {
-      // best-effort — the local "already voted" state still sticks either way
+      // best-effort — the vote just won't be counted server-side
     } finally {
       setSubmitting(false);
     }
@@ -53,7 +43,7 @@ export function Feedback({ editUrl, reportIssueUrl }: FeedbackProps = {}) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => vote('up')}
-            disabled={Boolean(voted) || submitting}
+            disabled={submitting}
             aria-label="This page was helpful"
             className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
               voted === 'up'
@@ -66,7 +56,7 @@ export function Feedback({ editUrl, reportIssueUrl }: FeedbackProps = {}) {
           </button>
           <button
             onClick={() => vote('down')}
-            disabled={Boolean(voted) || submitting}
+            disabled={submitting}
             aria-label="This page was not helpful"
             className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors ${
               voted === 'down'
