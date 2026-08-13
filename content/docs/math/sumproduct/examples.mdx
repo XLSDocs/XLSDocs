@@ -1,0 +1,31 @@
+---
+title: SUMPRODUCT examples
+description: Worked examples for SUMPRODUCT — a weighted average, OR-logic counting, and combining with IS-functions.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — sum of products" formula={`=SUMPRODUCT(Sales[Quantity], Sales[Price])`}>
+  Multiplies each row's quantity by its price, then sums every
+  result — a line-item total without a helper column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Weighted average" formula={`=SUMPRODUCT(Scores[Value], Scores[Weight]) / SUM(Scores[Weight])`}>
+  Multiplies each score by its weight, sums the products, then
+  divides by the total weight.
+</ExampleCard>
+
+<ExampleCard number="03" label="AND logic — counting matching rows" formula={`=SUMPRODUCT((Sales[Region]="West")*(Sales[Status]="Open"))`}>
+  Multiplying two boolean arrays counts rows where both conditions
+  are true — equivalent to COUNTIFS with two conditions.
+</ExampleCard>
+
+<ExampleCard number="04" label="OR logic — counting either condition" formula={`=SUMPRODUCT((Sales[Region]="West")+(Sales[Region]="East"))`}>
+  Adding boolean arrays counts rows matching either condition —
+  something COUNTIFS can't express directly.
+</ExampleCard>
+
+<ExampleCard number="05" label="Counting errors with a double negative" formula={`=SUMPRODUCT(--ISERROR(Sales[Amount]))`}>
+  The double negative coerces the TRUE/FALSE array from ISERROR into
+  1s and 0s so SUMPRODUCT can sum it.
+</ExampleCard>

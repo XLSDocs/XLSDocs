@@ -1,0 +1,155 @@
+---
+title: ROUNDDOWN
+description: Round a number toward zero, regardless of which direction is closer.
+---
+
+Round a number toward zero — always truncating, even if the value is
+much closer to the higher number. The function behind "only count
+whole completed units" logic, like age in whole years or fully
+completed inventory batches.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always rounds toward zero, never away from it', type: 'warn' },
+  { text: 'Positive num_digits rounds decimals, negative rounds whole-number places', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ROUNDDOWN(number, num_digits)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ROUNDDOWN(number, num_digits)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to round.',
+  },
+  {
+    name: 'num_digits',
+    type: 'number',
+    required: true,
+    description: 'How many digits to round to. Positive rounds decimal places, 0 rounds to the nearest integer, negative rounds to the left of the decimal point.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded toward zero to `num_digits` digits — the result is
+always at least as small in magnitude as `number`, never larger.
+
+## Description
+
+Unlike ROUND, which picks whichever direction is closer, ROUNDDOWN
+always truncates toward zero — `ROUNDDOWN(3.99, 0)` gives `3`, not
+`4`, even though `3.99` is much closer to `4`. This is the right
+tool whenever "only count whole completed units" is the actual rule —
+someone's age in whole years, or how many complete batches came off
+a production line.
+
+<Callout type="warn">
+  ROUNDDOWN rounds **toward zero** for negative numbers too —
+  `ROUNDDOWN(-3.99, 0)` gives `-3`, not `-4`. "Toward zero" means
+  smaller in magnitude, regardless of sign.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3.9': '3', '3.1': '3', '-3.9': '-3' }}
+  defaultValue="3.9"
+  label={'Live preview — ROUNDDOWN({value}, 0)'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### Expecting "round down" to mean "round toward negative infinity"
+
+<ExcelCode>{`ROUNDDOWN(-3.99, 0) → -3 (not -4)`}</ExcelCode>
+
+ROUNDDOWN rounds toward zero, not toward negative infinity — for
+negative numbers, that means a less negative result. Use FLOOR
+instead if rounding toward negative infinity regardless of sign is
+what's actually needed.
+
+### Using ROUND when the business rule actually needs ROUNDDOWN
+
+<ExcelCode>{`ROUND(3.99, 0) → 4 (rounds to the closer value, not toward zero)`}</ExcelCode>
+
+If the rule is genuinely "only count whole completed units," ROUND
+is the wrong function — it rounds to whichever value is closer,
+which usually isn't down.
+
+export const faqs = [
+  {
+    question: 'ROUNDDOWN vs ROUND — how do they differ?',
+    answer: 'ROUND rounds to whichever value is closer. ROUNDDOWN always truncates toward zero, even when the number is much closer to the higher value.',
+  },
+  {
+    question: 'How do I calculate age in whole completed years?',
+    answer: 'ROUNDDOWN((TODAY()-birthdate)/365.25, 0) gets close, but DATEDIF(birthdate, TODAY(), "y") is the more precise way to get whole completed years.',
+  },
+  {
+    question: 'Does ROUNDDOWN round negative numbers toward negative infinity?',
+    answer: 'No — it rounds toward zero, which for a negative number means less negative, not toward negative infinity. Use FLOOR if rounding toward negative infinity regardless of sign is what\'s actually needed.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ROUNDDOWN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ROUNDDOWN(Inventory[UnitsProduced]/24, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim completeBatches As Long
+    completeBatches = Application.WorksheetFunction.RoundDown(Range("A2").Value / 24, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    complete_batches = math.floor(units_produced / 24)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ROUND](/docs/math/round) — rounds to the nearest value, in
+  whichever direction is closer.
+- [ROUNDUP](/docs/math/roundup) — always rounds away from zero, the
+  opposite direction from ROUNDDOWN.

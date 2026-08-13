@@ -1,0 +1,159 @@
+---
+title: ROUND
+description: Round a number to a specified number of digits.
+---
+
+Round a number to a given number of decimal places — or to the
+nearest ten, hundred, or thousand using a negative digit count.
+Standard "round half away from zero" rounding, not banker's
+rounding.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Positive num_digits rounds decimals, negative rounds whole-number places', type: 'check' },
+  { text: 'Rounds .5 away from zero, not to even (no banker\'s rounding)', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ROUND(number, num_digits)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ROUND(number, num_digits)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to round.',
+  },
+  {
+    name: 'num_digits',
+    type: 'number',
+    required: true,
+    description: 'How many digits to round to. Positive rounds decimal places, 0 rounds to the nearest integer, negative rounds to the left of the decimal point.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded to `num_digits` digits, using standard "round half
+away from zero" rules — `0.5` always rounds up in magnitude, never
+down to the nearest even number.
+
+## Description
+
+ROUND is the general-purpose rounding function — `num_digits`
+controls both direction and place. `ROUND(3.14159, 2)` gives
+`3.14`; `ROUND(1250, -2)` rounds to the nearest hundred, giving
+`1300`. Unlike ROUNDUP/ROUNDDOWN, which always round in one fixed
+direction, ROUND rounds toward whichever value is actually closer.
+
+<Callout type="info">
+  A negative `num_digits` rounds to the left of the decimal point —
+  `-1` rounds to the nearest ten, `-2` to the nearest hundred, and so
+  on. This is the same digit-count convention TEXT and other
+  Excel formatting functions use.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3.4': '3', '3.5': '4', '-3.5': '-4' }}
+  defaultValue="3.5"
+  label={'Live preview — ROUND({value}, 0)'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### Result looks wrong — display formatting vs actual rounding
+
+<ExcelCode>{`ROUND(3.14159, 2) → 3.14 (a real, stored value — not just a display format)`}</ExcelCode>
+
+Unlike changing a cell's number format (which only changes how a
+value *displays*), ROUND changes the actual stored value — useful
+when later formulas need the rounded figure specifically, not just
+its appearance.
+
+### Expecting banker's rounding
+
+<ExcelCode>{`ROUND(2.5, 0) → 3 (not 2, unlike some statistical rounding conventions)`}</ExcelCode>
+
+Excel's ROUND always rounds `.5` away from zero, regardless of
+whether the result ends up even or odd — there's no built-in
+banker's-rounding option.
+
+export const faqs = [
+  {
+    question: 'ROUND vs ROUNDUP/ROUNDDOWN — how do they differ?',
+    answer: 'ROUND rounds to the nearest value, in whichever direction is closer. ROUNDUP always rounds away from zero, and ROUNDDOWN always rounds toward zero, regardless of which is actually closer.',
+  },
+  {
+    question: 'Does ROUND actually change the stored value, or just how it displays?',
+    answer: 'It changes the real, stored value — unlike a number format, which only changes the display. This matters when a later formula references the rounded cell and needs the rounded figure specifically.',
+  },
+  {
+    question: 'How do I round to the nearest 10, 100, or 1000?',
+    answer: 'Use a negative num_digits: ROUND(number, -1) rounds to the nearest ten, -2 to the nearest hundred, -3 to the nearest thousand.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ROUND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ROUND(Sales[Amount], 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rounded As Double
+    rounded = Application.WorksheetFunction.Round(Range("A2").Value, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    df["Amount"] = df["Amount"].round(2)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ROUNDUP](/docs/math/roundup) — always rounds away from zero,
+  regardless of which direction is closer.
+- [ROUNDDOWN](/docs/math/rounddown) — always rounds toward zero,
+  regardless of which direction is closer.
+- [SUM](/docs/math/sum) — often paired with ROUND when a total needs
+  to be displayed to a specific number of decimal places.

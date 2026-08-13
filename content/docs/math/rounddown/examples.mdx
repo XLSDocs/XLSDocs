@@ -1,0 +1,31 @@
+---
+title: ROUNDDOWN examples
+description: Worked examples for ROUNDDOWN — whole completed units, age calculation, and negative numbers.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — truncate to a whole number" formula={`=ROUNDDOWN(3.99, 0)`}>
+  Returns `3` — even though `3.99` is much closer to `4`, ROUNDDOWN
+  always truncates toward zero.
+</ExampleCard>
+
+<ExampleCard number="02" label="Complete batches produced" formula={`=ROUNDDOWN(Inventory[UnitsProduced]/24, 0)`}>
+  Counts only fully-complete batches — a partial batch doesn't round
+  up to count as one.
+</ExampleCard>
+
+<ExampleCard number="03" label="Truncating to two decimal places" formula={`=ROUNDDOWN(19.999, 2)`}>
+  Returns `19.99` — any remainder past the target digit is dropped,
+  not rounded up.
+</ExampleCard>
+
+<ExampleCard number="04" label="Approximate whole years of age" formula={`=ROUNDDOWN((TODAY()-B2)/365.25, 0)`}>
+  A quick approximate age in whole years — DATEDIF is more precise
+  for an exact calculation.
+</ExampleCard>
+
+<ExampleCard number="05" label="Negative numbers truncate toward zero too" formula={`=ROUNDDOWN(-3.99, 0)`}>
+  Returns `-3`, not `-4` — "toward zero" means less negative for
+  negative inputs.
+</ExampleCard>

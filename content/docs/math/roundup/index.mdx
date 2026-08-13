@@ -1,0 +1,155 @@
+---
+title: ROUNDUP
+description: Round a number away from zero, regardless of which direction is closer.
+---
+
+Round a number away from zero — always up in magnitude, even if the
+value is much closer to the lower number. The function behind "round
+up to the next whole unit" logic like packaging, billing increments,
+or capacity planning.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always rounds away from zero, never toward it', type: 'warn' },
+  { text: 'Positive num_digits rounds decimals, negative rounds whole-number places', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ROUNDUP(number, num_digits)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ROUNDUP(number, num_digits)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to round.',
+  },
+  {
+    name: 'num_digits',
+    type: 'number',
+    required: true,
+    description: 'How many digits to round to. Positive rounds decimal places, 0 rounds to the nearest integer, negative rounds to the left of the decimal point.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded away from zero to `num_digits` digits — the result
+is always at least as large in magnitude as `number`, never smaller.
+
+## Description
+
+Unlike ROUND, which picks whichever direction is closer, ROUNDUP
+always moves away from zero — `ROUNDUP(3.01, 0)` gives `4`, not `3`,
+even though `3.01` is much closer to `3`. This makes it the right
+tool whenever "round up no matter what" is the actual business
+rule — how many boxes are needed to ship a given quantity, or how
+many billing periods a partial period counts as.
+
+<Callout type="warn">
+  ROUNDUP rounds **away from zero** for negative numbers too —
+  `ROUNDUP(-3.01, 0)` gives `-4`, not `-3`. "Away from zero" means
+  larger in magnitude, not necessarily numerically larger.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3.1': '4', '3.9': '4', '-3.1': '-4' }}
+  defaultValue="3.1"
+  label={'Live preview — ROUNDUP({value}, 0)'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### Expecting "round up" to mean "round toward positive infinity"
+
+<ExcelCode>{`ROUNDUP(-3.01, 0) → -4 (not -3)`}</ExcelCode>
+
+ROUNDUP rounds away from zero, not toward positive infinity — for
+negative numbers, that means a more negative result. If rounding
+toward positive infinity specifically is needed regardless of sign,
+use CEILING instead.
+
+### Using ROUND when the business rule actually needs ROUNDUP
+
+<ExcelCode>{`ROUND(3.01, 0) → 3 (rounds to the closer value, not away from zero)`}</ExcelCode>
+
+If the rule is genuinely "always round up, even by a fraction," ROUND
+is the wrong function — it rounds to whichever value is closer, which
+usually isn't up.
+
+export const faqs = [
+  {
+    question: 'ROUNDUP vs ROUND — how do they differ?',
+    answer: 'ROUND rounds to whichever value is closer. ROUNDUP always rounds away from zero, even when the number is much closer to the lower value.',
+  },
+  {
+    question: 'How many boxes are needed to ship a partial quantity?',
+    answer: 'ROUNDUP(quantity / boxSize, 0) — this always rounds up to a whole box, even if only one extra unit doesn\'t fill it.',
+  },
+  {
+    question: 'Does ROUNDUP round negative numbers toward positive infinity?',
+    answer: 'No — it rounds away from zero, which for a negative number means more negative, not toward positive infinity. Use CEILING if rounding toward positive infinity regardless of sign is what\'s actually needed.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ROUNDUP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ROUNDUP(Orders[Quantity]/24, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim boxesNeeded As Long
+    boxesNeeded = Application.WorksheetFunction.RoundUp(Range("A2").Value / 24, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    boxes_needed = math.ceil(quantity / 24)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ROUND](/docs/math/round) — rounds to the nearest value, in
+  whichever direction is closer.
+- [ROUNDDOWN](/docs/math/rounddown) — always rounds toward zero,
+  the opposite direction from ROUNDUP.

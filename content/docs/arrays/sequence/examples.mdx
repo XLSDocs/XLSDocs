@@ -1,0 +1,28 @@
+---
+title: SEQUENCE examples
+description: Worked examples for SEQUENCE — a basic list, a grid, counting backward, and feeding LARGE/SMALL.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — a simple list" formula={`=SEQUENCE(10)`}>
+  Spills the numbers 1 through 10 down a single column.
+</ExampleCard>
+
+<ExampleCard number="02" label="A grid of numbers" formula={`=SEQUENCE(3, 4)`}>
+  Fills a 3-row, 4-column grid with numbers 1 through 12, row by row.
+</ExampleCard>
+
+<ExampleCard number="03" label="Counting backward" formula={`=SEQUENCE(5, 1, 10, -1)`}>
+  A negative step counts down: 10, 9, 8, 7, 6.
+</ExampleCard>
+
+<ExampleCard number="04" label="A top-5 list with LARGE" formula={`=LARGE(Sales[Amount], SEQUENCE(5))`}>
+  Feeding SEQUENCE(5) as LARGE's `k` argument spills the 1st through
+  5th largest values in one formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="A sequence of dates" formula={`=SEQUENCE(7, 1, DATE(2027,1,1))`}>
+  Since dates are stored as numbers, this generates 7 sequential
+  dates starting January 1, 2027.
+</ExampleCard>

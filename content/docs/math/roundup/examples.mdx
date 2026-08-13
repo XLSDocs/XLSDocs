@@ -1,0 +1,31 @@
+---
+title: ROUNDUP examples
+description: Worked examples for ROUNDUP — box/shipment counting, billing periods, and negative numbers.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — round up to a whole number" formula={`=ROUNDUP(3.01, 0)`}>
+  Returns `4` — even though `3.01` is much closer to `3`, ROUNDUP
+  always moves away from zero.
+</ExampleCard>
+
+<ExampleCard number="02" label="How many boxes are needed" formula={`=ROUNDUP(Orders[Quantity]/24, 0)`}>
+  Rounds up to a whole box, even if the last box is only
+  partially full.
+</ExampleCard>
+
+<ExampleCard number="03" label="Rounding up to two decimal places" formula={`=ROUNDUP(19.001, 2)`}>
+  Returns `19.01` — any nonzero remainder past the target digit
+  rounds up.
+</ExampleCard>
+
+<ExampleCard number="04" label="Billing periods for a partial month" formula={`=ROUNDUP(DaysUsed/30, 0)`}>
+  A single extra day still counts as a full additional billing
+  period.
+</ExampleCard>
+
+<ExampleCard number="05" label="Negative numbers round away from zero too" formula={`=ROUNDUP(-3.01, 0)`}>
+  Returns `-4`, not `-3` — "away from zero" means more negative for
+  negative inputs.
+</ExampleCard>

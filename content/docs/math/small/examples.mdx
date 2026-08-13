@@ -11,7 +11,7 @@ description: Worked examples for SMALL — bottom-N reporting, duplicate handlin
 
 <ExampleCard number="02" label="A bottom-3 list" formula={`=SMALL(Sales[Amount], SEQUENCE(3))`}>
   Spills the 1st, 2nd, and 3rd smallest values in one formula, using
-  SEQUENCE to generate `k` = 1, 2, 3 automatically.
+  [SEQUENCE](/docs/arrays/sequence) to generate `k` = 1, 2, 3 automatically.
 </ExampleCard>
 
 <ExampleCard number="03" label="Distinct low values, skipping ties" formula={`=SMALL(UNIQUE(Sales[Amount]), 2)`}>

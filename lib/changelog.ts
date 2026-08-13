@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-13',
+    title: 'SUMPRODUCT, ROUND, ROUNDUP, ROUNDDOWN, SEQUENCE, and IRR',
+    description:
+      'SUMPRODUCT closes out the site\'s most-referenced missing function - the flexible tool behind weighted totals and OR-logic sums. Plus the three rounding functions, a dynamic array number generator, and the rate-of-return counterpart to NPV.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-13',
     title: 'MAXIFS, MINIFS, LARGE, SMALL, MEDIAN, and SUBTOTAL',
     description:
       'Six more Math functions — conditional max/min, ranking by position instead of just the extreme, the outlier-resistant middle value, and a filter-aware total that plain SUM can\'t do.',

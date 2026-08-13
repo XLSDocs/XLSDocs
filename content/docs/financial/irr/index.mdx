@@ -1,0 +1,164 @@
+---
+title: IRR
+description: Find the discount rate that makes the net present value of a series of cash flows equal to zero.
+---
+
+Find the discount rate that makes a series of cash flows break
+even — the rate at which their net present value equals exactly
+zero. The standard way to compare investments or projects with
+different cash flow timing on a single, comparable number.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The first value (usually negative) is the initial investment', type: 'warn' },
+  { text: 'An iterative approximation — can fail to converge without a guess', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=IRR(values, [guess])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IRR(values, [guess])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'A range of cash flows, in chronological order. Must include at least one negative and one positive value.',
+  },
+  {
+    name: 'guess',
+    type: 'number',
+    required: false,
+    description: 'A starting estimate for the rate, to help the iterative solver converge. Defaults to 10%.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The discount rate that makes the net present value of `values`
+equal to zero. Returns `#NUM!` if the underlying iterative solver
+can't converge, or if `values` contains no sign change at all.
+
+## Description
+
+IRR answers the same underlying question as NPV, in reverse: instead
+of computing the present value at a known rate, it finds the rate
+that makes the present value exactly zero. Unlike RATE (which
+assumes equal payments every period), IRR handles cash flows that
+genuinely vary period to period — the same shape NPV expects.
+
+<Callout type="warn">
+  `values` must include the **initial investment as its first
+  entry**, typically negative (money paid out), followed by the
+  return cash flows. Unlike NPV, where the initial investment is
+  added *outside* the function call, IRR expects it included
+  directly *inside* `values` — the opposite convention.
+</Callout>
+
+## Common errors
+
+### #NUM! — no sign change in values
+
+<ExcelCode>{`IRR({1000, 2000, 3000}) → #NUM! (all positive, no investment to recover)`}</ExcelCode>
+
+`values` needs at least one negative value (the investment) and at
+least one positive value (the return) — a rate of return is
+undefined without both.
+
+### #NUM! — the solver failed to converge
+
+Some cash flow patterns converge slowly or not at all from the
+default 10% starting guess. Supplying a `guess` closer to the
+expected real answer often resolves it:
+
+<ExcelCode>{`IRR({-50000, 15000, 18000, 20000}, 15%)`}</ExcelCode>
+
+### Forgetting the initial investment inside values
+
+<ExcelCode>{`IRR({15000, 18000, 20000}) → wrong (missing the initial outflow entirely)`}</ExcelCode>
+
+Unlike NPV, IRR needs the initial investment as part of `values`
+itself, not added separately:
+
+<ExcelCode>{`IRR({-50000, 15000, 18000, 20000})`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'IRR vs NPV — how do they relate?',
+    answer: 'NPV computes the present value of cash flows at a known rate. IRR solves for the rate that makes that present value exactly zero — the two functions answer opposite questions using the same underlying cash-flow timing.',
+  },
+  {
+    question: 'Where does the initial investment go in IRR, compared to NPV?',
+    answer: "IRR expects it as the first entry inside values (typically negative). NPV instead expects the initial investment left out of the function call and subtracted separately afterward — an easy mix-up between the two functions.",
+  },
+  {
+    question: 'What counts as a "good" IRR?',
+    answer: "There's no universal threshold — it's typically compared against a required rate of return or cost of capital. An IRR higher than that benchmark suggests the investment is worth pursuing; IRR itself doesn't judge that on its own.",
+  },
+  {
+    question: 'IRR vs RATE — which should I use?',
+    answer: 'RATE assumes equal payments every period (like PMT/PV). IRR handles cash flows that genuinely vary period to period — use IRR whenever the returns aren\'t constant.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IRR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IRR(Cashflows[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rateOfReturn As Double
+    rateOfReturn = Application.WorksheetFunction.Irr(Range("Cashflows"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    cash_flows = [-50000, 15000, 18000, 20000]
+    rate_of_return = npf.irr(cash_flows)
+    print(rate_of_return)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NPV](/docs/financial/npv) — the present value at a known rate,
+  instead of solving for the rate itself.
+- [RATE](/docs/financial/rate) — solves for a rate too, but assumes
+  equal payments every period rather than IRR's varying cash flows.
+- [PMT](/docs/financial/pmt) and [PV](/docs/financial/pv) — assume
+  a constant payment amount, a simpler shape than IRR handles.

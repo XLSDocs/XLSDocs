@@ -1,0 +1,164 @@
+---
+title: SUMPRODUCT
+description: Multiply corresponding array elements together, then sum the results — the Swiss Army knife of conditional and weighted totals.
+---
+
+Multiply corresponding elements across one or more arrays, then sum
+every product — a single, flexible building block behind weighted
+averages, OR-logic totals, and row-by-row array math that SUMIFS
+can't express on its own.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'All arrays must be the same size and shape', type: 'warn' },
+  { text: 'With one array, it just sums it — same as SUM', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SUMPRODUCT(array1, [array2], [array3], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUMPRODUCT(array1, [array2], [array3], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first array or range.',
+  },
+  {
+    name: 'array2, array3, ...',
+    type: 'range',
+    required: false,
+    description: 'Up to 255 total arrays, each the same size and shape as array1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of the element-by-element products across all supplied
+arrays. With a single array, this is just the sum of its values —
+equivalent to plain SUM.
+
+## Description
+
+SUMPRODUCT is the general-purpose tool behind several patterns that
+SUMIFS/COUNTIFS can't express on their own: weighted totals
+(multiplying values by their weights before summing), OR logic
+inside a conditional sum (adding boolean arrays instead of ANDing
+them), and counting how many cells satisfy a condition by coercing
+TRUE/FALSE arrays to 1/0 with a double negative (`--`).
+
+<Callout type="warn">
+  Every array passed to SUMPRODUCT must be the **same size and
+  shape** — mixing a 10-row range with a 9-row range throws
+  `#VALUE!`, the same failure mode as SUMIFS/COUNTIFS with mismatched
+  ranges.
+</Callout>
+
+## Common errors
+
+### #VALUE! — mismatched array sizes
+
+<ExcelCode>{`SUMPRODUCT(A2:A10, B2:B9) → #VALUE!`}</ExcelCode>
+
+Both arrays must be the same size — here one is 9 rows and the other
+is 10.
+
+### Forgetting the double negative when coercing booleans
+
+<ExcelCode>{`SUMPRODUCT(ISERROR(A2:A100)) → #VALUE! (TRUE/FALSE can't be summed directly)`}</ExcelCode>
+
+A boolean array needs to be coerced to numbers first — the double
+negative (`--`) turns `TRUE`/`FALSE` into `1`/`0`:
+
+<ExcelCode>{`SUMPRODUCT(--ISERROR(A2:A100))`}</ExcelCode>
+
+### Using * to combine conditions when arrays contain text
+
+<ExcelCode>{`SUMPRODUCT((A2:A10="West")*(B2:B10="Open")) → counts rows matching both`}</ExcelCode>
+
+Not an error — this is the standard pattern for AND logic inside
+SUMPRODUCT: multiplying two boolean arrays keeps a row only if both
+conditions are true, the same technique used inside FILTER.
+
+export const faqs = [
+  {
+    question: 'SUMPRODUCT vs SUMIFS — which should I use?',
+    answer: 'SUMIFS is simpler and faster for straightforward AND conditions. Reach for SUMPRODUCT when you need OR logic, a weighted calculation, or row-by-row multiplication that SUMIFS can\'t express.',
+  },
+  {
+    question: 'How do I calculate a weighted average with SUMPRODUCT?',
+    answer: 'Multiply values by their weights and sum, then divide by the sum of the weights: SUMPRODUCT(values, weights) / SUM(weights).',
+  },
+  {
+    question: 'Why do I need the double negative (--) in front of a condition?',
+    answer: 'A comparison like ISERROR(range) or A2:A10="West" produces an array of TRUE/FALSE values, which SUMPRODUCT can\'t sum directly. The double negative arithmetically coerces TRUE to 1 and FALSE to 0.',
+  },
+  {
+    question: 'Can SUMPRODUCT do OR logic?',
+    answer: 'Yes — add boolean arrays together instead of multiplying them: SUMPRODUCT((A2:A10="West")+(A2:A10="East")) counts rows matching either condition.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUMPRODUCT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUMPRODUCT(Sales[Amount], Sales[Weight])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double
+    total = Application.WorksheetFunction.SumProduct( _
+      Range("Sales[Amount]"), Range("Sales[Weight]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = (df["Amount"] * df["Weight"]).sum()
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMIFS](/docs/math/sumifs) — simpler and faster for straightforward
+  AND-logic conditional sums.
+- [SUM](/docs/math/sum) — what SUMPRODUCT reduces to when given only
+  one array.
+- [FILTER](/docs/arrays/filter) — uses the same multiply-for-AND,
+  add-for-OR pattern for its own boolean array conditions.

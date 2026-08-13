@@ -1,0 +1,163 @@
+---
+title: SEQUENCE
+description: Generate a spilled array of sequential numbers.
+---
+
+Generate a list of sequential numbers — 1, 2, 3, ... or any custom
+start and step — without typing them in or dragging a fill handle.
+Commonly used to feed another function's `k` or index argument
+automatically.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Spills automatically — no need to pre-select a range', type: 'check' },
+  { text: 'Excel 365 & 2021 only', type: 'warn' },
+  { text: 'start and step can be negative or fractional', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SEQUENCE(rows, [columns], [start], [step])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SEQUENCE(rows, [columns], [start], [step])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rows',
+    type: 'number',
+    required: true,
+    description: 'How many rows to generate.',
+  },
+  {
+    name: 'columns',
+    type: 'number',
+    required: false,
+    description: 'How many columns to generate. Defaults to 1.',
+  },
+  {
+    name: 'start',
+    type: 'number',
+    required: false,
+    description: 'The first value in the sequence. Defaults to 1.',
+  },
+  {
+    name: 'step',
+    type: 'number',
+    required: false,
+    description: 'The increment between values. Defaults to 1. Can be negative or fractional.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A dynamic array of `rows` × `columns` sequential numbers, filled
+row by row starting from `start` and incrementing by `step`, spilled
+into the cells below/right of the formula.
+
+## Description
+
+SEQUENCE is a dynamic array function — like FILTER and SORT, it
+returns a live spill range rather than a single value. Its most
+common real use isn't as a standalone list, but as a generator for
+another function's numeric argument — feeding `k` = 1, 2, 3 into
+LARGE or SMALL to spill a whole ranked list in one formula, instead
+of writing the same call three separate times.
+
+<Callout type="warn">
+  SEQUENCE requires **Excel 365 or Excel 2021**, like other dynamic
+  array functions. It is not available in Excel 2019, 2016, or
+  earlier — those versions will show `#NAME?`.
+</Callout>
+
+## Common errors
+
+### #SPILL! — blocked spill range
+
+Cells below or to the right of the formula already contain data.
+Clear the spill range, or move the formula somewhere clear.
+
+### #VALUE! — non-numeric arguments
+
+<ExcelCode>{`SEQUENCE("five") → #VALUE!`}</ExcelCode>
+
+All four arguments must be numbers, not text.
+
+### Expecting a 2D grid without specifying columns
+
+<ExcelCode>{`SEQUENCE(5) → a single column of 5 numbers, not a grid`}</ExcelCode>
+
+Without `columns`, SEQUENCE defaults to one column — pass a second
+argument for a multi-column grid: `SEQUENCE(5, 3)`.
+
+export const faqs = [
+  {
+    question: 'What is SEQUENCE actually useful for, beyond a list of numbers?',
+    answer: 'Most often, feeding another function\'s numeric argument automatically — SEQUENCE(3) inside LARGE or SMALL spills the 1st, 2nd, and 3rd ranked values in one formula, instead of three separate calls.',
+  },
+  {
+    question: 'Can SEQUENCE count backward?',
+    answer: 'Yes — pass a negative step: SEQUENCE(5, 1, 10, -1) generates 10, 9, 8, 7, 6.',
+  },
+  {
+    question: 'Can SEQUENCE generate dates?',
+    answer: 'Yes — since dates are stored as numbers, SEQUENCE(10, 1, DATE(2027,1,1)) generates 10 sequential dates starting January 1, 2027.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SEQUENCE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SEQUENCE(10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.Sequence(10)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    result = np.arange(1, 11)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LARGE](/docs/math/large) and [SMALL](/docs/math/small) — commonly
+  fed a SEQUENCE for `k` to spill a whole ranked list at once.
+- [SORT](/docs/arrays/sort) — often used alongside SEQUENCE-generated
+  row numbers for custom ordering.
+- [UNIQUE](/docs/arrays/unique) — another dynamic array function
+  frequently combined with SEQUENCE-based indexing.

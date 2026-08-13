@@ -1,0 +1,30 @@
+---
+title: ROUND examples
+description: Worked examples for ROUND — decimal places, whole numbers, and rounding to the nearest ten or hundred.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — two decimal places" formula={`=ROUND(3.14159, 2)`}>
+  Returns `3.14` — the two decimal digits closest to the actual
+  value.
+</ExampleCard>
+
+<ExampleCard number="02" label="Rounding to a whole number" formula={`=ROUND(3.6, 0)`}>
+  With `num_digits` at 0, returns the nearest integer — `4`.
+</ExampleCard>
+
+<ExampleCard number="03" label="Rounding to the nearest hundred" formula={`=ROUND(1250, -2)`}>
+  A negative `num_digits` rounds left of the decimal point — this
+  returns `1300`.
+</ExampleCard>
+
+<ExampleCard number="04" label="Rounding a formula result" formula={`=ROUND(SUM(Sales[Amount]), 2)`}>
+  Wrapping SUM in ROUND rounds the total itself, not just its
+  display.
+</ExampleCard>
+
+<ExampleCard number="05" label="Negative numbers round the same way" formula={`=ROUND(-2.5, 0)`}>
+  Returns `-3` — `.5` rounds away from zero in both directions, not
+  just upward.
+</ExampleCard>

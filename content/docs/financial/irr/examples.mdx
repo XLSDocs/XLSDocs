@@ -1,0 +1,34 @@
+---
+title: IRR examples
+description: Worked examples for IRR — a basic project return, supplying a guess, and comparing against NPV.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — rate of return on a project" formula={`=IRR({-50000, 15000, 18000, 20000})`}>
+  A $50,000 initial investment followed by three years of returns —
+  IRR finds the rate at which this breaks even.
+</ExampleCard>
+
+<ExampleCard number="02" label="Using a range instead of literal values" formula={`=IRR(Cashflows[Amount])`}>
+  IRR accepts a range directly — cleaner than listing each cash flow
+  as a separate value once there are more than a few.
+</ExampleCard>
+
+<ExampleCard number="03" label="Supplying a guess for a hard-to-converge case" formula={`=IRR(Cashflows[Amount], 20%)`}>
+  A starting `guess` closer to the expected real rate helps the
+  iterative solver converge on genuinely difficult cash flow
+  patterns.
+</ExampleCard>
+
+<ExampleCard number="04" label="Checking against a required return" formula={`=IRR(Cashflows[Amount]) > 12%`}>
+  Compares the calculated IRR against a required rate of return —
+  TRUE means the project clears the bar.
+</ExampleCard>
+
+<ExampleCard number="05" label="Verifying with NPV at the IRR rate" formula={`=NPV(IRR({-50000,15000,18000,20000}), {15000,18000,20000}) - 50000`}>
+  Feeding IRR's own result back into NPV (excluding the initial
+  investment from the NPV call, same as any other NPV usage) should
+  land at very close to zero — a useful sanity check on the
+  calculation.
+</ExampleCard>

@@ -11,7 +11,7 @@ description: Worked examples for LARGE — top-N reporting, duplicate handling, 
 
 <ExampleCard number="02" label="A top-3 list" formula={`=LARGE(Sales[Amount], SEQUENCE(3))`}>
   Spills the 1st, 2nd, and 3rd largest values in one formula, using
-  SEQUENCE to generate `k` = 1, 2, 3 automatically.
+  [SEQUENCE](/docs/arrays/sequence) to generate `k` = 1, 2, 3 automatically.
 </ExampleCard>
 
 <ExampleCard number="03" label="Distinct top values, skipping ties" formula={`=LARGE(UNIQUE(Sales[Amount]), 2)`}>
