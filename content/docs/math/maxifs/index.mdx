@@ -1,0 +1,158 @@
+---
+title: MAXIFS
+description: Find the largest number in a range where every one of several conditions is met.
+---
+
+Find the largest value in a range, but only among rows that match
+**all** of one or more conditions — the highest sale in the West
+region, the latest deadline for open projects, and so on.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'All conditions must match (AND logic)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Returns 0, not an error, when nothing matches', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MAXIFS(max_range, criteria_range1, criteria1, ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MAXIFS(max_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'max_range',
+    type: 'range',
+    required: true,
+    description: 'The range to find the largest value within.',
+  },
+  {
+    name: 'criteria_range1',
+    type: 'range',
+    required: true,
+    description: 'The first range to evaluate a condition against.',
+  },
+  {
+    name: 'criteria1',
+    type: 'any',
+    required: true,
+    description:
+      'The condition applied to `criteria_range1` (a value, comparison string, or wildcard).',
+  },
+  {
+    name: 'criteria_range2, criteria2, ...',
+    type: 'range, any',
+    required: false,
+    description:
+      'Up to 126 more range/condition pairs. All conditions must be true for a row to be included (AND logic).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The largest value in `max_range` among rows where every criteria
+pair matches. Returns `0` if no rows match — not an error.
+
+## Description
+
+MAXIFS extends MAX the same way SUMIFS extends SUM — every condition
+must be true for a row to be considered (AND logic), and each
+`criteria_range` must be the same size and shape as `max_range`.
+
+<Callout type="warn">
+  MAXIFS puts `max_range` **first**, matching SUMIFS/COUNTIFS/
+  AVERAGEIFS — unlike plain MAX, which takes no range/condition pairs
+  at all. Don't confuse this with `LARGE`, which finds the *k*th
+  largest value with no conditional filtering.
+</Callout>
+
+## Common errors
+
+### #VALUE! — mismatched range sizes
+
+<ExcelCode>{`MAXIFS(A2:A10, B2:B9, "West") → #VALUE!`}</ExcelCode>
+
+`criteria_range` must be the same size as `max_range` — here one is
+9 rows and the other is 10.
+
+### Returns 0 — no error, but easy to miss
+
+<ExcelCode>{`MAXIFS(A2:A10, B2:B10, "Zzz") → 0`}</ExcelCode>
+
+Not an error — no rows matched "Zzz". Double-check the criteria
+value is actually present in `criteria_range`.
+
+export const faqs = [
+  {
+    question: 'MAXIFS vs LARGE — which should I use?',
+    answer: 'MAXIFS filters by a condition first, then finds the single largest match. LARGE finds the kth-largest value in an unfiltered range — different questions entirely.',
+  },
+  {
+    question: 'Can MAXIFS use OR logic instead of AND?',
+    answer: 'Not directly — like SUMIFS, every condition must be true. For "West OR East", use two separate MAXIFS calls wrapped in MAX: MAX(MAXIFS(...,"West"), MAXIFS(...,"East")).',
+  },
+  {
+    question: 'Why does MAXIFS return 0 when I expect a real value?',
+    answer: 'Either no rows genuinely match every condition, or a criteria value is missing its quotes — the same failure modes as SUMIFS/COUNTIFS.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MAXIFS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MAXIFS(Sales[Amount], Sales[Region], "West")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim highest As Double
+    highest = Application.WorksheetFunction.MaxIfs( _
+      Range("Sales[Amount]"), Range("Sales[Region]"), "West")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    highest = df.loc[df["Region"] == "West", "Amount"].max()
+    print(highest)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MINIFS](/docs/math/minifs) — same conditional matching, finding
+  the smallest value instead of the largest.
+- [MAX](/docs/math/max) — the unconditional version of MAXIFS.
+- [LARGE](/docs/math/large) — the kth-largest value, with no
+  conditional filtering.

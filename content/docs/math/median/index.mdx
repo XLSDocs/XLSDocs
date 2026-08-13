@@ -1,0 +1,148 @@
+---
+title: MEDIAN
+description: Find the middle value in a set of numbers, less sensitive to outliers than AVERAGE.
+---
+
+Find the middle value of a set of numbers — half the values fall
+above it, half below. Unlike AVERAGE, a few extreme outliers barely
+move it, which makes it the better "typical value" for skewed data
+like salaries or home prices.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Ignores text and blank cells within a range', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'With an even count, averages the two middle values', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MEDIAN(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MEDIAN(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to find the median of.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The middle value once every number is sorted. With an odd count of
+values, that's the single middle one; with an even count, it's the
+average of the two middle values.
+
+## Description
+
+MEDIAN answers "what's typical" in a way AVERAGE can't when the data
+is skewed — a handful of very high (or very low) values pull AVERAGE
+toward them, while MEDIAN barely moves, since it only cares about
+position, not magnitude. Household income and home prices are the
+classic real-world examples where MEDIAN is reported instead of the
+mean.
+
+<Callout type="warn">
+  With an **even** number of values, MEDIAN doesn't return one of the
+  actual data points — it averages the two middle ones. `MEDIAN(1, 2,
+  3, 4)` returns `2.5`, not `2` or `3`.
+</Callout>
+
+## Common errors
+
+### Expecting the average, getting the median
+
+<ExcelCode>{`MEDIAN(1, 2, 100) → 2 (not 34.3, which is the average)`}</ExcelCode>
+
+Not a bug — MEDIAN is deliberately insensitive to the outlier
+(`100`) here. Use AVERAGE if the mean is actually what's needed.
+
+### Surprised by a non-data-point result
+
+<ExcelCode>{`MEDIAN(10, 20, 30, 40) → 25 (the average of 20 and 30, not either one)`}</ExcelCode>
+
+With an even count of values, this is expected — MEDIAN averages
+the two middle values rather than picking one.
+
+export const faqs = [
+  {
+    question: 'MEDIAN vs AVERAGE — when should I use MEDIAN?',
+    answer: 'Use MEDIAN when a few extreme values would otherwise skew the "typical" figure — salaries, home prices, or any dataset with outliers. AVERAGE is fine for evenly-distributed data with no major outliers.',
+  },
+  {
+    question: 'Does MEDIAN require the data to already be sorted?',
+    answer: 'No — MEDIAN sorts internally. The arguments can be in any order.',
+  },
+  {
+    question: 'What does MEDIAN return for an even number of values?',
+    answer: 'The average of the two middle values once sorted — not one of the actual data points.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MEDIAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MEDIAN(Salaries[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim med As Double
+    med = Application.WorksheetFunction.Median(Range("Salaries[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Salaries")
+    med = df["Amount"].median()
+    print(med)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AVERAGE](/docs/math/average) — the arithmetic mean of the same
+  numbers, more sensitive to outliers than MEDIAN.
+- [LARGE](/docs/math/large) and [SMALL](/docs/math/small) — find a
+  specific rank position instead of the exact middle.
+- [MAX](/docs/math/max) and [MIN](/docs/math/min) — the extremes of
+  the same data, rather than the center.

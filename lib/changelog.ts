@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-13',
+    title: 'MAXIFS, MINIFS, LARGE, SMALL, MEDIAN, and SUBTOTAL',
+    description:
+      'Six more Math functions — conditional max/min, ranking by position instead of just the extreme, the outlier-resistant middle value, and a filter-aware total that plain SUM can\'t do.',
+    tags: ['New functions'],
+  },
+  {
     date: '2026-08-11',
     title: 'YEAR, MONTH, DAY, WEEKDAY, NETWORKDAYS, and WORKDAY',
     description:

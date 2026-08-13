@@ -1,0 +1,32 @@
+---
+title: SUBTOTAL examples
+description: Worked examples for SUBTOTAL — a filter-aware total, count, and average, plus the manual-hide distinction.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — sum of visible rows" formula={`=SUBTOTAL(109, Sales[Amount])`}>
+  Totals only the rows currently visible after any active filter —
+  updates automatically as the filter changes.
+</ExampleCard>
+
+<ExampleCard number="02" label="Count of visible rows" formula={`=SUBTOTAL(103, Sales[OrderID])`}>
+  Counts non-blank visible cells — useful as a live "how many rows
+  match the current filter" indicator.
+</ExampleCard>
+
+<ExampleCard number="03" label="Average of visible rows" formula={`=SUBTOTAL(101, Sales[Amount])`}>
+  Averages only the currently-visible rows, the SUBTOTAL equivalent
+  of AVERAGE.
+</ExampleCard>
+
+<ExampleCard number="04" label="Including manually-hidden rows" formula={`=SUBTOTAL(9, Sales[Amount])`}>
+  Using `9` instead of `109` still excludes filtered rows, but keeps
+  manually-hidden rows in the total.
+</ExampleCard>
+
+<ExampleCard number="05" label="A nested subtotal doesn't double-count" formula={`=SUBTOTAL(109, A2:A100)`}>
+  If A2:A100 already contains other SUBTOTAL formulas (e.g. per-group
+  subtotals), this grand total automatically ignores them rather than
+  adding them in twice.
+</ExampleCard>

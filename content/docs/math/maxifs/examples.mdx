@@ -1,0 +1,29 @@
+---
+title: MAXIFS examples
+description: Worked examples for MAXIFS — basic matching, multiple conditions, and combining with MAX.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — largest sale by region" formula={`=MAXIFS(Sales[Amount], Sales[Region], "West")`}>
+  Returns the largest amount among rows where Region equals "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple conditions" formula={`=MAXIFS(Sales[Amount], Sales[Region], "West", Sales[Quarter], "Q4")`}>
+  Both conditions must be true (AND logic) — West region **and** Q4.
+</ExampleCard>
+
+<ExampleCard number="03" label="Latest deadline among open projects" formula={`=MAXIFS(Projects[DueDate], Projects[Status], "Open")`}>
+  MAXIFS works on dates too, since Excel stores them as numbers —
+  this finds the furthest-out due date among open projects.
+</ExampleCard>
+
+<ExampleCard number="04" label="OR logic via two calls" formula={`=MAX(MAXIFS(Sales[Amount], Sales[Region], "West"), MAXIFS(Sales[Amount], Sales[Region], "East"))`}>
+  MAXIFS alone only ANDs conditions — wrapping two calls in MAX
+  answers "the largest sale in West OR East."
+</ExampleCard>
+
+<ExampleCard number="05" label="Dynamic criteria from a cell" formula={`=MAXIFS(Sales[Amount], Sales[Region], D2)`}>
+  Referencing a cell instead of hardcoding "West" lets the same
+  formula answer a different question when D2 changes.
+</ExampleCard>

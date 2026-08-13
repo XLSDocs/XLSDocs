@@ -1,0 +1,160 @@
+---
+title: MINIFS
+description: Find the smallest number in a range where every one of several conditions is met.
+---
+
+Find the smallest value in a range, but only among rows that match
+**all** of one or more conditions — the lowest price in a category,
+the earliest deadline among open projects, and so on.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'All conditions must match (AND logic)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Returns 0, not an error, when nothing matches', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MINIFS(min_range, criteria_range1, criteria1, ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MINIFS(min_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'min_range',
+    type: 'range',
+    required: true,
+    description: 'The range to find the smallest value within.',
+  },
+  {
+    name: 'criteria_range1',
+    type: 'range',
+    required: true,
+    description: 'The first range to evaluate a condition against.',
+  },
+  {
+    name: 'criteria1',
+    type: 'any',
+    required: true,
+    description:
+      'The condition applied to `criteria_range1` (a value, comparison string, or wildcard).',
+  },
+  {
+    name: 'criteria_range2, criteria2, ...',
+    type: 'range, any',
+    required: false,
+    description:
+      'Up to 126 more range/condition pairs. All conditions must be true for a row to be included (AND logic).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The smallest value in `min_range` among rows where every criteria
+pair matches. Returns `0` if no rows match — not an error, and
+genuinely ambiguous with a real zero value if one exists in the data.
+
+## Description
+
+MINIFS extends MIN the same way SUMIFS extends SUM — every condition
+must be true for a row to be considered (AND logic), and each
+`criteria_range` must be the same size and shape as `min_range`.
+
+<Callout type="warn">
+  MINIFS puts `min_range` **first**, matching SUMIFS/COUNTIFS/
+  AVERAGEIFS — unlike plain MIN, which takes no range/condition pairs
+  at all. Don't confuse this with `SMALL`, which finds the *k*th
+  smallest value with no conditional filtering.
+</Callout>
+
+## Common errors
+
+### #VALUE! — mismatched range sizes
+
+<ExcelCode>{`MINIFS(A2:A10, B2:B9, "West") → #VALUE!`}</ExcelCode>
+
+`criteria_range` must be the same size as `min_range` — here one is
+9 rows and the other is 10.
+
+### Ambiguous 0 — genuine value or no match?
+
+<ExcelCode>{`MINIFS(A2:A10, B2:B10, "Zzz") → 0 (either a real zero, or nothing matched at all)`}</ExcelCode>
+
+Unlike SUMIFS/COUNTIFS (where a `0` result unambiguously means "no
+matches"), MINIFS returning `0` can also mean the smallest genuinely
+matching value is `0` — check the data directly if this matters.
+
+export const faqs = [
+  {
+    question: 'MINIFS vs SMALL — which should I use?',
+    answer: 'MINIFS filters by a condition first, then finds the single smallest match. SMALL finds the kth-smallest value in an unfiltered range — different questions entirely.',
+  },
+  {
+    question: 'Can MINIFS use OR logic instead of AND?',
+    answer: 'Not directly — like SUMIFS, every condition must be true. For "West OR East", use two separate MINIFS calls wrapped in MIN: MIN(MINIFS(...,"West"), MINIFS(...,"East")).',
+  },
+  {
+    question: 'Why does MINIFS return 0 when I expect a real value?',
+    answer: 'Either no rows genuinely match every condition, or the smallest matching value is a real zero — unlike SUMIFS/COUNTIFS, a 0 from MINIFS is ambiguous, so check the underlying data if it matters.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MINIFS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MINIFS(Sales[Amount], Sales[Region], "West")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim lowest As Double
+    lowest = Application.WorksheetFunction.MinIfs( _
+      Range("Sales[Amount]"), Range("Sales[Region]"), "West")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    lowest = df.loc[df["Region"] == "West", "Amount"].min()
+    print(lowest)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MAXIFS](/docs/math/maxifs) — same conditional matching, finding
+  the largest value instead of the smallest.
+- [MIN](/docs/math/min) — the unconditional version of MINIFS.
+- [SMALL](/docs/math/small) — the kth-smallest value, with no
+  conditional filtering.

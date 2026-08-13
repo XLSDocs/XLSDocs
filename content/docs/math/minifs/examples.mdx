@@ -1,0 +1,30 @@
+---
+title: MINIFS examples
+description: Worked examples for MINIFS — basic matching, multiple conditions, and combining with MIN.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — lowest price by category" formula={`=MINIFS(Products[Price], Products[Category], "Widgets")`}>
+  Returns the smallest price among rows where Category equals
+  "Widgets".
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple conditions" formula={`=MINIFS(Sales[Amount], Sales[Region], "West", Sales[Quarter], "Q4")`}>
+  Both conditions must be true (AND logic) — West region **and** Q4.
+</ExampleCard>
+
+<ExampleCard number="03" label="Earliest deadline among open projects" formula={`=MINIFS(Projects[DueDate], Projects[Status], "Open")`}>
+  MINIFS works on dates too, since Excel stores them as numbers —
+  this finds the nearest due date among open projects.
+</ExampleCard>
+
+<ExampleCard number="04" label="OR logic via two calls" formula={`=MIN(MINIFS(Sales[Amount], Sales[Region], "West"), MINIFS(Sales[Amount], Sales[Region], "East"))`}>
+  MINIFS alone only ANDs conditions — wrapping two calls in MIN
+  answers "the smallest sale in West OR East."
+</ExampleCard>
+
+<ExampleCard number="05" label="Dynamic criteria from a cell" formula={`=MINIFS(Sales[Amount], Sales[Region], D2)`}>
+  Referencing a cell instead of hardcoding "West" lets the same
+  formula answer a different question when D2 changes.
+</ExampleCard>

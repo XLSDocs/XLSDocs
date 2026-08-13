@@ -1,0 +1,30 @@
+---
+title: LARGE examples
+description: Worked examples for LARGE — top-N reporting, duplicate handling, and combining with SEQUENCE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — second-largest value" formula={`=LARGE(Sales[Amount], 2)`}>
+  Returns the runner-up value — the same as MAX if `k` were 1.
+</ExampleCard>
+
+<ExampleCard number="02" label="A top-3 list" formula={`=LARGE(Sales[Amount], SEQUENCE(3))`}>
+  Spills the 1st, 2nd, and 3rd largest values in one formula, using
+  SEQUENCE to generate `k` = 1, 2, 3 automatically.
+</ExampleCard>
+
+<ExampleCard number="03" label="Distinct top values, skipping ties" formula={`=LARGE(UNIQUE(Sales[Amount]), 2)`}>
+  Wrapping `array` in UNIQUE first means duplicate values only count
+  once in the ranking.
+</ExampleCard>
+
+<ExampleCard number="04" label="Naming the top performer" formula={`=INDEX(Sales[Rep], MATCH(LARGE(Sales[Amount], 1), Sales[Amount], 0))`}>
+  Combining LARGE with INDEX/MATCH looks up which row actually has
+  the top value.
+</ExampleCard>
+
+<ExampleCard number="05" label="Top value matching a condition" formula={`=LARGE(FILTER(Sales[Amount], Sales[Region]="West"), 1)`}>
+  Filtering to West-region sales first, then ranking within just
+  those — equivalent to a single-condition MAXIFS.
+</ExampleCard>

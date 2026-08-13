@@ -1,0 +1,161 @@
+---
+title: SUBTOTAL
+description: Aggregate a range while automatically excluding rows hidden by a filter.
+---
+
+Aggregate a range — sum, count, average, and more — while
+automatically excluding rows hidden by a filter, something plain
+SUM/AVERAGE/COUNT can't do. The function behind Excel Table and
+AutoFilter's built-in totals row.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always ignores filtered-out rows, regardless of function_num', type: 'check' },
+  { text: 'function_num 1–11 includes manually-hidden rows; 101–111 excludes them too', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SUBTOTAL(function_num, ref1, [ref2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUBTOTAL(function_num, ref1, [ref2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'function_num',
+    type: 'number',
+    required: true,
+    description: 'Which aggregate to apply — see the table below. 1–11 include manually-hidden rows; 101–111 exclude them too.',
+  },
+  {
+    name: 'ref1',
+    type: 'range',
+    required: true,
+    description: 'The range to aggregate.',
+  },
+  {
+    name: 'ref2, ...',
+    type: 'range',
+    required: false,
+    description: 'Up to 254 more ranges to include in the same aggregate.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The result of the chosen aggregate function, computed only over rows
+that aren't hidden by a filter (and, for codes 101–111, not
+manually hidden either).
+
+## Description
+
+`function_num` selects which aggregate to run: `1`=AVERAGE, `2`=COUNT,
+`3`=COUNTA, `4`=MAX, `5`=MIN, `6`=PRODUCT, `7`=STDEV, `8`=STDEVP,
+`9`=SUM, `10`=VAR, `11`=VARP. Add `100` to any of these (`101`–`111`)
+to also exclude rows hidden manually (right-click → Hide Row), not
+just ones hidden by an active filter.
+
+<Callout type="warn">
+  SUBTOTAL **always** excludes rows hidden by a filter, no matter
+  which `function_num` is used — the 1–11 vs 101–111 split only
+  controls whether *manually*-hidden rows are also excluded. It also
+  ignores any other SUBTOTAL results inside its own range, so nested
+  subtotals don't get double-counted.
+</Callout>
+
+## Common errors
+
+### Total doesn't change when filtering
+
+<ExcelCode>{`SUM(A2:A100) → same total no matter what's filtered`}</ExcelCode>
+
+Plain SUM always includes every row, filtered or not. Switch to
+SUBTOTAL to get a total that updates as the filter changes:
+
+<ExcelCode>{`SUBTOTAL(109, A2:A100)`}</ExcelCode>
+
+### Manually-hidden rows still counted
+
+<ExcelCode>{`SUBTOTAL(9, A2:A100) → still includes rows hidden via right-click → Hide Row`}</ExcelCode>
+
+Codes 1–11 only exclude *filtered* rows, not manually hidden ones —
+use the 101–111 range instead if manual hides should also be
+excluded:
+
+<ExcelCode>{`SUBTOTAL(109, A2:A100)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'SUBTOTAL vs SUM — when should I use SUBTOTAL?',
+    answer: 'Use SUBTOTAL whenever the total needs to reflect an active filter — SUM always includes every row regardless of what\'s currently hidden.',
+  },
+  {
+    question: 'What\'s the difference between function_num 9 and 109?',
+    answer: '9 (SUM) excludes filtered rows but still includes manually-hidden ones. 109 excludes both filtered and manually-hidden rows. The +100 versions are the stricter "exclude everything hidden" option.',
+  },
+  {
+    question: 'Does SUBTOTAL double-count nested subtotals?',
+    answer: "No — SUBTOTAL automatically ignores any other SUBTOTAL result that falls within its own range, which is exactly what lets Excel's built-in subtotal/grand-total reports nest correctly without inflating the grand total.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUBTOTAL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUBTOTAL(109, Sales[Amount])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim visibleTotal As Double
+    visibleTotal = Application.WorksheetFunction.Subtotal(109, Range("Sales[Amount]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    visible_total = df.loc[df["Region"] == "West", "Amount"].sum()
+    print(visible_total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUM](/docs/math/sum) — the unconditional total, including
+  filtered-out and hidden rows.
+- [SUMIFS](/docs/math/sumifs) — totals matching a condition, rather
+  than matching visibility state.
+- [MAXIFS](/docs/math/maxifs) and [MINIFS](/docs/math/minifs) — same
+  conditional-matching idea, for the largest/smallest value instead
+  of a sum.

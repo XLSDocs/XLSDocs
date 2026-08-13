@@ -1,0 +1,29 @@
+---
+title: MEDIAN examples
+description: Worked examples for MEDIAN — basic usage, an outlier comparison against AVERAGE, and grouped medians.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — median salary" formula={`=MEDIAN(Salaries[Amount])`}>
+  Returns the middle salary once every value is sorted.
+</ExampleCard>
+
+<ExampleCard number="02" label="Median vs average with an outlier" formula={`=MEDIAN(45000, 48000, 52000, 550000)`}>
+  Returns `50000` — barely moved by the one very high value, unlike
+  AVERAGE of the same numbers (`173750`).
+</ExampleCard>
+
+<ExampleCard number="03" label="Median of a filtered subset" formula={`=MEDIAN(FILTER(Salaries[Amount], Salaries[Department]="Engineering"))`}>
+  Filters to one department first, then finds the median within
+  just those rows.
+</ExampleCard>
+
+<ExampleCard number="04" label="Comparing median and average side by side" formula={`=MEDIAN(Salaries[Amount]) - AVERAGE(Salaries[Amount])`}>
+  A large gap between the two is itself a signal that the data is
+  skewed by outliers.
+</ExampleCard>
+
+<ExampleCard number="05" label="Multiple ranges" formula={`=MEDIAN(Q1Salaries[Amount], Q2Salaries[Amount])`}>
+  MEDIAN treats multiple ranges as one combined pool of numbers.
+</ExampleCard>

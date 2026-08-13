@@ -1,0 +1,144 @@
+---
+title: LARGE
+description: Find the kth-largest value in a range.
+---
+
+Find the 2nd, 3rd, or nth largest value in a range — not just the
+single biggest, which is all MAX can give you.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'k=1 is equivalent to MAX', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Duplicate values are not skipped', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LARGE(array, k)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LARGE(array, k)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array to rank values within.',
+  },
+  {
+    name: 'k',
+    type: 'number',
+    required: true,
+    description: 'Which rank to return — 1 for the largest, 2 for the second-largest, and so on.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The `k`th-largest numeric value in `array`. Returns `#NUM!` if `k`
+is less than 1 or greater than the count of values in `array`.
+
+## Description
+
+LARGE ranks every value in `array` from biggest to smallest and
+returns whichever one sits at position `k` — `LARGE(range, 1)` is
+the same as `MAX(range)`, `LARGE(range, 2)` is the runner-up, and so
+on. Useful for "top 3" or "top 5" reporting without sorting the
+whole dataset.
+
+<Callout type="warn">
+  LARGE does **not** skip duplicate values when ranking. If the two
+  highest values in a range are both `100`, `LARGE(range, 1)` and
+  `LARGE(range, 2)` both return `100` — `k=2` means "second position
+  in the ranking," not "second-distinct value."
+</Callout>
+
+## Common errors
+
+### #NUM! — k out of range
+
+<ExcelCode>{`LARGE(A2:A10, 15) → #NUM! (only 9 values exist)`}</ExcelCode>
+
+`k` can't exceed the number of values actually in `array`.
+
+### Expecting distinct values, getting duplicates
+
+<ExcelCode>{`LARGE(A2:A10, 2) → 100 (same as LARGE(A2:A10, 1), if 100 appears twice)`}</ExcelCode>
+
+If genuinely distinct values are needed (skipping ties), wrap
+`array` in `UNIQUE` first: `LARGE(UNIQUE(A2:A10), 2)`.
+
+export const faqs = [
+  {
+    question: 'LARGE vs MAX — how do they relate?',
+    answer: 'MAX always returns the single largest value — the same as LARGE(range, 1). LARGE lets you go further: the 2nd, 3rd, or nth largest.',
+  },
+  {
+    question: 'How do I get a top-5 list with LARGE?',
+    answer: 'Use k=1 through 5 in five separate LARGE calls, or spill a whole ranked list at once with SEQUENCE: =LARGE(range, SEQUENCE(5)).',
+  },
+  {
+    question: 'Does LARGE skip duplicate values?',
+    answer: "No — duplicates occupy their own rank positions. Wrap array in UNIQUE first (LARGE(UNIQUE(range), k)) if distinct values are what's actually needed.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LARGE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LARGE(Sales[Amount], 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim secondHighest As Double
+    secondHighest = Application.WorksheetFunction.Large(Range("Sales[Amount]"), 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    second_highest = df["Amount"].nlargest(2).iloc[-1]
+    print(second_highest)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SMALL](/docs/math/small) — the kth-smallest value instead of the
+  kth-largest.
+- [MAX](/docs/math/max) — the single largest value; equivalent to
+  `LARGE(array, 1)`.
+- [MAXIFS](/docs/math/maxifs) — the largest value matching a
+  condition, instead of ranked by position.

@@ -1,0 +1,144 @@
+---
+title: SMALL
+description: Find the kth-smallest value in a range.
+---
+
+Find the 2nd, 3rd, or nth smallest value in a range — not just the
+single lowest, which is all MIN can give you.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'k=1 is equivalent to MIN', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Duplicate values are not skipped', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SMALL(array, k)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SMALL(array, k)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array to rank values within.',
+  },
+  {
+    name: 'k',
+    type: 'number',
+    required: true,
+    description: 'Which rank to return — 1 for the smallest, 2 for the second-smallest, and so on.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The `k`th-smallest numeric value in `array`. Returns `#NUM!` if `k`
+is less than 1 or greater than the count of values in `array`.
+
+## Description
+
+SMALL ranks every value in `array` from smallest to biggest and
+returns whichever one sits at position `k` — `SMALL(range, 1)` is
+the same as `MIN(range)`, `SMALL(range, 2)` is the next-lowest, and
+so on. Useful for "bottom 3" or "lowest 5" reporting without sorting
+the whole dataset.
+
+<Callout type="warn">
+  SMALL does **not** skip duplicate values when ranking. If the two
+  lowest values in a range are both `10`, `SMALL(range, 1)` and
+  `SMALL(range, 2)` both return `10` — `k=2` means "second position
+  in the ranking," not "second-distinct value."
+</Callout>
+
+## Common errors
+
+### #NUM! — k out of range
+
+<ExcelCode>{`SMALL(A2:A10, 15) → #NUM! (only 9 values exist)`}</ExcelCode>
+
+`k` can't exceed the number of values actually in `array`.
+
+### Expecting distinct values, getting duplicates
+
+<ExcelCode>{`SMALL(A2:A10, 2) → 10 (same as SMALL(A2:A10, 1), if 10 appears twice)`}</ExcelCode>
+
+If genuinely distinct values are needed (skipping ties), wrap
+`array` in `UNIQUE` first: `SMALL(UNIQUE(A2:A10), 2)`.
+
+export const faqs = [
+  {
+    question: 'SMALL vs MIN — how do they relate?',
+    answer: 'MIN always returns the single smallest value — the same as SMALL(range, 1). SMALL lets you go further: the 2nd, 3rd, or nth smallest.',
+  },
+  {
+    question: 'How do I get a bottom-5 list with SMALL?',
+    answer: 'Use k=1 through 5 in five separate SMALL calls, or spill a whole ranked list at once with SEQUENCE: =SMALL(range, SEQUENCE(5)).',
+  },
+  {
+    question: 'Does SMALL skip duplicate values?',
+    answer: "No — duplicates occupy their own rank positions. Wrap array in UNIQUE first (SMALL(UNIQUE(range), k)) if distinct values are what's actually needed.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SMALL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SMALL(Sales[Amount], 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim secondLowest As Double
+    secondLowest = Application.WorksheetFunction.Small(Range("Sales[Amount]"), 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    second_lowest = df["Amount"].nsmallest(2).iloc[-1]
+    print(second_lowest)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LARGE](/docs/math/large) — the kth-largest value instead of the
+  kth-smallest.
+- [MIN](/docs/math/min) — the single smallest value; equivalent to
+  `SMALL(array, 1)`.
+- [MINIFS](/docs/math/minifs) — the smallest value matching a
+  condition, instead of ranked by position.

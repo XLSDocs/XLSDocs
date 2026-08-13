@@ -1,0 +1,30 @@
+---
+title: SMALL examples
+description: Worked examples for SMALL — bottom-N reporting, duplicate handling, and combining with SEQUENCE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — second-smallest value" formula={`=SMALL(Sales[Amount], 2)`}>
+  Returns the next-lowest value — the same as MIN if `k` were 1.
+</ExampleCard>
+
+<ExampleCard number="02" label="A bottom-3 list" formula={`=SMALL(Sales[Amount], SEQUENCE(3))`}>
+  Spills the 1st, 2nd, and 3rd smallest values in one formula, using
+  SEQUENCE to generate `k` = 1, 2, 3 automatically.
+</ExampleCard>
+
+<ExampleCard number="03" label="Distinct low values, skipping ties" formula={`=SMALL(UNIQUE(Sales[Amount]), 2)`}>
+  Wrapping `array` in UNIQUE first means duplicate values only count
+  once in the ranking.
+</ExampleCard>
+
+<ExampleCard number="04" label="Naming the lowest performer" formula={`=INDEX(Sales[Rep], MATCH(SMALL(Sales[Amount], 1), Sales[Amount], 0))`}>
+  Combining SMALL with INDEX/MATCH looks up which row actually has
+  the lowest value.
+</ExampleCard>
+
+<ExampleCard number="05" label="Lowest value matching a condition" formula={`=SMALL(FILTER(Sales[Amount], Sales[Region]="West"), 1)`}>
+  Filtering to West-region sales first, then ranking within just
+  those — equivalent to a single-condition MINIFS.
+</ExampleCard>
