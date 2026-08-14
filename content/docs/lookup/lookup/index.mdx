@@ -1,0 +1,173 @@
+---
+title: LOOKUP
+description: Look up a value in a sorted range and return a corresponding value from another range.
+---
+
+The original lookup function — find a value in one range and return
+the corresponding value from another. Simpler than VLOOKUP or
+XLOOKUP in a few ways, but with a strict requirement neither of them
+share: the lookup range **must** be sorted ascending.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'lookup_vector must be sorted ascending — no exceptions', type: 'warn' },
+  { text: 'Always approximate match — no exact-match option', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LOOKUP(lookup_value, lookup_vector, [result_vector])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOOKUP(lookup_value, lookup_vector, [result_vector])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'lookup_value',
+    type: 'any',
+    required: true,
+    description: 'The value to search for.',
+  },
+  {
+    name: 'lookup_vector',
+    type: 'range',
+    required: true,
+    description: 'A single row or column to search, sorted in ascending order.',
+  },
+  {
+    name: 'result_vector',
+    type: 'range',
+    required: false,
+    description: 'The single row or column to return a value from. Defaults to lookup_vector itself if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value from `result_vector` in the same position as the largest
+value in `lookup_vector` that is less than or equal to
+`lookup_value`. Returns `#N/A` if `lookup_value` is smaller than
+every value in `lookup_vector`.
+
+## Description
+
+LOOKUP predates VLOOKUP, and works differently in one important way:
+it doesn't take a match-type argument at all — it's always an
+approximate match, and it requires `lookup_vector` to be sorted
+ascending for that match to make sense. Its main advantage is
+compactness for a simple two-column reference table, but XLOOKUP or
+VLOOKUP with an explicit exact-match argument are almost always the
+safer, clearer choice today.
+
+<Callout type="warn">
+  If `lookup_vector` isn't actually sorted ascending, LOOKUP doesn't
+  error — it just silently returns a wrong result, since its search
+  algorithm assumes sorted data. This is the single biggest source of
+  confusing LOOKUP results: a formula that looks correct but returns
+  the wrong row because the source data wasn't sorted the way LOOKUP
+  requires.
+</Callout>
+
+## Common errors
+
+### Silently wrong results from unsorted data
+
+<ExcelCode>{`LOOKUP(85, {90,70,80}, {"A","C","B"}) → wrong (not sorted ascending)`}</ExcelCode>
+
+LOOKUP assumes ascending order and won't warn if that assumption is
+violated — sort the source data first:
+
+<ExcelCode>{`LOOKUP(85, {70,80,90}, {"C","B","A"})`}</ExcelCode>
+
+### #N/A — lookup_value smaller than every entry
+
+<ExcelCode>{`LOOKUP(5, {10,20,30}, {"A","B","C"}) → #N/A`}</ExcelCode>
+
+LOOKUP can't return anything below the smallest value in
+`lookup_vector` — there's no "largest value less than or equal to 5"
+in this range.
+
+### Expecting an exact match
+
+<ExcelCode>{`LOOKUP(84, {70,80,90}, {"C","B","A"}) → "B" (matches 80, not an exact 84)`}</ExcelCode>
+
+LOOKUP has no exact-match mode — it always returns the closest value
+at or below `lookup_value`. Use XLOOKUP or VLOOKUP with an explicit
+exact-match argument if an exact match (or `#N/A` on no match) is
+what's actually needed.
+
+export const faqs = [
+  {
+    question: 'LOOKUP vs VLOOKUP/XLOOKUP — which should I use?',
+    answer: 'XLOOKUP (or VLOOKUP with exact match) almost always. LOOKUP has no exact-match option and silently misbehaves on unsorted data — it\'s mostly worth knowing to understand older spreadsheets, not for new formulas.',
+  },
+  {
+    question: 'Does lookup_vector really need to be sorted?',
+    answer: "Yes — LOOKUP's algorithm assumes ascending order and doesn't verify it. Unsorted data doesn't throw an error; it just silently returns the wrong result.",
+  },
+  {
+    question: 'What happens if result_vector is omitted?',
+    answer: 'LOOKUP returns the matching value from lookup_vector itself — useful for finding "the largest value at or below X" without a separate results column.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LOOKUP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LOOKUP(A2, Grades[MinScore], Grades[Letter])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim letterGrade As String
+    letterGrade = Application.WorksheetFunction.Lookup( _
+      Range("A2").Value, Range("Grades[MinScore]"), Range("Grades[Letter]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    grades = pd.read_excel("workbook.xlsx", sheet_name="Grades").sort_values("MinScore")
+    grades_indexed = grades.set_index("MinScore")["Letter"]
+    letter_grade = grades_indexed.asof(score)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [XLOOKUP](/docs/lookup/xlookup) — the modern replacement, with a
+  real exact-match option and no sort requirement.
+- [VLOOKUP](/docs/lookup/vlookup) — also supports approximate match
+  on sorted data, but with an explicit match-type argument.
+- [INDEX](/docs/lookup/index) and [MATCH](/docs/lookup/match) —
+  together, a more flexible alternative that doesn't require sorted
+  data.

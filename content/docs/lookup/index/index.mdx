@@ -193,5 +193,9 @@ export const compatibility = [
 - [VLOOKUP](/docs/lookup/vlookup) — a more constrained lookup that
   can only search its own leftmost column and return to the right;
   INDEX/MATCH has no such direction restriction.
+- [CHOOSE](/docs/lookup/choose) — returns a value by position from a
+  fixed, typed-in list, instead of a range.
+- [OFFSET](/docs/lookup/offset) — also returns a reference by
+  position, but volatile, unlike INDEX.
 - [IFERROR](/docs/logical/iferror) — wraps `INDEX(..., MATCH(...))`
   to catch a `#N/A` from a failed MATCH.

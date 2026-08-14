@@ -1,0 +1,170 @@
+---
+title: OFFSET
+description: Return a reference shifted a given number of rows and columns from a starting cell.
+---
+
+Return a reference to a range that's shifted a given number of rows
+and columns from a starting point, optionally resized. Powerful for
+building dynamic ranges, but volatile — it recalculates on every
+sheet change, which can slow down a large workbook.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A volatile function — recalculates on every sheet edit', type: 'warn' },
+  { text: 'Returns a reference, not a value — can be resized', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=OFFSET(reference, rows, cols, [height], [width])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=OFFSET(reference, rows, cols, [height], [width])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'range',
+    required: true,
+    description: 'The starting cell or range to offset from.',
+  },
+  {
+    name: 'rows',
+    type: 'number',
+    required: true,
+    description: 'How many rows to shift. Positive moves down, negative moves up.',
+  },
+  {
+    name: 'cols',
+    type: 'number',
+    required: true,
+    description: 'How many columns to shift. Positive moves right, negative moves left.',
+  },
+  {
+    name: 'height',
+    type: 'number',
+    required: false,
+    description: 'The height (in rows) of the returned reference. Defaults to the height of reference.',
+  },
+  {
+    name: 'width',
+    type: 'number',
+    required: false,
+    description: 'The width (in columns) of the returned reference. Defaults to the width of reference.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A reference to a range `rows` rows and `cols` columns away from
+`reference`, resized to `height` × `width` if those are supplied.
+Since it returns a reference (not a plain value), OFFSET can be
+wrapped in SUM, AVERAGE, or any function that expects a range.
+
+## Description
+
+OFFSET is most often used to build a range that shifts or grows
+based on other cells — a rolling 12-month total that moves forward
+each month, or a dynamic chart range. Modern alternatives (Excel
+Tables, dynamic arrays) handle many of the same needs without
+OFFSET's volatility cost, so it's worth checking whether one of
+those fits before reaching for OFFSET in a new workbook.
+
+<Callout type="warn">
+  OFFSET is a **volatile function** — it recalculates every time
+  *anything* changes anywhere in the workbook, not just when its own
+  inputs change. A worksheet with many OFFSET formulas can become
+  noticeably slower to edit as the workbook grows. INDEX is a
+  non-volatile alternative for many of the same dynamic-range needs.
+</Callout>
+
+## Common errors
+
+### #REF! — offsetting past the edge of the sheet
+
+<ExcelCode>{`OFFSET(A1, -5, 0) → #REF! (there's no row above row 1)`}</ExcelCode>
+
+Shifting beyond row 1 or column A (or past the last row/column)
+throws `#REF!` — check the offset amount against the actual sheet
+boundaries.
+
+### Unexpected slowdown in a large workbook
+
+Not an error, but a real performance issue — many OFFSET formulas
+scattered through a large workbook force a full recalculation on
+every edit. Consider INDEX-based alternatives if this becomes
+noticeable.
+
+export const faqs = [
+  {
+    question: 'OFFSET vs INDEX for a dynamic range — which should I use?',
+    answer: "INDEX returns a reference too, but isn't volatile — it only recalculates when its own inputs change. For most dynamic-range needs, an INDEX-based formula performs better in a large workbook.",
+  },
+  {
+    question: 'Why is OFFSET considered risky or discouraged?',
+    answer: "Mainly its volatility — heavy OFFSET use can measurably slow down a large workbook, since every OFFSET formula recalculates on every single edit anywhere in the file, not just when its own arguments change.",
+  },
+  {
+    question: 'Can OFFSET resize a range, not just move it?',
+    answer: 'Yes — the optional height and width arguments let OFFSET return a range larger or smaller than reference, which is what makes it useful for building expanding/rolling ranges.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with OFFSET from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUM(OFFSET(A1, 0, 0, 12, 1))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rollingTotal As Double
+    rollingTotal = Application.WorksheetFunction.Sum( _
+      Range("A1").Offset(0, 0).Resize(12, 1))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    rolling_total = df.iloc[0:12, 0].sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [INDEX](/docs/lookup/index) — returns a reference too, without
+  OFFSET's volatility cost, for many of the same dynamic-range needs.
+- [INDIRECT](/docs/lookup/indirect) — also builds a reference
+  dynamically, but from a text string rather than a row/column shift.
+- [MATCH](/docs/lookup/match) — often paired with INDEX/OFFSET to
+  find the shift amount instead of hardcoding it.

@@ -1,0 +1,158 @@
+---
+title: CHOOSE
+description: Return the value at a given position from a list of values.
+---
+
+Pick one value out of a fixed list based on its position — the 1st,
+2nd, 3rd, and so on. A simple alternative to nested IF statements
+when there's a small, known set of options tied to a number.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'index_num is 1-based, not 0-based', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'Up to 254 values to choose from', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CHOOSE(index_num, value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHOOSE(index_num, value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'index_num',
+    type: 'number',
+    required: true,
+    description: 'Which value to return — 1 for the first, 2 for the second, and so on.',
+  },
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The first value in the list.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 253 more values — text, numbers, cell references, or even ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value at position `index_num` in the list. Returns `#VALUE!` if
+`index_num` is less than 1 or greater than the number of values
+supplied.
+
+## Description
+
+CHOOSE picks from a fixed, small list of options by position — a
+day-of-week name from a weekday number, a tier label from a rank, or
+a discount rate from a category code. For more than a handful of
+options, or when the values come from a table rather than being
+typed inline, IFS or a lookup function is usually a better fit.
+
+<Callout type="info">
+  `index_num` is **1-based** — `CHOOSE(1, "A", "B", "C")` returns
+  `"A"`, not `"B"`. This trips up anyone used to 0-based indexing
+  from a programming language.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': 'Bronze', '2': 'Silver', '3': 'Gold' }}
+  defaultValue="2"
+  label={'Live preview — CHOOSE({value}, "Bronze", "Silver", "Gold")'}
+  fieldLabel="index_num"
+/>
+
+## Common errors
+
+### #VALUE! — index_num out of range
+
+<ExcelCode>{`CHOOSE(5, "A", "B", "C") → #VALUE! (only 3 values exist)`}</ExcelCode>
+
+`index_num` can't exceed the number of values actually supplied.
+
+### Off-by-one from 0-based thinking
+
+<ExcelCode>{`CHOOSE(0, "A", "B", "C") → #VALUE!`}</ExcelCode>
+
+`index_num` starts at `1`, not `0` — there's no "zeroth" value to
+return.
+
+export const faqs = [
+  {
+    question: 'CHOOSE vs nested IF — which should I use?',
+    answer: 'CHOOSE is cleaner when the input is already a clean number (1, 2, 3...) mapping to a fixed list. Nested IF or IFS is better when the branching depends on a condition rather than a position.',
+  },
+  {
+    question: 'Can CHOOSE return a range instead of a single value?',
+    answer: 'Yes — each value can be a range reference, and CHOOSE(index_num, A1:A10, B1:B10) picks which whole range to use, useful inside SUM or another aggregate function.',
+  },
+  {
+    question: 'Why does CHOOSE(0, ...) return an error?',
+    answer: 'index_num is 1-based — the first value is position 1, not 0. There\'s no valid "0th" value to return.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHOOSE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHOOSE(Orders[Tier], "Bronze", "Silver", "Gold")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim tierName As String
+    tierName = Choose(Range("A2").Value, "Bronze", "Silver", "Gold")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    tiers = ["Bronze", "Silver", "Gold"]
+    tier_name = tiers[tier_number - 1]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IFS](/docs/logical/ifs) — branches on conditions instead of a
+  fixed numeric position.
+- [SWITCH](/docs/logical/switch) — compares one value against a list
+  of exact matches, closer to CHOOSE's shape but keyed by value
+  rather than position.
+- [INDEX](/docs/lookup/index) — looks up a value by position within
+  a range, rather than a hardcoded list of literals.

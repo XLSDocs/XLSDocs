@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-14',
+    title: 'CHOOSE, LOOKUP, OFFSET, and INDIRECT',
+    description:
+      'Rounds out the Lookup category with four more classics — picking a value by position, the original (and trickier) lookup function, and the two volatile reference-building functions worth understanding even when better alternatives exist.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-14',
     title: 'CEILING, FLOOR, EXACT, and CONCATENATE',
     description:
       'Rounding to an arbitrary step size (nickels, quarter-hours) instead of a digit count, the one built-in case-sensitive text comparison, and the legacy text-joining function CONCAT replaces.',

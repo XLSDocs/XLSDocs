@@ -1,0 +1,30 @@
+---
+title: CHOOSE examples
+description: Worked examples for CHOOSE — tier labels, day names, choosing between ranges, and combining with WEEKDAY.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — a tier label from a rank" formula={`=CHOOSE(Orders[Tier], "Bronze", "Silver", "Gold")`}>
+  Returns the label matching whatever number (1, 2, or 3) is in the
+  Tier column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Day name from WEEKDAY" formula={`=CHOOSE(WEEKDAY(A2), "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")`}>
+  Combines CHOOSE with WEEKDAY's default numbering to produce a
+  short day-name abbreviation.
+</ExampleCard>
+
+<ExampleCard number="03" label="Choosing between two ranges" formula={`=SUM(CHOOSE(A2, Q1Sales[Amount], Q2Sales[Amount]))`}>
+  Each "value" can be a whole range — this sums whichever quarter's
+  range A2 selects.
+</ExampleCard>
+
+<ExampleCard number="04" label="A discount rate by customer tier" formula={`=Orders[Price] * (1 - CHOOSE(Orders[Tier], 0, 0.05, 0.1))`}>
+  Maps a tier number directly to a discount percentage.
+</ExampleCard>
+
+<ExampleCard number="05" label="Out-of-range index_num" formula={`=CHOOSE(4, "A", "B", "C")`}>
+  Returns `#VALUE!` — only 3 values were supplied, so `index_num=4`
+  has nothing to return.
+</ExampleCard>

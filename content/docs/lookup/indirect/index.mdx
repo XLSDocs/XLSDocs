@@ -1,0 +1,156 @@
+---
+title: INDIRECT
+description: Convert a text string into a real cell reference.
+---
+
+Turn a text string like `"A1"` or `"Sheet2!B3"` into a real, live
+cell reference — useful when the reference itself needs to be built
+dynamically, from a sheet name in one cell and a row number in
+another, for example.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A volatile function — recalculates on every sheet edit', type: 'warn' },
+  { text: 'Breaks if a referenced sheet is renamed', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=INDIRECT(ref_text, [a1])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=INDIRECT(ref_text, [a1])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'ref_text',
+    type: 'text',
+    required: true,
+    description: 'A text string representing a cell reference, e.g. "A1" or "Sheet2!B3".',
+  },
+  {
+    name: 'a1',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE (default) for A1-style references. FALSE for R1C1-style references.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value at the cell reference described by `ref_text`. If
+`ref_text` refers to a range rather than a single cell, INDIRECT
+returns a reference usable inside another function like SUM.
+
+## Description
+
+INDIRECT's job is building a reference out of text pieces at
+calculation time — combining a sheet name typed in one cell with a
+cell address in another to point at a moving target, or switching
+which sheet a formula reads from based on a dropdown selection. The
+tradeoff is that the reference exists only as text until INDIRECT
+evaluates it, so Excel can't track it the way it tracks a normal
+formula reference.
+
+<Callout type="warn">
+  Because `ref_text` is just a string until evaluated, **INDIRECT
+  references silently break if a referenced sheet is renamed** —
+  unlike a normal formula reference, which updates automatically.
+  It's also volatile, recalculating on every sheet edit, the same
+  cost as OFFSET.
+</Callout>
+
+## Common errors
+
+### #REF! — the text doesn't resolve to a valid reference
+
+<ExcelCode>{`INDIRECT("Sheet5!A1") → #REF! (if "Sheet5" doesn't exist)`}</ExcelCode>
+
+The text must resolve to a genuinely valid reference — a typo in a
+sheet name or cell address produces `#REF!`, not a more specific
+error pointing at the actual problem.
+
+### A renamed sheet silently breaks the formula
+
+<ExcelCode>{`INDIRECT("Sales!A1") → #REF! (if the "Sales" sheet was renamed)`}</ExcelCode>
+
+Unlike a normal cell reference, INDIRECT doesn't update automatically
+when a referenced sheet is renamed — the text string has to be
+updated manually, or built from a cell value that itself gets
+updated.
+
+export const faqs = [
+  {
+    question: 'Why use INDIRECT instead of a normal cell reference?',
+    answer: "When the reference itself needs to be built dynamically — for example, from a sheet name typed into a dropdown cell, so the same formula can point at different sheets without being edited.",
+  },
+  {
+    question: 'Does INDIRECT update automatically if I rename a referenced sheet?',
+    answer: "No — this is INDIRECT's biggest practical risk. Since the reference only exists as text, Excel's automatic reference-updating (which happens for normal formula references on rename) doesn't apply.",
+  },
+  {
+    question: 'Is INDIRECT as slow as OFFSET?',
+    answer: 'Yes — both are volatile functions that recalculate on every workbook edit, not just when their own inputs change. Heavy use of either can measurably slow down a large workbook.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with INDIRECT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=INDIRECT("'" & A2 & "'!B1")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sheetName As String
+    sheetName = Range("A2").Value
+    Dim result As Variant
+    result = Sheets(sheetName).Range("B1").Value
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    sheet_name = "January"  # e.g. read from another cell/config
+    df = pd.read_excel("workbook.xlsx", sheet_name=sheet_name)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [OFFSET](/docs/lookup/offset) — also builds a reference
+  dynamically, and shares the same volatility cost as INDIRECT.
+- [INDEX](/docs/lookup/index) — a non-volatile way to return a
+  reference for many of the same use cases.
+- [XLOOKUP](/docs/lookup/xlookup) — a more direct choice when the
+  goal is retrieving a value, rather than constructing a reference
+  from text.

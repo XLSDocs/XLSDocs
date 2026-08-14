@@ -1,0 +1,32 @@
+---
+title: INDIRECT examples
+description: Worked examples for INDIRECT — a dynamic sheet reference, building an address from parts, and a dropdown-driven lookup.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — a text reference to a cell" formula={`=INDIRECT("A1")`}>
+  Returns whatever value is in cell A1 — equivalent to referencing
+  A1 directly, but built from a string.
+</ExampleCard>
+
+<ExampleCard number="02" label="A dynamic sheet reference" formula={`=INDIRECT("'" & A2 & "'!B1")`}>
+  Builds a reference to cell B1 on whatever sheet name is typed in
+  A2 — the single quotes handle sheet names containing spaces.
+</ExampleCard>
+
+<ExampleCard number="03" label="Building an address from row and column parts" formula={`=INDIRECT("A" & B2)`}>
+  Combines a fixed column letter with a row number from another
+  cell to point at a moving target row.
+</ExampleCard>
+
+<ExampleCard number="04" label="A dropdown-driven monthly total" formula={`=SUM(INDIRECT(SelectedMonth & "!B:B"))`}>
+  Sums column B on whichever month's sheet is selected in a
+  dropdown-linked cell.
+</ExampleCard>
+
+<ExampleCard number="05" label="A broken reference after a rename" formula={`=INDIRECT("Sales!A1")`}>
+  Returns `#REF!` if the "Sales" sheet has since been renamed —
+  unlike a normal formula reference, this doesn't update
+  automatically.
+</ExampleCard>

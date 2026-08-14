@@ -1,0 +1,30 @@
+---
+title: OFFSET examples
+description: Worked examples for OFFSET — a rolling total, a dynamic single-cell reference, and combining with MATCH.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — shift down 2 rows" formula={`=OFFSET(A1, 2, 0)`}>
+  Returns a reference to A3 — two rows below A1, same column.
+</ExampleCard>
+
+<ExampleCard number="02" label="A rolling 12-month total" formula={`=SUM(OFFSET(Sales!A1, COUNTA(Sales!A:A)-12, 0, 12, 1))`}>
+  Builds a 12-row window that automatically shifts as more months of
+  data are added below it.
+</ExampleCard>
+
+<ExampleCard number="03" label="A dynamic single-cell lookup" formula={`=OFFSET(A1, MATCH("West", B:B, 0)-1, 2)`}>
+  Combines OFFSET with MATCH to jump to a specific row found
+  dynamically, then shift two columns right.
+</ExampleCard>
+
+<ExampleCard number="04" label="Resizing to a wider range" formula={`=SUM(OFFSET(A1, 0, 0, 5, 3))`}>
+  Sums a 5-row, 3-column block starting at A1, built entirely from
+  the offset/resize arguments.
+</ExampleCard>
+
+<ExampleCard number="05" label="A non-volatile INDEX alternative" formula={`=SUM(A1:INDEX(A:A, COUNTA(A:A)))`}>
+  Achieves a similar "sum down to the last row" result without
+  OFFSET's volatility, using INDEX instead.
+</ExampleCard>
