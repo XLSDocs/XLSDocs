@@ -47,8 +47,8 @@ and symbols pass through unchanged.
 UPPER only affects letter casing — it doesn't trim spaces, remove
 punctuation, or otherwise clean up text. It's commonly used to
 normalize codes or IDs before comparing them with `=`, since Excel's
-text comparison is case-sensitive in some contexts (like `EXACT`)
-but not others (like a plain `=`).
+text comparison is case-sensitive in some contexts (like
+[EXACT](/docs/text/exact)) but not others (like a plain `=`).
 
 <Callout type="info">
   UPPER returns a **new** text value — it doesn't change whatever
@@ -155,3 +155,5 @@ export const compatibility = [
   each word.
 - [TRIM](/docs/text/trim) — often combined with UPPER to clean up
   spacing at the same time as casing.
+- [EXACT](/docs/text/exact) — the case-sensitive comparison UPPER is
+  often used to normalize text before or around.

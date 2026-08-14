@@ -1,0 +1,149 @@
+---
+title: FLOOR
+description: Round a number down to the nearest multiple of significance.
+---
+
+Round a number down to the nearest multiple of a given value — the
+mirror image of CEILING. Useful whenever the rounding step is a
+specific increment rather than a decimal place, like rounding a
+price down to the nearest nickel or a duration down to a full
+billing unit.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Rounds down (toward zero) to the nearest multiple of significance', type: 'check' },
+  { text: 'number and significance must have the same sign', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FLOOR(number, significance)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FLOOR(number, significance)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: true,
+    description: 'The multiple to round down to.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded down to the nearest multiple of `significance`.
+`FLOOR(22, 5)` returns `20`; `FLOOR(0.38, 0.25)` returns `0.25`.
+
+## Description
+
+Unlike ROUNDDOWN, which rounds to a number of *digits*, FLOOR rounds
+down to a multiple of any arbitrary value — the nearest nickel
+(`0.05`), a full billing unit, or a whole case of stock. This makes
+it the right tool whenever the rounding step isn't a clean power of
+ten.
+
+<Callout type="warn">
+  `number` and `significance` must have the **same sign** —
+  `FLOOR(-22, 5)` (a negative number with a positive significance)
+  returns `#NUM!`. For negative numbers, `significance` needs to be
+  negative too: `FLOOR(-22, -5)`.
+</Callout>
+
+## Common errors
+
+### #NUM! — mismatched signs
+
+<ExcelCode>{`FLOOR(-22, 5) → #NUM!`}</ExcelCode>
+
+`number` is negative but `significance` is positive — they need to
+match in sign:
+
+<ExcelCode>{`FLOOR(-22, -5) → -25`}</ExcelCode>
+
+### #DIV/0! — significance is zero
+
+<ExcelCode>{`FLOOR(22, 0) → #DIV/0!`}</ExcelCode>
+
+`significance` can't be zero — there's no multiple of zero to round
+to.
+
+export const faqs = [
+  {
+    question: 'FLOOR vs ROUNDDOWN — how do they differ?',
+    answer: 'ROUNDDOWN rounds to a number of decimal digits. FLOOR rounds down to the nearest multiple of any value — useful when the rounding step isn\'t a clean power of ten.',
+  },
+  {
+    question: 'How do I round a price down to the nearest nickel?',
+    answer: 'FLOOR(price, 0.05) rounds any price down to the previous 5-cent increment.',
+  },
+  {
+    question: 'FLOOR vs CEILING — how do they relate?',
+    answer: 'They round to the same kind of multiple of significance, just in opposite directions — FLOOR always rounds down, CEILING always rounds up.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FLOOR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FLOOR(Prices[Amount], 0.05)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rounded As Double
+    rounded = Application.WorksheetFunction.Floor_Math(Range("A2").Value, 0.05)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    rounded = math.floor(price / 0.05) * 0.05
+    print(round(rounded, 2))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CEILING](/docs/math/ceiling) — rounds up to the nearest multiple
+  of significance, the opposite direction from FLOOR.
+- [ROUNDDOWN](/docs/math/rounddown) — rounds toward zero to a number
+  of digits, instead of a multiple of significance.
+- [ROUND](/docs/math/round) — rounds to the nearest digit position,
+  in whichever direction is closer.

@@ -1,0 +1,30 @@
+---
+title: EXACT examples
+description: Worked examples for EXACT — basic comparison, case-sensitive counting, and combining with TRIM.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — case-sensitive comparison" formula={`=EXACT(A2, B2)`}>
+  Returns `TRUE` only if A2 and B2 match exactly, including case.
+</ExampleCard>
+
+<ExampleCard number="02" label="Validating a case-sensitive code" formula={`=IF(EXACT(A2, "SKU-1042"), "Valid", "Check case")`}>
+  Flags entries that match except for case — useful for codes where
+  case genuinely matters.
+</ExampleCard>
+
+<ExampleCard number="03" label="Case-sensitive counting" formula={`=SUMPRODUCT(--EXACT("West", A2:A10))`}>
+  COUNTIF alone can't do a case-sensitive count — this combines
+  EXACT with SUMPRODUCT to count only exact-case matches.
+</ExampleCard>
+
+<ExampleCard number="04" label="Ignoring incidental whitespace" formula={`=EXACT(TRIM(A2), TRIM(B2))`}>
+  Wrapping both sides in TRIM means stray leading/trailing spaces
+  don't cause a false mismatch.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing against the default = operator" formula={`=A2=B2`}>
+  Returns `TRUE` even when case differs (`"USA"` vs `"usa"`) — the
+  key difference EXACT is built to catch.
+</ExampleCard>

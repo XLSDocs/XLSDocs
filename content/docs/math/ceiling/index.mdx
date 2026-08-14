@@ -1,0 +1,149 @@
+---
+title: CEILING
+description: Round a number up to the nearest multiple of significance.
+---
+
+Round a number up to the nearest multiple of a given value — not
+just a decimal place, but a genuine "round up to the next 5, next
+0.25, or next 100" step size. The function behind pricing to the
+nearest nickel, or scheduling to the nearest quarter-hour.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Rounds up (away from zero) to the nearest multiple of significance', type: 'check' },
+  { text: 'number and significance must have the same sign', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CEILING(number, significance)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CEILING(number, significance)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: true,
+    description: 'The multiple to round up to.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded up to the nearest multiple of `significance`.
+`CEILING(22, 5)` returns `25`; `CEILING(0.12, 0.25)` returns `0.25`.
+
+## Description
+
+Unlike ROUNDUP, which rounds to a number of *digits*, CEILING rounds
+to a multiple of any arbitrary value — the nearest nickel (`0.05`),
+the nearest quarter-hour on a timesheet (`1/96` of a day, or more
+simply `"0:15"`), or the nearest full case of 24 units. This makes
+it the right tool whenever the rounding step isn't a clean power of
+ten.
+
+<Callout type="warn">
+  `number` and `significance` must have the **same sign** —
+  `CEILING(-22, 5)` (a negative number with a positive significance)
+  returns `#NUM!`. For negative numbers, `significance` needs to be
+  negative too: `CEILING(-22, -5)`.
+</Callout>
+
+## Common errors
+
+### #NUM! — mismatched signs
+
+<ExcelCode>{`CEILING(-22, 5) → #NUM!`}</ExcelCode>
+
+`number` is negative but `significance` is positive — they need to
+match in sign:
+
+<ExcelCode>{`CEILING(-22, -5) → -20`}</ExcelCode>
+
+### #DIV/0! — significance is zero
+
+<ExcelCode>{`CEILING(22, 0) → #DIV/0!`}</ExcelCode>
+
+`significance` can't be zero — there's no multiple of zero to round
+to.
+
+export const faqs = [
+  {
+    question: 'CEILING vs ROUNDUP — how do they differ?',
+    answer: 'ROUNDUP rounds to a number of decimal digits. CEILING rounds up to the nearest multiple of any value — useful when the rounding step isn\'t a clean power of ten, like nickels or quarter-hours.',
+  },
+  {
+    question: 'How do I round a price up to the nearest nickel?',
+    answer: 'CEILING(price, 0.05) rounds any price up to the next 5-cent increment.',
+  },
+  {
+    question: 'How do I round a time up to the nearest 15 minutes?',
+    answer: 'CEILING(time, "0:15") rounds a time value up to the next quarter-hour.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CEILING from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CEILING(Prices[Amount], 0.05)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rounded As Double
+    rounded = Application.WorksheetFunction.Ceiling_Math(Range("A2").Value, 0.05)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    rounded = math.ceil(price / 0.05) * 0.05
+    print(round(rounded, 2))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FLOOR](/docs/math/floor) — rounds down to the nearest multiple of
+  significance, the opposite direction from CEILING.
+- [ROUNDUP](/docs/math/roundup) — rounds away from zero to a number
+  of digits, instead of a multiple of significance.
+- [ROUND](/docs/math/round) — rounds to the nearest digit position,
+  in whichever direction is closer.

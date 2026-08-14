@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-14',
+    title: 'CEILING, FLOOR, EXACT, and CONCATENATE',
+    description:
+      'Rounding to an arbitrary step size (nickels, quarter-hours) instead of a digit count, the one built-in case-sensitive text comparison, and the legacy text-joining function CONCAT replaces.',
+    tags: ['New functions'],
+  },
+  {
     date: '2026-08-13',
     title: 'SUMPRODUCT, ROUND, ROUNDUP, ROUNDDOWN, SEQUENCE, and IRR',
     description:

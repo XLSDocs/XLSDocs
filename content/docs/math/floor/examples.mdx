@@ -1,0 +1,30 @@
+---
+title: FLOOR examples
+description: Worked examples for FLOOR — pricing to the nearest nickel, billing units, and combining with CEILING.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — round down to the nearest 5" formula={`=FLOOR(22, 5)`}>
+  Returns `20` — the previous multiple of 5 at or below 22.
+</ExampleCard>
+
+<ExampleCard number="02" label="Pricing to the nearest nickel" formula={`=FLOOR(Prices[Amount], 0.05)`}>
+  Rounds every price down to the previous 5-cent increment.
+</ExampleCard>
+
+<ExampleCard number="03" label="Whole billing units only" formula={`=FLOOR(Usage[Minutes], 15)`}>
+  Rounds usage down to the last complete 15-minute billing unit,
+  ignoring a partial unit at the end.
+</ExampleCard>
+
+<ExampleCard number="04" label="Negative numbers need a matching sign" formula={`=FLOOR(-22, -5)`}>
+  Returns `-25` — both arguments need to be negative together, or
+  the formula returns `#NUM!`.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing FLOOR and CEILING" formula={`=CEILING(A2, 5) - FLOOR(A2, 5)`}>
+  Together, FLOOR and CEILING bracket a value between the nearest
+  multiples below and above it — this returns the width of that
+  bracket.
+</ExampleCard>

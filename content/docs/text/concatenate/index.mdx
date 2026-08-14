@@ -1,0 +1,152 @@
+---
+title: CONCATENATE
+description: Join text values together — the older function CONCAT replaces, still supported for backward compatibility.
+---
+
+Join two or more text values into one string — the original text-
+joining function, superseded by [CONCAT](/docs/text/concat) but
+still fully supported. Still worth knowing since plenty of existing
+spreadsheets and older tutorials use it.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Superseded by CONCAT — kept only for backward compatibility', type: 'warn' },
+  { text: 'Cannot accept a whole range as a single argument, unlike CONCAT', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CONCATENATE(text1, [text2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CONCATENATE(text1, [text2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text1',
+    type: 'text',
+    required: true,
+    description: 'The first text value, cell reference, or literal string.',
+  },
+  {
+    name: 'text2, ...',
+    type: 'text',
+    required: false,
+    description: 'Up to 255 total arguments — more text values to join, in order.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single string formed by joining every argument together, in the
+order given, with nothing inserted between them.
+
+## Description
+
+CONCATENATE was the original text-joining function, still fully
+functional today, but Microsoft's own guidance is to use
+[CONCAT](/docs/text/concat) going forward. The practical difference:
+CONCATENATE only accepts individual values, one argument per cell —
+`CONCATENATE(A1, A2, A3)` — while CONCAT also accepts an entire
+range as one argument — `CONCAT(A1:A3)`.
+
+<Callout type="warn">
+  Microsoft has marked CONCATENATE as a legacy function — it isn't
+  deprecated or scheduled for removal, but new formulas should use
+  CONCAT (or [TEXTJOIN](/docs/text/textjoin) for a version with a
+  separator) instead. There's no compatibility reason to keep using
+  CONCATENATE in a new spreadsheet.
+</Callout>
+
+## Common errors
+
+### Trying to pass a whole range as one argument
+
+<ExcelCode>{`CONCATENATE(A1:A5) → only joins A1, ignoring A2:A5`}</ExcelCode>
+
+Unlike CONCAT, CONCATENATE can't expand a range into its individual
+cells — each cell needs its own argument:
+
+<ExcelCode>{`CONCATENATE(A1, A2, A3, A4, A5)`}</ExcelCode>
+
+### No separator between joined values
+
+<ExcelCode>{`CONCATENATE(A2, B2) → "JohnSmith" (no space)`}</ExcelCode>
+
+CONCATENATE inserts nothing between arguments — add a literal
+separator explicitly:
+
+<ExcelCode>{`CONCATENATE(A2, " ", B2)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'CONCATENATE vs CONCAT — which should I use?',
+    answer: 'Use CONCAT for any new formula — it does everything CONCATENATE does, plus accepts whole ranges as a single argument. CONCATENATE still works and isn\'t going away, but Microsoft recommends CONCAT going forward.',
+  },
+  {
+    question: 'Is CONCATENATE deprecated?',
+    answer: 'Not removed or non-functional — it still works in every current Excel version. Microsoft labels it a "legacy" function and recommends CONCAT/TEXTJOIN instead for new formulas.',
+  },
+  {
+    question: 'How do I join text with a separator using CONCATENATE?',
+    answer: 'Add the separator as its own literal argument between each value: CONCATENATE(A2, ", ", B2). TEXTJOIN handles this more cleanly when joining many values with the same separator.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CONCATENATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CONCATENATE(A2, " ", B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim fullName As String
+    fullName = Range("A2").Value & " " & Range("B2").Value
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["FullName"] = df["First"] + " " + df["Last"]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CONCAT](/docs/text/concat) — the modern replacement, which also
+  accepts whole ranges as a single argument.
+- [TEXTJOIN](/docs/text/textjoin) — like CONCAT, but inserts a
+  separator between every joined item automatically.
+- [TEXT](/docs/text/text) — formats a number or date as text, often
+  used inside CONCATENATE to control how a value appears.

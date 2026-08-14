@@ -1,0 +1,150 @@
+---
+title: EXACT
+description: Test whether two text values are identical, including case.
+---
+
+Test whether two strings are exactly identical — including
+uppercase vs lowercase, which every other text comparison in Excel
+(`=`, VLOOKUP, COUNTIF, MATCH) ignores by default.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Case-sensitive — "West" and "west" are NOT equal', type: 'warn' },
+  { text: 'The only built-in case-sensitive text comparison', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=EXACT(text1, text2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EXACT(text1, text2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text1',
+    type: 'text',
+    required: true,
+    description: 'The first text value to compare.',
+  },
+  {
+    name: 'text2',
+    type: 'text',
+    required: true,
+    description: 'The second text value to compare.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `text1` and `text2` are identical character-for-character,
+including case. `FALSE` otherwise.
+
+## Description
+
+Every other text comparison in Excel — the `=` operator, VLOOKUP,
+XLOOKUP, MATCH, COUNTIF — treats "West" and "west" as the same
+value. EXACT is the one built-in exception: it's case-sensitive, so
+it's the right tool whenever the distinction between uppercase and
+lowercase genuinely matters, like validating a case-sensitive code
+or password field.
+
+<Callout type="info">
+  `A2=B2` and `EXACT(A2, B2)` look interchangeable until case
+  differs — `"USA"="usa"` returns `TRUE`, but `EXACT("USA", "usa")`
+  returns `FALSE`. Reach for EXACT specifically when that difference
+  matters.
+</Callout>
+
+## Common errors
+
+### Expecting the default comparison to be case-sensitive
+
+<ExcelCode>{`A2=B2 → TRUE (even if A2="USA" and B2="usa")`}</ExcelCode>
+
+The plain `=` operator ignores case — switch to EXACT if the
+comparison genuinely needs to be case-sensitive:
+
+<ExcelCode>{`EXACT(A2, B2) → FALSE`}</ExcelCode>
+
+### Leading/trailing spaces cause an unexpected FALSE
+
+<ExcelCode>{`EXACT("USA", "USA ") → FALSE (trailing space)`}</ExcelCode>
+
+EXACT compares every character, including whitespace — wrap both
+sides in TRIM first if stray spaces shouldn't count:
+
+<ExcelCode>{`EXACT(TRIM(A2), TRIM(B2))`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'EXACT vs the = operator — what\'s the difference?',
+    answer: 'The = operator ignores case ("USA" equals "usa"). EXACT is case-sensitive, so those two would be FALSE. Use EXACT specifically when uppercase/lowercase needs to matter.',
+  },
+  {
+    question: 'Can EXACT be used inside COUNTIF or MATCH for case-sensitive matching?',
+    answer: 'Yes — wrap EXACT in SUMPRODUCT: SUMPRODUCT(--EXACT("West", A2:A10)) counts case-sensitive matches, something COUNTIF alone can\'t do.',
+  },
+  {
+    question: 'Does EXACT ignore leading or trailing spaces?',
+    answer: "No — EXACT compares every character literally, including whitespace. Wrap both arguments in TRIM first if incidental spacing shouldn't affect the result.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EXACT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EXACT(A2, B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim isMatch As Boolean
+    isMatch = (StrComp(Range("A2").Value, Range("B2").Value, vbBinaryCompare) = 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["Match"] = df["A"] == df["B"]  # case-sensitive by default
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TRIM](/docs/text/trim) — often paired with EXACT to strip
+  incidental whitespace before comparing.
+- [UPPER](/docs/text/upper) and [LOWER](/docs/text/lower) — normalize
+  case before a comparison, the opposite goal from EXACT.
+- [COUNTIF](/docs/math/countif) — matches text case-insensitively by
+  default, unlike EXACT.

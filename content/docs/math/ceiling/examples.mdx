@@ -1,0 +1,27 @@
+---
+title: CEILING examples
+description: Worked examples for CEILING — pricing to the nearest nickel, quarter-hour scheduling, and case-quantity rounding.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — round up to the nearest 5" formula={`=CEILING(22, 5)`}>
+  Returns `25` — the next multiple of 5 at or above 22.
+</ExampleCard>
+
+<ExampleCard number="02" label="Pricing to the nearest nickel" formula={`=CEILING(Prices[Amount], 0.05)`}>
+  Rounds every price up to the next 5-cent increment.
+</ExampleCard>
+
+<ExampleCard number="03" label="Scheduling to the nearest quarter-hour" formula={`=CEILING(A2, "0:15")`}>
+  Rounds a time value up to the next quarter-hour boundary.
+</ExampleCard>
+
+<ExampleCard number="04" label="Rounding up to a full case" formula={`=CEILING(Orders[Quantity], 24)`}>
+  Rounds an order quantity up to the next full case of 24 units.
+</ExampleCard>
+
+<ExampleCard number="05" label="Negative numbers need a matching sign" formula={`=CEILING(-22, -5)`}>
+  Returns `-20` — both arguments need to be negative together, or
+  the formula returns `#NUM!`.
+</ExampleCard>

@@ -1,0 +1,30 @@
+---
+title: CONCATENATE examples
+description: Worked examples for CONCATENATE — joining names, adding separators, and mixing in literal text.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — join two cells" formula={`=CONCATENATE(A2, B2)`}>
+  Joins the values with nothing between them.
+</ExampleCard>
+
+<ExampleCard number="02" label="Full name with a space" formula={`=CONCATENATE(A2, " ", B2)`}>
+  Adding a literal space as its own argument separates the two
+  joined names.
+</ExampleCard>
+
+<ExampleCard number="03" label="Building a labeled string" formula={`=CONCATENATE("Order #", A2, " — ", B2)`}>
+  Mixes literal text with cell references to build a formatted
+  string.
+</ExampleCard>
+
+<ExampleCard number="04" label="Joining more than two values" formula={`=CONCATENATE(A2, "-", B2, "-", C2)`}>
+  Any number of arguments can be joined, alternating values and
+  separators as needed.
+</ExampleCard>
+
+<ExampleCard number="05" label="The modern equivalent with CONCAT" formula={`=CONCAT(A2, " ", B2)`}>
+  Same result as example 2 — CONCAT is the recommended function for
+  new formulas, with CONCATENATE kept only for compatibility.
+</ExampleCard>
