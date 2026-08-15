@@ -1,0 +1,185 @@
+---
+title: NETWORKDAYS.INTL
+description: Count working days between two dates, with a customizable weekend schedule.
+---
+
+Count the number of working days between two dates, using a
+**customizable weekend** — Friday/Saturday, Sunday-only, or any other
+pattern, instead of `NETWORKDAYS`'s fixed Saturday/Sunday.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Both start_date and end_date are included in the count', type: 'check' },
+  { text: 'Adds a weekend argument between end_date and holidays', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NETWORKDAYS.INTL(start_date, end_date, [weekend], [holidays])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NETWORKDAYS.INTL(start_date, end_date, [weekend], [holidays])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The first date of the range.',
+  },
+  {
+    name: 'end_date',
+    type: 'date',
+    required: true,
+    description: 'The last date of the range.',
+  },
+  {
+    name: 'weekend',
+    type: 'number, text',
+    required: false,
+    description: 'Which days count as the weekend — a preset code from 1–7/11–17, or a 7-character string of 1s and 0s (1 = non-workday, starting Monday). Defaults to Saturday/Sunday (code 1) if omitted.',
+  },
+  {
+    name: 'holidays',
+    type: 'range',
+    required: false,
+    description: 'A range of dates to also exclude, in addition to the weekend.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of working days between `start_date` and `end_date`,
+inclusive of both endpoints, excluding whichever days are marked as
+weekend and any dates in `holidays`.
+
+## Description
+
+NETWORKDAYS.INTL solves the same limitation for counting business
+days that `WORKDAY.INTL` solves for finding them: a weekend that
+isn't always Saturday/Sunday. It uses the identical `weekend`
+argument format as WORKDAY.INTL — a preset code or a custom
+7-character string — so a workbook using one can reuse the same
+weekend definition for the other.
+
+The preset codes:
+
+| Code | Weekend days |
+| --- | --- |
+| 1 (default) | Saturday, Sunday |
+| 2 | Sunday, Monday |
+| 3 | Monday, Tuesday |
+| 4 | Tuesday, Wednesday |
+| 5 | Wednesday, Thursday |
+| 6 | Thursday, Friday |
+| 7 | Friday, Saturday |
+| 11 | Sunday only |
+| 12 | Monday only |
+| 13 | Tuesday only |
+| 14 | Wednesday only |
+| 15 | Thursday only |
+| 16 | Friday only |
+| 17 | Saturday only |
+
+<Callout type="info">
+  `weekend` sits **between** `end_date` and `holidays` — different
+  argument order than plain NETWORKDAYS, where `holidays` is the
+  third argument. Omitting `weekend` falls back to the standard
+  Saturday/Sunday weekend.
+</Callout>
+
+## Common errors
+
+### #NUM! — invalid weekend code
+
+<ExcelCode>{`NETWORKDAYS.INTL(A2, B2, 9) → #NUM! (9 isn't a valid preset code)`}</ExcelCode>
+
+Only `1`–`7` and `11`–`17` are valid preset codes — anything else
+needs to be a 7-character `1`/`0` string instead.
+
+### Off-by-one from expecting an exclusive count
+
+<ExcelCode>{`NETWORKDAYS.INTL(DATE(2027,1,4), DATE(2027,1,8), 1) → 5 (both endpoints included)`}</ExcelCode>
+
+Both `start_date` and `end_date` count if they fall on a working day
+under the chosen weekend pattern — same inclusive behavior as plain
+NETWORKDAYS.
+
+export const faqs = [
+  {
+    question: 'NETWORKDAYS.INTL vs NETWORKDAYS — which should I use?',
+    answer: 'NETWORKDAYS when the weekend is the standard Saturday/Sunday. NETWORKDAYS.INTL when the business operates on a different weekly schedule, or to stay consistent with a WORKDAY.INTL formula elsewhere in the same workbook.',
+  },
+  {
+    question: 'Do NETWORKDAYS.INTL and WORKDAY.INTL use the same weekend codes?',
+    answer: 'Yes — both accept the identical set of preset codes (1-7, 11-17) and the same 7-character custom string format, so a weekend definition can be reused between the two.',
+  },
+  {
+    question: 'What happens if end_date is before start_date?',
+    answer: 'NETWORKDAYS.INTL returns a negative number rather than an error, same as plain NETWORKDAYS — worth guarding against with an IF check if the dates might arrive in the wrong order.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NETWORKDAYS.INTL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NETWORKDAYS.INTL(Project[Start], Project[End], 7, Holidays[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim businessDays As Long
+    businessDays = Application.WorksheetFunction.NetworkDays_Intl( _
+      Range("A2"), Range("B2"), 7, Range("Holidays"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    # weekmask marks workdays (1) vs weekend (0), Mon-Sun
+    business_days = np.busday_count(
+        "2027-01-04", "2027-01-09",
+        weekmask="1111100",  # Sat/Sun off
+        holidays=["2027-01-06"],
+    )
+    print(business_days)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NETWORKDAYS](/docs/date/networkdays) — the simpler version, fixed
+  to a Saturday/Sunday weekend.
+- [WORKDAY.INTL](/docs/date/workday-intl) — the inverse calculation
+  with the same customizable weekend argument.
+- [DATEDIF](/docs/date/datedif) — counts total calendar days between
+  two dates, without excluding weekends.

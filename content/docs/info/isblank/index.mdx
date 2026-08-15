@@ -48,7 +48,9 @@ ISBLANK is the strictest of the "is this empty" checks — it only
 returns `TRUE` for a cell that has never held a value or formula at
 all. A cell containing a formula that currently evaluates to `""`
 (an empty string) looks empty visually but is **not** blank to
-ISBLANK, the same distinction that affects COUNTA/COUNTBLANK.
+ISBLANK — a subtlety that runs the other way for
+[COUNTBLANK](/docs/math/countblank), which counts those same cells
+as blank.
 
 <Callout type="warn">
   ISBLANK returns `FALSE` for a cell holding `=IF(A1="","","x")`,
@@ -146,3 +148,5 @@ export const compatibility = [
   blank" instead.
 - [COUNTA](/docs/math/counta) — counts non-blank cells across a whole
   range, instead of testing a single cell.
+- [COUNTBLANK](/docs/math/countblank) — counts blank cells across a
+  whole range, instead of testing a single cell.

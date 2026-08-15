@@ -1,0 +1,151 @@
+---
+title: COUNTBLANK
+description: Count how many cells in a range are empty.
+---
+
+Count how many cells in a range are genuinely empty — the mirror
+image of COUNTA, and the direct answer to "how many rows are still
+missing this field."
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Counts truly empty cells — a formula returning "" still counts as blank', type: 'warn' },
+  { text: 'Only takes one range, unlike most other COUNT functions', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUNTBLANK(range)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUNTBLANK(range)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'range',
+    type: 'range',
+    required: true,
+    description: 'The range to count empty cells within. Unlike COUNT/COUNTA, only a single range is accepted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of cells in `range` that are empty — including cells that
+contain a formula whose result is an empty string (`""`).
+
+## Description
+
+COUNTBLANK answers the opposite question from COUNTA: instead of
+"how many cells have anything in them," it's "how many don't." It's
+commonly used to spot incomplete data — how many rows in a form are
+still missing an email address, how many order rows have no ship
+date yet. Unlike COUNT, COUNTA, SUM, and most other aggregate
+functions, COUNTBLANK only accepts a single `range` argument, not a
+variable list of values.
+
+<Callout type="warn">
+  COUNTBLANK counts a cell as blank even if it holds a formula that
+  **returns** an empty string (`=""`) — visually the cell looks
+  empty, and COUNTBLANK agrees, but COUNTA would still count it as
+  non-blank since it technically contains a formula. This is the
+  opposite gotcha from ISBLANK, which treats `=""` cells as
+  non-blank.
+</Callout>
+
+## Common errors
+
+### Not matching COUNTA's complement
+
+<ExcelCode>{`COUNT(A1:A10) + COUNTA(A1:A10) + COUNTBLANK(A1:A10) → doesn't always add up to 10`}</ExcelCode>
+
+COUNT only counts numeric cells, so `COUNT + COUNTBLANK` misses any
+text cells and undercounts the range's total size. The reliable
+identity is `COUNTA(range) + COUNTBLANK(range) = total cells in
+range` — use `COUNTA`, not `COUNT`, alongside COUNTBLANK to account
+for every cell.
+
+### Passing multiple ranges
+
+<ExcelCode>{`COUNTBLANK(A1:A10, B1:B10) → #VALUE! (only one range is allowed)`}</ExcelCode>
+
+Unlike COUNT or COUNTA, COUNTBLANK doesn't accept a list of ranges —
+combine them with addition instead:
+
+<ExcelCode>{`COUNTBLANK(A1:A10) + COUNTBLANK(B1:B10)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'COUNTBLANK vs COUNTIF(range, "") — any difference?',
+    answer: 'They return the same result for genuinely blank and formula-returns-"" cells. COUNTIF(range, "") is more flexible since it can be combined with other conditions, but COUNTBLANK is more direct for a plain blank count.',
+  },
+  {
+    question: 'Does COUNTBLANK count a cell with a formula returning ""?',
+    answer: 'Yes — visually and functionally it treats that as blank, which is the opposite of how ISBLANK treats the same cell (ISBLANK says it\'s not blank, since it contains a formula).',
+  },
+  {
+    question: 'Why can\'t I pass multiple ranges to COUNTBLANK?',
+    answer: "COUNTBLANK's syntax only accepts a single range argument, unlike COUNT, COUNTA, or SUM. Add separate COUNTBLANK calls together to cover multiple ranges.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUNTBLANK from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUNTBLANK(Orders[ShipDate])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim missing As Long
+    missing = Application.WorksheetFunction.CountBlank(Range("Orders[ShipDate]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    missing = df["ShipDate"].isna().sum()
+    print(missing)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUNTA](/docs/math/counta) — counts non-blank cells, the mirror
+  image of COUNTBLANK.
+- [COUNT](/docs/math/count) — counts numeric cells only, a narrower
+  question than either COUNTA or COUNTBLANK.
+- [ISBLANK](/docs/info/isblank) — tests a single cell for blankness,
+  with the opposite `=""` behavior from COUNTBLANK.
+- [COUNTIF](/docs/math/countif) — `COUNTIF(range, "")` reproduces
+  COUNTBLANK's result with more flexibility.

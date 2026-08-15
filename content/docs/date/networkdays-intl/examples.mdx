@@ -1,0 +1,30 @@
+---
+title: NETWORKDAYS.INTL examples
+description: Worked examples for NETWORKDAYS.INTL — custom weekend presets, a custom weekend string, and combining with holidays.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — Sunday-only weekend" formula={`=NETWORKDAYS.INTL(A2, B2, 11)`}>
+  Counts business days between two dates, treating only Sunday as
+  the weekend.
+</ExampleCard>
+
+<ExampleCard number="02" label="Friday/Saturday weekend" formula={`=NETWORKDAYS.INTL(A2, B2, 7)`}>
+  Uses preset code 7 for a Sunday-Thursday work week.
+</ExampleCard>
+
+<ExampleCard number="03" label="Custom weekend string" formula={`=NETWORKDAYS.INTL(A2, B2, "0000001")`}>
+  A 7-character string starting Monday — here, only Sunday (the last
+  character) is marked as the weekend.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combining a custom weekend with holidays" formula={`=NETWORKDAYS.INTL(Project[Start], Project[End], 7, Holidays[Date])`}>
+  Excludes both the custom weekend pattern and any listed holiday
+  dates.
+</ExampleCard>
+
+<ExampleCard number="05" label="Guarding against a negative result" formula={`=IF(B2<A2, "Check dates", NETWORKDAYS.INTL(A2, B2, 1))`}>
+  Returns a friendly message instead of a negative count when the
+  end date is before the start date.
+</ExampleCard>

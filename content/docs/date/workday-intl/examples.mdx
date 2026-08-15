@@ -1,0 +1,29 @@
+---
+title: WORKDAY.INTL examples
+description: Worked examples for WORKDAY.INTL — custom weekend presets, a custom weekend string, and combining with holidays.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — Sunday-only weekend" formula={`=WORKDAY.INTL(A2, 10, 11)`}>
+  Finds the date 10 working days out, treating only Sunday as the
+  weekend.
+</ExampleCard>
+
+<ExampleCard number="02" label="Friday/Saturday weekend" formula={`=WORKDAY.INTL(A2, 10, 7)`}>
+  Uses preset code 7 for a Sunday-Thursday work week.
+</ExampleCard>
+
+<ExampleCard number="03" label="Custom weekend string" formula={`=WORKDAY.INTL(A2, 10, "0000001")`}>
+  A 7-character string starting Monday — here, only Sunday (the last
+  character) is marked as the weekend.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combining a custom weekend with holidays" formula={`=WORKDAY.INTL(Orders[ShipDate], 10, 7, Holidays[Date])`}>
+  Skips both the custom weekend pattern and any listed holiday dates.
+</ExampleCard>
+
+<ExampleCard number="05" label="Finding a date before, not after" formula={`=WORKDAY.INTL(A2, -5, 1)`}>
+  A negative days value finds a date before start_date instead of
+  after, with the standard Saturday/Sunday weekend.
+</ExampleCard>

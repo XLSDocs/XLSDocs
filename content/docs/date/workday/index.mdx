@@ -81,7 +81,7 @@ result — `days=1` means "one working day after this date."
 
 Like NETWORKDAYS, plain WORKDAY always treats Saturday and Sunday as
 the weekend, with no argument to change that — use
-`WORKDAY.INTL` for a custom weekly schedule.
+[WORKDAY.INTL](/docs/date/workday-intl) for a custom weekly schedule.
 
 export const faqs = [
   {
@@ -145,6 +145,8 @@ export const compatibility = [
 - [NETWORKDAYS](/docs/date/networkdays) — the inverse calculation:
   counts business days between two known dates, instead of finding a
   date a given number of business days away.
+- [WORKDAY.INTL](/docs/date/workday-intl) — the same calculation
+  with a customizable weekend, instead of a fixed Saturday/Sunday.
 - [EDATE](/docs/date/edate) — shifts a date by a number of *months*
   instead of business days.
 - [WEEKDAY](/docs/date/weekday) — identifies the day of the week for

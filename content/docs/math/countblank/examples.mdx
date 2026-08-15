@@ -1,0 +1,30 @@
+---
+title: COUNTBLANK examples
+description: Worked examples for COUNTBLANK — finding missing data, percent-complete tracking, and combining ranges.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — rows missing a ship date" formula={`=COUNTBLANK(Orders[ShipDate])`}>
+  Counts how many orders don't have a ship date entered yet.
+</ExampleCard>
+
+<ExampleCard number="02" label="Percent of a form still incomplete" formula={`=COUNTBLANK(Survey[Email]) / COUNTA(Survey[Name])`}>
+  Compares blank email fields against the total number of started
+  responses.
+</ExampleCard>
+
+<ExampleCard number="03" label="Flagging a row with any missing field" formula={`=COUNTBLANK(A2:D2) > 0`}>
+  Flags a row as incomplete if any of its first four fields are
+  empty.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combining two ranges" formula={`=COUNTBLANK(A1:A10) + COUNTBLANK(B1:B10)`}>
+  COUNTBLANK only accepts one range at a time — add separate calls
+  together to cover more than one.
+</ExampleCard>
+
+<ExampleCard number="05" label="Confirming COUNTA and COUNTBLANK add up" formula={`=COUNTA(A1:A10) + COUNTBLANK(A1:A10) = ROWS(A1:A10)`}>
+  Verifies every cell in the range is accounted for as either
+  non-blank or blank — this should always return TRUE.
+</ExampleCard>

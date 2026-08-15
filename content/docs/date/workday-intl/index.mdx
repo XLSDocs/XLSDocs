@@ -1,0 +1,191 @@
+---
+title: WORKDAY.INTL
+description: Find a date a given number of working days away, with a customizable weekend schedule.
+---
+
+Find the date that's a given number of working days away from a
+start date, using a **customizable weekend** — Friday/Saturday,
+Sunday-only, or any other pattern, instead of `WORKDAY`'s fixed
+Saturday/Sunday.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Adds a weekend argument between days and holidays', type: 'check' },
+  { text: 'Weekend can be a preset code (1-7, 11-17) or a custom 7-character string', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=WORKDAY.INTL(start_date, days, [weekend], [holidays])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=WORKDAY.INTL(start_date, days, [weekend], [holidays])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The date to count forward or backward from.',
+  },
+  {
+    name: 'days',
+    type: 'number',
+    required: true,
+    description: 'How many working days away the result should be. Positive moves forward, negative moves backward.',
+  },
+  {
+    name: 'weekend',
+    type: 'number, text',
+    required: false,
+    description: 'Which days count as the weekend — a preset code from 1–7/11–17, or a 7-character string of 1s and 0s (1 = non-workday, starting Monday). Defaults to Saturday/Sunday (code 1) if omitted.',
+  },
+  {
+    name: 'holidays',
+    type: 'range',
+    required: false,
+    description: 'A range of dates to also skip, in addition to the weekend.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The date that is `days` working days after (or before, if negative)
+`start_date`, skipping the days marked as weekend and any dates
+listed in `holidays`.
+
+## Description
+
+WORKDAY.INTL solves the one real limitation of plain `WORKDAY`: a
+weekend that's always Saturday/Sunday. Many businesses run on a
+different schedule — Friday/Saturday off in parts of the Middle East,
+Sunday-only for a six-day work week — and WORKDAY.INTL's `weekend`
+argument covers both common presets and fully custom patterns.
+
+The preset codes:
+
+| Code | Weekend days |
+| --- | --- |
+| 1 (default) | Saturday, Sunday |
+| 2 | Sunday, Monday |
+| 3 | Monday, Tuesday |
+| 4 | Tuesday, Wednesday |
+| 5 | Wednesday, Thursday |
+| 6 | Thursday, Friday |
+| 7 | Friday, Saturday |
+| 11 | Sunday only |
+| 12 | Monday only |
+| 13 | Tuesday only |
+| 14 | Wednesday only |
+| 15 | Thursday only |
+| 16 | Friday only |
+| 17 | Saturday only |
+
+For anything else — like a genuinely irregular schedule — pass a
+7-character string of `1`s and `0`s starting Monday, where `1` marks
+a non-workday: `"0000011"` is the default Saturday/Sunday weekend
+written out explicitly.
+
+<Callout type="info">
+  `weekend` sits **between** `days` and `holidays` — different
+  argument order than plain WORKDAY, where `holidays` is the third
+  argument. Omitting `weekend` (passing nothing, not `""`) falls back
+  to the standard Saturday/Sunday weekend.
+</Callout>
+
+## Common errors
+
+### #NUM! — invalid weekend code
+
+<ExcelCode>{`WORKDAY.INTL(A2, 10, 8) → #NUM! (8 isn't a valid preset code)`}</ExcelCode>
+
+Only `1`–`7` and `11`–`17` are valid preset codes — anything else
+needs to be a 7-character `1`/`0` string instead.
+
+### Forgetting the argument shifted position
+
+<ExcelCode>{`WORKDAY.INTL(A2, 10, HolidayList) → treats the holiday range as an invalid weekend code`}</ExcelCode>
+
+Unlike WORKDAY, `weekend` comes third and `holidays` comes fourth —
+skip a weekend argument with nothing (not by moving holidays up):
+
+<ExcelCode>{`WORKDAY.INTL(A2, 10, 1, HolidayList)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'WORKDAY.INTL vs WORKDAY — which should I use?',
+    answer: 'WORKDAY when the weekend is the standard Saturday/Sunday — it\'s simpler and matches every Excel version. WORKDAY.INTL when the business operates on a different weekly schedule.',
+  },
+  {
+    question: 'What weekend code should I use for a Sunday-Friday work week?',
+    answer: 'Code 7 (Friday, Saturday off) is the closest standard preset for a Sunday-Thursday work week common in parts of the Middle East.',
+  },
+  {
+    question: 'Can I skip the weekend argument but still supply holidays?',
+    answer: 'Yes — pass the default weekend code explicitly (1) rather than trying to omit it: WORKDAY.INTL(A2, 10, 1, HolidayList).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with WORKDAY.INTL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=WORKDAY.INTL(Orders[ShipDate], 10, 7, Holidays[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim deliveryDate As Date
+    deliveryDate = Application.WorksheetFunction.WorkDay_Intl( _
+      Range("A2"), 10, 7, Range("Holidays"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    # weekmask marks workdays (1) vs weekend (0), Mon-Sun
+    delivery_date = np.busday_offset(
+        "2027-01-04", 10, roll="forward",
+        weekmask="1111100",  # Sat/Sun off
+        holidays=["2027-01-06"],
+    )
+    print(delivery_date)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [WORKDAY](/docs/date/workday) — the simpler version, fixed to a
+  Saturday/Sunday weekend.
+- [NETWORKDAYS.INTL](/docs/date/networkdays-intl) — the inverse
+  calculation with the same customizable weekend argument.
+- [EDATE](/docs/date/edate) — shifts a date by a number of *months*
+  instead of business days.

@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-15',
+    title: 'COUNTBLANK, WORKDAY.INTL, and NETWORKDAYS.INTL',
+    description:
+      'A dedicated blank-cell counter for Math, plus customizable-weekend versions of WORKDAY and NETWORKDAYS for businesses that don\'t run a standard Saturday/Sunday schedule.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-15',
     title: 'RANK.EQ, RANK.AVG, PERCENTILE.INC, and PERCENTILE.EXC',
     description:
       'Closes out the Statistical category\'s legacy-to-modern renames — plus RANK.AVG\'s genuinely different averaged tie-handling and PERCENTILE.EXC\'s stricter, sample-based percentile method.',

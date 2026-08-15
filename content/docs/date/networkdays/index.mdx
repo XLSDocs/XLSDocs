@@ -67,8 +67,9 @@ would incorrectly count weekends as working time.
   Weekends are hardcoded to Saturday and Sunday — there's no
   argument to change that. For a business that operates on a
   different weekly schedule (e.g. Friday/Saturday off instead of
-  Saturday/Sunday), use `NETWORKDAYS.INTL` instead, which adds a
-  `weekend` argument to customize which days don't count.
+  Saturday/Sunday), use
+  [NETWORKDAYS.INTL](/docs/date/networkdays-intl) instead, which adds
+  a `weekend` argument to customize which days don't count.
 </Callout>
 
 ## Common errors
@@ -151,6 +152,9 @@ export const compatibility = [
 - [WORKDAY](/docs/date/workday) — the inverse calculation: finds a
   date a given number of business days away, instead of counting
   business days between two known dates.
+- [NETWORKDAYS.INTL](/docs/date/networkdays-intl) — the same
+  calculation with a customizable weekend, instead of a fixed
+  Saturday/Sunday.
 - [WEEKDAY](/docs/date/weekday) — identifies the day of the week for
   a single date, the building block NETWORKDAYS uses internally.
 - [DATEDIF](/docs/date/datedif) — counts total calendar days (or

@@ -71,8 +71,9 @@ many numbers."
 <ExcelCode>{`COUNTA(A1:A10) → counts a cell holding =IF(B1="","","x") even when it displays blank`}</ExcelCode>
 
 The cell isn't truly empty — it holds a formula, even if that
-formula's result is an empty string. COUNTBLANK also treats these
-cells as non-blank for the same reason.
+formula's result is an empty string.
+[COUNTBLANK](/docs/math/countblank), unlike COUNTA, treats these
+cells as blank instead.
 
 ### Confusing COUNTA with COUNT
 
@@ -148,6 +149,8 @@ export const compatibility = [
 
 - [COUNT](/docs/math/count) — counts numeric cells only, instead of
   every non-blank cell.
+- [COUNTBLANK](/docs/math/countblank) — counts empty cells, the
+  mirror image of COUNTA.
 - [COUNTIF](/docs/math/countif) — counts cells matching a specific
   condition instead of just "is this non-blank."
 - [COUNTIFS](/docs/math/countifs) — same idea, with multiple

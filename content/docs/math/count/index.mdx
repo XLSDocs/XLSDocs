@@ -53,8 +53,9 @@ Text, blank cells, and logical (`TRUE`/`FALSE`) values are excluded.
 
 COUNT is narrowly scoped to numeric data — it's the right choice when
 the question is specifically "how many numbers are here," not "how
-many cells have anything in them" (that's COUNTA) or "how many cells
-are empty" (that's COUNTBLANK).
+many cells have anything in them" (that's [COUNTA](/docs/math/counta))
+or "how many cells are empty" (that's
+[COUNTBLANK](/docs/math/countblank)).
 
 <Callout type="info">
   COUNT treats dates and times as numbers, since Excel stores them
@@ -146,6 +147,8 @@ export const compatibility = [
 
 - [COUNTA](/docs/math/counta) — counts every non-blank cell,
   regardless of type, instead of numeric cells only.
+- [COUNTBLANK](/docs/math/countblank) — counts empty cells, the
+  opposite question from COUNT.
 - [COUNTIF](/docs/math/countif) — counts cells matching a specific
   condition instead of just "is this numeric."
 - [COUNTIFS](/docs/math/countifs) — same idea, with multiple
