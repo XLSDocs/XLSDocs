@@ -1,20 +1,94 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { highlightLine } from '../excel-code';
 
 const SPEEDS = { Slow: 90, Normal: 45, Fast: 20 } as const;
 type Speed = keyof typeof SPEEDS;
+
+// A small, hand-tuned tokenizer for the VBA/Python demo panels — not a
+// real parser, just enough to color keywords/functions/strings/numbers
+// consistently with the Excel highlighter's palette (see excel-code.tsx).
+function highlightGeneric(
+  line: string,
+  { keywords, functions, commentPrefix }: { keywords: string[]; functions: string[]; commentPrefix: string },
+) {
+  if (line.trimStart().startsWith(commentPrefix)) {
+    return [
+      <span key={0} style={{ color: 'var(--excel-punct)', fontStyle: 'italic' }}>
+        {line}
+      </span>,
+    ];
+  }
+
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+  let key = 0;
+  const isWordChar = (c: string | undefined) => !!c && /\w/.test(c);
+  const push = (color: string, text: string, weight?: string) =>
+    nodes.push(
+      <span key={key++} style={{ color, fontWeight: weight }}>
+        {text}
+      </span>,
+    );
+
+  while (i < line.length) {
+    const rest = line.slice(i);
+    if (line[i] === '"') {
+      const end = line.indexOf('"', i + 1);
+      const str = end === -1 ? rest : line.slice(i, end + 1);
+      push('var(--excel-string)', str);
+      i += str.length;
+      continue;
+    }
+    const fnMatch = functions.find((fn) => rest.startsWith(fn) && rest[fn.length] === '(');
+    if (fnMatch) {
+      push('var(--excel-fn)', fnMatch, '500');
+      i += fnMatch.length;
+      continue;
+    }
+    const kwMatch = keywords.find(
+      (kw) => rest.startsWith(kw) && !isWordChar(rest[kw.length]) && !isWordChar(line[i - 1]),
+    );
+    if (kwMatch) {
+      push('var(--excel-keyword)', kwMatch, '500');
+      i += kwMatch.length;
+      continue;
+    }
+    const numMatch = !isWordChar(line[i - 1]) ? rest.match(/^-?\d+(\.\d+)?/) : null;
+    if (numMatch) {
+      push('var(--excel-number)', numMatch[0]);
+      i += numMatch[0].length;
+      continue;
+    }
+    if ('()[]'.includes(line[i]) || '<>=!&,.;:'.includes(line[i])) {
+      push('var(--excel-punct)', line[i]);
+      i++;
+      continue;
+    }
+    nodes.push(line[i]);
+    i++;
+  }
+  return nodes;
+}
+
+const VBA_KEYWORDS = ['Set', 'For', 'To', 'Step', 'If', 'Then', 'End', 'Next', 'True', 'False'];
+const VBA_FUNCTIONS = ['CountA'];
+const PYTHON_KEYWORDS = ['import', 'as'];
+const PYTHON_FUNCTIONS = ['read_excel', 'print'];
 
 const PANELS = [
   {
     filename: 'dashboard.xlsx',
     badge: 'FORMULA',
+    language: 'excel' as const,
     code: `// xlsdocs — XLOOKUP Examples
 =XLOOKUP(D2, Products[Name], Products[Price])`,
   },
   {
     filename: 'automation.bas',
     badge: 'VBA',
+    language: 'vba' as const,
     code: `Set ws = ActiveSheet
 Application.ScreenUpdating = False
 For i = ws.UsedRange.Rows.Count To 1 Step -1
@@ -26,6 +100,7 @@ Next i`,
   {
     filename: 'lambdas.xlam',
     badge: 'λ FUNC',
+    language: 'excel' as const,
     code: `ToQuarter = LAMBDA(d,
   CHOOSE(ROUNDUP(MONTH(d)/3, 0), "Q1", "Q2", "Q3", "Q4")
 )`,
@@ -33,6 +108,7 @@ Next i`,
   {
     filename: 'lookup.py',
     badge: 'PYTHON',
+    language: 'python' as const,
     code: `import pandas as pd
 
 df = pd.read_excel("dashboard.xlsx", sheet_name="Products")
@@ -41,16 +117,26 @@ print(price)`,
   },
 ];
 
+function highlightPanelLine(line: string, language: 'excel' | 'vba' | 'python') {
+  if (language === 'excel') return highlightLine(line);
+  if (language === 'vba') {
+    return highlightGeneric(line, { keywords: VBA_KEYWORDS, functions: VBA_FUNCTIONS, commentPrefix: "'" });
+  }
+  return highlightGeneric(line, { keywords: PYTHON_KEYWORDS, functions: PYTHON_FUNCTIONS, commentPrefix: '#' });
+}
+
 function TypingPanel({
   filename,
   badge,
   code,
   speed,
+  language,
 }: {
   filename: string;
   badge: string;
   code: string;
   speed: number;
+  language: 'excel' | 'vba' | 'python';
 }) {
   const [visibleChars, setVisibleChars] = useState(0);
 
@@ -92,7 +178,7 @@ function TypingPanel({
               {i + 1}
             </span>
             <span className="whitespace-pre-wrap">
-              {line}
+              {highlightPanelLine(line, language)}
               {i === lines.length - 1 && visibleChars < code.length && (
                 <span className="ml-px inline-block h-[1em] w-[2px] translate-y-[2px] animate-pulse bg-fd-primary" />
               )}

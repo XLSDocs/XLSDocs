@@ -33,6 +33,7 @@
   --excel-ref: #8250df;
   --excel-number: #005cc5;
   --excel-punct: #6a737d;
+  --excel-keyword: #d73a49;
 }
 
 .dark {
@@ -48,6 +49,7 @@
   --excel-string: #9ecbff;
   --excel-ref: #d2a8ff;
   --excel-number: #79b8ff;
+  --excel-keyword: #ff7b72;
 }
 
 @theme {

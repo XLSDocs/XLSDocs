@@ -5,6 +5,7 @@ const FN_LIST = [
   'XLOOKUP', 'VLOOKUP', 'HLOOKUP', 'INDEX', 'MATCH', 'XMATCH', 'FILTER',
   'SORT', 'SORTBY', 'UNIQUE', 'SEQUENCE', 'SUMIFS', 'SUMIF', 'COUNTIFS',
   'COUNTIF', 'AVERAGEIFS', 'IF', 'IFS', 'IFERROR', 'IFNA', 'SWITCH',
+  'LAMBDA', 'CHOOSE', 'ROUNDUP', 'MONTH',
 ];
 
 // VBA function names use PascalCase, not the ALL CAPS convention Excel
@@ -16,7 +17,7 @@ const VBA_FN_LIST = [
 
 const ALL_FN_LIST = [...FN_LIST, ...VBA_FN_LIST];
 
-function highlightLine(line: string) {
+export function highlightLine(line: string) {
   const nodes: React.ReactNode[] = [];
   let i = 0;
   let key = 0;
@@ -26,6 +27,16 @@ function highlightLine(line: string) {
         {text}
       </span>,
     );
+
+  // Excel formulas don't have real comments — this only ever matches the
+  // decorative "// ..." header line used in the homepage's code demo.
+  if (line.trimStart().startsWith('//')) {
+    return [
+      <span key={0} style={{ color: 'var(--excel-punct)', fontStyle: 'italic' }}>
+        {line}
+      </span>,
+    ];
+  }
 
   while (i < line.length) {
     const rest = line.slice(i);
