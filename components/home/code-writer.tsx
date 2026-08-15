@@ -30,6 +30,15 @@ Next i`,
   CHOOSE(ROUNDUP(MONTH(d)/3, 0), "Q1", "Q2", "Q3", "Q4")
 )`,
   },
+  {
+    filename: 'lookup.py',
+    badge: 'PYTHON',
+    code: `import pandas as pd
+
+df = pd.read_excel("dashboard.xlsx", sheet_name="Products")
+price = df.loc[df["Name"] == "Widget A", "Price"].iloc[0]
+print(price)`,
+  },
 ];
 
 function TypingPanel({
@@ -126,7 +135,7 @@ export function CodeWriterSection() {
           ))}
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {PANELS.map((panel) => (
           <TypingPanel key={panel.filename} {...panel} speed={SPEEDS[speed]} />
         ))}
