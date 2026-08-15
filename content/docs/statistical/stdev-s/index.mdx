@@ -1,0 +1,151 @@
+---
+title: STDEV.S
+description: The modern, explicit name for sample standard deviation.
+---
+
+Estimate standard deviation from a sample of data — the modern,
+explicitly-named version of `STDEV`, introduced so the function name
+itself makes clear it's the sample (not population) calculation.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Assumes the data is a sample, not the whole population', type: 'warn' },
+  { text: 'Identical calculation to the legacy STDEV — same result, clearer name', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=STDEV.S(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STDEV.S(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing a sample of the data.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample standard deviation of the supplied numbers — the square
+root of the sample variance. Text and blank cells within a range are
+ignored.
+
+## Description
+
+STDEV.S computes exactly the same result as the older `STDEV` — the
+`.S` suffix (for "sample") was added in Excel 2010 as part of a
+broader rename that made the sample-vs-population distinction
+explicit in every statistical function's name, rather than something
+only STDEV.P's existence hinted at. There's no calculation difference
+between STDEV and STDEV.S; the only reason to prefer STDEV.S in new
+work is that the name itself documents what the formula assumes.
+
+<Callout type="info">
+  STDEV.S and STDEV always return the same number on the same data —
+  this isn't a case of "use the newer one because it fixed a bug."
+  Older workbooks and add-ins that still reference plain `STDEV` don't
+  need to be changed; it isn't deprecated, just superseded in Excel's
+  own naming convention.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — fewer than two numeric values
+
+<ExcelCode>{`STDEV.S(5) → #DIV/0!`}</ExcelCode>
+
+Sample standard deviation is undefined with only one value — at
+least two numbers are required.
+
+### Using STDEV.S on a full population
+
+<ExcelCode>{`STDEV.S(range) → slightly overstates spread if range is the entire population`}</ExcelCode>
+
+Not an error, but a common source of "why don't these match" —
+STDEV.S divides by `n-1`, assuming the data is a sample. If every
+relevant data point is already included, use `STDEV.P` instead.
+
+export const faqs = [
+  {
+    question: 'STDEV.S vs STDEV — is there any real difference?',
+    answer: 'No calculation difference at all — STDEV.S is the modern, explicitly-named version of the same sample standard deviation formula. STDEV still works and isn\'t deprecated; STDEV.S just documents the sample assumption in its name.',
+  },
+  {
+    question: 'STDEV.S vs STDEV.P — which should I use?',
+    answer: 'STDEV.S for a sample of a larger population — most real-world data analysis. STDEV.P for when every relevant data point is already included, with nothing left out.',
+  },
+  {
+    question: 'Do I need to switch existing STDEV formulas to STDEV.S?',
+    answer: 'No — there\'s no functional benefit to switching existing formulas. STDEV.S is worth using in new formulas mainly for the self-documenting name, not because STDEV is going away.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STDEV.S from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STDEV.S(Scores[Value])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sd As Double
+    sd = Application.WorksheetFunction.StDev_S(Range("Scores[Value]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Scores")
+    sd = df["Value"].std()  # ddof=1 (sample) by default
+    print(sd)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [STDEV](/docs/statistical/stdev) — the legacy name for the same
+  sample standard deviation calculation.
+- [STDEV.P](/docs/statistical/stdev-p) — the population version,
+  used when the data isn't a sample.
+- [VAR.S](/docs/statistical/var-s) — sample variance, the squared
+  value STDEV.S takes the square root of.

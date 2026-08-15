@@ -56,8 +56,9 @@ MODE answers "what comes up most often," which can be a genuinely
 different answer from AVERAGE or MEDIAN — the most common shoe size
 sold, the most frequent order quantity, or the most common response
 on a survey with numeric answer choices. MODE is the older name for
-what's now formally `MODE.SNGL`; if the data has more than one value
-tied for most frequent, MODE returns only the first one encountered.
+what's now formally [MODE.SNGL](/docs/statistical/mode-sngl); if the
+data has more than one value tied for most frequent, MODE returns
+only the first one encountered.
 
 <Callout type="warn">
   MODE returns `#N/A`, not `0`, when no value repeats at all — every
@@ -80,8 +81,8 @@ not a malformed formula.
 <ExcelCode>{`MODE(1, 1, 2, 2, 3) → 1 (the first-encountered tie, not both)`}</ExcelCode>
 
 When multiple values are tied for most frequent, MODE only returns
-one of them — use `MODE.MULT` (an array formula) to return every
-tied mode at once.
+one of them — use [MODE.MULT](/docs/statistical/mode-mult) (an array
+formula) to return every tied mode at once.
 
 export const faqs = [
   {
@@ -142,6 +143,10 @@ export const compatibility = [
 
 ## Related functions
 
+- [MODE.SNGL](/docs/statistical/mode-sngl) — the modern,
+  explicitly-named version of this same calculation.
+- [MODE.MULT](/docs/statistical/mode-mult) — returns every tied mode
+  as a spilled array, instead of just the first.
 - [MEDIAN](/docs/math/median) — the middle value instead of the most
   frequent one.
 - [AVERAGE](/docs/math/average) — the arithmetic mean, a third

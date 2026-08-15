@@ -1,0 +1,31 @@
+---
+title: STDEV.P examples
+description: Worked examples for STDEV.P — full-batch quality data, class-wide test scores, and comparing to STDEV.S.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — spread across an entire batch" formula={`=STDEV.P(FullBatch[Weight])`}>
+  Returns the population standard deviation when every unit produced
+  is included, not a sample of them.
+</ExampleCard>
+
+<ExampleCard number="02" label="Every student's score on a single test" formula={`=STDEV.P(ClassScores[Value])`}>
+  Valid as a population calculation only when the range covers every
+  student who took the test — the whole population, not a subset.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing population vs sample" formula={`=STDEV.P(Data[Value]) - STDEV.S(Data[Value])`}>
+  Shows that STDEV.P is always less than or equal to STDEV.S on
+  identical data — the result here is always zero or negative.
+</ExampleCard>
+
+<ExampleCard number="04" label="Population coefficient of variation" formula={`=STDEV.P(Readings[Value]) / AVERAGE(Readings[Value])`}>
+  Spread relative to the mean, using the population version — useful
+  when comparing complete datasets of different scales.
+</ExampleCard>
+
+<ExampleCard number="05" label="Z-score using population parameters" formula={`=(A2 - AVERAGE(Data[Value])) / STDEV.P(Data[Value])`}>
+  Standardizes a value into units of population standard deviation
+  from the mean.
+</ExampleCard>

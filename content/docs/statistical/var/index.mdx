@@ -58,14 +58,16 @@ dollars squared" doesn't mean much intuitively, while its square
 root, a $20 standard deviation, does). VAR is mostly useful as an
 intermediate calculation, or in statistical formulas that
 specifically call for variance rather than standard deviation. VAR
-is the older name for what's now formally `VAR.S`.
+is the older name for what's now formally
+[VAR.S](/docs/statistical/var-s).
 
 <Callout type="info">
   VAR is exactly `STDEV` squared, and STDEV is exactly `SQRT(VAR)` —
   they measure the same underlying spread, just in different units.
   Reach for STDEV when the number needs to be interpretable on its
   own; reach for VAR only when a formula specifically requires
-  variance.
+  variance. Use [VAR.P](/docs/statistical/var-p) instead of VAR when
+  the data is the entire population, not a sample.
 </Callout>
 
 ## Common errors
@@ -147,5 +149,9 @@ export const compatibility = [
 
 - [STDEV](/docs/statistical/stdev) — the square root of variance, in
   the same units as the original data and easier to interpret.
+- [VAR.S](/docs/statistical/var-s) — the modern, explicitly-named
+  version of this same calculation.
+- [VAR.P](/docs/statistical/var-p) — the population version, for
+  data that isn't a sample.
 - [AVERAGE](/docs/math/average) — the mean that VAR measures spread
   around.

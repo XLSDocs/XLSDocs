@@ -1,0 +1,146 @@
+---
+title: VAR.P
+description: Calculate variance across an entire population, not a sample.
+---
+
+Measure how spread out a set of numbers is from their average, in
+squared units, when the data represents an **entire population** —
+every relevant value, not a sample drawn from a larger group.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Assumes the data is the whole population, not a sample', type: 'warn' },
+  { text: 'Divides by n instead of n-1 — slightly smaller than VAR.S on the same data', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VAR.P(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VAR.P(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing the entire population.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population variance of the supplied numbers. Text and blank
+cells within a range are ignored.
+
+## Description
+
+VAR.P treats the supplied numbers as the **entire population**, so
+it divides the sum of squared deviations by `n` (the actual count)
+rather than `n-1`. That makes VAR.P always less than or equal to
+VAR.S on identical data — same logic as the STDEV.P/STDEV.S
+relationship, just in squared units. VAR.P replaced the older
+`VARP`, which still works for compatibility.
+
+<Callout type="warn">
+  Using VAR.P when the data is actually a **sample** understates the
+  true spread. If there's any meaningful data outside what's in the
+  range, use `VAR.S` instead.
+</Callout>
+
+## Common errors
+
+### Treating a sample as a population
+
+<ExcelCode>{`VAR.P(SurveyResponses) → understated spread if respondents are a sample, not everyone`}</ExcelCode>
+
+Not an error, but a common source of subtly wrong statistics — most
+real-world datasets are samples of a larger group, which calls for
+`VAR.S`, not VAR.P.
+
+### Misinterpreting the units
+
+<ExcelCode>{`VAR.P(Prices) → a number in "dollars squared," not dollars`}</ExcelCode>
+
+Variance is always in squared units of the original data. Use
+`STDEV.P` for a directly interpretable number.
+
+export const faqs = [
+  {
+    question: 'VAR.P vs VAR.S — which should I use?',
+    answer: 'VAR.P only when the data genuinely is the entire population — every relevant value, with nothing left out. Almost all real-world analysis works with a sample, which calls for VAR.S instead.',
+  },
+  {
+    question: 'VAR.P vs the older VARP — any difference?',
+    answer: 'None — VAR.P is the modern name for the same population variance calculation that VARP performs. VARP still works for backward compatibility.',
+  },
+  {
+    question: 'How does VAR.P relate to STDEV.P?',
+    answer: 'STDEV.P is the square root of VAR.P — VAR.P is the squared, intermediate form, while STDEV.P is the more directly interpretable number in the original data\'s units.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VAR.P from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VAR.P(AllScores[Value])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim variance As Double
+    variance = Application.WorksheetFunction.Var_P(Range("AllScores[Value]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="AllScores")
+    variance = df["Value"].var(ddof=0)  # ddof=0 for population
+    print(variance)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VAR.S](/docs/statistical/var-s) — the sample version, for data
+  that represents a subset of a larger group.
+- [VAR](/docs/statistical/var) — the legacy name for VAR.S.
+- [STDEV.P](/docs/statistical/stdev-p) — the square root of VAR.P,
+  in the same units as the original data.

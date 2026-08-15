@@ -1,0 +1,31 @@
+---
+title: VAR.P examples
+description: Worked examples for VAR.P — full-batch data, comparing to VAR.S, and deriving population standard deviation.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — variance across an entire batch" formula={`=VAR.P(FullBatch[Weight])`}>
+  Returns the population variance when every unit produced is
+  included, not a sample of them.
+</ExampleCard>
+
+<ExampleCard number="02" label="Deriving population standard deviation" formula={`=SQRT(VAR.P(AllScores[Value]))`}>
+  Confirms the relationship between VAR.P and STDEV.P — this always
+  matches STDEV.P on the same data.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing population vs sample" formula={`=VAR.P(Data[Value]) - VAR.S(Data[Value])`}>
+  Shows that VAR.P is always less than or equal to VAR.S on identical
+  data — the result here is always zero or negative.
+</ExampleCard>
+
+<ExampleCard number="04" label="Variance of every reading, not a sample" formula={`=VAR.P(SensorLog[Reading])`}>
+  Valid as a population calculation only when the log covers every
+  reading taken, not a subset of them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing spread across two full datasets" formula={`=VAR.P(GroupA[Value]) / VAR.P(GroupB[Value])`}>
+  A variance ratio between two complete populations, rather than
+  samples.
+</ExampleCard>

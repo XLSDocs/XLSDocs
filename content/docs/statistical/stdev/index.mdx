@@ -55,15 +55,15 @@ STDEV treats the numbers given to it as a **sample** drawn from a
 larger population, not the entire population itself — this affects
 the exact formula used (dividing by `n-1` instead of `n`), producing
 a slightly larger result than the population version would. STDEV is
-the older name for what's now formally `STDEV.S`; both compute the
-identical result, and STDEV still works in every current Excel
-version.
+the older name for what's now formally
+[STDEV.S](/docs/statistical/stdev-s); both compute the identical
+result, and STDEV still works in every current Excel version.
 
 <Callout type="warn">
   Using STDEV (sample) when the data actually **is** the entire
   population — not a sample of it — slightly overstates the spread.
-  Use `STDEV.P` instead when every relevant data point is included,
-  not just a subset.
+  Use [STDEV.P](/docs/statistical/stdev-p) instead when every
+  relevant data point is included, not just a subset.
 </Callout>
 
 ## Common errors
@@ -142,6 +142,10 @@ export const compatibility = [
 
 ## Related functions
 
+- [STDEV.S](/docs/statistical/stdev-s) — the modern, explicitly-named
+  version of this same calculation.
+- [STDEV.P](/docs/statistical/stdev-p) — the population version, for
+  data that isn't a sample.
 - [VAR](/docs/statistical/var) — the squared version of standard
   deviation; STDEV is VAR's square root.
 - [AVERAGE](/docs/math/average) — the mean that STDEV measures

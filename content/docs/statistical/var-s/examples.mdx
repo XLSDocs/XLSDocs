@@ -1,0 +1,30 @@
+---
+title: VAR.S examples
+description: Worked examples for VAR.S — intermediate calculations, comparing to VAR.P, and deriving standard deviation.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — sample variance of test scores" formula={`=VAR.S(Scores[Value])`}>
+  Returns the sample variance of a set of test scores.
+</ExampleCard>
+
+<ExampleCard number="02" label="Deriving standard deviation manually" formula={`=SQRT(VAR.S(Scores[Value]))`}>
+  Confirms the relationship between variance and standard deviation —
+  this always matches `STDEV.S` on the same data.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing sample vs population" formula={`=VAR.S(Data[Value]) - VAR.P(Data[Value])`}>
+  Shows the gap between the sample and population calculations on
+  the same data — always non-negative.
+</ExampleCard>
+
+<ExampleCard number="04" label="Variance as an input to a statistical test" formula={`=VAR.S(GroupA[Value]) / VAR.S(GroupB[Value])`}>
+  A variance ratio, the kind of intermediate value used in an F-test
+  comparing the spread of two groups.
+</ExampleCard>
+
+<ExampleCard number="05" label="Pooled variance across two samples" formula={`=((COUNT(GroupA[Value])-1)*VAR.S(GroupA[Value]) + (COUNT(GroupB[Value])-1)*VAR.S(GroupB[Value])) / (COUNT(GroupA[Value])+COUNT(GroupB[Value])-2)`}>
+  Combines the variance of two samples into a single pooled estimate,
+  weighted by each group's size.
+</ExampleCard>

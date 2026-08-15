@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-15',
+    title: 'STDEV.S, STDEV.P, VAR.S, VAR.P, MODE.SNGL, and MODE.MULT',
+    description:
+      'The modern, explicitly-named sample and population variants of STDEV, VAR, and MODE — plus MODE.MULT, which returns every tied mode as a spilled array instead of just the first.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-15',
     title: 'A new Statistical category: STDEV, VAR, MODE, RANK, and PERCENTILE',
     description:
       'Five functions for measuring spread and relative standing, not just totals and averages — including the sample-vs-population distinction on STDEV/VAR and the tie-handling rules on RANK.',

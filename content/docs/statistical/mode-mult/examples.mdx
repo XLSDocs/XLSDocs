@@ -1,0 +1,31 @@
+---
+title: MODE.MULT examples
+description: Worked examples for MODE.MULT — listing every tied mode, sorting the result, and counting ties.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — every quantity tied for most common" formula={`=MODE.MULT(Orders[Quantity])`}>
+  Spills every quantity tied for most frequent, not just the first
+  one found.
+</ExampleCard>
+
+<ExampleCard number="02" label="Sorting the tied modes" formula={`=SORT(MODE.MULT(Survey[Rating]))`}>
+  Returns the tied modes in ascending numeric order instead of the
+  order they were first encountered.
+</ExampleCard>
+
+<ExampleCard number="03" label="Counting how many values are tied" formula={`=COUNTA(MODE.MULT(Orders[Quantity]))`}>
+  Counts the tied modes — returns 1 when there's a single clear mode,
+  more when several values share the top frequency.
+</ExampleCard>
+
+<ExampleCard number="04" label="Joining the tied modes into one cell" formula={`=TEXTJOIN(", ", TRUE, MODE.MULT(Orders[Quantity]))`}>
+  Combines every tied mode into a single readable, comma-separated
+  cell instead of a spilled range.
+</ExampleCard>
+
+<ExampleCard number="05" label="Checking for a genuine tie before reporting" formula={`=IF(COUNTA(MODE.MULT(Data[Value]))>1, "Multiple modes", MODE.SNGL(Data[Value]))`}>
+  Reports a "Multiple modes" message when there's a tie, otherwise
+  falls back to the single mode value.
+</ExampleCard>

@@ -1,0 +1,151 @@
+---
+title: MODE.MULT
+description: Return every value tied for most frequent, as a spilled array.
+---
+
+Find every value tied for most frequent in a set of numbers, returned
+as a spilled array — where `MODE`/`MODE.SNGL` only ever return the
+first tied value, MODE.MULT returns all of them at once.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns an array — spills automatically in Excel 365, needs Ctrl+Shift+Enter before that', type: 'warn' },
+  { text: 'Returns every value tied for most frequent, not just the first', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MODE.MULT(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MODE.MULT(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to find the most common values within.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A vertical array containing every numeric value tied for most
+frequent, in the order first encountered. Returns `#N/A` if every
+value appears exactly once. If there's a single clear mode with no
+tie, the array contains just that one value.
+
+## Description
+
+MODE.MULT exists specifically to solve the limitation that both
+`MODE` and `MODE.SNGL` share: when multiple values are tied for most
+common, they can only report one of them. MODE.MULT returns every
+tied value at once, as a spilled array — enter it in one cell in
+Excel 365 and it fills downward on its own, or select a vertical
+range and enter it with `Ctrl+Shift+Enter` in older versions where
+dynamic arrays aren't available.
+
+<Callout type="warn">
+  In pre-365 Excel, MODE.MULT must be entered as a legacy array
+  formula (`Ctrl+Shift+Enter`) into a range selected **in advance** —
+  select more rows than you expect ties, since extra cells simply
+  return `#N/A` rather than resizing automatically the way a modern
+  spilled array does.
+</Callout>
+
+## Common errors
+
+### #N/A — no value repeats
+
+<ExcelCode>{`MODE.MULT(1, 2, 3, 4, 5) → #N/A (every value is unique)`}</ExcelCode>
+
+There's no mode when nothing repeats, same as MODE.SNGL.
+
+### Only seeing one result
+
+<ExcelCode>{`MODE.MULT(1, 1, 2, 2, 3) → {1; 2} spilled, but only 1 shows if entered without Ctrl+Shift+Enter in pre-365 Excel`}</ExcelCode>
+
+In Excel 365, MODE.MULT spills automatically. In older versions,
+forgetting `Ctrl+Shift+Enter` (or not pre-selecting enough cells)
+silently truncates the result to just the first tied value.
+
+export const faqs = [
+  {
+    question: 'MODE.MULT vs MODE.SNGL — which should I use?',
+    answer: 'MODE.SNGL when only one "most common" value is needed. MODE.MULT when the data might have multiple values tied for most frequent and every tied value matters — for example, reporting all of them rather than picking one arbitrarily.',
+  },
+  {
+    question: 'Why does MODE.MULT need Ctrl+Shift+Enter in some versions?',
+    answer: "MODE.MULT returns an array, not a single value. Excel 365's dynamic arrays spill automatically, but in Excel 2019 and earlier, array-returning formulas need to be entered as a legacy array formula into a pre-selected range.",
+  },
+  {
+    question: 'What order does MODE.MULT return tied values in?',
+    answer: 'The order they were first encountered while scanning the data, not sorted numerically. Wrap it in SORT if a specific order matters.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MODE.MULT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MODE.MULT(Orders[Quantity])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim modes As Variant
+    modes = Application.WorksheetFunction.Mode_Mult(Range("Orders[Quantity]"))
+    ' modes is an array — loop over it, e.g. with For Each
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    all_modes = df["Quantity"].mode()  # returns every tied mode
+    print(all_modes.tolist())
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MODE.SNGL](/docs/statistical/mode-sngl) — returns only the first
+  tied value instead of all of them.
+- [MODE](/docs/statistical/mode) — the legacy name for MODE.SNGL.
+- [UNIQUE](/docs/arrays/unique) — another array-spilling function,
+  for distinct values rather than the most frequent ones.

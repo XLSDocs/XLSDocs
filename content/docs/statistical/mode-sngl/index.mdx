@@ -1,0 +1,150 @@
+---
+title: MODE.SNGL
+description: The modern, explicit name for finding a single most frequent value.
+---
+
+Find the value that appears most often in a set of numbers — the
+modern, explicitly-named version of `MODE`, distinguished from
+`MODE.MULT` by returning just one value even when several are tied.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Numbers only — ignores text and blanks', type: 'check' },
+  { text: 'Identical calculation to the legacy MODE — same result, clearer name', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MODE.SNGL(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MODE.SNGL(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to find the most common value within.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The numeric value that appears most often across all arguments.
+Returns `#N/A` if every value appears exactly once. If several values
+are tied for most frequent, returns only the first one encountered.
+
+## Description
+
+MODE.SNGL computes exactly the same result as the older `MODE` — the
+`.SNGL` suffix (for "single") was added in Excel 2010 alongside
+`MODE.MULT`, which returns *every* tied mode as a spilled array
+instead of just the first. The two functions only diverge in
+behavior when there's a genuine tie for most frequent value; on data
+with a single clear mode, MODE.SNGL, MODE, and MODE.MULT (spilled to
+one cell) would all agree.
+
+<Callout type="info">
+  MODE.SNGL and MODE always return the same number on the same data.
+  Reach for `MODE.MULT` instead when the data might have more than
+  one value tied for most common and every tied value matters, not
+  just the first one found.
+</Callout>
+
+## Common errors
+
+### #N/A — no value repeats
+
+<ExcelCode>{`MODE.SNGL(1, 2, 3, 4, 5) → #N/A (every value is unique)`}</ExcelCode>
+
+There's no mode when nothing repeats — this is expected behavior,
+not a malformed formula.
+
+### Assuming there's only one mode
+
+<ExcelCode>{`MODE.SNGL(1, 1, 2, 2, 3) → 1 (the first-encountered tie, not both)`}</ExcelCode>
+
+When multiple values are tied for most frequent, MODE.SNGL only
+returns one of them — use `MODE.MULT` to return every tied mode at
+once.
+
+export const faqs = [
+  {
+    question: 'MODE.SNGL vs MODE — is there any real difference?',
+    answer: 'No calculation difference — MODE.SNGL is the modern, explicitly-named version of the same single-mode calculation. MODE still works; MODE.SNGL just distinguishes itself from MODE.MULT in its name.',
+  },
+  {
+    question: 'MODE.SNGL vs MODE.MULT — which should I use?',
+    answer: 'MODE.SNGL when only one "most common" value is needed, or when ties are unlikely. MODE.MULT when the data might have multiple values tied for most frequent and all of them matter.',
+  },
+  {
+    question: 'Which tied value does MODE.SNGL return?',
+    answer: "The first one it encounters while scanning the data — not necessarily the smallest, largest, or first-listed. If which specific tied value comes back matters, use MODE.MULT to see all of them.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MODE.SNGL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MODE.SNGL(Orders[Quantity])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim mostCommon As Variant
+    mostCommon = Application.WorksheetFunction.Mode_Sngl(Range("Orders[Quantity]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    most_common = df["Quantity"].mode().iloc[0]
+    print(most_common)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MODE](/docs/statistical/mode) — the legacy name for the same
+  single-mode calculation.
+- [MODE.MULT](/docs/statistical/mode-mult) — returns every tied
+  mode as a spilled array, instead of just the first.
+- [MEDIAN](/docs/math/median) — the middle value instead of the
+  most frequent one.

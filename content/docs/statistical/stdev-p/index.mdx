@@ -1,0 +1,150 @@
+---
+title: STDEV.P
+description: Calculate standard deviation across an entire population, not a sample.
+---
+
+Measure how spread out a set of numbers is from their average, when
+the data represents an **entire population** — every relevant value,
+not a sample drawn from a larger group.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Assumes the data is the whole population, not a sample', type: 'warn' },
+  { text: 'Divides by n instead of n-1 — slightly smaller than STDEV.S on the same data', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=STDEV.P(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STDEV.P(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing the entire population.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population standard deviation of the supplied numbers. Text and
+blank cells within a range are ignored.
+
+## Description
+
+STDEV.P treats the supplied numbers as the **entire population**,
+not a sample of something larger — every score on every test that
+was given, every unit ever produced, not a subset standing in for a
+bigger group. That assumption changes the formula: STDEV.P divides
+by `n` (the actual count), while the sample version divides by `n-1`,
+which is why STDEV.P always returns a value less than or equal to
+STDEV.S on identical data. STDEV.P replaced the older `STDEVP`, which
+still works for compatibility but isn't part of Excel's current
+naming convention.
+
+<Callout type="warn">
+  Using STDEV.P when the data is actually a **sample** — not the
+  whole population — understates the true spread. If there's any
+  meaningful data outside what's in the range (customers who haven't
+  ordered yet, future test-takers), use `STDEV.S` instead.
+</Callout>
+
+## Common errors
+
+### Treating a sample as a population
+
+<ExcelCode>{`STDEV.P(SurveyResponses) → understated spread if respondents are a sample, not everyone`}</ExcelCode>
+
+Not an error, but a common source of subtly wrong statistics — most
+real-world datasets (survey responses, a batch of test scores) are
+samples of a larger group, which calls for `STDEV.S`, not STDEV.P.
+
+### Empty range
+
+<ExcelCode>{`STDEV.P(A1:A1) → #DIV/0! if the range has no numeric values`}</ExcelCode>
+
+STDEV.P needs at least one numeric value to compute against; a fully
+blank or text-only range returns an error.
+
+export const faqs = [
+  {
+    question: 'STDEV.P vs STDEV.S — which should I use?',
+    answer: 'STDEV.P only when the data genuinely is the entire population — every relevant value, with nothing left out. Almost all real-world analysis works with a sample of a larger group, which calls for STDEV.S instead.',
+  },
+  {
+    question: 'Why is STDEV.P always smaller than STDEV.S on the same data?',
+    answer: 'STDEV.P divides by n (the actual count), while STDEV.S divides by n-1. Dividing by a smaller number produces a larger result, so the sample version is always equal to or greater than the population version.',
+  },
+  {
+    question: 'STDEV.P vs the older STDEVP — any difference?',
+    answer: 'None — STDEV.P is the modern name for the same population standard deviation calculation that STDEVP performs. STDEVP still works for backward compatibility.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STDEV.P from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STDEV.P(AllScores[Value])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sd As Double
+    sd = Application.WorksheetFunction.StDev_P(Range("AllScores[Value]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="AllScores")
+    sd = df["Value"].std(ddof=0)  # ddof=0 for population
+    print(sd)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [STDEV.S](/docs/statistical/stdev-s) — the sample version, for
+  data that represents a subset of a larger group.
+- [STDEV](/docs/statistical/stdev) — the legacy name for STDEV.S.
+- [VAR.P](/docs/statistical/var-p) — population variance, the
+  squared value STDEV.P takes the square root of.

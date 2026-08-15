@@ -1,0 +1,149 @@
+---
+title: VAR.S
+description: The modern, explicit name for sample variance.
+---
+
+Estimate variance from a sample of data — the modern, explicitly-named
+version of `VAR`, introduced so the function name itself makes clear
+it's the sample (not population) calculation.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Assumes the data is a sample, not the whole population', type: 'warn' },
+  { text: 'Identical calculation to the legacy VAR — same result, clearer name', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VAR.S(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VAR.S(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing a sample of the data.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample variance of the supplied numbers — the average of the
+squared differences from the mean, adjusted for sample size. Text and
+blank cells within a range are ignored.
+
+## Description
+
+VAR.S computes exactly the same result as the older `VAR` — the `.S`
+suffix was added in Excel 2010 as part of the same naming pass that
+introduced STDEV.S and STDEV.P, making the sample-vs-population
+assumption explicit in the function name rather than implicit. Like
+VAR, it's mostly useful as an intermediate calculation or as an input
+to formulas that specifically call for variance; STDEV.S is usually
+the more directly interpretable number for reporting.
+
+<Callout type="info">
+  VAR.S and VAR always return the same number on the same data. Use
+  VAR.S in new formulas for the self-documenting name; existing
+  formulas using plain VAR don't need to be changed.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — fewer than two numeric values
+
+<ExcelCode>{`VAR.S(5) → #DIV/0!`}</ExcelCode>
+
+Sample variance is undefined with only one value — at least two
+numbers are required.
+
+### Using VAR.S on a full population
+
+<ExcelCode>{`VAR.S(range) → slightly overstates spread if range is the entire population`}</ExcelCode>
+
+Not an error, but a common mismatch — VAR.S divides by `n-1`,
+assuming the data is a sample. Use `VAR.P` when every relevant data
+point is already included.
+
+export const faqs = [
+  {
+    question: 'VAR.S vs VAR — is there any real difference?',
+    answer: 'No calculation difference — VAR.S is the modern, explicitly-named version of the same sample variance formula. VAR still works; VAR.S just documents the sample assumption in its name.',
+  },
+  {
+    question: 'VAR.S vs VAR.P — which should I use?',
+    answer: 'VAR.S for a sample of a larger population — most real-world data analysis. VAR.P for when every relevant data point is already included.',
+  },
+  {
+    question: 'Should I use VAR.S or STDEV.S for reporting?',
+    answer: 'STDEV.S, in almost every case — it\'s in the same units as the original data and directly interpretable. VAR.S is mainly useful as an intermediate value or when a specific formula requires variance.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VAR.S from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VAR.S(Scores[Value])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim variance As Double
+    variance = Application.WorksheetFunction.Var_S(Range("Scores[Value]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Scores")
+    variance = df["Value"].var()  # ddof=1 (sample) by default
+    print(variance)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VAR](/docs/statistical/var) — the legacy name for the same sample
+  variance calculation.
+- [VAR.P](/docs/statistical/var-p) — the population version, used
+  when the data isn't a sample.
+- [STDEV.S](/docs/statistical/stdev-s) — the square root of VAR.S,
+  in the same units as the original data.

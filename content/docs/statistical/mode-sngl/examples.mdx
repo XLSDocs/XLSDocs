@@ -1,0 +1,30 @@
+---
+title: MODE.SNGL examples
+description: Worked examples for MODE.SNGL — most common order size, handling ties, and comparing to MODE.MULT.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — most common order quantity" formula={`=MODE.SNGL(Orders[Quantity])`}>
+  Returns whichever quantity appears most often across all orders.
+</ExampleCard>
+
+<ExampleCard number="02" label="Most common survey rating" formula={`=MODE.SNGL(Survey[Rating])`}>
+  Finds the single most frequently chosen rating value.
+</ExampleCard>
+
+<ExampleCard number="03" label="Handling the no-repeat case" formula={`=IFERROR(MODE.SNGL(Prices[Amount]), "No repeated value")`}>
+  Returns a friendly message instead of `#N/A` when every price in
+  the range happens to be unique.
+</ExampleCard>
+
+<ExampleCard number="04" label="Checking whether the mode is actually a tie" formula={`=COUNTA(MODE.MULT(Orders[Quantity])) > 1`}>
+  Compares MODE.SNGL's single answer against MODE.MULT's full spilled
+  list to check whether more than one value was actually tied for
+  most common.
+</ExampleCard>
+
+<ExampleCard number="05" label="Mode within a filtered subset" formula={`=MODE.SNGL(FILTER(Orders[Quantity], Orders[Region]="West"))`}>
+  Filters to West-region orders first, then finds the most common
+  quantity within just those rows.
+</ExampleCard>
