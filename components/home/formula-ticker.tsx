@@ -10,21 +10,25 @@ const FORMULAS = [
   '=SORTBY(A2:A10, B2:B10)',
 ];
 
-const STATS = [
-  'AI formula builder',
-  '2026–27 blog coverage',
-  'Print-ready PDF export on all docs',
-  'Mobile fully responsive',
-  'Dark mode only — as it should be',
-  '96 functions documented',
-  '8 categories covered',
-  'Excel 365 fully supported',
-];
-
-export function FormulaTicker() {
+export function FormulaTicker({
+  functionCount,
+  categoryCount,
+}: {
+  functionCount: number;
+  categoryCount: number;
+}) {
+  const stats = [
+    'AI formula builder',
+    '2026–27 blog coverage',
+    'Mobile fully responsive',
+    'Dark mode only — as it should be',
+    `${functionCount} functions documented`,
+    `${categoryCount} categories covered`,
+    'Excel 365 fully supported',
+  ];
   const items = [
     ...FORMULAS.map((text) => ({ text, mono: true })),
-    ...STATS.map((text) => ({ text, mono: false })),
+    ...stats.map((text) => ({ text, mono: false })),
   ];
   const looped = [...items, ...items];
 
