@@ -1,0 +1,154 @@
+---
+title: RANK.EQ
+description: The modern, explicit name for finding a number's rank, with tied values sharing the top rank.
+---
+
+Find where a number stands within a list — the modern, explicitly-named
+version of `RANK`, distinguished from `RANK.AVG` by how it handles
+ties: tied values share the same (best) rank rather than an averaged
+one.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Default: largest number ranks 1st (descending)', type: 'warn' },
+  { text: 'Tied values get the same rank, skipping the next position', type: 'warn' },
+  { text: 'Identical calculation to the legacy RANK — same result, clearer name', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RANK.EQ(number, ref, [order])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RANK.EQ(number, ref, [order])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to find the rank of.',
+  },
+  {
+    name: 'ref',
+    type: 'range',
+    required: true,
+    description: 'The list of numbers to rank against.',
+  },
+  {
+    name: 'order',
+    type: 'number',
+    required: false,
+    description: '0 or omitted for descending (largest = rank 1). Any nonzero value for ascending (smallest = rank 1).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number`'s position within `ref` once ranked. Ties receive the same
+rank, and the rank after a tie skips ahead to account for it — the
+"EQ" (equal) tie-handling behavior.
+
+## Description
+
+RANK.EQ computes exactly the same result as the older `RANK` — the
+`.EQ` suffix was added in Excel 2010 alongside `RANK.AVG`, which
+handles ties differently (averaging the tied positions instead of
+giving them all the best one). On data with no ties, RANK, RANK.EQ,
+and RANK.AVG all agree; they only diverge when two or more values are
+identical.
+
+<Callout type="info">
+  RANK.EQ and RANK always return the same number on the same data.
+  Reach for `RANK.AVG` instead when tied values should split the
+  difference between the ranks they'd otherwise occupy, rather than
+  all claiming the higher one.
+</Callout>
+
+## Common errors
+
+### #N/A — number isn't actually in ref
+
+<ExcelCode>{`RANK.EQ(999, {10,20,30}) → #N/A`}</ExcelCode>
+
+`number` must be one of the values genuinely present in `ref`.
+
+### Forgetting to lock ref when copying down
+
+<ExcelCode>{`RANK.EQ(A2, B2:B10) → wrong ranks in every row after the first`}</ExcelCode>
+
+Lock the reference so every row ranks against the same fixed list:
+
+<ExcelCode>{`RANK.EQ(A2, $B$2:$B$10)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'RANK.EQ vs RANK — is there any real difference?',
+    answer: 'No calculation difference — RANK.EQ is the modern, explicitly-named version of the same tie-handling behavior. RANK still works; RANK.EQ just distinguishes itself from RANK.AVG in its name.',
+  },
+  {
+    question: 'RANK.EQ vs RANK.AVG — which should I use?',
+    answer: 'RANK.EQ for standard "competition ranking" where ties share the best rank (like sports standings). RANK.AVG when tied values should each get the average of the ranks they\'d occupy.',
+  },
+  {
+    question: 'How do I break ties so every rank is unique?',
+    answer: 'RANK.EQ + COUNTIF is a common pattern: RANK.EQ(A2,$B$2:$B$10) + COUNTIF($B$2:A2,A2) - 1 nudges each tied duplicate to a distinct sequential rank.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RANK.EQ from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RANK.EQ(A2, $B$2:$B$10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim position As Long
+    position = Application.WorksheetFunction.Rank_Eq(Range("A2").Value, Range("B2:B10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["Rank"] = df["Score"].rank(ascending=False, method="min").astype(int)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RANK](/docs/statistical/rank) — the legacy name for this same
+  tie-handling calculation.
+- [RANK.AVG](/docs/statistical/rank-avg) — averages tied ranks
+  instead of giving them all the higher position.
+- [LARGE](/docs/math/large) — the value at a given rank position,
+  the inverse question from RANK.EQ.

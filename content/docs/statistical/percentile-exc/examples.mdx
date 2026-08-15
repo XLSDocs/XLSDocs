@@ -1,0 +1,30 @@
+---
+title: PERCENTILE.EXC examples
+description: Worked examples for PERCENTILE.EXC — valid k ranges, comparing to PERCENTILE.INC, and handling #NUM!.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — 75th percentile" formula={`=PERCENTILE.EXC(Scores[Value], 0.75)`}>
+  Returns the exclusive-method 75th percentile, assuming there are
+  enough values for k=0.75 to be valid.
+</ExampleCard>
+
+<ExampleCard number="02" label="Comparing to PERCENTILE.INC" formula={`=PERCENTILE.EXC(Data[Value], 0.5) = PERCENTILE.INC(Data[Value], 0.5)`}>
+  The two methods always agree at the 50th percentile — this returns
+  TRUE.
+</ExampleCard>
+
+<ExampleCard number="03" label="Handling #NUM! gracefully" formula={`=IFERROR(PERCENTILE.EXC(Scores[Value], 0.02), "k out of range for this dataset")`}>
+  Falls back to a friendly message when k falls outside the valid
+  1/(n+1) to n/(n+1) range for a small dataset.
+</ExampleCard>
+
+<ExampleCard number="04" label="Interquartile range, exclusive method" formula={`=PERCENTILE.EXC(Scores[Value], 0.75) - PERCENTILE.EXC(Scores[Value], 0.25)`}>
+  The exclusive-method spread between the 75th and 25th percentiles.
+</ExampleCard>
+
+<ExampleCard number="05" label="Checking the valid k range for a dataset" formula={`=1/(COUNT(Scores[Value])+1)`}>
+  Computes the lower bound of valid k for PERCENTILE.EXC on a given
+  range — the upper bound is n/(n+1), or one minus this value.
+</ExampleCard>

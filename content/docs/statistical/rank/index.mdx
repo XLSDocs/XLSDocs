@@ -61,7 +61,9 @@ account for it.
 RANK is a straightforward "where does this value stand" lookup — no
 sorting required, since it computes the rank directly from the
 unsorted list. It's most often copied down a whole column so every
-row shows its own rank relative to the same fixed list.
+row shows its own rank relative to the same fixed list. RANK is the
+older name for what's now formally
+[RANK.EQ](/docs/statistical/rank-eq).
 
 <Callout type="warn">
   Ties share the same rank, and the **next** rank skips ahead to
@@ -148,6 +150,10 @@ export const compatibility = [
 
 ## Related functions
 
+- [RANK.EQ](/docs/statistical/rank-eq) — the modern, explicitly-named
+  version of this same calculation.
+- [RANK.AVG](/docs/statistical/rank-avg) — averages tied ranks
+  instead of giving them all the higher position.
 - [LARGE](/docs/math/large) — the value at a given rank position,
   the inverse question from RANK.
 - [SMALL](/docs/math/small) — same idea as LARGE, for the low end

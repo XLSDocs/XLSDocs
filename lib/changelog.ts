@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-15',
+    title: 'RANK.EQ, RANK.AVG, PERCENTILE.INC, and PERCENTILE.EXC',
+    description:
+      'Closes out the Statistical category\'s legacy-to-modern renames — plus RANK.AVG\'s genuinely different averaged tie-handling and PERCENTILE.EXC\'s stricter, sample-based percentile method.',
+    tags: ['New functions', 'Milestone'],
+  },
+  {
+    date: '2026-08-15',
     title: 'STDEV.S, STDEV.P, VAR.S, VAR.P, MODE.SNGL, and MODE.MULT',
     description:
       'The modern, explicitly-named sample and population variants of STDEV, VAR, and MODE — plus MODE.MULT, which returns every tied mode as a spilled array instead of just the first.',

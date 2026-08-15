@@ -1,0 +1,157 @@
+---
+title: PERCENTILE.EXC
+description: Find a percentile using the exclusive method, which excludes the dataset's own endpoints.
+---
+
+Find the value at a given percentile within a set of numbers, using
+a stricter statistical convention than `PERCENTILE.INC` — one that
+excludes the dataset's own minimum and maximum from the valid range
+of `k`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'k must stay strictly between 1/(n+1) and n/(n+1)', type: 'warn' },
+  { text: 'Returns #NUM! for k values PERCENTILE.INC would happily accept', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PERCENTILE.EXC(array, k)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PERCENTILE.EXC(array, k)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array of numbers to find a percentile within.',
+  },
+  {
+    name: 'k',
+    type: 'number',
+    required: true,
+    description: 'The percentile to find, as a fraction strictly between 1/(n+1) and n/(n+1), where n is the count of values in array.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value at the `k`th percentile of `array`, using the exclusive
+method. Unlike `PERCENTILE.INC`, `k` can never actually reach `0` or
+`1` — the valid range depends on how many values are in `array`, and
+narrows as `array` gets smaller.
+
+## Description
+
+PERCENTILE.EXC uses a different statistical convention than the more
+common `PERCENTILE.INC`: it treats the dataset as a *sample* drawn
+from a larger population, and excludes the sample's own endpoints
+from ever being returned as an exact percentile. That changes the
+valid range for `k` — instead of the full `0` to `1`, it's restricted
+to `1/(n+1)` through `n/(n+1)`, where `n` is the count of values.
+With 9 values, for example, valid `k` runs from about `0.1` to `0.9`;
+anything outside that returns `#NUM!`.
+
+<Callout type="warn">
+  PERCENTILE.EXC rejects `k` values that `PERCENTILE.INC` accepts
+  without complaint — including `k=0` and `k=1`, which always work
+  with the inclusive method. The valid range shrinks further with
+  smaller datasets, so PERCENTILE.EXC is more likely to return
+  `#NUM!` on small samples.
+</Callout>
+
+## Common errors
+
+### #NUM! — k outside the valid exclusive range
+
+<ExcelCode>{`PERCENTILE.EXC(A2:A10, 0.05) → #NUM! (with 9 values, valid k starts around 0.1)`}</ExcelCode>
+
+Unlike PERCENTILE.INC, `k` can't reach all the way to `0` or `1` — the
+usable range depends on the count of values in `array` and is always
+narrower than the full 0–1 span.
+
+### Assuming it matches PERCENTILE.INC
+
+<ExcelCode>{`PERCENTILE.EXC(range, 0.9) ≠ PERCENTILE.INC(range, 0.9)`}</ExcelCode>
+
+Not an error, but a common surprise — the two methods use different
+formulas and generally return slightly different values at the same
+`k`, even when both accept it.
+
+export const faqs = [
+  {
+    question: 'PERCENTILE.EXC vs PERCENTILE.INC — which should I use?',
+    answer: 'PERCENTILE.INC for almost every real-world case — it accepts the full 0 to 1 range and matches how most people expect percentiles to behave. PERCENTILE.EXC follows a stricter sample-based convention used in some statistical contexts, and rejects k values near the extremes on small datasets.',
+  },
+  {
+    question: 'Why does PERCENTILE.EXC return #NUM! more often?',
+    answer: "Its valid range for k is 1/(n+1) to n/(n+1), not the full 0 to 1 — and that range narrows as the dataset gets smaller. PERCENTILE.INC has no such restriction, accepting any k from 0 to 1 regardless of how many values are in the range.",
+  },
+  {
+    question: 'Does PERCENTILE.EXC have a legacy equivalent, like PERCENTILE for PERCENTILE.INC?',
+    answer: "No — PERCENTILE.EXC's exclusive method was introduced alongside PERCENTILE.INC in Excel 2010, with no older function computing the same thing. The pre-2010 PERCENTILE function always matches PERCENTILE.INC's behavior, never PERCENTILE.EXC's.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PERCENTILE.EXC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PERCENTILE.EXC(ResponseTimes[Seconds], 0.9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim p90 As Double
+    p90 = Application.WorksheetFunction.Percentile_Exc(Range("ResponseTimes[Seconds]"), 0.9)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="ResponseTimes")
+    p90 = df["Seconds"].quantile(0.9, interpolation="linear")
+    # pandas' quantile doesn't natively replicate PERCENTILE.EXC's
+    # narrower valid range — check k against 1/(n+1) to n/(n+1) manually
+    print(p90)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PERCENTILE.INC](/docs/statistical/percentile-inc) — the more
+  common, more forgiving method that accepts the full 0–1 range.
+- [PERCENTILE](/docs/statistical/percentile) — the legacy function,
+  which always matches PERCENTILE.INC, never PERCENTILE.EXC.
+- [MEDIAN](/docs/math/median) — the 50th percentile under either
+  method; INC and EXC always agree at `k=0.5`.

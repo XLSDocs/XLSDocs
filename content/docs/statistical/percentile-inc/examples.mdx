@@ -1,0 +1,29 @@
+---
+title: PERCENTILE.INC examples
+description: Worked examples for PERCENTILE.INC — load time percentiles, the MEDIAN relationship, and interquartile range.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — 90th percentile load time" formula={`=PERCENTILE.INC(ResponseTimes[Seconds], 0.9)`}>
+  Returns the load time that 90% of requests were at or faster than.
+</ExampleCard>
+
+<ExampleCard number="02" label="Minimum and maximum via k=0 and k=1" formula={`=PERCENTILE.INC(Scores[Value], 0) = MIN(Scores[Value])`}>
+  Confirms the inclusive method's defining trait — k=0 always equals
+  the actual minimum. This should return TRUE.
+</ExampleCard>
+
+<ExampleCard number="03" label="Verifying the MEDIAN relationship" formula={`=PERCENTILE.INC(Scores[Value], 0.5) = MEDIAN(Scores[Value])`}>
+  The 50th percentile and the median are always the same value.
+</ExampleCard>
+
+<ExampleCard number="04" label="Interquartile range" formula={`=PERCENTILE.INC(Scores[Value], 0.75) - PERCENTILE.INC(Scores[Value], 0.25)`}>
+  The gap between the 75th and 25th percentiles — a common measure
+  of spread that ignores extreme outliers.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing to PERCENTILE.EXC" formula={`=PERCENTILE.INC(Data[Value], 0.9) - PERCENTILE.EXC(Data[Value], 0.9)`}>
+  Shows the (usually small) gap between the two methods on the same
+  data and percentile.
+</ExampleCard>

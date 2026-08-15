@@ -1,0 +1,155 @@
+---
+title: RANK.AVG
+description: Find a number's rank, with tied values sharing the average of the ranks they'd occupy.
+---
+
+Find where a number stands within a list, with a genuinely different
+tie-handling rule than `RANK`/`RANK.EQ`: tied values share the
+**average** of the ranks they'd otherwise occupy, instead of all
+claiming the higher one.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Default: largest number ranks 1st (descending)', type: 'warn' },
+  { text: 'Tied values share the average of their ranks — can return a decimal', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=RANK.AVG(number, ref, [order])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RANK.AVG(number, ref, [order])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to find the rank of.',
+  },
+  {
+    name: 'ref',
+    type: 'range',
+    required: true,
+    description: 'The list of numbers to rank against.',
+  },
+  {
+    name: 'order',
+    type: 'number',
+    required: false,
+    description: '0 or omitted for descending (largest = rank 1). Any nonzero value for ascending (smallest = rank 1).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number`'s position within `ref` once ranked. Tied values return the
+**average** of the ranks they'd occupy — for example, two values tied
+for 2nd place both return `2.5` (the average of 2 and 3), not `2`.
+
+## Description
+
+RANK.AVG answers the same "where does this stand" question as
+`RANK.EQ`, but resolves ties differently: instead of giving every
+tied value the better rank and skipping ahead afterward, it splits
+the difference. Two values tied for 2nd place both get `2.5` — the
+average of the 2nd and 3rd positions they're jointly occupying. On
+data with no ties, RANK.AVG and RANK.EQ always agree; the difference
+only shows up when values repeat.
+
+<Callout type="warn">
+  RANK.AVG can return a **decimal** rank whenever there's a tie —
+  something RANK.EQ never does. If downstream logic expects a whole
+  number (like indexing into a fixed set of positions), RANK.EQ is
+  usually the safer choice.
+</Callout>
+
+## Common errors
+
+### #N/A — number isn't actually in ref
+
+<ExcelCode>{`RANK.AVG(999, {10,20,30}) → #N/A`}</ExcelCode>
+
+`number` must be one of the values genuinely present in `ref`.
+
+### Expecting a whole number
+
+<ExcelCode>{`RANK.AVG(A2, B2:B10) → 2.5 when A2 is tied for 2nd place`}</ExcelCode>
+
+Not an error, but a common surprise — unlike RANK.EQ, RANK.AVG
+returns fractional ranks whenever ties exist. Round or switch to
+RANK.EQ if a whole number is required.
+
+export const faqs = [
+  {
+    question: 'RANK.AVG vs RANK.EQ — which should I use?',
+    answer: 'RANK.EQ for standard "competition ranking" where ties share the best rank, matching how sports standings usually work. RANK.AVG when a fairer, averaged rank matters more than a whole number — for example, in some statistical or grading contexts.',
+  },
+  {
+    question: 'Why did RANK.AVG return a decimal?',
+    answer: "There's a tie. RANK.AVG averages the ranks tied values would occupy — two values tied for 2nd both return 2.5, the average of 2 and 3. Untied values always return whole numbers.",
+  },
+  {
+    question: 'Does RANK.AVG have a legacy equivalent, like RANK for RANK.EQ?',
+    answer: "No — RANK.AVG's averaged tie-handling was introduced alongside RANK.EQ in Excel 2010, with no older function computing the same thing. RANK (the pre-2010 function) always matches RANK.EQ's behavior, never RANK.AVG's.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RANK.AVG from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RANK.AVG(A2, $B$2:$B$10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim position As Double
+    position = Application.WorksheetFunction.Rank_Avg(Range("A2").Value, Range("B2:B10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["Rank"] = df["Score"].rank(ascending=False, method="average")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RANK.EQ](/docs/statistical/rank-eq) — ties share the higher rank
+  instead of an averaged one.
+- [RANK](/docs/statistical/rank) — the legacy function, which always
+  matches RANK.EQ's tie behavior, never RANK.AVG's.
+- [SMALL](/docs/math/small) — the value at a given rank position
+  from the low end, the inverse question from RANK.AVG.

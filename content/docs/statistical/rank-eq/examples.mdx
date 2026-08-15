@@ -1,0 +1,30 @@
+---
+title: RANK.EQ examples
+description: Worked examples for RANK.EQ — sales leaderboards, ascending order, and tie-breaking with COUNTIF.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — sales leaderboard" formula={`=RANK.EQ(A2, $B$2:$B$10)`}>
+  Ranks each salesperson's total against the whole team, largest
+  first.
+</ExampleCard>
+
+<ExampleCard number="02" label="Ascending order — fastest time wins" formula={`=RANK.EQ(A2, $B$2:$B$10, 1)`}>
+  Ranks smallest first, useful for race times or any "lower is
+  better" metric.
+</ExampleCard>
+
+<ExampleCard number="03" label="Breaking ties into unique ranks" formula={`=RANK.EQ(A2,$B$2:$B$10) + COUNTIF($B$2:A2,A2) - 1`}>
+  Nudges each tied duplicate to a distinct sequential rank instead of
+  sharing one.
+</ExampleCard>
+
+<ExampleCard number="04" label="Top 3 flag" formula={`=RANK.EQ(A2, $B$2:$B$10) <= 3`}>
+  Flags whether a row is in the top 3 by rank.
+</ExampleCard>
+
+<ExampleCard number="05" label="Rank within a filtered group" formula={`=RANK.EQ(A2, FILTER($B$2:$B$20, $C$2:$C$20=C2))`}>
+  Ranks a value only against rows in its own group (e.g. its own
+  region), instead of the whole list.
+</ExampleCard>

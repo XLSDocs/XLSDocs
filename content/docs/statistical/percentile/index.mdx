@@ -58,6 +58,8 @@ distribution actually fall." The 90th percentile of page load times
 is a common real-world example: it says 90% of visitors experienced
 that time or faster, which is a more honest picture of "typical"
 performance than an average that a few slow outliers can skew.
+PERCENTILE is the older name for what's now formally
+[PERCENTILE.INC](/docs/statistical/percentile-inc).
 
 <Callout type="warn">
   `k` is a **fraction between 0 and 1**, not a whole-number
@@ -144,6 +146,10 @@ export const compatibility = [
 
 ## Related functions
 
+- [PERCENTILE.INC](/docs/statistical/percentile-inc) — the modern,
+  explicitly-named version of this same calculation.
+- [PERCENTILE.EXC](/docs/statistical/percentile-exc) — a stricter
+  method that excludes the dataset's endpoints.
 - [MEDIAN](/docs/math/median) — the special case of PERCENTILE at
   `k=0.5`.
 - [RANK](/docs/statistical/rank) — expresses standing as a
