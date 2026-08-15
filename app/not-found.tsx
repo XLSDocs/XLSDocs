@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { CodeRainBackground } from '@/components/shared/code-rain';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Page Not Found',
+  robots: { index: false, follow: true },
+};
 
 export default function NotFound() {
   return (
