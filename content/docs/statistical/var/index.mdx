@@ -1,0 +1,151 @@
+---
+title: VAR
+description: Estimate variance from a sample of data.
+---
+
+Measure how spread out a set of numbers is from their average, in
+squared units — the building block behind standard deviation.
+Mostly useful as an intermediate calculation; STDEV is usually the
+more directly interpretable number.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Assumes the data is a sample, not the whole population', type: 'warn' },
+  { text: 'The legacy name for VAR.S — still fully supported', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=VAR(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VAR(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing a sample of the data.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample variance of the supplied numbers — the average of the
+squared differences from the mean. Text and blank cells within a
+range are ignored.
+
+## Description
+
+VAR measures spread the same way STDEV does, but in squared units —
+which makes it harder to interpret directly (a variance of "400
+dollars squared" doesn't mean much intuitively, while its square
+root, a $20 standard deviation, does). VAR is mostly useful as an
+intermediate calculation, or in statistical formulas that
+specifically call for variance rather than standard deviation. VAR
+is the older name for what's now formally `VAR.S`.
+
+<Callout type="info">
+  VAR is exactly `STDEV` squared, and STDEV is exactly `SQRT(VAR)` —
+  they measure the same underlying spread, just in different units.
+  Reach for STDEV when the number needs to be interpretable on its
+  own; reach for VAR only when a formula specifically requires
+  variance.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — fewer than two numeric values
+
+<ExcelCode>{`VAR(5) → #DIV/0!`}</ExcelCode>
+
+Sample variance is undefined with only one value — at least two
+numbers are required.
+
+### Misinterpreting the units
+
+<ExcelCode>{`VAR(Prices) → a number in "dollars squared," not dollars`}</ExcelCode>
+
+Not an error, but a common source of confusion — variance is in
+squared units of the original data, which rarely has a direct
+real-world interpretation. Use STDEV for a number that's actually
+meaningful on its own.
+
+export const faqs = [
+  {
+    question: 'VAR vs STDEV — which should I use?',
+    answer: 'STDEV, for almost any practical purpose — it\'s in the same units as the original data and is directly interpretable. Reach for VAR mainly when a specific statistical formula calls for variance rather than standard deviation.',
+  },
+  {
+    question: 'VAR vs VAR.P — which should I use?',
+    answer: 'VAR (VAR.S) is for a sample of a larger population. VAR.P is for when every relevant data point is already included, with nothing left out.',
+  },
+  {
+    question: 'Why is variance in "squared" units?',
+    answer: 'Because it\'s computed by averaging the squared differences from the mean — squaring is what makes negative and positive deviations both count as spread, but it also changes the units, which is why STDEV (its square root) is usually more useful for interpretation.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VAR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VAR(Scores[Value])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim variance As Double
+    variance = Application.WorksheetFunction.Var(Range("Scores[Value]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Scores")
+    variance = df["Value"].var()  # ddof=1 (sample) by default
+    print(variance)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [STDEV](/docs/statistical/stdev) — the square root of variance, in
+  the same units as the original data and easier to interpret.
+- [AVERAGE](/docs/math/average) — the mean that VAR measures spread
+  around.

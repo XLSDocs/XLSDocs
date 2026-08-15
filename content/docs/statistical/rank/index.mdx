@@ -1,0 +1,156 @@
+---
+title: RANK
+description: Find a number's rank within a list of numbers.
+---
+
+Find where a number stands within a list — 1st, 2nd, 3rd, and so
+on — without manually sorting anything. The function behind
+leaderboards, sales rankings, and "top performer" reports.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Default: largest number ranks 1st (descending)', type: 'warn' },
+  { text: 'Tied values get the same rank, skipping the next position', type: 'warn' },
+  { text: 'The legacy name for RANK.EQ — still fully supported', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RANK(number, ref, [order])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RANK(number, ref, [order])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to find the rank of.',
+  },
+  {
+    name: 'ref',
+    type: 'range',
+    required: true,
+    description: 'The list of numbers to rank against.',
+  },
+  {
+    name: 'order',
+    type: 'number',
+    required: false,
+    description: '0 or omitted for descending (largest = rank 1). Any nonzero value for ascending (smallest = rank 1).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number`'s position within `ref` once ranked — `1` for the top
+value (by default, the largest), `2` for the next, and so on. Ties
+receive the same rank, and the rank after a tie skips ahead to
+account for it.
+
+## Description
+
+RANK is a straightforward "where does this value stand" lookup — no
+sorting required, since it computes the rank directly from the
+unsorted list. It's most often copied down a whole column so every
+row shows its own rank relative to the same fixed list.
+
+<Callout type="warn">
+  Ties share the same rank, and the **next** rank skips ahead to
+  account for it — with two values tied for 2nd place, the next
+  distinct value is ranked 4th, not 3rd. This matches how sports
+  standings usually work, but surprises anyone expecting consecutive
+  rank numbers.
+</Callout>
+
+## Common errors
+
+### #N/A — number isn't actually in ref
+
+<ExcelCode>{`RANK(999, {10,20,30}) → #N/A`}</ExcelCode>
+
+`number` must be one of the values genuinely present in `ref` — it
+can't rank a value that isn't part of the list being ranked against.
+
+### Forgetting to lock ref when copying down
+
+<ExcelCode>{`RANK(A2, B2:B10) → wrong ranks in every row after the first`}</ExcelCode>
+
+Without absolute references, `ref` shifts down along with `number`
+as the formula is copied — lock it so every row ranks against the
+same fixed list:
+
+<ExcelCode>{`RANK(A2, $B$2:$B$10)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Why do tied values get the same rank, and the next rank skip a number?',
+    answer: 'RANK follows standard "competition ranking" — two values tied for 2nd place are both ranked 2, and the next distinct value is ranked 4th, not 3rd, since two positions were already used.',
+  },
+  {
+    question: 'How do I rank in ascending order instead of descending?',
+    answer: 'Pass any nonzero value as the third argument: RANK(A2, B2:B10, 1) ranks the smallest value as 1st instead of the largest.',
+  },
+  {
+    question: 'How do I break ties so every rank is unique?',
+    answer: 'RANK.EQ + COUNTIF is a common pattern: RANK(A2,$B$2:$B$10) + COUNTIF($B$2:A2,A2) - 1 nudges each tied duplicate to a distinct sequential rank.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RANK from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RANK(A2, $B$2:$B$10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim position As Long
+    position = Application.WorksheetFunction.Rank(Range("A2").Value, Range("B2:B10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["Rank"] = df["Score"].rank(ascending=False, method="min").astype(int)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LARGE](/docs/math/large) — the value at a given rank position,
+  the inverse question from RANK.
+- [SMALL](/docs/math/small) — same idea as LARGE, for the low end
+  of the list.
+- [PERCENTILE](/docs/statistical/percentile) — expresses standing
+  as a percentile instead of a whole-number rank.

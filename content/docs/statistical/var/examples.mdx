@@ -1,0 +1,29 @@
+---
+title: VAR examples
+description: Worked examples for VAR — basic usage, verifying the STDEV relationship, and population variance.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — variance of test scores" formula={`=VAR(Scores[Value])`}>
+  Returns the average squared deviation of scores from their mean.
+</ExampleCard>
+
+<ExampleCard number="02" label="Verifying the relationship with STDEV" formula={`=SQRT(VAR(Scores[Value])) = STDEV(Scores[Value])`}>
+  Standard deviation is always the square root of variance on the
+  same data — this should return TRUE.
+</ExampleCard>
+
+<ExampleCard number="03" label="Population version for complete data" formula={`=VAR.P(Scores[Value])`}>
+  Use this instead of VAR when the data covers every relevant case,
+  not just a sample.
+</ExampleCard>
+
+<ExampleCard number="04" label="Comparing variance between two groups" formula={`=VAR(GroupA[Value]) < VAR(GroupB[Value])`}>
+  TRUE if Group A's results are less spread out than Group B's.
+</ExampleCard>
+
+<ExampleCard number="05" label="Variance of a filtered subset" formula={`=VAR(FILTER(Scores[Value], Scores[Class]="A"))`}>
+  Filters to one class first, then calculates variance within just
+  those scores.
+</ExampleCard>

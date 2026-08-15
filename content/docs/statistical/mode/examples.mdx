@@ -1,0 +1,28 @@
+---
+title: MODE examples
+description: Worked examples for MODE — most common order size, handling no-repeat data, and combining with COUNTIF.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — most common order quantity" formula={`=MODE(Orders[Quantity])`}>
+  Returns whichever quantity appears most often across all orders.
+</ExampleCard>
+
+<ExampleCard number="02" label="Most common survey rating" formula={`=MODE(Survey[Rating])`}>
+  Finds the single most frequently chosen rating value.
+</ExampleCard>
+
+<ExampleCard number="03" label="Handling the no-repeat case" formula={`=IFERROR(MODE(Prices[Amount]), "No repeated value")`}>
+  Returns a friendly message instead of `#N/A` when every price in
+  the range happens to be unique.
+</ExampleCard>
+
+<ExampleCard number="04" label="Confirming the mode's actual frequency" formula={`=COUNTIF(Orders[Quantity], MODE(Orders[Quantity]))`}>
+  Counts exactly how many times the mode value itself appears.
+</ExampleCard>
+
+<ExampleCard number="05" label="Mode within a filtered subset" formula={`=MODE(FILTER(Orders[Quantity], Orders[Region]="West"))`}>
+  Filters to West-region orders first, then finds the most common
+  quantity within just those rows.
+</ExampleCard>

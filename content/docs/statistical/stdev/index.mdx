@@ -1,0 +1,150 @@
+---
+title: STDEV
+description: Estimate standard deviation from a sample of data.
+---
+
+Measure how spread out a set of numbers is from their average — a
+small standard deviation means values cluster tightly around the
+mean, a large one means they're scattered widely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Assumes the data is a sample, not the whole population', type: 'warn' },
+  { text: 'The legacy name for STDEV.S — still fully supported', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=STDEV(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STDEV(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing a sample of the data.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample standard deviation of the supplied numbers — the square
+root of the sample variance. Text and blank cells within a range are
+ignored.
+
+## Description
+
+STDEV treats the numbers given to it as a **sample** drawn from a
+larger population, not the entire population itself — this affects
+the exact formula used (dividing by `n-1` instead of `n`), producing
+a slightly larger result than the population version would. STDEV is
+the older name for what's now formally `STDEV.S`; both compute the
+identical result, and STDEV still works in every current Excel
+version.
+
+<Callout type="warn">
+  Using STDEV (sample) when the data actually **is** the entire
+  population — not a sample of it — slightly overstates the spread.
+  Use `STDEV.P` instead when every relevant data point is included,
+  not just a subset.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — fewer than two numeric values
+
+<ExcelCode>{`STDEV(5) → #DIV/0!`}</ExcelCode>
+
+Sample standard deviation is undefined with only one value — at
+least two numbers are required.
+
+### Confusing sample and population versions
+
+<ExcelCode>{`STDEV(range) vs STDEV.P(range) → different results on the same data`}</ExcelCode>
+
+Not an error, but a common source of "why don't these match" —
+STDEV divides by `n-1`, STDEV.P divides by `n`. Pick the one that
+matches whether the data is a sample or the full population.
+
+export const faqs = [
+  {
+    question: 'STDEV vs STDEV.P — which should I use?',
+    answer: "STDEV (STDEV.S) is for a sample of a larger population — most real-world data analysis. STDEV.P is for when every relevant data point is already included, with nothing left out.",
+  },
+  {
+    question: 'What does a standard deviation of 0 mean?',
+    answer: 'Every value is identical — there\'s no spread at all around the mean.',
+  },
+  {
+    question: 'How does STDEV relate to VAR?',
+    answer: 'Standard deviation is the square root of variance — STDEV(range) always equals SQRT(VAR(range)) on the same data.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STDEV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STDEV(Scores[Value])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sd As Double
+    sd = Application.WorksheetFunction.StDev(Range("Scores[Value]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Scores")
+    sd = df["Value"].std()  # ddof=1 (sample) by default
+    print(sd)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VAR](/docs/statistical/var) — the squared version of standard
+  deviation; STDEV is VAR's square root.
+- [AVERAGE](/docs/math/average) — the mean that STDEV measures
+  spread around.
+- [MEDIAN](/docs/math/median) — a different measure of "typical
+  value," less sensitive to outliers than AVERAGE.

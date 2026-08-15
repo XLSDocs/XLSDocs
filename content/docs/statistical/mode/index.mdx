@@ -1,0 +1,150 @@
+---
+title: MODE
+description: Find the most frequently occurring value in a set of numbers.
+---
+
+Find the value that appears most often in a set of numbers — the
+statistical "mode," a different kind of "typical value" than the
+mean or median, useful whenever the most common outcome matters more
+than the average one.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Numbers only — ignores text and blanks', type: 'check' },
+  { text: 'Returns #N/A if no value repeats', type: 'warn' },
+  { text: 'The legacy name for MODE.SNGL — still fully supported', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=MODE(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MODE(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range to find the most common value within.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The numeric value that appears most often across all arguments.
+Returns `#N/A` if every value appears exactly once — with no repeat,
+there's no mode.
+
+## Description
+
+MODE answers "what comes up most often," which can be a genuinely
+different answer from AVERAGE or MEDIAN — the most common shoe size
+sold, the most frequent order quantity, or the most common response
+on a survey with numeric answer choices. MODE is the older name for
+what's now formally `MODE.SNGL`; if the data has more than one value
+tied for most frequent, MODE returns only the first one encountered.
+
+<Callout type="warn">
+  MODE returns `#N/A`, not `0`, when no value repeats at all — every
+  number in the set is unique. This is a common surprise for data
+  that's mostly continuous (like exact prices or measurements) rather
+  than naturally repeating (like categories or ratings).
+</Callout>
+
+## Common errors
+
+### #N/A — no value repeats
+
+<ExcelCode>{`MODE(1, 2, 3, 4, 5) → #N/A (every value is unique)`}</ExcelCode>
+
+There's no mode when nothing repeats — this is expected behavior,
+not a malformed formula.
+
+### Assuming there's only one mode
+
+<ExcelCode>{`MODE(1, 1, 2, 2, 3) → 1 (the first-encountered tie, not both)`}</ExcelCode>
+
+When multiple values are tied for most frequent, MODE only returns
+one of them — use `MODE.MULT` (an array formula) to return every
+tied mode at once.
+
+export const faqs = [
+  {
+    question: 'MODE vs AVERAGE vs MEDIAN — how do they differ?',
+    answer: 'AVERAGE is the arithmetic mean, MEDIAN is the middle value when sorted, MODE is the most frequently occurring value. All three are valid "typical value" measures, and can each give a genuinely different answer on the same data.',
+  },
+  {
+    question: 'Why does MODE return #N/A?',
+    answer: "Every value in the range is unique — nothing repeats, so there's no most-common value to return. This is the expected result for genuinely unique data, not an error condition.",
+  },
+  {
+    question: 'What if there are multiple values tied for most common?',
+    answer: 'Plain MODE only returns the first one it encounters. MODE.MULT (entered as an array formula) returns every tied mode as a spilled list.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MODE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MODE(Orders[Quantity])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim mostCommon As Variant
+    mostCommon = Application.WorksheetFunction.Mode(Range("Orders[Quantity]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    most_common = df["Quantity"].mode().iloc[0]
+    print(most_common)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MEDIAN](/docs/math/median) — the middle value instead of the most
+  frequent one.
+- [AVERAGE](/docs/math/average) — the arithmetic mean, a third
+  distinct measure of "typical value."
+- [COUNTIF](/docs/math/countif) — counts how many times a specific
+  value occurs, useful for checking a mode's actual frequency.

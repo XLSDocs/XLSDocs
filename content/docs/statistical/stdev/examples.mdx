@@ -1,0 +1,30 @@
+---
+title: STDEV examples
+description: Worked examples for STDEV — basic usage, comparing two data sets, and combining with AVERAGE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — spread of test scores" formula={`=STDEV(Scores[Value])`}>
+  Returns how far scores typically deviate from the average.
+</ExampleCard>
+
+<ExampleCard number="02" label="Comparing consistency between two groups" formula={`=STDEV(GroupA[Value]) < STDEV(GroupB[Value])`}>
+  TRUE if Group A's results are more tightly clustered than Group
+  B's, regardless of whether their averages are similar.
+</ExampleCard>
+
+<ExampleCard number="03" label="Flagging values outside one standard deviation" formula={`=ABS(A2-AVERAGE(Scores[Value])) > STDEV(Scores[Value])`}>
+  Flags a value as an outlier if it's more than one standard
+  deviation from the mean.
+</ExampleCard>
+
+<ExampleCard number="04" label="Population version for complete data" formula={`=STDEV.P(Scores[Value])`}>
+  Use this instead of STDEV when the data covers every relevant
+  case, not just a sample.
+</ExampleCard>
+
+<ExampleCard number="05" label="Verifying the relationship with VAR" formula={`=STDEV(Scores[Value]) = SQRT(VAR(Scores[Value]))`}>
+  Standard deviation is always the square root of variance on the
+  same data — this should return TRUE.
+</ExampleCard>

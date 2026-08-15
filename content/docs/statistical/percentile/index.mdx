@@ -1,0 +1,152 @@
+---
+title: PERCENTILE
+description: Find the value at a given percentile within a set of numbers.
+---
+
+Find the value below which a given percentage of the data falls —
+the 90th percentile of response times, the 25th percentile of test
+scores. A more nuanced view of a distribution than a single average.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'k is a fraction between 0 and 1, not a whole percentage', type: 'warn' },
+  { text: 'The legacy name for PERCENTILE.INC — still fully supported', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PERCENTILE(array, k)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PERCENTILE(array, k)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array of numbers to find a percentile within.',
+  },
+  {
+    name: 'k',
+    type: 'number',
+    required: true,
+    description: 'The percentile to find, as a fraction between 0 and 1 (e.g. 0.9 for the 90th percentile).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value at the `k`th percentile of `array` — `PERCENTILE(range,
+0.5)` is equivalent to `MEDIAN(range)`, `PERCENTILE(range, 0)` is
+equivalent to `MIN(range)`, and `PERCENTILE(range, 1)` is equivalent
+to `MAX(range)`.
+
+## Description
+
+PERCENTILE answers a more nuanced question than AVERAGE — not just
+"what's typical," but "where does a specific point in the
+distribution actually fall." The 90th percentile of page load times
+is a common real-world example: it says 90% of visitors experienced
+that time or faster, which is a more honest picture of "typical"
+performance than an average that a few slow outliers can skew.
+
+<Callout type="warn">
+  `k` is a **fraction between 0 and 1**, not a whole-number
+  percentage — the 90th percentile is `k=0.9`, not `k=90`. Passing
+  `90` directly returns `#NUM!`, since it's outside the valid 0–1
+  range.
+</Callout>
+
+## Common errors
+
+### #NUM! — k outside the 0–1 range
+
+<ExcelCode>{`PERCENTILE(A2:A100, 90) → #NUM!`}</ExcelCode>
+
+`k` needs to be a fraction, not a percentage number — use `0.9` for
+the 90th percentile:
+
+<ExcelCode>{`PERCENTILE(A2:A100, 0.9)`}</ExcelCode>
+
+### Confusing percentile with percentage
+
+<ExcelCode>{`PERCENTILE(A2:A100, 0.9) → a value from the data, not "90% of something"`}</ExcelCode>
+
+Not an error, but a common misunderstanding — the result is a value
+*from the dataset's scale* (like a load time in seconds), not a
+percentage itself.
+
+export const faqs = [
+  {
+    question: 'What does the 90th percentile actually mean?',
+    answer: '90% of the values in the data are at or below that number. It\'s commonly used for things like load times or response times, where a handful of slow outliers would otherwise distort a plain average.',
+  },
+  {
+    question: 'How is PERCENTILE related to MEDIAN?',
+    answer: 'MEDIAN is exactly PERCENTILE(range, 0.5) — the 50th percentile. PERCENTILE generalizes the same idea to any point in the distribution, not just the middle.',
+  },
+  {
+    question: 'PERCENTILE.INC vs PERCENTILE.EXC — what\'s the difference?',
+    answer: 'PERCENTILE (PERCENTILE.INC) allows k from 0 to 1 inclusive, covering the full range including the min and max. PERCENTILE.EXC excludes the endpoints and requires a range of k that depends on the data size — INC is the more commonly used, more intuitive default.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PERCENTILE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PERCENTILE(ResponseTimes[Seconds], 0.9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim p90 As Double
+    p90 = Application.WorksheetFunction.Percentile_Inc(Range("ResponseTimes[Seconds]"), 0.9)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="ResponseTimes")
+    p90 = df["Seconds"].quantile(0.9)
+    print(p90)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MEDIAN](/docs/math/median) — the special case of PERCENTILE at
+  `k=0.5`.
+- [RANK](/docs/statistical/rank) — expresses standing as a
+  whole-number position instead of a percentile.
+- [LARGE](/docs/math/large) and [SMALL](/docs/math/small) — find a
+  value at a specific rank position rather than a percentile.

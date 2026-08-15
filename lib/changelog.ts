@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-15',
+    title: 'A new Statistical category: STDEV, VAR, MODE, RANK, and PERCENTILE',
+    description:
+      'Five functions for measuring spread and relative standing, not just totals and averages — including the sample-vs-population distinction on STDEV/VAR and the tie-handling rules on RANK.',
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-08-14',
     title: 'CHOOSE, LOOKUP, OFFSET, and INDIRECT',
     description:

@@ -1,0 +1,30 @@
+---
+title: PERCENTILE examples
+description: Worked examples for PERCENTILE — page load times, test score cutoffs, and the MEDIAN relationship.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — 90th percentile load time" formula={`=PERCENTILE(ResponseTimes[Seconds], 0.9)`}>
+  Returns the load time that 90% of requests were at or faster than.
+</ExampleCard>
+
+<ExampleCard number="02" label="A test score cutoff for the top 10%" formula={`=PERCENTILE(Scores[Value], 0.9)`}>
+  Finds the score threshold that separates the top 10% of students
+  from the rest.
+</ExampleCard>
+
+<ExampleCard number="03" label="Verifying the MEDIAN relationship" formula={`=PERCENTILE(Scores[Value], 0.5) = MEDIAN(Scores[Value])`}>
+  The 50th percentile and the median are always the same value —
+  this should return TRUE.
+</ExampleCard>
+
+<ExampleCard number="04" label="Interquartile range" formula={`=PERCENTILE(Scores[Value], 0.75) - PERCENTILE(Scores[Value], 0.25)`}>
+  The gap between the 75th and 25th percentiles — a common measure
+  of spread that ignores extreme outliers.
+</ExampleCard>
+
+<ExampleCard number="05" label="Flagging values above the 95th percentile" formula={`=A2 > PERCENTILE(ResponseTimes[Seconds], 0.95)`}>
+  Flags unusually slow response times relative to the rest of the
+  data.
+</ExampleCard>
