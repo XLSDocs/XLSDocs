@@ -1,0 +1,159 @@
+---
+title: MsgBox
+description: Display a message box, optionally with buttons, and return which one the user clicked.
+---
+
+Display a message box to the user — the most basic way for a macro
+to communicate anything, from a simple "Done" notification to a
+Yes/No/Cancel confirmation before a destructive action.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Parentheses are required only when capturing the return value', type: 'warn' },
+  { text: 'buttons combines a button set and an icon into one number', type: 'check' },
+  { text: 'Not available in Excel for the web', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'MsgBox(prompt, [buttons], [title], [helpfile], [context])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`MsgBox(prompt, [buttons], [title], [helpfile], [context])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'prompt',
+    type: 'string',
+    required: true,
+    description: 'The message text to display. Use vbCrLf inside the string to break it across multiple lines.',
+  },
+  {
+    name: 'buttons',
+    type: 'number',
+    required: false,
+    description: 'Which buttons and icon to show, as a sum of constants like vbYesNo + vbQuestion. Defaults to a single OK button (vbOKOnly).',
+  },
+  {
+    name: 'title',
+    type: 'string',
+    required: false,
+    description: 'Text for the message box\'s title bar. Defaults to "Microsoft Excel" if omitted.',
+  },
+  {
+    name: 'helpfile',
+    type: 'string',
+    required: false,
+    description: 'Path to a help file, paired with context to add a Help button. Rarely used in modern macros.',
+  },
+  {
+    name: 'context',
+    type: 'number',
+    required: false,
+    description: 'The help topic\'s context ID within helpfile.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+An `Integer` identifying which button the user clicked — `vbOK` (1),
+`vbCancel` (2), `vbYes` (6), `vbNo` (7), and so on, depending on which
+`buttons` were shown. If `MsgBox` is used as a statement rather than
+assigned to a variable, the return value is simply discarded.
+
+## Description
+
+MsgBox is the simplest way for a macro to talk back to the user —
+confirming that a long-running task finished, warning before an
+action that can't be undone, or asking a Yes/No/Cancel question and
+branching on the answer. `buttons` is built by adding together a
+button-set constant (`vbOKOnly`, `vbYesNo`, `vbYesNoCancel`, and so
+on) and an icon constant (`vbInformation`, `vbExclamation`,
+`vbCritical`, `vbQuestion`) — `vbYesNo + vbQuestion` shows Yes/No
+buttons with a question-mark icon.
+
+<Callout type="warn">
+  Parentheses around the arguments are only valid when the result is
+  captured: `result = MsgBox("Continue?", vbYesNo)`. Called as a bare
+  statement with no assignment, parentheses cause a compile error —
+  write `MsgBox "Continue?", vbYesNo` instead, without parens.
+</Callout>
+
+## Common errors
+
+### Compile error from parentheses on a bare statement
+
+<ExcelCode>{`MsgBox("Done") → Compile error: Expected: end of statement`}</ExcelCode>
+
+Parentheses are only allowed when the return value is being
+captured. Drop them for a plain statement call:
+
+<ExcelCode>{`MsgBox "Done"`}</ExcelCode>
+
+### Forgetting to combine buttons and icon constants
+
+<ExcelCode>{`MsgBox("Continue?", vbQuestion) → shows only OK, no Yes/No choice`}</ExcelCode>
+
+`vbQuestion` alone only controls the icon — the button set defaults
+to `vbOKOnly` unless a button constant is added in too:
+
+<ExcelCode>{`MsgBox("Continue?", vbYesNo + vbQuestion)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'How do I check which button the user clicked?',
+    answer: 'Capture the return value and compare it against the vb constants: If MsgBox("Continue?", vbYesNo) = vbYes Then ... — vbYes is 6, vbNo is 7, vbCancel is 2, and so on.',
+  },
+  {
+    question: 'How do I break the message onto multiple lines?',
+    answer: 'Insert vbCrLf inside the prompt string: MsgBox "Line one" & vbCrLf & "Line two".',
+  },
+  {
+    question: 'Why does my macro pause when MsgBox runs?',
+    answer: "MsgBox is modal — code execution stops until the user dismisses it. That's expected; it's how MsgBox waits for a button click before continuing (or before returning a value).",
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Sub ConfirmAndDelete()
+  Dim response As VbMsgBoxResult
+  response = MsgBox("Delete all rows below row 1?", vbYesNo + vbExclamation, "Confirm delete")
+
+  If response = vbYes Then
+    Rows("2:" & Rows.Count).Delete
+    MsgBox "Rows deleted.", vbInformation
+  Else
+    MsgBox "Cancelled — nothing was deleted.", vbInformation
+  End If
+End Sub
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [InputBox](/docs/vba/inputbox) — prompts for typed input instead
+  of just a button click.
+- [Format](/docs/vba/format) — often used to build the `prompt`
+  string, formatting a number or date for display.

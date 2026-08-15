@@ -1,0 +1,29 @@
+---
+title: InStr examples
+description: Worked examples for InStr — finding a delimiter, case-insensitive search, and checking for a keyword.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — find the @ in an email" formula={`InStr(1, "user@example.com", "@")`}>
+  Returns 5 — the position of the @ character.
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive keyword check" formula={`InStr(1, cellText, "urgent", vbTextCompare) > 0`}>
+  Returns TRUE if "urgent" appears anywhere in cellText, regardless
+  of case.
+</ExampleCard>
+
+<ExampleCard number="03" label="Checking a substring exists" formula={`If InStr(fileName, ".xlsx") = 0 Then fileName = fileName & ".xlsx"`}>
+  Appends a file extension only if it isn't already present.
+</ExampleCard>
+
+<ExampleCard number="04" label="Searching from a later position" formula={`InStr(10, longText, "the")`}>
+  Starts the search at character 10 instead of the beginning of the
+  string.
+</ExampleCard>
+
+<ExampleCard number="05" label="Splitting a path at the last backslash" formula={`fileOnly = Mid(fullPath, InStrRev(fullPath, "\\") + 1)`}>
+  Uses InStrRev to find the last backslash, then extracts everything
+  after it.
+</ExampleCard>

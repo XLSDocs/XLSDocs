@@ -1,0 +1,146 @@
+---
+title: Split
+description: Split a string into an array of substrings using a delimiter.
+---
+
+Break a string apart into an array wherever a delimiter appears — the
+usual first step for parsing a comma-separated list, a full name, or
+any other delimited text pulled from a cell or user input.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a zero-based array — the first element is index 0, not 1', type: 'warn' },
+  { text: 'Defaults to splitting on a single space if delimiter is omitted', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'Split(expression, [delimiter], [limit], [compare])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`Split(expression, [delimiter], [limit], [compare])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'string',
+    required: true,
+    description: 'The string to split apart.',
+  },
+  {
+    name: 'delimiter',
+    type: 'string',
+    required: false,
+    description: 'The character or substring to split on. Defaults to a single space (" ") if omitted.',
+  },
+  {
+    name: 'limit',
+    type: 'number',
+    required: false,
+    description: 'The maximum number of substrings to return. -1 (default) returns every substring, with no limit.',
+  },
+  {
+    name: 'compare',
+    type: 'number',
+    required: false,
+    description: 'vbBinaryCompare (0, default) for a case-sensitive delimiter match, or vbTextCompare (1) to ignore case.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A zero-based, one-dimensional array of `String` values — `Split("a,b,c",
+",")` returns an array where element `0` is `"a"`, `1` is `"b"`, and `2`
+is `"c"`.
+
+## Description
+
+Split is the VBA counterpart to Excel's `TEXTSPLIT` — turning one
+delimited string into a list of pieces that can be looped over,
+indexed into, or reassembled with `Join`. It's the standard way to
+parse a comma-separated value pasted from elsewhere, break a full
+name into first/last, or process a multi-line string one line at a
+time (splitting on `vbCrLf`).
+
+<Callout type="warn">
+  The returned array is **zero-based**, not one-based like most
+  worksheet-facing VBA collections — `result(0)` is the first piece,
+  not `result(1)`. Looping with `For i = 0 To UBound(result)` avoids
+  accidentally skipping the first element or overrunning the array.
+</Callout>
+
+## Common errors
+
+### Off-by-one from assuming a 1-based array
+
+<ExcelCode>{`parts(1) → the second piece, not the first`}</ExcelCode>
+
+Split's result is zero-based — the first piece is `parts(0)`:
+
+<ExcelCode>{`parts(0)`}</ExcelCode>
+
+### Subscript out of range on a single-piece result
+
+<ExcelCode>{`Split("nodelimiterhere", ",")(1) → Run-time error 9: Subscript out of range`}</ExcelCode>
+
+If the delimiter never appears, the array has only one element
+(index `0`) — check `UBound(result)` before assuming a second
+element exists.
+
+export const faqs = [
+  {
+    question: 'Split vs the worksheet TEXTSPLIT function — any difference?',
+    answer: 'Same idea — breaking a string apart on a delimiter — but Split returns a VBA array for use in code, while TEXTSPLIT spills the pieces across cells in a worksheet formula.',
+  },
+  {
+    question: 'How do I find out how many pieces Split returned?',
+    answer: 'UBound(result) - LBound(result) + 1, or simply UBound(result) + 1 since Split always returns a zero-based array (LBound is always 0).',
+  },
+  {
+    question: 'How do I put the pieces back together?',
+    answer: 'Use Join(array, delimiter) — the inverse of Split, combining an array of strings back into one string with a given separator.',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Sub ParseCommaSeparatedTags()
+  Dim tags() As String
+  tags = Split(Range("A2").Value, ",")
+
+  Dim i As Long
+  For i = 0 To UBound(tags)
+    Debug.Print Trim(tags(i))
+  Next i
+End Sub
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [InStr](/docs/vba/instr) — locates a single occurrence of a
+  substring, rather than splitting on every occurrence.
+- [InputBox](/docs/vba/inputbox) — a common source of the delimited
+  text that Split then parses.

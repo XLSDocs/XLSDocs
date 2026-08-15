@@ -1,0 +1,153 @@
+---
+title: InputBox
+description: Prompt the user to type a value and return what they entered.
+---
+
+Prompt the user to type a value and return it as a string — the
+simplest way for a macro to ask a question that needs more than a
+button click to answer.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns a String, even if the user types a number', type: 'warn' },
+  { text: 'Returns an empty string if Cancel is clicked', type: 'warn' },
+  { text: 'Not available in Excel for the web', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'InputBox(prompt, [title], [default], [xpos], [ypos], [helpfile], [context])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`InputBox(prompt, [title], [default], [xpos], [ypos], [helpfile], [context])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'prompt',
+    type: 'string',
+    required: true,
+    description: 'The message asking the user for input.',
+  },
+  {
+    name: 'title',
+    type: 'string',
+    required: false,
+    description: 'Text for the input box\'s title bar. Defaults to "Microsoft Excel" if omitted.',
+  },
+  {
+    name: 'default',
+    type: 'string',
+    required: false,
+    description: 'Text pre-filled in the input field before the user types anything.',
+  },
+  {
+    name: 'xpos, ypos',
+    type: 'number',
+    required: false,
+    description: 'Screen position for the box, in twips. Rarely set explicitly — Excel centers it by default.',
+  },
+  {
+    name: 'helpfile, context',
+    type: 'string, number',
+    required: false,
+    description: 'A help file and topic ID, paired together to add a Help button. Rarely used in modern macros.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A `String` containing whatever the user typed. Clicking Cancel (or
+the box's close button) returns an empty string `""`, indistinguishable
+from the user submitting nothing and clicking OK.
+
+## Description
+
+InputBox pauses the macro and shows a text field for the user to
+fill in — a name, a quantity, a search term — then hands back
+whatever was typed as a plain string. Because the result is always
+text, a numeric answer still needs converting (with `CInt`, `CDbl`,
+or similar) before it can be used in arithmetic.
+
+<Callout type="warn">
+  InputBox can't tell the difference between the user typing nothing
+  and clicking Cancel — both return `""`. If that distinction
+  matters, check for `""` and treat it as "no input provided" rather
+  than trying to detect Cancel specifically.
+</Callout>
+
+## Common errors
+
+### Treating the result as a number directly
+
+<ExcelCode>{`InputBox("Enter quantity:") + 1 → type mismatch if the field is left blank or non-numeric`}</ExcelCode>
+
+The return value is always a string — validate and convert it first:
+
+<ExcelCode>{`If IsNumeric(qtyText) Then qty = CInt(qtyText)`}</ExcelCode>
+
+### Confusing InputBox with Application.InputBox
+
+<ExcelCode>{`InputBox("Select a range:") → returns typed text, not a Range object`}</ExcelCode>
+
+Plain `InputBox` (a VBA language function) only returns text. For a
+version that can return a real cell range the user clicks on, use
+`Application.InputBox` with its `Type` argument set to `8` instead.
+
+export const faqs = [
+  {
+    question: 'How do I know if the user clicked Cancel?',
+    answer: 'You can\'t distinguish it directly — Cancel and submitting a blank field both return "". Treat an empty result as "no input" for either case.',
+  },
+  {
+    question: 'How do I get a numeric value instead of text?',
+    answer: 'Convert the returned string yourself, after checking it\'s actually numeric: If IsNumeric(result) Then value = CDbl(result).',
+  },
+  {
+    question: 'InputBox vs Application.InputBox — what\'s the difference?',
+    answer: 'Plain InputBox is a VBA language function that always returns text. Application.InputBox is an Excel-specific version that can also return a Range, a number, or other types depending on its Type argument — useful for prompting the user to select cells.',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Sub PromptForSheetName()
+  Dim newName As String
+  newName = InputBox("Enter a name for the new sheet:", "New Sheet", "Sheet" & (Sheets.Count + 1))
+
+  If newName = "" Then
+    MsgBox "Cancelled — no sheet created.", vbInformation
+    Exit Sub
+  End If
+
+  Sheets.Add.Name = newName
+End Sub
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MsgBox](/docs/vba/msgbox) — displays a message and captures a
+  button click instead of typed text.
+- [Split](/docs/vba/split) — often used right after InputBox to
+  break a comma-separated answer into an array.

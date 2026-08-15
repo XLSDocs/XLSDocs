@@ -1,0 +1,30 @@
+---
+title: MsgBox examples
+description: Worked examples for MsgBox — simple notifications, Yes/No confirmations, and multi-line messages.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — simple notification" formula={`MsgBox "Import complete."`}>
+  Shows a plain message with a single OK button, no return value
+  captured.
+</ExampleCard>
+
+<ExampleCard number="02" label="Yes/No confirmation" formula={`If MsgBox("Overwrite existing file?", vbYesNo) = vbYes Then`}>
+  Captures the result and branches on whether the user clicked Yes
+  or No.
+</ExampleCard>
+
+<ExampleCard number="03" label="Custom title and icon" formula={`MsgBox "Invalid entry.", vbCritical, "Input Error"`}>
+  Sets a custom title bar and shows a red critical-error icon instead
+  of the default.
+</ExampleCard>
+
+<ExampleCard number="04" label="Multi-line message" formula={`MsgBox "Row " & i & " skipped:" & vbCrLf & "Missing required field"`}>
+  Uses vbCrLf to break the message onto a second line.
+</ExampleCard>
+
+<ExampleCard number="05" label="Three-way Yes/No/Cancel" formula={`result = MsgBox("Save changes before closing?", vbYesNoCancel)`}>
+  Captures one of three possible outcomes — vbYes, vbNo, or
+  vbCancel — for a three-way branch.
+</ExampleCard>

@@ -1,0 +1,133 @@
+---
+title: Format
+description: Format a number, date, or string as text according to a pattern.
+---
+
+Format a number, date, or string into text using a pattern — the VBA
+equivalent of Excel's `TEXT` worksheet function, for building
+readable strings inside a macro instead of inside a cell.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns a String, regardless of the input type', type: 'check' },
+  { text: 'Uses the same pattern codes as Excel custom number formats', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'Format(expression, [format])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`Format(expression, [format])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'any',
+    required: true,
+    description: 'The number, date, or string to format.',
+  },
+  {
+    name: 'format',
+    type: 'string',
+    required: false,
+    description: 'A pattern like "0.00", "yyyy-mm-dd", or "@@@-@@@@", or a named format like "Currency". Defaults to a plain, unformatted conversion to string if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A `String` containing `expression` rendered according to `format` —
+`Format(1234.5, "#,##0.00")` returns `"1,234.50"`,
+`Format(Date, "yyyy-mm-dd")` returns something like `"2027-03-14"`.
+
+## Description
+
+Format works like Excel's `TEXT` function, but from inside VBA code
+rather than a worksheet cell — building a status-bar message, a file
+name with today's date baked in, or a formatted number for a
+`MsgBox` prompt. It accepts the same custom-format pattern codes as
+Excel's cell formatting (`0`, `#`, `yyyy`, `mm`, `dd`, `@`), plus a
+handful of named formats like `"Currency"`, `"Percent"`, and
+`"Long Date"`.
+
+<Callout type="info">
+  Format's pattern codes are the same ones used in Excel's Format
+  Cells dialog — anything that works there (`"$#,##0.00"`,
+  `"mmm d, yyyy"`) works identically as the `format` argument here.
+</Callout>
+
+## Common errors
+
+### Forgetting format returns a String, not a Date/Number
+
+<ExcelCode>{`If Format(dueDate, "yyyy-mm-dd") > Format(today, "yyyy-mm-dd") Then`}</ExcelCode>
+
+This comparison works only because ISO-style date strings happen to
+sort correctly as text — for real date math, compare the original
+`Date` values directly instead of their formatted strings.
+
+### Using an Excel formula format code that VBA doesn't recognize
+
+<ExcelCode>{`Format(123, "General") → "123" (fine), but not every worksheet format code has a VBA equivalent`}</ExcelCode>
+
+Most common codes match, but a few worksheet-only formats (like
+accounting-style parenthesis negatives) don't translate directly —
+test the exact pattern in the Immediate window if the result looks
+off.
+
+export const faqs = [
+  {
+    question: 'Format vs the worksheet TEXT function — any difference?',
+    answer: 'They use the same pattern codes and produce the same kind of result — TEXT is for formulas inside cells, Format is the equivalent for use inside VBA code.',
+  },
+  {
+    question: 'How do I format today\'s date for a file name?',
+    answer: 'Format(Date, "yyyy-mm-dd") gives a sortable, filename-safe date string, e.g. "2027-03-14".',
+  },
+  {
+    question: 'Can Format add currency symbols and thousands separators?',
+    answer: 'Yes — either a custom pattern like "$#,##0.00" or the named format Format(amount, "Currency"), which uses the system\'s regional currency settings.',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Sub ExportWithDatedFileName()
+  Dim fileName As String
+  fileName = "SalesReport_" & Format(Date, "yyyy-mm-dd") & ".xlsx"
+
+  ActiveWorkbook.SaveAs Filename:=ThisWorkbook.Path & "\" & fileName
+  MsgBox "Saved as " & fileName, vbInformation
+End Sub
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MsgBox](/docs/vba/msgbox) — often shows a Format-ed number or
+  date inside its message text.
+- [InStr](/docs/vba/instr) — a common next step for parsing a
+  string, once it's been formatted or before it's converted.

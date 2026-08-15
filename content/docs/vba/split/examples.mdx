@@ -1,0 +1,31 @@
+---
+title: Split examples
+description: Worked examples for Split — comma-separated values, looping over pieces, and limiting the split count.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — comma-separated values" formula={`Split("apple,banana,cherry", ",")`}>
+  Returns a zero-based array: element 0 is "apple", 1 is "banana",
+  2 is "cherry".
+</ExampleCard>
+
+<ExampleCard number="02" label="Looping over every piece" formula={`For i = 0 To UBound(parts): Debug.Print parts(i): Next i`}>
+  Iterates the full array from the first element to the last,
+  starting at index 0.
+</ExampleCard>
+
+<ExampleCard number="03" label="Splitting a full name" formula={`nameParts = Split(fullName, " ")`}>
+  Uses the default space delimiter to break "Jane Doe" into
+  ["Jane", "Doe"].
+</ExampleCard>
+
+<ExampleCard number="04" label="Limiting the number of pieces" formula={`Split("a-b-c-d", "-", 2)`}>
+  Returns just two elements — "a" and "b-c-d" — stopping the split
+  after the first delimiter.
+</ExampleCard>
+
+<ExampleCard number="05" label="Splitting multi-line text into rows" formula={`lines = Split(cellText, vbLf)`}>
+  Splits a cell's wrapped multi-line text into one array element per
+  line.
+</ExampleCard>

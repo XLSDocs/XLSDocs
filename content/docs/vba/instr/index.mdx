@@ -1,0 +1,152 @@
+---
+title: InStr
+description: Find the position of one string within another.
+---
+
+Find where one string first appears inside another — the VBA
+equivalent of Excel's `FIND` and `SEARCH` worksheet functions, for
+locating a substring inside code instead of inside a cell formula.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns 0 if the substring isn\'t found — not an error', type: 'warn' },
+  { text: 'Case-sensitive by default, unlike Excel\'s SEARCH', type: 'warn' },
+  { text: 'The optional start argument comes first, before both strings', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'InStr([start, ]string1, string2, [compare])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`InStr([start, ]string1, string2, [compare])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start',
+    type: 'number',
+    required: false,
+    description: 'The character position to begin searching from. Defaults to 1 (the beginning of string1). Required if compare is supplied.',
+  },
+  {
+    name: 'string1',
+    type: 'string',
+    required: true,
+    description: 'The string to search within.',
+  },
+  {
+    name: 'string2',
+    type: 'string',
+    required: true,
+    description: 'The substring to search for.',
+  },
+  {
+    name: 'compare',
+    type: 'number',
+    required: false,
+    description: 'vbBinaryCompare (0, default) for a case-sensitive search, or vbTextCompare (1) to ignore case.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The 1-based position of the first character of `string2` within
+`string1`, searching from `start` onward. Returns `0` if `string2`
+isn't found, and `0` immediately if `string1` is empty.
+
+## Description
+
+InStr answers "where does this substring first appear" — checking
+whether a cell's text contains a keyword, finding the position of an
+`@` to split an email address, or locating a delimiter before slicing
+a string with `Mid`/`Left`/`Right`. Unlike Excel's worksheet
+`SEARCH` function, InStr is case-sensitive by default; matching
+`FIND`'s case-sensitivity requires no extra argument, but matching
+`SEARCH`'s case-insensitivity requires passing `vbTextCompare`
+explicitly.
+
+<Callout type="warn">
+  `InStr` returns `0`, not `-1` or an error, when nothing is found —
+  a common source of an off-by-one bug for anyone expecting a
+  "not found" sentinel like `-1`. Always check `InStr(...) = 0`
+  explicitly rather than assuming a falsy/negative result.
+</Callout>
+
+## Common errors
+
+### Assuming InStr is case-insensitive
+
+<ExcelCode>{`InStr("Hello World", "world") → 0 (case doesn't match)`}</ExcelCode>
+
+By default InStr is case-sensitive — pass `vbTextCompare` to match
+regardless of case:
+
+<ExcelCode>{`InStr(1, "Hello World", "world", vbTextCompare)`}</ExcelCode>
+
+### Passing compare without start
+
+<ExcelCode>{`InStr("Hello", "l", vbTextCompare) → argument mismatch — compare needs start supplied too`}</ExcelCode>
+
+`start` is required whenever `compare` is supplied — it can't be
+skipped just because the default (position 1) is wanted:
+
+<ExcelCode>{`InStr(1, "Hello", "l", vbTextCompare)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'InStr vs the worksheet FIND/SEARCH functions — any difference?',
+    answer: 'Same idea, different case-sensitivity defaults: InStr is case-sensitive by default (like FIND), while SEARCH is case-insensitive by default. Pass vbTextCompare to InStr to match SEARCH\'s behavior.',
+  },
+  {
+    question: 'What does InStr return if the substring isn\'t found?',
+    answer: '0 — not an error, and not -1. Always check for 0 explicitly rather than assuming a negative or error result.',
+  },
+  {
+    question: 'How do I search from the end of a string instead of the start?',
+    answer: 'Use InStrRev(string1, string2, [start], [compare]) — the same idea as InStr, but scanning backward from the end (or from a given start position) to find the last occurrence.',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Function GetDomain(email As String) As String
+  Dim atPos As Long
+  atPos = InStr(1, email, "@")
+
+  If atPos = 0 Then
+    GetDomain = ""
+  Else
+    GetDomain = Mid(email, atPos + 1)
+  End If
+End Function
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [Split](/docs/vba/split) — breaks a string into an array around a
+  delimiter, instead of just locating one occurrence.
+- [FIND](/docs/text/find) and [SEARCH](/docs/text/search) — the
+  worksheet-formula equivalents, for use inside a cell instead of
+  VBA code.

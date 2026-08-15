@@ -7,6 +7,15 @@ const FN_LIST = [
   'COUNTIF', 'AVERAGEIFS', 'IF', 'IFS', 'IFERROR', 'IFNA', 'SWITCH',
 ];
 
+// VBA function names use PascalCase, not the ALL CAPS convention Excel
+// formulas use — kept separate so a VBA page's own function (e.g. MsgBox)
+// still gets the same highlight treatment as an Excel function name.
+const VBA_FN_LIST = [
+  'MsgBox', 'InputBox', 'Format', 'InStr', 'InStrRev', 'Split', 'Join',
+];
+
+const ALL_FN_LIST = [...FN_LIST, ...VBA_FN_LIST];
+
 function highlightLine(line: string) {
   const nodes: React.ReactNode[] = [];
   let i = 0;
@@ -27,7 +36,7 @@ function highlightLine(line: string) {
       i += str.length;
       continue;
     }
-    const fnMatch = FN_LIST.find((fn) => rest.startsWith(fn) && rest[fn.length] === '(');
+    const fnMatch = ALL_FN_LIST.find((fn) => rest.startsWith(fn) && rest[fn.length] === '(');
     if (fnMatch) {
       push('var(--excel-fn)', fnMatch, '500');
       i += fnMatch.length;

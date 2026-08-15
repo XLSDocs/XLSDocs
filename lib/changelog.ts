@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-15',
+    title: 'A new VBA section: MsgBox, InputBox, Format, InStr, and Split',
+    description:
+      'Built-in VBA functions get their own reference, separate from worksheet formulas — the same syntax/parameters/examples format, plus notes on where each one differs from its closest Excel formula equivalent.',
+    tags: ['New functions', 'Milestone'],
+  },
+  {
+    date: '2026-08-15',
     title: 'COUNTBLANK, WORKDAY.INTL, and NETWORKDAYS.INTL',
     description:
       'A dedicated blank-cell counter for Math, plus customizable-weekend versions of WORKDAY and NETWORKDAYS for businesses that don\'t run a standard Saturday/Sunday schedule.',
