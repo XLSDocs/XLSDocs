@@ -1,0 +1,28 @@
+---
+title: TEXTBEFORE examples
+description: Worked examples for TEXTBEFORE — usernames from emails, file names without extensions, and handling missing delimiters.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — username from an email" formula={`=TEXTBEFORE(A2, "@")`}>
+  Extracts everything before the @ symbol.
+</ExampleCard>
+
+<ExampleCard number="02" label="File name without extension" formula={`=TEXTBEFORE(A2, ".", -1)`}>
+  Splits at the last period, useful for file names that might
+  contain other periods.
+</ExampleCard>
+
+<ExampleCard number="03" label="First word of a sentence" formula={`=TEXTBEFORE(A2, " ")`}>
+  Grabs everything before the first space.
+</ExampleCard>
+
+<ExampleCard number="04" label="Handling a missing delimiter" formula={`=TEXTBEFORE(A2, "@", 1, 0, 0, "No @ found")`}>
+  Returns a friendly fallback instead of #N/A when the text doesn't
+  contain an @ symbol.
+</ExampleCard>
+
+<ExampleCard number="05" label="Text before the second occurrence" formula={`=TEXTBEFORE(A2, "-", 2)`}>
+  Splits at the second dash instead of the first, using instance_num.
+</ExampleCard>

@@ -1,0 +1,27 @@
+---
+title: VSTACK examples
+description: Worked examples for VSTACK — combining monthly sheets, appending new records, and deduplicating with UNIQUE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — combine two ranges" formula={`=VSTACK(A1:C5, D1:F5)`}>
+  Stacks the second range directly below the first.
+</ExampleCard>
+
+<ExampleCard number="02" label="Combining monthly sheets" formula={`=VSTACK(Jan!A1:C10, Feb!A1:C10, Mar!A1:C10)`}>
+  Merges three separate sheets into one continuous list.
+</ExampleCard>
+
+<ExampleCard number="03" label="Appending new records to an existing table" formula={`=VSTACK(Sales[#All], NewRecords[#All])`}>
+  Combines an existing table with a staging range of new rows,
+  headers included.
+</ExampleCard>
+
+<ExampleCard number="04" label="Deduplicating a combined list" formula={`=UNIQUE(VSTACK(ListA, ListB))`}>
+  Combines two lists and removes duplicate rows in one formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="Sorting a combined list" formula={`=SORT(VSTACK(RegionA, RegionB))`}>
+  Combines two ranges and sorts the merged result.
+</ExampleCard>

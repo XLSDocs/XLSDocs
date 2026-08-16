@@ -1,0 +1,187 @@
+---
+title: TEXTBEFORE
+description: Extract the text that comes before a delimiter.
+---
+
+Extract the portion of a string that comes before a delimiter — no
+more combining LEFT with FIND just to split text at a character.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Case-sensitive by default', type: 'warn' },
+  { text: 'Returns #N/A if the delimiter isn\'t found, unless if_not_found is set', type: 'warn' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TEXTBEFORE(text, delimiter, [instance_num], [match_mode], [match_end], [if_not_found])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TEXTBEFORE(text, delimiter, [instance_num], [match_mode], [match_end], [if_not_found])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The string to extract from.',
+  },
+  {
+    name: 'delimiter',
+    type: 'text',
+    required: true,
+    description: 'The text marking where the extraction should stop.',
+  },
+  {
+    name: 'instance_num',
+    type: 'number',
+    required: false,
+    description: 'Which occurrence of delimiter to split at. Defaults to 1 (the first). Negative counts from the end.',
+  },
+  {
+    name: 'match_mode',
+    type: 'number',
+    required: false,
+    description: '0 (default) case-sensitive · 1 case-insensitive.',
+  },
+  {
+    name: 'match_end',
+    type: 'number',
+    required: false,
+    description: '0 (default) don\'t treat the end of text as a delimiter · 1 treat it as one, useful with a negative instance_num.',
+  },
+  {
+    name: 'if_not_found',
+    type: 'any',
+    required: false,
+    description: 'Value to return instead of #N/A when delimiter isn\'t found.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The substring of `text` that appears before the specified occurrence
+of `delimiter`. Returns `#N/A` if `delimiter` isn't found, unless
+`if_not_found` supplies a fallback.
+
+## Description
+
+TEXTBEFORE replaces the older pattern of combining `LEFT` with `FIND`
+or `SEARCH` just to grab everything up to a separator — getting a
+domain-free username from an email address, the first word of a
+sentence, or a folder path with the file name stripped off. Negative
+`instance_num` counts delimiters from the end of the string instead
+of the start, useful for a string with more than one occurrence of
+the delimiter.
+
+<Callout type="warn">
+  TEXTBEFORE returns `#N/A` when `delimiter` doesn't appear in `text`
+  at all — not an empty string. Supply `if_not_found` (the sixth
+  argument) to return something else instead, the same fallback
+  pattern XLOOKUP uses.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'user@example.com': 'user', 'jane.doe@company.org': 'jane.doe', 'admin@test.io': 'admin' }}
+  defaultValue="user@example.com"
+  label={'Live preview — TEXTBEFORE(email, "@")'}
+  fieldLabel="email"
+/>
+
+## Common errors
+
+### #N/A — delimiter not found
+
+<ExcelCode>{`TEXTBEFORE("no-at-sign-here", "@") → #N/A`}</ExcelCode>
+
+Supply a fallback with `if_not_found` instead of letting the error
+propagate:
+
+<ExcelCode>{`TEXTBEFORE("no-at-sign-here", "@", 1, 0, 0, "")`}</ExcelCode>
+
+### Forgetting text has more than one delimiter
+
+<ExcelCode>{`TEXTBEFORE("a.b.c.txt", ".") → "a" (only up to the first period)`}</ExcelCode>
+
+With multiple delimiters, `instance_num` controls which one is used
+— `-1` finds text before the *last* one instead of the first:
+
+<ExcelCode>{`TEXTBEFORE("a.b.c.txt", ".", -1) → "a.b.c"`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'TEXTBEFORE vs LEFT + FIND — why switch?',
+    answer: 'TEXTBEFORE does in one function what previously needed LEFT(text, FIND(delimiter, text)-1) — shorter, and it directly supports multiple occurrences, case-insensitive matching, and a not-found fallback that the LEFT/FIND combination can\'t do as cleanly.',
+  },
+  {
+    question: 'How do I extract text before the last occurrence of a delimiter?',
+    answer: 'Pass -1 as instance_num: TEXTBEFORE(text, delimiter, -1) counts from the end, splitting at the last occurrence instead of the first.',
+  },
+  {
+    question: 'What does TEXTBEFORE return if the delimiter never appears?',
+    answer: '#N/A by default. Add a sixth argument, if_not_found, to return a custom fallback value instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TEXTBEFORE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TEXTBEFORE(Users[Email], "@")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim username As String
+    Dim atPos As Long
+    atPos = InStr(1, email, "@")
+    username = IIf(atPos = 0, "", Left(email, atPos - 1))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Users")
+    df["Username"] = df["Email"].str.split("@").str[0]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TEXTAFTER](/docs/text/textafter) — the mirror image, extracting
+  what comes after the delimiter instead of before.
+- [FIND](/docs/text/find) and [SEARCH](/docs/text/search) — the
+  older way to locate a delimiter's position, previously combined
+  with LEFT to do what TEXTBEFORE does in one step.
+- [LEFT](/docs/text/left) — extracts a fixed number of characters,
+  rather than up to a dynamically located delimiter.

@@ -1,0 +1,170 @@
+---
+title: XMATCH
+description: Find a value's position within a range — the modern, exact-by-default replacement for MATCH.
+---
+
+Search a range for a value and return its **position** within that
+range — the modern replacement for `MATCH`, with a safer default
+(exact match instead of approximate) and a few abilities MATCH never
+had, like searching from the last item backward.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Exact match by default — the opposite of MATCH\'s default', type: 'check' },
+  { text: 'Can search from the last item to the first', type: 'check' },
+  { text: 'Requires Excel 365 or 2021', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=XMATCH(lookup_value, lookup_array, [match_mode], [search_mode])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=XMATCH(lookup_value, lookup_array, [match_mode], [search_mode])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'lookup_value',
+    type: 'any',
+    required: true,
+    description: 'The value to search for.',
+  },
+  {
+    name: 'lookup_array',
+    type: 'range',
+    required: true,
+    description: "A single row or column to search — like MATCH, XMATCH doesn't work across a 2D range.",
+  },
+  {
+    name: 'match_mode',
+    type: 'number',
+    required: false,
+    description: '`0` (default) exact match · `-1` exact match, or the next smaller item · `1` exact match, or the next larger item · `2` wildcard match.',
+  },
+  {
+    name: 'search_mode',
+    type: 'number',
+    required: false,
+    description: '`1` (default) first to last · `-1` last to first · `2`/`-2` binary search (requires sorted data, much faster on large ranges).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The 1-based position of `lookup_value` within `lookup_array`. Returns
+`#N/A` if no match is found — same failure behavior as MATCH.
+
+## Description
+
+XMATCH answers the same "where is it" question as MATCH, but flips
+the risky default: MATCH silently assumes an approximate,
+sorted-ascending match unless `0` is passed explicitly, while XMATCH
+assumes an **exact** match unless told otherwise. It also adds a
+`search_mode` argument MATCH never had — searching from the end of
+the range backward (`-1`), which is the standard way to find the
+*last* occurrence of a value instead of the first.
+
+<Callout type="info">
+  XMATCH is the position half of the same modernization that produced
+  `XLOOKUP` — in fact, XLOOKUP uses the exact same `match_mode` and
+  `search_mode` arguments internally. Learning XMATCH's arguments
+  means already knowing XLOOKUP's.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ apple: '1', banana: '2', mango: '3', orange: '4', grape: '5' }}
+  defaultValue="Mango"
+  label={'Live preview — XMATCH("{value}", Products!A1:A5)'}
+/>
+
+## Common errors
+
+### #N/A — no match found
+
+<ExcelCode>{`XMATCH("Zzz", A1:A10) → #N/A`}</ExcelCode>
+
+`lookup_value` doesn't exist anywhere in `lookup_array`, and
+`match_mode` wasn't set to allow a next-smaller/next-larger fallback.
+
+### #N/A — lookup_array is two-dimensional
+
+<ExcelCode>{`XMATCH("Widget", A1:C10) → #N/A`}</ExcelCode>
+
+Like MATCH, `lookup_array` must be a single row or a single column.
+
+export const faqs = [
+  {
+    question: 'XMATCH vs MATCH — what actually changed?',
+    answer: 'The default match behavior flipped: MATCH defaults to an approximate match requiring sorted data, XMATCH defaults to an exact match that works on unsorted data. XMATCH also adds search_mode for searching backward or with binary search.',
+  },
+  {
+    question: 'How do I find the last occurrence of a value instead of the first?',
+    answer: 'Set search_mode to -1: XMATCH(value, range, 0, -1) scans from the bottom of the range up, returning the position of the last match.',
+  },
+  {
+    question: 'Do I need to upgrade every MATCH formula to XMATCH?',
+    answer: "No — MATCH still works everywhere and isn't going away. XMATCH is worth using in new formulas for the safer default and search_mode, especially inside XLOOKUP's optional match_mode argument.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with XMATCH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=XMATCH("Widget", Products!A:A)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim position As Variant
+    position = Application.WorksheetFunction.XMatch( _
+      "Widget", Range("Products!A:A"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Products")
+    match = df.index[df["Name"] == "Widget"]
+    position = match[0] + 1 if len(match) else "#N/A"  # +1 for 1-based position
+    print(position)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MATCH](/docs/lookup/match) — the legacy version, with an
+  approximate-match default instead of exact.
+- [XLOOKUP](/docs/lookup/xlookup) — combines XMATCH's searching with
+  returning a value in one step.
+- [INDEX](/docs/lookup/index) — turns the position XMATCH finds back
+  into an actual value; commonly used together.

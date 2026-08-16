@@ -1,0 +1,186 @@
+---
+title: TEXTAFTER
+description: Extract the text that comes after a delimiter.
+---
+
+Extract the portion of a string that comes after a delimiter — the
+mirror image of `TEXTBEFORE`, replacing the older combination of MID
+and FIND/SEARCH.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Case-sensitive by default', type: 'warn' },
+  { text: 'Returns #N/A if the delimiter isn\'t found, unless if_not_found is set', type: 'warn' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TEXTAFTER(text, delimiter, [instance_num], [match_mode], [match_end], [if_not_found])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TEXTAFTER(text, delimiter, [instance_num], [match_mode], [match_end], [if_not_found])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The string to extract from.',
+  },
+  {
+    name: 'delimiter',
+    type: 'text',
+    required: true,
+    description: 'The text marking where the extraction should start.',
+  },
+  {
+    name: 'instance_num',
+    type: 'number',
+    required: false,
+    description: 'Which occurrence of delimiter to split at. Defaults to 1 (the first). Negative counts from the end.',
+  },
+  {
+    name: 'match_mode',
+    type: 'number',
+    required: false,
+    description: '0 (default) case-sensitive · 1 case-insensitive.',
+  },
+  {
+    name: 'match_end',
+    type: 'number',
+    required: false,
+    description: '0 (default) don\'t treat the end of text as a delimiter · 1 treat it as one, useful with a negative instance_num.',
+  },
+  {
+    name: 'if_not_found',
+    type: 'any',
+    required: false,
+    description: 'Value to return instead of #N/A when delimiter isn\'t found.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The substring of `text` that appears after the specified occurrence
+of `delimiter`. Returns `#N/A` if `delimiter` isn't found, unless
+`if_not_found` supplies a fallback.
+
+## Description
+
+TEXTAFTER replaces the older pattern of combining `MID` with `FIND`
+or `SEARCH` and a length calculation just to grab everything after a
+separator — a domain from an email address, a file extension, or
+whatever follows the last slash in a path. Like TEXTBEFORE, a
+negative `instance_num` counts delimiters from the end of the string
+instead of the start.
+
+<Callout type="warn">
+  TEXTAFTER returns `#N/A` when `delimiter` doesn't appear in `text`
+  at all — not an empty string. Supply `if_not_found` (the sixth
+  argument) to return something else instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'user@example.com': 'example.com', 'jane.doe@company.org': 'company.org', 'admin@test.io': 'test.io' }}
+  defaultValue="user@example.com"
+  label={'Live preview — TEXTAFTER(email, "@")'}
+  fieldLabel="email"
+/>
+
+## Common errors
+
+### #N/A — delimiter not found
+
+<ExcelCode>{`TEXTAFTER("no-at-sign-here", "@") → #N/A`}</ExcelCode>
+
+Supply a fallback with `if_not_found` instead of letting the error
+propagate:
+
+<ExcelCode>{`TEXTAFTER("no-at-sign-here", "@", 1, 0, 0, "")`}</ExcelCode>
+
+### Forgetting text has more than one delimiter
+
+<ExcelCode>{`TEXTAFTER("a.b.c.txt", ".") → "b.c.txt" (only after the first period)`}</ExcelCode>
+
+With multiple delimiters, `instance_num` controls which one is used
+— `-1` finds text after the *last* one instead of the first:
+
+<ExcelCode>{`TEXTAFTER("a.b.c.txt", ".", -1) → "txt"`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'TEXTAFTER vs MID + FIND — why switch?',
+    answer: 'TEXTAFTER does in one function what previously needed a MID/FIND/LEN combination to isolate everything after a delimiter — shorter, and it directly supports multiple occurrences, case-insensitive matching, and a not-found fallback.',
+  },
+  {
+    question: 'How do I extract a file extension?',
+    answer: 'TEXTAFTER(fileName, ".", -1) splits at the last period, returning just the extension even if the file name itself contains periods.',
+  },
+  {
+    question: 'What does TEXTAFTER return if the delimiter never appears?',
+    answer: '#N/A by default. Add a sixth argument, if_not_found, to return a custom fallback value instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TEXTAFTER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TEXTAFTER(Users[Email], "@")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim domain As String
+    Dim atPos As Long
+    atPos = InStr(1, email, "@")
+    domain = IIf(atPos = 0, "", Mid(email, atPos + 1))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Users")
+    df["Domain"] = df["Email"].str.split("@").str[-1]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TEXTBEFORE](/docs/text/textbefore) — the mirror image, extracting
+  what comes before the delimiter instead of after.
+- [FIND](/docs/text/find) and [SEARCH](/docs/text/search) — the
+  older way to locate a delimiter's position, previously combined
+  with MID to do what TEXTAFTER does in one step.
+- [RIGHT](/docs/text/right) — extracts a fixed number of characters
+  from the end, rather than after a dynamically located delimiter.

@@ -1,0 +1,30 @@
+---
+title: XMATCH examples
+description: Worked examples for XMATCH — exact match by default, searching backward, and pairing with INDEX.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — exact match, no third argument needed" formula={`=XMATCH("Widget", Products!A:A)`}>
+  Finds the exact position of "Widget" without needing to pass a
+  match type, unlike MATCH.
+</ExampleCard>
+
+<ExampleCard number="02" label="Finding the last occurrence" formula={`=XMATCH("Closed", Status!A:A, 0, -1)`}>
+  Searches from the bottom of the range up, returning the position
+  of the last matching row instead of the first.
+</ExampleCard>
+
+<ExampleCard number="03" label="Paired with INDEX" formula={`=INDEX(Products!B:B, XMATCH("Widget", Products!A:A))`}>
+  Uses XMATCH's position to pull the corresponding value from a
+  different column.
+</ExampleCard>
+
+<ExampleCard number="04" label="Next-larger fallback" formula={`=XMATCH(85, Scores!A:A, 1)`}>
+  Returns the position of 85 if present, or the next value greater
+  than 85 if it isn't.
+</ExampleCard>
+
+<ExampleCard number="05" label="Wildcard match" formula={`=XMATCH("Widget*", Products!A:A, 2)`}>
+  Matches any product name starting with "Widget" using match_mode 2.
+</ExampleCard>

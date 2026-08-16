@@ -1,0 +1,28 @@
+---
+title: TEXTAFTER examples
+description: Worked examples for TEXTAFTER — domains from emails, file extensions, and handling missing delimiters.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — domain from an email" formula={`=TEXTAFTER(A2, "@")`}>
+  Extracts everything after the @ symbol.
+</ExampleCard>
+
+<ExampleCard number="02" label="File extension" formula={`=TEXTAFTER(A2, ".", -1)`}>
+  Splits at the last period, returning just the extension.
+</ExampleCard>
+
+<ExampleCard number="03" label="Last word of a sentence" formula={`=TEXTAFTER(A2, " ", -1)`}>
+  Grabs everything after the last space.
+</ExampleCard>
+
+<ExampleCard number="04" label="Handling a missing delimiter" formula={`=TEXTAFTER(A2, "@", 1, 0, 0, "No @ found")`}>
+  Returns a friendly fallback instead of #N/A when the text doesn't
+  contain an @ symbol.
+</ExampleCard>
+
+<ExampleCard number="05" label="Text after the second occurrence" formula={`=TEXTAFTER(A2, "-", 2)`}>
+  Splits after the second dash instead of the first, using
+  instance_num.
+</ExampleCard>

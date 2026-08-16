@@ -162,5 +162,7 @@ export const compatibility = [
   alphabetized list of distinct values: `SORT(UNIQUE(...))`.
 - [FILTER](/docs/arrays/filter) — combines with UNIQUE for "distinct
   values matching a condition": `UNIQUE(FILTER(...))`.
+- [VSTACK](/docs/arrays/vstack) — combines multiple ranges into one
+  before UNIQUE deduplicates them: `UNIQUE(VSTACK(...))`.
 - [COUNTIF](/docs/math/countif) — useful alongside UNIQUE to count how
   many times each distinct value occurs.

@@ -1,0 +1,152 @@
+---
+title: VSTACK
+description: Combine two or more ranges or arrays into one, stacked vertically.
+---
+
+Combine multiple ranges or arrays into a single spilled array,
+stacked one on top of the other — no copy-pasting rows from separate
+sheets into one combined list.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Mismatched column counts get padded with #N/A, not rejected', type: 'warn' },
+  { text: 'Accepts up to 254 arrays', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VSTACK(array1, [array2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VSTACK(array1, [array2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first range or array to stack.',
+  },
+  {
+    name: 'array2, ...',
+    type: 'range',
+    required: false,
+    description: 'Up to 253 more ranges or arrays, stacked in the order given.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single dynamic array containing every row from every argument, in
+order, spilled into the cells below/right of the formula.
+
+## Description
+
+VSTACK is the formula equivalent of pasting several tables one below
+another — combining January/February/March sales sheets into one
+continuous list, or merging a "new records" range under an existing
+table, all as a live formula that updates when any source range
+changes. It works across sheets (`=VSTACK(Jan!A:C, Feb!A:C, Mar!A:C)`)
+just as easily as within one.
+
+<Callout type="warn">
+  If the arguments have different numbers of columns, VSTACK doesn't
+  error — it pads the narrower rows with `#N/A` on the right so every
+  row in the result has the same width. Mismatched column counts are
+  usually a sign the wrong ranges were selected, even though VSTACK
+  itself won't complain.
+</Callout>
+
+## Common errors
+
+### #N/A padding from mismatched column counts
+
+<ExcelCode>{`VSTACK(A1:B5, D1:F5) → rows from A1:B5 get an extra #N/A column`}</ExcelCode>
+
+Both ranges need the same number of columns to combine cleanly —
+adjust the range widths to match:
+
+<ExcelCode>{`VSTACK(A1:C5, D1:F5)`}</ExcelCode>
+
+### #SPILL! — blocked spill range
+
+Cells below or beside the formula already contain data. Clear the
+spill range, or move the formula somewhere clear.
+
+export const faqs = [
+  {
+    question: 'Do the arrays being stacked need the same number of columns?',
+    answer: 'They don\'t have to — VSTACK will still combine them, but any row from a narrower array gets padded with #N/A to match the widest array\'s column count.',
+  },
+  {
+    question: 'Can VSTACK combine ranges from different sheets?',
+    answer: 'Yes — each argument can reference any sheet: VSTACK(Jan!A1:C10, Feb!A1:C10) combines rows from both sheets into one array.',
+  },
+  {
+    question: 'How do I remove duplicate rows after stacking?',
+    answer: 'Wrap the result in UNIQUE: =UNIQUE(VSTACK(range1, range2)) combines both ranges and deduplicates in one formula.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VSTACK from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VSTACK(Jan!A1:C10, Feb!A1:C10, Mar!A1:C10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim combined As Variant
+    combined = Application.WorksheetFunction.VStack( _
+      Sheets("Jan").Range("A1:C10"), _
+      Sheets("Feb").Range("A1:C10"), _
+      Sheets("Mar").Range("A1:C10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    jan = pd.read_excel("workbook.xlsx", sheet_name="Jan")
+    feb = pd.read_excel("workbook.xlsx", sheet_name="Feb")
+    mar = pd.read_excel("workbook.xlsx", sheet_name="Mar")
+    combined = pd.concat([jan, feb, mar], ignore_index=True)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [UNIQUE](/docs/arrays/unique) — often wraps VSTACK to deduplicate
+  a combined list: `UNIQUE(VSTACK(...))`.
+- [SORT](/docs/arrays/sort) — often wraps VSTACK to put the combined
+  rows in order.
+- [FILTER](/docs/arrays/filter) — can run on VSTACK's result to pull
+  matching rows out of the combined list.

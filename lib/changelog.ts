@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-16',
+    title: 'XMATCH, VSTACK, TEXTBEFORE, and TEXTAFTER',
+    description:
+      'Four modern dynamic-array and text functions — including the exact-by-default replacement for MATCH, a way to stack ranges into one live list, and delimiter-based text extraction that replaces the old LEFT/MID + FIND combinations.',
+    tags: ['New functions'],
+  },
+  {
     date: '2026-08-15',
     title: 'A new VBA section: MsgBox, InputBox, Format, InStr, and Split',
     description:
