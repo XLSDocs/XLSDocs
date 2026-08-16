@@ -1,0 +1,168 @@
+---
+title: LET
+description: Assign names to intermediate values within a formula, instead of repeating the same expression.
+---
+
+Assign a name to an intermediate value inside a formula, then reuse
+that name instead of repeating the same expression — shorter
+formulas, computed once instead of once per repetition, and easier
+to actually read.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Each name can reference the names defined before it', type: 'check' },
+  { text: 'The final argument is always the calculation, not another name/value pair', type: 'warn' },
+  { text: 'Requires Excel 2021 or 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LET(name1, value1, [name2, value2, ...,] calculation)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LET(name1, value1, [name2, value2, ...,] calculation)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'name1',
+    type: 'text',
+    required: true,
+    description: 'A name to assign — must start with a letter and can\'t look like a cell reference (e.g. "A1" isn\'t allowed).',
+  },
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The value or expression name1 refers to. Can reference cells, ranges, or any earlier name already defined in this LET.',
+  },
+  {
+    name: 'name2, value2, ...',
+    type: 'text, any',
+    required: false,
+    description: 'Up to 126 total name/value pairs, each able to reference the names defined before it.',
+  },
+  {
+    name: 'calculation',
+    type: 'any',
+    required: true,
+    description: 'The formula to evaluate, using the names defined above. Always the last argument — never another name/value pair.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+Whatever `calculation` evaluates to, with every `nameN` inside it
+substituted for its corresponding `valueN`.
+
+## Description
+
+LET solves the "repeated sub-expression" problem that makes long
+formulas hard to read and slow to run — instead of writing the same
+`VLOOKUP(...)` or `FILTER(...)` three times in one formula, compute
+it once, give it a name, and reference that name everywhere else.
+Excel also only evaluates each named value once, rather than once
+per use, which can meaningfully speed up a formula that previously
+repeated an expensive lookup or calculation.
+
+<Callout type="info">
+  Names defined earlier in the same LET can be used in the value
+  expressions that come after them — `LET(total, SUM(A:A), avg,
+  total/COUNT(A:A), avg)` uses `total` while defining `avg`. Order
+  matters: a name can't be used before it's been defined.
+</Callout>
+
+## Common errors
+
+### Forgetting the final calculation argument
+
+<ExcelCode>{`LET(total, SUM(A:A)) → #VALUE! (missing the calculation)`}</ExcelCode>
+
+Every LET needs a final argument after the name/value pairs — the
+formula that actually uses them:
+
+<ExcelCode>{`LET(total, SUM(A:A), total)`}</ExcelCode>
+
+### Using a name that looks like a cell reference
+
+<ExcelCode>{`LET(A1, 5, A1*2) → error — "A1" isn't a valid LET name`}</ExcelCode>
+
+Names can't be formatted like a cell reference. Pick a descriptive
+word instead:
+
+<ExcelCode>{`LET(price, 5, price*2)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Does LET actually make formulas run faster, or just look cleaner?',
+    answer: 'Both — Excel computes each named value once and reuses the result, rather than recalculating the same expression every time it appears. On a formula that repeats an expensive lookup or FILTER call, this can be a real performance improvement, not just a readability one.',
+  },
+  {
+    question: 'Can I use LET instead of helper columns?',
+    answer: 'Often, yes — LET keeps the intermediate calculation inside a single formula instead of spreading it across extra cells, which keeps the sheet cleaner and avoids anyone accidentally deleting a helper column a formula depends on.',
+  },
+  {
+    question: 'Can a name defined in LET reference an earlier name in the same LET?',
+    answer: 'Yes — each value expression can use any name already defined earlier in the same LET, letting later calculations build on earlier ones.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LET from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LET(total, SUM(Sales[Amount]), tax, total*0.08, total+tax)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double, tax As Double
+    total = Application.WorksheetFunction.Sum(Range("Sales[Amount]"))
+    tax = total * 0.08
+    Debug.Print total + tax
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    total = df["Amount"].sum()
+    tax = total * 0.08
+    print(total + tax)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LAMBDA](/docs/custom-functions/lambda) — builds an entire
+  reusable custom function; LAMBDA bodies frequently use LET
+  internally to name their own intermediate values.
+- [XLOOKUP](/docs/lookup/xlookup) and
+  [FILTER](/docs/arrays/filter) — common expressions worth naming
+  with LET when a formula calls them more than once.

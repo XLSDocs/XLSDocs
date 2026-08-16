@@ -1,0 +1,31 @@
+---
+title: LET examples
+description: Worked examples for LET — avoiding repeated expressions, multi-step calculations, and readable long formulas.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — naming a single value" formula={`=LET(total, SUM(Sales[Amount]), total)`}>
+  Names the sum once instead of repeating SUM(Sales[Amount]) if it's
+  needed more than once.
+</ExampleCard>
+
+<ExampleCard number="02" label="Avoiding a repeated lookup" formula={`=LET(price, XLOOKUP(A2, Products[Name], Products[Price]), IF(price>100, "Premium", "Standard"))`}>
+  Looks up the price once, then reuses it in the comparison instead
+  of calling XLOOKUP twice.
+</ExampleCard>
+
+<ExampleCard number="03" label="Multi-step calculation" formula={`=LET(subtotal, SUM(A2:A10), discount, subtotal*0.1, subtotal-discount)`}>
+  Builds a final result from two named intermediate values, each
+  computed once.
+</ExampleCard>
+
+<ExampleCard number="04" label="Naming a value that depends on an earlier name" formula={`=LET(total, SUM(A:A), avg, total/COUNT(A:A), avg)`}>
+  The second name (avg) references the first (total), showing names
+  can build on each other within the same LET.
+</ExampleCard>
+
+<ExampleCard number="05" label="Simplifying a long nested formula" formula={`=LET(clean, TRIM(A2), upper, UPPER(clean), LEFT(upper, 3))`}>
+  Breaks a chain of nested text functions into named, readable steps
+  instead of one deeply nested expression.
+</ExampleCard>

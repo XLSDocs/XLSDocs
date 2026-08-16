@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-16',
+    title: 'A new Custom Functions category: LET and LAMBDA',
+    description:
+      'The two functions behind building reusable, custom Excel functions without VBA — including the LAMBDA the homepage\'s own live-code demo has shown since launch, finally with a real page.',
+    tags: ['New functions', 'Milestone'],
+  },
+  {
+    date: '2026-08-16',
     title: 'TEXTSPLIT',
     description:
       'Splits text into rows and/or columns as a live spilled array — the worksheet-formula counterpart to VBA\'s Split, and the last of the forward references from the last few batches.',

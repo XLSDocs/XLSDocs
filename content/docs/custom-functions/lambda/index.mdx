@@ -1,0 +1,172 @@
+---
+title: LAMBDA
+description: Build a custom, reusable function out of a formula — no VBA required.
+---
+
+Turn a formula into a custom, reusable function with its own named
+parameters — the same kind of thing VBA's `Function...End Function`
+does, but as a plain worksheet formula that works in Excel for the
+web too.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Entering a bare LAMBDA in a cell returns #CALC! — it needs to be called or named', type: 'warn' },
+  { text: 'Save it in Name Manager to reuse it like a built-in function', type: 'check' },
+  { text: 'Requires Excel 365 — not available in the perpetual 2021 release', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LAMBDA([parameter1, parameter2, ...,] calculation)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LAMBDA([parameter1, parameter2, ...,] calculation)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'parameter1, parameter2, ...',
+    type: 'text',
+    required: false,
+    description: 'Up to 253 parameter names the calculation can reference. Optional — a LAMBDA with no parameters is valid, just not very useful.',
+  },
+  {
+    name: 'calculation',
+    type: 'any',
+    required: true,
+    description: 'The formula to run, using the parameter names above. Always the last argument.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A function — not a plain value. Calling it with arguments (either
+immediately, or later by name once saved) returns whatever
+`calculation` evaluates to for those arguments.
+
+## Description
+
+LAMBDA is what makes it possible to build a genuinely custom Excel
+function — `TOQUARTER`, `CLEANPHONE`, `WEIGHTEDAVG` — without VBA, a
+macro-enabled file, or anything that Excel for the web can't run. A
+LAMBDA on its own is just a definition; it needs to actually be
+**called** to produce a result, either immediately by appending a
+second set of parentheses with the arguments (`LAMBDA(x, x*2)(5)`
+returns `10`), or saved once under a name in Name Manager so it can
+be called from any cell just like `SUM` or `XLOOKUP`.
+
+<Callout type="warn">
+  Typing `=LAMBDA(x, x*2)` into a cell by itself returns `#CALC!` —
+  "LAMBDA takes 1 argument(s)." A LAMBDA isn't a value until it's
+  called with its arguments: either append them directly
+  (`=LAMBDA(x, x*2)(5)`) or save the LAMBDA under a name first.
+</Callout>
+
+## How to save a LAMBDA as a reusable function
+
+1. Go to **Formulas → Name Manager → New**.
+2. Give it a name (e.g. `TOQUARTER`) — this becomes the function
+   name used in formulas.
+3. In **Refers to**, paste the LAMBDA formula, without a leading `=`
+   and without calling it: `LAMBDA(d, CHOOSE(ROUNDUP(MONTH(d)/3,0), "Q1", "Q2", "Q3", "Q4"))`.
+4. Click OK. `=TOQUARTER(A2)` now works in any cell in the workbook.
+
+## Try it
+
+<TryIt
+  data={{ '2027-01-15': 'Q1', '2027-04-20': 'Q2', '2027-07-10': 'Q3', '2027-11-05': 'Q4' }}
+  defaultValue="2027-01-15"
+  label={'Live preview — TOQUARTER(date), a LAMBDA saved in Name Manager'}
+  fieldLabel="date"
+/>
+
+## Common errors
+
+### #CALC! from an uncalled LAMBDA
+
+<ExcelCode>{`=LAMBDA(x, x*2) → #CALC! ("LAMBDA takes 1 argument(s).")`}</ExcelCode>
+
+Call it with arguments instead of leaving it bare:
+
+<ExcelCode>{`=LAMBDA(x, x*2)(5)`}</ExcelCode>
+
+### Forgetting to remove the leading = when saving in Name Manager
+
+<ExcelCode>{`=LAMBDA(x, x*2) in the "Refers to" field → error`}</ExcelCode>
+
+Name Manager's "Refers to" field needs the formula **without** a
+leading `=`:
+
+<ExcelCode>{`LAMBDA(x, x*2)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Why does my LAMBDA return #CALC! when I enter it in a cell?',
+    answer: 'A LAMBDA is a function definition, not a value — it needs to be called with arguments (LAMBDA(x, x*2)(5)) or saved under a name in Name Manager before it can produce a result.',
+  },
+  {
+    question: 'How is LAMBDA different from writing a VBA function?',
+    answer: "LAMBDA is a plain formula — no macro-enabled file, no VBA editor, and it works in Excel for the web, where VBA doesn't run at all. VBA functions are more powerful for complex logic, but LAMBDA covers a lot of the same ground for pure calculations.",
+  },
+  {
+    question: 'Can a LAMBDA call itself recursively?',
+    answer: "Yes, but only once it's saved under a name — a named LAMBDA can reference its own name inside its calculation to recurse, the same way a VBA function can call itself. An anonymous, unnamed LAMBDA can't self-reference.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LAMBDA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TOQUARTER(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Function ToQuarter(d As Date) As String
+      ToQuarter = "Q" & Application.WorksheetFunction.RoundUp(Month(d) / 3, 0)
+    End Function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    to_quarter = lambda d: f"Q{math.ceil(d.month / 3)}"
+    print(to_quarter(some_date))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LET](/docs/custom-functions/let) — names intermediate values
+  inside a formula; LAMBDA bodies frequently use LET internally to
+  stay readable.
+- [IF](/docs/logical/if) and
+  [CHOOSE](/docs/lookup/choose) — commonly appear inside a LAMBDA's
+  calculation for branching logic.

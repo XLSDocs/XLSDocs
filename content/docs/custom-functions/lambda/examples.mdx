@@ -1,0 +1,32 @@
+---
+title: LAMBDA examples
+description: Worked examples for LAMBDA — calling immediately, saving as a named function, and combining with LET.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — called immediately" formula={`=LAMBDA(x, x*2)(5)`}>
+  Defines a doubling function and calls it right away with 5,
+  returning 10.
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple parameters" formula={`=LAMBDA(price, qty, price*qty)(9.99, 3)`}>
+  A LAMBDA with two parameters, called immediately with both
+  arguments.
+</ExampleCard>
+
+<ExampleCard number="03" label="Calling a LAMBDA saved as TOQUARTER" formula={`=TOQUARTER(A2)`}>
+  Once saved in Name Manager, a LAMBDA is called just like any
+  built-in function.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combining LAMBDA with LET" formula={`=LAMBDA(r, LET(area, PI()*r^2, ROUND(area,2)))(4)`}>
+  Uses LET inside the LAMBDA body to name an intermediate value
+  before rounding it.
+</ExampleCard>
+
+<ExampleCard number="05" label="A recursive LAMBDA (saved as FACTORIAL)" formula={`LAMBDA(n, IF(n<=1, 1, n*FACTORIAL(n-1)))`}>
+  Saved under the name FACTORIAL, this LAMBDA references its own
+  name to recurse, computing a factorial by calling itself with a
+  smaller n each time.
+</ExampleCard>
