@@ -8,6 +8,7 @@ const FOOTER_LINKS = [
   { href: '/tools/formula-builder', label: 'Formula Builder' },
   { href: '/docs', label: 'Docs' },
   { href: '/changelog', label: 'Changelog' },
+  { href: '/faq', label: 'FAQ' },
 ];
 
 function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {

@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-16',
+    title: 'FAQ page',
+    description:
+      'Answers to common site-level questions — cost, sign-up, Excel version coverage, and how to report an issue — that didn\'t fit on any single function page.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-16',
     title: 'A new Custom Functions category: LET and LAMBDA',
     description:
       'The two functions behind building reusable, custom Excel functions without VBA — including the LAMBDA the homepage\'s own live-code demo has shown since launch, finally with a real page.',
