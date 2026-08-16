@@ -1,45 +1,70 @@
 # xlsdocs
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+The Excel function reference built for the AI era — every function
+documented (Excel formulas, VBA, and the code to reproduce them in
+Python/pandas), plus an AI formula builder and a searchable function
+index.
 
-Run development server:
+**Live site:** [xlsdocs.com](https://xlsdocs.com)
+
+Built with [Next.js](https://nextjs.org) and
+[Fumadocs](https://fumadocs.dev), deployed to Cloudflare Workers via
+[OpenNext](https://opennext.js.org/cloudflare).
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-pnpm dev
-# or
-yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open http://localhost:3000 to see the result.
 
-## Explore
+```bash
+npm run types:check   # typegen + tsc --noEmit
+npm run build          # production Next.js build
+```
 
-In the project, you can see:
+## Deploying
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+Deployed to Cloudflare Workers, not a Node server — the build and
+deploy steps go through `@opennextjs/cloudflare`:
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
+```bash
+npm run deploy    # build + deploy to Cloudflare Workers
+npm run preview    # build + run the Workers build locally
+```
 
-### Fumadocs MDX
+## Content structure
 
-Collections are defined with the [Macro API](https://fumadocs.dev/docs/mdx/macro) in `lib/source.ts`.
+Every function page lives under `content/docs/<category>/<function>/`
+as three files:
 
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+- `index.mdx` — syntax, parameters, description, common errors, FAQ,
+  code examples, compatibility, and related functions
+- `examples.mdx` — five worked examples
+- `meta.json` — `{ "title": "<FUNCTION NAME>", "pages": [] }`
 
-## Learn More
+A new top-level category needs its own `meta.json` with
+`"root": true` and an `index.mdx` — without an index page, the
+category's sidebar entry won't appear even if function pages exist
+underneath it.
 
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
+Blog posts live under `content/blog/`. `lib/changelog.ts` tracks
+user-facing changes shown on the `/changelog` page and the homepage
+ticker.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+## Project layout
+
+| Path                       | Description                                              |
+| --------------------------- | --------------------------------------------------------- |
+| `app/(home)`                | Landing page, functions catalog, formula builder tool.    |
+| `app/docs`                  | Documentation layout and function/category pages.         |
+| `app/blog`                  | Blog layout and post pages.                                |
+| `app/api/search/route.ts`   | Route handler for site search.                             |
+| `app/api/formula-builder`   | Route handler for the AI formula builder.                  |
+| `content/docs`               | Function reference content (MDX).                          |
+| `content/blog`               | Blog post content (MDX).                                   |
+| `lib/source.ts`              | Content source adapter — [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access content. |
+| `lib/changelog.ts`           | Changelog entries shown on `/changelog` and the homepage.  |
+| `components/`                | Shared function-page components (`QuickAnswer`, `ParametersTable`, `TryIt`, `Compatibility`, etc.). |
