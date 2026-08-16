@@ -1,0 +1,30 @@
+---
+title: TEXTSPLIT examples
+description: Worked examples for TEXTSPLIT — splitting tags, 2D splits, and handling ragged rows.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic — comma-separated tags" formula={`=TEXTSPLIT(A2, ",")`}>
+  Spills each tag into its own column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Splitting into rows instead of columns" formula={`=TEXTSPLIT(A2, , ";")`}>
+  Skips the column delimiter and splits on semicolons into separate
+  rows instead.
+</ExampleCard>
+
+<ExampleCard number="03" label="Full 2D split" formula={`=TEXTSPLIT(A2, ",", ";")`}>
+  Splits into columns on commas and rows on semicolons, producing a
+  grid in one formula.
+</ExampleCard>
+
+<ExampleCard number="04" label="Ignoring empty pieces" formula={`=TEXTSPLIT(A2, ",", , TRUE)`}>
+  Collapses consecutive commas instead of leaving blank pieces
+  between them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Padding ragged rows with a blank instead of #N/A" formula={`=TEXTSPLIT(A2, ",", ";", , , "")`}>
+  Fills any gaps from uneven row lengths with an empty string instead
+  of the default #N/A.
+</ExampleCard>

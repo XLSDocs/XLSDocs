@@ -63,7 +63,8 @@ is `"c"`.
 
 ## Description
 
-Split is the VBA counterpart to Excel's `TEXTSPLIT` — turning one
+Split is the VBA counterpart to Excel's
+[TEXTSPLIT](/docs/text/textsplit) — turning one
 delimited string into a list of pieces that can be looped over,
 indexed into, or reassembled with `Join`. It's the standard way to
 parse a comma-separated value pasted from elsewhere, break a full
@@ -144,3 +145,6 @@ export const compatibility = [
   substring, rather than splitting on every occurrence.
 - [InputBox](/docs/vba/inputbox) — a common source of the delimited
   text that Split then parses.
+- [TEXTSPLIT](/docs/text/textsplit) — the worksheet-formula
+  counterpart, spilling the pieces across cells instead of returning
+  a code-side array.

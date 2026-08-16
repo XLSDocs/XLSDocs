@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-16',
+    title: 'TEXTSPLIT',
+    description:
+      'Splits text into rows and/or columns as a live spilled array — the worksheet-formula counterpart to VBA\'s Split, and the last of the forward references from the last few batches.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-16',
     title: 'XMATCH, VSTACK, TEXTBEFORE, and TEXTAFTER',
     description:
       'Four modern dynamic-array and text functions — including the exact-by-default replacement for MATCH, a way to stack ranges into one live list, and delimiter-based text extraction that replaces the old LEFT/MID + FIND combinations.',

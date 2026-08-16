@@ -1,0 +1,179 @@
+---
+title: TEXTSPLIT
+description: Split text into rows and/or columns using one or more delimiters, spilling the results automatically.
+---
+
+Split a string into a live spilled array using a delimiter — no
+Text to Columns dialog, no combination of MID/FIND/SEARCH, and no
+fixed destination range to worry about ahead of time.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Splits into columns by default, rows too if row_delimiter is given', type: 'check' },
+  { text: 'Live formula — updates automatically', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TEXTSPLIT(text, col_delimiter, [row_delimiter], [ignore_empty], [match_mode], [pad_with])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TEXTSPLIT(text, col_delimiter, [row_delimiter], [ignore_empty], [match_mode], [pad_with])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The string to split apart.',
+  },
+  {
+    name: 'col_delimiter',
+    type: 'text',
+    required: true,
+    description: 'The text to split into separate columns on.',
+  },
+  {
+    name: 'row_delimiter',
+    type: 'text',
+    required: false,
+    description: 'The text to split into separate rows on, producing a 2D spilled array.',
+  },
+  {
+    name: 'ignore_empty',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE to skip empty results from consecutive delimiters. Defaults to FALSE.',
+  },
+  {
+    name: 'match_mode',
+    type: 'number',
+    required: false,
+    description: '0 (default) case-sensitive · 1 case-insensitive.',
+  },
+  {
+    name: 'pad_with',
+    type: 'any',
+    required: false,
+    description: 'Value used to fill gaps when splitting into a 2D array with uneven row lengths. Defaults to #N/A.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A dynamic array of the pieces of `text`, split on `col_delimiter`
+(and `row_delimiter`, if given), spilled into the cells
+below/right of the formula.
+
+## Description
+
+TEXTSPLIT replaces the pattern of nested MID/FIND/SEARCH formulas —
+or a one-time Text to Columns operation — with a single live
+formula. Passing both a `col_delimiter` and a `row_delimiter` splits
+into a full 2D array at once: a comma-and-semicolon-separated string
+like `"a,b;c,d"` becomes a 2x2 grid in one formula. It's the
+worksheet-formula counterpart to VBA's `Split` function, but spills
+across cells instead of returning a code-side array.
+
+<Callout type="warn">
+  When splitting into a 2D array, rows don't have to come out the
+  same length — TEXTSPLIT fills the gaps with `#N/A` by default. Use
+  `pad_with` to fill with something less alarming, like an empty
+  string, if the ragged array is expected rather than an error
+  condition.
+</Callout>
+
+## Common errors
+
+### #N/A padding from uneven row lengths
+
+<ExcelCode>{`TEXTSPLIT("a,b,c;d,e", ",", ";") → last row padded with #N/A`}</ExcelCode>
+
+Not an error exactly, but a common surprise — supply `pad_with` to
+control what fills the gap instead of `#N/A`:
+
+<ExcelCode>{`TEXTSPLIT("a,b,c;d,e", ",", ";", , , "")`}</ExcelCode>
+
+### Consecutive delimiters producing empty pieces
+
+<ExcelCode>{`TEXTSPLIT("a,,b", ",") → {"a", "", "b"} — an empty piece in the middle`}</ExcelCode>
+
+Set `ignore_empty` to `TRUE` to collapse consecutive delimiters
+instead of keeping the blank pieces between them:
+
+<ExcelCode>{`TEXTSPLIT("a,,b", ",", , TRUE)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'TEXTSPLIT vs the VBA Split function — any difference?',
+    answer: 'Same core idea — breaking a string apart on a delimiter — but TEXTSPLIT spills the pieces across worksheet cells as a live formula, while VBA\'s Split returns an array for use inside code.',
+  },
+  {
+    question: 'How do I split into both rows and columns at once?',
+    answer: 'Supply both delimiters: TEXTSPLIT(text, col_delimiter, row_delimiter) produces a full 2D array, splitting into columns first and then rows.',
+  },
+  {
+    question: 'TEXTSPLIT vs Text to Columns — which should I use?',
+    answer: 'TEXTSPLIT is a live formula that updates automatically when the source text changes. Text to Columns is a one-time, destructive operation that overwrites the selected cells — use TEXTSPLIT whenever the source data might change.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TEXTSPLIT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TEXTSPLIT(Orders[Tags], ",")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim parts() As String
+    parts = Split(Range("A2").Value, ",")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    parts = df["Tags"].str.split(",")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TEXTBEFORE](/docs/text/textbefore) and
+  [TEXTAFTER](/docs/text/textafter) — pull a single piece around one
+  delimiter occurrence, instead of splitting every occurrence at once.
+- [Split](/docs/vba/split) — the VBA counterpart, returning a
+  code-side array instead of spilling across cells.
+- [VSTACK](/docs/arrays/vstack) — combines multiple ranges rather
+  than splitting one string, but produces the same kind of spilled
+  array result.
