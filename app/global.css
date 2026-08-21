@@ -97,6 +97,22 @@
   transition: background-size 0.2s ease;
 }
 
+/*
+ * A border whose color fades along its own edge (brighter top-left, fading
+ * to the normal border color by bottom-right) instead of one flat shade —
+ * the standard two-layer trick: a solid inner layer clipped to padding-box
+ * covers the card's interior, leaving only the border ring showing the
+ * gradient layer underneath, clipped to border-box.
+ */
+.gradient-border-card {
+  border: 1px solid transparent;
+  background-image:
+    linear-gradient(var(--color-fd-card), var(--color-fd-card)),
+    linear-gradient(135deg, color-mix(in oklch, var(--color-fd-primary) 55%, transparent), var(--color-fd-border) 65%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
 .prose a:hover {
   background-size: 100% 1.5px;
 }
