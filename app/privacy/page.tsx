@@ -1,7 +1,27 @@
 import type { Metadata } from 'next';
+import { UserX, Cookie, Shield, Database } from 'lucide-react';
 import { HomeNav } from '@/components/home/nav';
 import { Footer } from '@/components/home/footer';
 import { gitConfig } from '@/lib/shared';
+
+const QUICK_FACTS = [
+  {
+    icon: UserX,
+    text: 'No account or email required to use any tool on this site — the free tools are genuinely free, no signup.',
+  },
+  {
+    icon: Cookie,
+    text: 'Analytics is cookieless (Cloudflare Web Analytics) — no tracking, no cross-site profiles.',
+  },
+  {
+    icon: Shield,
+    text: 'No ads, no ad trackers, anywhere on this site. The only cookie set is for subscription status, and only if you subscribe.',
+  },
+  {
+    icon: Database,
+    text: 'Nothing is sold, rented, or shared with third parties for marketing — ever.',
+  },
+];
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -26,6 +46,15 @@ export default function PrivacyPage() {
             Last updated August 21, 2026. This describes what xlsdocs.com
             actually collects and does — not a generic template.
           </p>
+
+          <div className="mt-8 grid gap-x-8 gap-y-5 rounded-xl border border-fd-border bg-fd-card p-6 sm:grid-cols-2">
+            {QUICK_FACTS.map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-start gap-3">
+                <Icon className="mt-0.5 size-5 shrink-0 text-fd-primary" />
+                <p className="text-sm text-fd-muted-foreground">{text}</p>
+              </div>
+            ))}
+          </div>
 
           <article className="prose mt-10">
             <h2>The short version</h2>
