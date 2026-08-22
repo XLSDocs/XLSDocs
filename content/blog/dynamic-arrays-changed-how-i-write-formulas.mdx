@@ -67,3 +67,22 @@ If you learned Excel before 2020, dynamic arrays are worth an
 afternoon of deliberate practice — not because the syntax is hard, but
 because the instinct to reach for a helper column is. That instinct is
 the thing actually being replaced.
+
+export const faqs = [
+  {
+    question: 'What causes #SPILL!, and how do I fix it?',
+    answer: 'A dynamic array formula\'s spill range is blocked by existing data in a neighboring cell. Clear whatever\'s in the way, or move the formula somewhere with empty cells below/right of it.',
+  },
+  {
+    question: 'Do FILTER, SORT, and UNIQUE work in older Excel versions?',
+    answer: 'No — they require Excel 365 or 2021. Older versions need the helper-column or `Ctrl+Shift+Enter` array-formula approaches this post describes replacing.',
+  },
+  {
+    question: 'Is UNIQUE the same as Remove Duplicates?',
+    answer: 'Functionally similar output, but UNIQUE is a live formula that updates automatically as source data changes — Remove Duplicates is a one-time, destructive edit to the data itself.',
+  },
+  {
+    question: 'Why does nesting FILTER, SORT, and UNIQUE together get hard to debug?',
+    answer: 'You can\'t see the intermediate result each layer produces — only the final output. Breaking a long chain into named LET/LAMBDA steps, or even just intermediate cells, makes each layer inspectable again.',
+  },
+];

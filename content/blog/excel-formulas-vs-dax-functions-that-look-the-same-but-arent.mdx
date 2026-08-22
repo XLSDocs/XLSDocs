@@ -89,3 +89,22 @@ three months later as "why is this measure sometimes wrong."
 Full reference pages for the Excel side of these functions:
 [IF](/docs/logical/if), [SWITCH](/docs/logical/switch),
 [ISBLANK](/docs/info/isblank), and [IFERROR](/docs/logical/iferror).
+
+export const faqs = [
+  {
+    question: 'Why does IF handle blanks differently in DAX vs Excel?',
+    answer: 'DAX\'s BLANK() propagates through arithmetic — [Amount] + BLANK() returns [Amount] unchanged. The equivalent in Excel, A2 + "", throws #VALUE! instead. A measure built on the Excel assumption that blank behaves like an error will quietly produce wrong totals rather than visibly failing.',
+  },
+  {
+    question: 'What\'s the Excel equivalent of DAX\'s SWITCH(TRUE(), ...) pattern?',
+    answer: 'IFS — Excel\'s own SWITCH only does exact-match comparisons against one value, with no equivalent for the range-based branching that SWITCH(TRUE(), ...) does in DAX.',
+  },
+  {
+    question: 'Should I use IFERROR or DIVIDE for division in DAX?',
+    answer: 'DIVIDE — it has a built-in zero-denominator handler that\'s meaningfully cheaper to evaluate at scale than IFERROR wrapping a plain division. Excel has no DIVIDE equivalent, so IFERROR-wrapped division is the standard approach there instead.',
+  },
+  {
+    question: 'If a DAX function shares a name with an Excel function, does it behave the same?',
+    answer: 'Not necessarily — check what the DAX version actually does with blanks, filter context, and error propagation specifically, not just what arguments it takes. The syntax similarity is real; the behavior underneath can differ in ways that only show up later.',
+  },
+];

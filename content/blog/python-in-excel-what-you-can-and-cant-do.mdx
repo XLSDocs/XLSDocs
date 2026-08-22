@@ -67,3 +67,22 @@ If your job already looks like pandas — grouping, merging, plotting —
 Python in Excel removes a genuinely painful export-to-notebook step.
 If your job looks like "reformat this report every Monday," you still
 want VBA, or a Power Query refresh.
+
+export const faqs = [
+  {
+    question: 'Does Python in Excel run on my local machine?',
+    answer: 'No — every `=PY()` cell runs in a sandboxed, cloud-hosted Python environment. It has no internet access and can\'t read local files; every input has to already be on the sheet, brought in via `xl()`.',
+  },
+  {
+    question: 'Why did my =PY() formula give a wrong answer on a large table?',
+    answer: 'There\'s a hard row limit on what `xl()` will pull into Python per call. Past that limit it truncates silently instead of erroring loudly, which is the most common cause of an unexpectedly wrong result.',
+  },
+  {
+    question: 'Why doesn\'t my Python-generated chart update automatically?',
+    answer: '`=PY()` results don\'t recalculate on every keystroke the way normal formulas do — Excel batches Python execution to avoid overloading the sandbox. Check that the workbook is actually set to auto-calculate Python cells if something looks stale.',
+  },
+  {
+    question: 'Should I replace my VBA macros with Python in Excel?',
+    answer: 'Not wholesale. VBA still owns anything that touches the Excel object model directly — formatting, UI automation, event handlers, talking to other Office apps. Python in Excel is for the analysis layer on top of your data, and the two coexist fine in the same workbook.',
+  },
+];
