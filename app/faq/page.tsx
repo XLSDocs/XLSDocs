@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { HomeNav } from '@/components/home/nav';
 import { Footer } from '@/components/home/footer';
 import { Faq, type FaqItem } from '@/components/faq';
+import { contactEmail } from '@/lib/shared';
 
 export const metadata: Metadata = {
   title: 'FAQ',
@@ -38,7 +39,7 @@ const faqs: FaqItem[] = [
   },
   {
     question: 'I found an error, or a function that\'s missing — how do I report it?',
-    answer: 'Every function page has "Edit this page" and "Report an issue" links that go straight to the source repository on GitHub — no account needed to view them, and a free GitHub account to submit a change or issue.',
+    answer: `Every function page has "Edit this page" and "Report an issue" links that go straight to the source repository on GitHub — no account needed to view them, and a free GitHub account to submit a change or issue. Prefer email? Send it to ${contactEmail}.`,
   },
   {
     question: 'How often is new content added?',

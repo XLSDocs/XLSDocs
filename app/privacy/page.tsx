@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { UserX, Cookie, Shield, Database } from 'lucide-react';
 import { HomeNav } from '@/components/home/nav';
 import { Footer } from '@/components/home/footer';
-import { gitConfig } from '@/lib/shared';
+import { gitConfig, contactEmail } from '@/lib/shared';
 
 const QUICK_FACTS = [
   {
@@ -143,12 +143,14 @@ export default function PrivacyPage() {
             <p>
               Since there's no account system, there's no dashboard to
               delete data from — rate-limit and feedback data are already
-              anonymous and short-lived by design. If you have a question
-              about any of this, or want something looked into,{' '}
+              anonymous and short-lived by design. For a privacy question or
+              request, email{' '}
+              <a href={`mailto:${contactEmail}`}>{contactEmail}</a>. For a
+              bug or a missing function,{' '}
               <a href={issuesUrl} target="_blank" rel="noreferrer noopener">
                 open an issue on GitHub
-              </a>
-              .
+              </a>{' '}
+              instead.
             </p>
 
             <h2>Changes to this policy</h2>
