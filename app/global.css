@@ -113,6 +113,39 @@
   background-clip: padding-box, border-box;
 }
 
+/*
+ * Same gradient-ring idea as .gradient-border-card, but flat/invisible by
+ * default and faded in on hover via a ::before pseudo-element instead of
+ * the element's own background — background-image can't transition
+ * smoothly, opacity can.
+ */
+.category-card {
+  border: 1px solid var(--color-fd-border);
+  transition: border-color 0.3s ease;
+}
+.category-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--color-fd-primary), transparent 70%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.category-card:hover {
+  border-color: transparent;
+}
+.category-card:hover::before {
+  opacity: 1;
+}
+
 .prose a:hover {
   background-size: 100% 1.5px;
 }

@@ -25,8 +25,10 @@ export function Hero() {
           <span className="font-serif italic text-fd-primary">the AI era</span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-fd-muted-foreground">
-          Every function documented. An AI formula builder that actually
-          works. The Excel reference site power users deserve.
+          Every formula, VBA function, and custom LAMBDA documented. An AI
+          formula builder that actually works, plus a Claude-powered
+          assistant on every page. The Excel reference site power users
+          deserve.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <Link
