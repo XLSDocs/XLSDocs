@@ -11,10 +11,11 @@ export async function checkRateLimit(
   request: Request,
   routeKey: string,
   limit: number,
+  identifier?: string,
 ): Promise<{ allowed: boolean }> {
-  const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
+  const id = identifier ?? request.headers.get('cf-connecting-ip') ?? 'unknown';
   const { env } = await getCloudflareContext({ async: true });
-  const key = `ratelimit:${routeKey}:${ip}`;
+  const key = `ratelimit:${routeKey}:${id}`;
 
   const current = Number((await env.FEEDBACK.get(key)) ?? '0');
   if (current >= limit) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, Sparkle } from 'lucide-react';
 import { ExcelCode } from '@/components/excel-code';
 import { CodeRainBackground } from '@/components/shared/code-rain';
 
@@ -28,19 +28,32 @@ interface Build {
   breakdown: BreakdownItem[];
 }
 
-export function FormulaBuilder() {
+interface FormulaBuilderProps {
+  initialIsSubscriber: boolean;
+  billingEnabled: boolean;
+  checkoutStatus: 'upgraded' | 'canceled' | null;
+}
+
+export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutStatus }: FormulaBuilderProps) {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [rateLimited, setRateLimited] = useState(false);
   const [result, setResult] = useState<Build | null>(null);
   const [recent, setRecent] = useState<Build[]>([]);
+  const [upgrading, setUpgrading] = useState(false);
+  const [billingError, setBillingError] = useState('');
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+
+  const isSubscriber = initialIsSubscriber;
 
   async function build(text: string) {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
     setLoading(true);
     setError('');
+    setRateLimited(false);
 
     try {
       const res = await fetch('/api/formula-builder', {
@@ -56,6 +69,7 @@ export function FormulaBuilder() {
       };
       if (data.error) {
         setError(data.error);
+        setRateLimited(res.status === 429);
       } else {
         const build: Build = {
           prompt: trimmed,
@@ -73,6 +87,44 @@ export function FormulaBuilder() {
     }
   }
 
+  async function startCheckout() {
+    if (upgrading) return;
+    setUpgrading(true);
+    setBillingError('');
+    try {
+      const res = await fetch('/api/checkout', { method: 'POST' });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setBillingError(data.error ?? 'Could not start checkout.');
+        setUpgrading(false);
+      }
+    } catch {
+      setBillingError('Could not start checkout.');
+      setUpgrading(false);
+    }
+  }
+
+  async function openBillingPortal() {
+    if (upgrading) return;
+    setUpgrading(true);
+    setBillingError('');
+    try {
+      const res = await fetch('/api/billing/portal', { method: 'POST' });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setBillingError(data.error ?? 'Could not open the billing portal.');
+        setUpgrading(false);
+      }
+    } catch {
+      setBillingError('Could not open the billing portal.');
+      setUpgrading(false);
+    }
+  }
+
   return (
     <section ref={sectionRef} className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-0 opacity-60">
@@ -80,10 +132,18 @@ export function FormulaBuilder() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-3xl px-6 pt-20 pb-8 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-fd-border px-3 py-1 font-mono text-xs text-fd-muted-foreground">
-          <Sparkles className="size-3 text-fd-primary" />
-          Powered by Claude
-        </span>
+        <div className="flex items-center justify-center gap-2">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-fd-border px-3 py-1 font-mono text-xs text-fd-muted-foreground">
+            <Sparkles className="size-3 text-fd-primary" />
+            Powered by Claude
+          </span>
+          {isSubscriber && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-fd-primary/30 bg-fd-primary/10 px-3 py-1 font-mono text-xs text-fd-primary">
+              <Sparkle className="size-3" />
+              Unlimited
+            </span>
+          )}
+        </div>
         <h1 className="mt-6 text-4xl font-normal md:text-5xl">
           AI Formula <span className="font-serif text-fd-primary italic">Builder</span>
         </h1>
@@ -91,6 +151,52 @@ export function FormulaBuilder() {
           Describe what you want in plain English. Get the exact Excel formula
           — with a full breakdown of every argument.
         </p>
+
+        {checkoutStatus && !bannerDismissed && (
+          <div
+            className={`mx-auto mt-4 flex max-w-lg items-center justify-between gap-3 rounded-lg border px-4 py-2 text-sm ${
+              checkoutStatus === 'upgraded'
+                ? 'border-fd-primary/30 bg-fd-primary/10 text-fd-primary'
+                : 'border-fd-border bg-fd-card text-fd-muted-foreground'
+            }`}
+          >
+            <span>
+              {checkoutStatus === 'upgraded'
+                ? "You're upgraded — unlimited builds unlocked."
+                : 'Checkout canceled — no charge was made.'}
+            </span>
+            <button
+              onClick={() => setBannerDismissed(true)}
+              className="shrink-0 text-xs underline decoration-dotted underline-offset-2 hover:opacity-80"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        {billingEnabled && (
+          <div className="mt-4">
+            {isSubscriber ? (
+              <button
+                onClick={openBillingPortal}
+                disabled={upgrading}
+                className="text-xs text-fd-muted-foreground underline decoration-dotted underline-offset-2 hover:text-fd-foreground disabled:opacity-50"
+              >
+                {upgrading ? 'Opening…' : 'Manage subscription'}
+              </button>
+            ) : (
+              <button
+                onClick={startCheckout}
+                disabled={upgrading}
+                className="inline-flex items-center gap-1.5 rounded-full border border-fd-primary/30 bg-fd-primary/10 px-4 py-1.5 text-sm font-medium text-fd-primary transition-colors hover:bg-fd-primary/20 disabled:opacity-50"
+              >
+                {upgrading ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkle className="size-3.5" />}
+                Upgrade — $5/mo for unlimited
+              </button>
+            )}
+            {billingError && <p className="mt-2 text-xs text-red-400">{billingError}</p>}
+          </div>
+        )}
 
         <div className="mx-auto mt-8 rounded-xl border border-fd-border bg-fd-card/80 p-3 text-left">
           <textarea
@@ -117,7 +223,20 @@ export function FormulaBuilder() {
             </button>
           </div>
         </div>
-        {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+        {error && (
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <p className="text-sm text-red-400">{error}</p>
+            {rateLimited && billingEnabled && !isSubscriber && (
+              <button
+                onClick={startCheckout}
+                disabled={upgrading}
+                className="text-sm font-medium text-fd-primary underline decoration-dotted underline-offset-2 hover:opacity-80 disabled:opacity-50"
+              >
+                Upgrade for unlimited →
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="relative z-10 mx-auto flex max-w-6xl gap-8 px-6 pb-20">

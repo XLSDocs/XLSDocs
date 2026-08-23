@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { checkSubscriber } from '@/lib/subscription';
+
+// Generous, but not fully unlimited — bounds worst-case Anthropic API cost
+// from a leaked/shared cookie or a KV outage forcing fail-open, while being
+// effectively unlimited for any real single user of this tool.
+const SUBSCRIBER_LIMIT = 300;
+const FREE_LIMIT = 15;
 
 const SYSTEM_PROMPT = `You are an Excel formula expert. The user will describe, in plain English, a spreadsheet task. Respond with the exact Excel formula that accomplishes it, plus a breakdown of each part.
 
@@ -24,12 +31,18 @@ interface AnthropicMessagesResponse {
 }
 
 export async function POST(req: NextRequest) {
-  const { allowed } = await checkRateLimit(req, 'formula-builder', 15);
+  const subscriber = await checkSubscriber(req);
+  const { allowed } = subscriber.isSubscriber
+    ? await checkRateLimit(req, 'formula-builder-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
+    : await checkRateLimit(req, 'formula-builder', FREE_LIMIT);
+
   if (!allowed) {
-    return NextResponse.json(
-      { error: "You've hit the free limit for the Formula Builder this hour — try again later." },
-      { status: 429 },
-    );
+    const message = subscriber.isSubscriber
+      ? "You've hit an unusually high usage spike — try again shortly."
+      : "You've hit the free limit for the Formula Builder this hour — upgrade for unlimited, or try again later.";
+    const res = NextResponse.json({ error: message }, { status: 429 });
+    if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
+    return res;
   }
 
   const { prompt } = (await req.json()) as FormulaBuilderRequestBody;
@@ -78,11 +91,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Malformed response from Claude.' }, { status: 500 });
     }
 
-    return NextResponse.json({
+    const successRes = NextResponse.json({
       formula: parsed.formula,
       explanation: parsed.explanation ?? '',
       breakdown: parsed.breakdown,
     });
+    if (subscriber.setCookieHeader) successRes.headers.append('Set-Cookie', subscriber.setCookieHeader);
+    return successRes;
   } catch {
     return NextResponse.json({ error: 'Failed to reach Claude API.' }, { status: 500 });
   }
