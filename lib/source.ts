@@ -23,6 +23,41 @@ export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
   plugins: [lucideIconsPlugin()],
+  pageTree: {
+    transformers: [
+      {
+        // Every function page (e.g. content/docs/date/datedif/) is a folder
+        // containing index.mdx + examples.mdx, but its meta.json sets
+        // `"pages": []` so neither is listed as a sidebar child (Examples is
+        // reached via the in-page FunctionNav tabs instead). That leaves an
+        // empty-children folder node, which fumadocs-ui still renders with a
+        // chevron even though expanding it reveals nothing. Category folders
+        // always have real children, so this only ever collapses function
+        // (leaf) nodes into a plain link.
+        folder(node) {
+          // Must be a fresh object, not `node.index` itself: fumadocs tracks
+          // node ownership by object identity to dedupe a file appearing in
+          // two places, and `node.index` is already "owned" by this folder
+          // at the same priority the parent would claim it at — reusing the
+          // reference makes the parent's ownership claim lose, silently
+          // dropping this item from the parent's children.
+          if (node.children.length === 0 && node.index) {
+            const idx = node.index;
+            return {
+              type: 'page',
+              name: idx.name,
+              url: idx.url,
+              description: idx.description,
+              icon: idx.icon,
+              external: idx.external,
+              $ref: idx.$ref,
+            } as unknown as typeof node;
+          }
+          return node;
+        },
+      },
+    ],
+  },
 });
 
 export function getPageImageUrl(page: (typeof source)['$inferPage']) {
