@@ -143,12 +143,29 @@ interface Message {
   content: string;
 }
 
+const FREE_LIMIT_MESSAGE = "You've hit the free limit for Ask Claude this hour — upgrade for unlimited, or try again later.";
+
 export function AskClaude({ pageTitle }: { pageTitle: string }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [rateLimited, setRateLimited] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  async function startCheckout() {
+    if (upgrading) return;
+    setUpgrading(true);
+    try {
+      const res = await fetch('/api/checkout', { method: 'POST' });
+      const data = (await res.json()) as { url?: string };
+      if (data.url) window.location.href = data.url;
+      else setUpgrading(false);
+    } catch {
+      setUpgrading(false);
+    }
+  }
 
   const quickQuestions = [
     `What does ${pageTitle} do?`,
@@ -166,6 +183,7 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
     setMessages(next);
     setInput('');
     setLoading(true);
+    setRateLimited(false);
 
     try {
       const res = await fetch('/api/ask-claude', {
@@ -176,6 +194,7 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
       const data = (await res.json()) as { reply?: string; error?: string };
       if (data.error) {
         setMessages([...next, { role: 'assistant', content: `Error: ${data.error}` }]);
+        if (res.status === 429 && data.error === FREE_LIMIT_MESSAGE) setRateLimited(true);
       } else {
         setMessages([...next, { role: 'assistant', content: data.reply ?? '' }]);
       }
@@ -251,6 +270,19 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
                 </div>
               )}
             </div>
+
+            {rateLimited && (
+              <div className="flex items-center justify-between gap-2 border-t bg-fd-primary/10 px-4 py-2 text-xs">
+                <span className="text-fd-primary">Free limit reached for this hour.</span>
+                <button
+                  onClick={startCheckout}
+                  disabled={upgrading}
+                  className="shrink-0 font-medium text-fd-primary underline decoration-dotted underline-offset-2 hover:opacity-80 disabled:opacity-50"
+                >
+                  {upgrading ? 'Opening…' : 'Upgrade — $5/mo for unlimited →'}
+                </button>
+              </div>
+            )}
 
             <div className="flex gap-2 p-3 border-t">
               <input

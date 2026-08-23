@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { checkSubscriber } from '@/lib/subscription';
+
+// Same subscription that unlocks the Formula Builder also covers Ask Claude —
+// one $5/mo tier, not a second paywall. Free limit is deliberately lower than
+// Formula Builder's: a chat panel invites more back-and-forth messages per
+// visit than a single formula request.
+const SUBSCRIBER_LIMIT = 200;
+const FREE_LIMIT = 8;
 
 interface AskClaudeRequestBody {
   messages: { role: 'user' | 'assistant'; content: string }[];
@@ -12,12 +20,18 @@ interface AnthropicMessagesResponse {
 }
 
 export async function POST(req: NextRequest) {
-  const { allowed } = await checkRateLimit(req, 'ask-claude', 20);
+  const subscriber = await checkSubscriber(req);
+  const { allowed } = subscriber.isSubscriber
+    ? await checkRateLimit(req, 'ask-claude-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
+    : await checkRateLimit(req, 'ask-claude', FREE_LIMIT);
+
   if (!allowed) {
-    return NextResponse.json(
-      { error: "You've hit the free limit for Ask Claude this hour — try again later." },
-      { status: 429 },
-    );
+    const message = subscriber.isSubscriber
+      ? "You've hit an unusually high usage spike — try again shortly."
+      : "You've hit the free limit for Ask Claude this hour — upgrade for unlimited, or try again later.";
+    const res = NextResponse.json({ error: message }, { status: 429 });
+    if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
+    return res;
   }
 
   const { messages, pageTitle } = (await req.json()) as AskClaudeRequestBody;
@@ -54,7 +68,9 @@ export async function POST(req: NextRequest) {
     }
 
     const reply = data.content?.find((b: { type: string }) => b.type === 'text')?.text ?? '';
-    return NextResponse.json({ reply });
+    const successRes = NextResponse.json({ reply });
+    if (subscriber.setCookieHeader) successRes.headers.append('Set-Cookie', subscriber.setCookieHeader);
+    return successRes;
   } catch {
     return NextResponse.json({ error: 'Failed to reach Claude API.' }, { status: 500 });
   }
