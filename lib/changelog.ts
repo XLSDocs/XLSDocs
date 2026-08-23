@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-23',
+    title: 'NPER, PPMT, and IPMT',
+    description:
+      'Three more Financial functions round out the loan-amortization set alongside PMT — solving for the number of payments instead of the payment amount, and splitting any individual payment into its principal and interest portions.',
+    tags: ['New functions'],
+  },
+  {
     date: '2026-08-22',
     title: 'A better docs sidebar',
     description:

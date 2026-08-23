@@ -1,0 +1,187 @@
+---
+title: PPMT
+description: Calculate the principal portion of a specific loan payment, given a constant payment amount and a constant interest rate.
+---
+
+Calculate how much of one specific payment goes toward paying down
+the principal (the original loan balance), as opposed to interest —
+the building block behind a full amortization schedule.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'per must be between 1 and nper — it identifies which payment', type: 'warn' },
+  { text: 'PPMT + IPMT for the same per always equals the total PMT', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PPMT(rate, per, nper, pv, [fv], [type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PPMT(rate, per, nper, pv, [fv], [type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period (not per year, unless the period is a year).',
+  },
+  {
+    name: 'per',
+    type: 'number',
+    required: true,
+    description: 'The specific payment period to calculate, from 1 to nper.',
+  },
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The present value — the loan amount received now.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: false,
+    description: 'The desired cash balance after the last payment. Defaults to 0 (loan fully paid off).',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: false,
+    description: '0 for payments due at the end of each period (default), 1 for payments due at the start.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The principal portion of the payment identified by `per`, as a
+negative number (money paid out), following the same cash-flow sign
+convention as PMT.
+
+## Description
+
+Every loan payment splits into two parts: interest on the remaining
+balance, and principal that actually reduces the balance. PPMT
+isolates the principal part of one specific payment — early payments
+on a standard loan are mostly interest, and the principal share grows
+with each payment as the balance shrinks.
+
+<Callout type="info">
+  For any payment period, `PPMT(...) + IPMT(...)` (with identical
+  arguments) always equals the total payment from `PMT(...)` — the
+  two functions are a full breakdown of the same fixed payment, not
+  independent calculations.
+</Callout>
+
+## Common errors
+
+### #NUM! — per is outside the valid range
+
+<ExcelCode>{`PPMT(5%/12, 0, 360, 200000) → #NUM!`}</ExcelCode>
+
+`per` must be between `1` and `nper`. Payment "0" doesn't exist —
+the first payment is period 1.
+
+### The principal amount looks backwards — too small early, too large late
+
+This is expected, not an error. Early payments on a standard
+amortizing loan are mostly interest (the balance is still high), so
+the principal portion starts small and grows every period as the
+balance shrinks — the exact opposite pattern from what intuition
+suggests.
+
+### Building a full schedule returns the wrong total
+
+A full amortization schedule needs `per` to increment by 1 in each
+row (`per=1`, `per=2`, `per=3`, ...), typically via a relative
+reference like `=PPMT($B$1, ROW()-1, $B$2, $B$3)` dragged down a
+column — reusing the same `per` value in every row is the most common
+mistake when building one by hand.
+
+export const faqs = [
+  {
+    question: 'Why is the principal portion so small on early payments?',
+    answer:
+      "That's expected. The interest portion is calculated on the full remaining balance, which is highest at the start of the loan — so early payments are mostly interest, and the principal share grows every period as the balance shrinks.",
+  },
+  {
+    question: 'How do PPMT and IPMT relate to PMT?',
+    answer:
+      "PPMT and IPMT split PMT's total payment into its principal and interest components for one specific period. Add them together (with identical rate/nper/pv/fv/type arguments) and the result equals PMT for that same loan.",
+  },
+  {
+    question: 'What does the per argument actually mean?',
+    answer:
+      'per identifies which single payment in the loan’s life to analyze — 1 for the first payment, 2 for the second, and so on up to nper. Each call to PPMT only returns the breakdown for that one payment, not the whole schedule.',
+  },
+  {
+    question: 'How do I build a full amortization schedule with PPMT?',
+    answer:
+      "List payment numbers 1 through nper down a column, then use PPMT (and IPMT) with that column as the per argument, keeping rate/nper/pv fixed with absolute references — one row per payment period.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PPMT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PPMT(5%/12, 1, 30*12, 200000)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim principalPortion As Double
+    principalPortion = PPmt(0.05 / 12, 1, 30 * 12, 200000)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    principal_portion = npf.ppmt(0.05 / 12, 1, 30 * 12, 200000)
+    print(principal_portion)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IPMT](/docs/financial/ipmt) — the interest portion of the same
+  payment; add the two together to get the total PMT.
+- [PMT](/docs/financial/pmt) — the total fixed payment amount per
+  period, before splitting into principal and interest.
+- [NPER](/docs/financial/nper) — the total number of payment periods
+  for the loan.

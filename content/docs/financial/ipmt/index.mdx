@@ -1,0 +1,187 @@
+---
+title: IPMT
+description: Calculate the interest portion of a specific loan payment, given a constant payment amount and a constant interest rate.
+---
+
+Calculate how much of one specific payment goes toward interest, as
+opposed to reducing the loan balance — the other half of PPMT's
+principal/interest breakdown.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'per must be between 1 and nper — it identifies which payment', type: 'warn' },
+  { text: 'PPMT + IPMT for the same per always equals the total PMT', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=IPMT(rate, per, nper, pv, [fv], [type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IPMT(rate, per, nper, pv, [fv], [type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period (not per year, unless the period is a year).',
+  },
+  {
+    name: 'per',
+    type: 'number',
+    required: true,
+    description: 'The specific payment period to calculate, from 1 to nper.',
+  },
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The present value — the loan amount received now.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: false,
+    description: 'The desired cash balance after the last payment. Defaults to 0 (loan fully paid off).',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: false,
+    description: '0 for payments due at the end of each period (default), 1 for payments due at the start.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The interest portion of the payment identified by `per`, as a
+negative number (money paid out), following the same cash-flow sign
+convention as PMT.
+
+## Description
+
+IPMT calculates interest on whatever balance remains at the start of
+period `per` — since a standard loan's balance shrinks over time, the
+interest charge (and therefore IPMT's result) shrinks with it. The
+first payment carries the most interest of any payment in the loan;
+the last carries the least.
+
+<Callout type="info">
+  For any payment period, `IPMT(...) + PPMT(...)` (with identical
+  arguments) always equals the total payment from `PMT(...)` — these
+  two functions split the same fixed payment, they don't calculate
+  independent amounts.
+</Callout>
+
+## Common errors
+
+### #NUM! — per is outside the valid range
+
+<ExcelCode>{`IPMT(5%/12, 0, 360, 200000) → #NUM!`}</ExcelCode>
+
+`per` must be between `1` and `nper`. Payment "0" doesn't exist —
+the first payment is period 1.
+
+### The interest amount seems too high on early payments
+
+This is expected, not an error. Interest is charged on the full
+remaining balance, which is highest right after the loan starts —
+IPMT's result is largest on the first payment and decreases every
+period after that as the balance is paid down.
+
+### Total interest paid over the life of the loan is wrong
+
+Summing IPMT across every period (`=SUM(IPMT(rate, 1, nper, pv), ...,
+IPMT(rate, nper, nper, pv))`) gives total interest paid — but it's
+easy to get this wrong by summing a fixed number of rows that doesn't
+actually match `nper`. Use `CUMIPMT` instead when the total across a
+whole range of periods is needed, rather than building the sum by
+hand.
+
+export const faqs = [
+  {
+    question: 'Why is the interest portion so large on the first payment?',
+    answer:
+      "Interest is calculated on the loan's full remaining balance, which is highest at the very start. As payments reduce the balance, each subsequent period's interest charge — and IPMT's result — gets smaller.",
+  },
+  {
+    question: 'How do IPMT and PPMT relate to PMT?',
+    answer:
+      "IPMT and PPMT split PMT's total fixed payment into its interest and principal components for one specific period. Add them together (with identical rate/nper/pv/fv/type arguments) and the result equals PMT for that same loan.",
+  },
+  {
+    question: 'How do I find the total interest paid over the whole loan?',
+    answer:
+      'CUMIPMT sums the interest portion across a whole range of periods in one call, which is more reliable than manually adding up IPMT for every individual period.',
+  },
+  {
+    question: 'Does IPMT work for savings/investment plans, not just loans?',
+    answer:
+      "Yes — the same principal/interest split applies to any constant-payment, constant-rate cash flow, including regular contributions toward a savings goal, not just loan repayment.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IPMT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IPMT(5%/12, 1, 30*12, 200000)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim interestPortion As Double
+    interestPortion = IPmt(0.05 / 12, 1, 30 * 12, 200000)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    interest_portion = npf.ipmt(0.05 / 12, 1, 30 * 12, 200000)
+    print(interest_portion)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PPMT](/docs/financial/ppmt) — the principal portion of the same
+  payment; add the two together to get the total PMT.
+- [PMT](/docs/financial/pmt) — the total fixed payment amount per
+  period, before splitting into principal and interest.
+- [NPER](/docs/financial/nper) — the total number of payment periods
+  for the loan.

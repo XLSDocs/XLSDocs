@@ -1,0 +1,183 @@
+---
+title: NPER
+description: Calculate the number of payment periods needed to pay off a loan or reach a savings goal with constant payments and a constant interest rate.
+---
+
+Calculate how many payment periods a loan or savings plan will take,
+given a fixed payment amount and a constant interest rate — the
+question "how long until this is paid off?" answered directly.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'rate and pmt must match the same period (monthly rate for monthly payments)', type: 'warn' },
+  { text: 'pmt and pv normally need opposite signs — see Description', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=NPER(rate, pmt, pv, [fv], [type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NPER(rate, pmt, pv, [fv], [type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period (not per year, unless the period is a year).',
+  },
+  {
+    name: 'pmt',
+    type: 'number',
+    required: true,
+    description: 'The fixed payment made each period. Cannot change over the life of the loan.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The present value — the loan amount received now, or the current value of the investment.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: false,
+    description: 'The desired cash balance after the last payment. Defaults to 0 (loan fully paid off).',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: false,
+    description: '0 for payments due at the end of each period (default), 1 for payments due at the start.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of payment periods required, as a decimal number. A
+result of `47.3` means the loan is paid off partway through the 48th
+period — most amortization schedules round this up to a whole number
+of payments.
+
+## Description
+
+NPER answers the same underlying loan-math question as PMT, PV, and
+FV, just solved for a different unknown: instead of "what's the
+payment?", it's "how many payments?" All four share the same
+cash-flow sign convention.
+
+<Callout type="warn">
+  `pmt` and `pv` normally need **opposite signs** — a loan received
+  (positive `pv`) is paid off with money going out (negative `pmt`).
+  Passing both as positive numbers is the single most common cause of
+  a `#NUM!` error or a nonsensical result from NPER.
+</Callout>
+
+## Common errors
+
+### #NUM! — pv and pmt have the same sign
+
+<ExcelCode>{`NPER(5%/12, 1000, 200000) → #NUM!`}</ExcelCode>
+
+Both `pv` (200000) and `pmt` (1000) are positive here, which describes
+an impossible cash flow — money coming in from two directions with
+nothing going out. Make the payment negative to represent money paid
+toward the loan:
+
+<ExcelCode>{`NPER(5%/12, -1000, 200000) → 269.3`}</ExcelCode>
+
+### The result looks far too large or too small
+
+`rate` and `pmt` must be in the **same period**. A monthly payment
+paired with an annual rate (instead of that rate divided by 12) will
+produce a period count that's off by roughly a factor of 12.
+
+### The answer isn't a whole number
+
+NPER almost never returns a whole number — a fixed payment amount
+rarely divides a loan evenly. Round up with
+<ExcelCode>{`=ROUNDUP(NPER(...), 0)`}</ExcelCode>
+to get the number of full payments actually required (the last one is
+typically smaller than the rest).
+
+export const faqs = [
+  {
+    question: 'Why does NPER return #NUM!?',
+    answer:
+      "The most common cause is pv and pmt having the same sign. They need opposite signs — a loan you receive (positive pv) is paid off with outgoing payments (negative pmt).",
+  },
+  {
+    question: 'Why is the result not a whole number, like 269.3?',
+    answer:
+      "A fixed payment amount rarely divides a loan into an exact whole number of periods. Wrap the formula in ROUNDUP to get the number of full payments, keeping in mind the last one is usually smaller.",
+  },
+  {
+    question: 'How is NPER different from a manual amortization schedule?',
+    answer:
+      "NPER gives just the total period count from one formula. A full amortization schedule (a row per payment showing the interest/principal split) needs PPMT and IPMT built out period by period — NPER answers a single, faster question.",
+  },
+  {
+    question: 'Can NPER be used for a savings goal instead of a loan?',
+    answer:
+      "Yes — set pv to 0 (or a starting balance) and fv to the target amount, with pmt as the negative (outgoing) regular contribution. NPER then returns how many contributions are needed to reach the goal.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NPER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NPER(5%/12, -1000, 200000)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim periods As Double
+    periods = NPer(0.05 / 12, -1000, 200000)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    periods = npf.nper(0.05 / 12, -1000, 200000)
+    print(periods)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PMT](/docs/financial/pmt) — calculates the fixed payment instead of
+  the number of periods, given the other terms.
+- [PPMT](/docs/financial/ppmt) — the principal portion of a specific
+  payment within the loan's term.
+- [IPMT](/docs/financial/ipmt) — the interest portion of a specific
+  payment within the loan's term.

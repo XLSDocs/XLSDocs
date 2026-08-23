@@ -1,0 +1,34 @@
+---
+title: NPER examples
+description: Worked examples for NPER — paying off a loan early with extra payments, a savings goal, and the sign-convention gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Standard loan payoff" formula={`=NPER(5%/12, -1073.64, 200000)`}>
+  A $200,000 loan at 5% annual interest, paid at $1,073.64/month —
+  the exact payment PMT calculates for a 30-year term — returns
+  almost exactly 360 periods.
+</ExampleCard>
+
+<ExampleCard number="02" label="Paying off a loan faster with a higher payment" formula={`=NPER(5%/12, -1500, 200000)`}>
+  Raising the monthly payment to $1,500 on the same loan cuts the
+  payoff time to about 187 months — roughly 15.5 years instead of 30.
+</ExampleCard>
+
+<ExampleCard number="03" label="Rounding up to a whole number of payments" formula={`=ROUNDUP(NPER(5%/12, -1000, 200000), 0)`}>
+  NPER's raw result (269.3) rarely lands on a whole number — ROUNDUP
+  gives the number of full payments actually needed.
+</ExampleCard>
+
+<ExampleCard number="04" label="Time to reach a savings goal" formula={`=NPER(4%/12, -300, -5000, 50000)`}>
+  Starting from a $5,000 balance, contributing $300/month at 4%
+  annual interest, this returns how many months are needed to reach
+  a $50,000 target.
+</ExampleCard>
+
+<ExampleCard number="05" label="The sign-mismatch #NUM! error" formula={`=NPER(5%/12, 1000, 200000)`}>
+  Returns `#NUM!` because `pmt` and `pv` are both positive — an
+  impossible cash flow. The payment needs a negative sign to
+  represent money paid out.
+</ExampleCard>
