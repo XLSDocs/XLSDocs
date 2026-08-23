@@ -12,6 +12,46 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-22',
+    title: 'A better docs sidebar',
+    description:
+      'Every category is now visible and expandable at once, instead of hiding behind a single-category dropdown — and individual function entries no longer show a dead expand arrow that opened onto nothing.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-08-22',
+    title: 'A clearer FAQ toggle',
+    description: 'Question accordions now show a plain +/− instead of a rotating arrow, on every function page, the FAQ page, and blog posts.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-08-22',
+    title: 'FAQs on blog posts, too',
+    description:
+      'Every post now ends with a few real questions and answers, marked up as FAQPage structured data so they can surface directly in Google results — the same treatment function pages already had.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-22',
+    title: 'A real contact email',
+    description: 'contact@xlsdocs.com replaces GitHub issues as the way to reach us with privacy questions or general feedback.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-08-21',
+    title: 'A homepage that actually explains the site',
+    description:
+      'New sections show every category at a glance with live function counts, and what the Ask Claude panel looks like on a real page — both were previously invisible unless you\'d already found your way into the docs.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-21',
+    title: 'A Privacy Policy page',
+    description:
+      'What we collect, what we don\'t, and how to reach us with questions — including a scannable quick-facts summary up top.',
+    tags: ['Feature'],
+  },
+  {
     date: '2026-08-16',
     title: 'FAQ page',
     description:
