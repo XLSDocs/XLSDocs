@@ -44,7 +44,10 @@ export function Hero() {
             Browse functions
           </Link>
         </div>
-        <p className="mt-6 text-xs text-fd-muted-foreground">
+        <p className="mt-3 text-xs text-fd-muted-foreground">
+          Free to try · $5/mo for unlimited formulas
+        </p>
+        <p className="mt-3 text-xs text-fd-muted-foreground">
           Built by Excel power users · Free to use · No sign-up needed
         </p>
       </div>
