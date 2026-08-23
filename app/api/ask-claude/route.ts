@@ -3,11 +3,12 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSubscriber } from '@/lib/subscription';
 
 // Same subscription that unlocks the Formula Builder also covers Ask Claude —
-// one $5/mo tier, not a second paywall. Free limit is deliberately lower than
-// Formula Builder's: a chat panel invites more back-and-forth messages per
-// visit than a single formula request.
+// one $5/mo tier, not a second paywall. Free tier is a daily cap, not hourly:
+// an hourly reset let anyone dodge it by just waiting, which undermined the
+// point of capping it at all.
 const SUBSCRIBER_LIMIT = 200;
-const FREE_LIMIT = 8;
+const FREE_LIMIT = 5;
+const DAY_SECONDS = 60 * 60 * 24;
 
 interface AskClaudeRequestBody {
   messages: { role: 'user' | 'assistant'; content: string }[];
@@ -23,12 +24,12 @@ export async function POST(req: NextRequest) {
   const subscriber = await checkSubscriber(req);
   const { allowed } = subscriber.isSubscriber
     ? await checkRateLimit(req, 'ask-claude-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
-    : await checkRateLimit(req, 'ask-claude', FREE_LIMIT);
+    : await checkRateLimit(req, 'ask-claude', FREE_LIMIT, undefined, DAY_SECONDS);
 
   if (!allowed) {
     const message = subscriber.isSubscriber
       ? "You've hit an unusually high usage spike — try again shortly."
-      : "You've hit the free limit for Ask Claude this hour — upgrade for unlimited, or try again later.";
+      : "You've hit the free limit for Ask Claude today — upgrade for unlimited, or try again tomorrow.";
     const res = NextResponse.json({ error: message }, { status: 429 });
     if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return res;

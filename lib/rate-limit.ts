@@ -1,17 +1,18 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-const WINDOW_SECONDS = 60 * 60;
+const DEFAULT_WINDOW_SECONDS = 60 * 60;
 
 /**
  * Reuses the FEEDBACK KV namespace with a `ratelimit:` key prefix rather than
  * provisioning a dedicated namespace — same tradeoff as feedback counts: a
- * non-atomic read-modify-write, fine for a rough per-hour cap, not exact.
+ * non-atomic read-modify-write, fine for a rough cap, not exact.
  */
 export async function checkRateLimit(
   request: Request,
   routeKey: string,
   limit: number,
   identifier?: string,
+  windowSeconds: number = DEFAULT_WINDOW_SECONDS,
 ): Promise<{ allowed: boolean }> {
   const id = identifier ?? request.headers.get('cf-connecting-ip') ?? 'unknown';
   const { env } = await getCloudflareContext({ async: true });
@@ -22,6 +23,6 @@ export async function checkRateLimit(
     return { allowed: false };
   }
 
-  await env.FEEDBACK.put(key, String(current + 1), { expirationTtl: WINDOW_SECONDS });
+  await env.FEEDBACK.put(key, String(current + 1), { expirationTtl: windowSeconds });
   return { allowed: true };
 }

@@ -143,7 +143,7 @@ interface Message {
   content: string;
 }
 
-const FREE_LIMIT_MESSAGE = "You've hit the free limit for Ask Claude this hour — upgrade for unlimited, or try again later.";
+const FREE_LIMIT_MESSAGE = "You've hit the free limit for Ask Claude today — upgrade for unlimited, or try again tomorrow.";
 
 export function AskClaude({ pageTitle }: { pageTitle: string }) {
   const [open, setOpen] = useState(false);
@@ -273,7 +273,7 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
 
             {rateLimited && (
               <div className="flex items-center justify-between gap-2 border-t bg-fd-primary/10 px-4 py-2 text-xs">
-                <span className="text-fd-primary">Free limit reached for this hour.</span>
+                <span className="text-fd-primary">Free limit reached for today.</span>
                 <button
                   onClick={startCheckout}
                   disabled={upgrading}
