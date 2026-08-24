@@ -1,0 +1,141 @@
+---
+title: IsNull
+description: Test whether a Variant contains Null — a deliberate "no valid data" marker, distinct from an uninitialized variable.
+---
+
+Test whether a Variant holds `Null` — VBA's marker for "explicitly no
+valid data," most often seen coming back from a database field or a
+cell that's genuinely absent, not just a variable that hasn't been
+set yet.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The only reliable way to test for Null — a direct = comparison always fails', type: 'warn' },
+  { text: 'Null is not the same as Empty (an uninitialized Variant)', type: 'warn' },
+  { text: 'Only meaningful for Variant variables', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'IsNull(expression)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`IsNull(expression)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'variant',
+    required: true,
+    description: 'The Variant to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`True` if `expression` is `Null`. `False` for every other value,
+including an uninitialized Variant (which is `Empty`, not `Null`).
+
+## Description
+
+`Null` represents a deliberate absence of data — it's what a
+database query returns for a field with no value, or what a variable
+holds after being explicitly assigned `Null`. It behaves unlike any
+other VBA value: `Null` "poisons" almost any expression it touches
+(`Null + 1` is `Null`, not an error or `1`), and critically, **a
+direct comparison to Null always returns Null, never True or False**
+— VBA's three-valued logic means `If x = Null Then` can never work as
+written, which is exactly the gap `IsNull` exists to close.
+
+<Callout type="warn">
+  `If x = Null Then` **never** executes the `Then` branch — not
+  because `x` isn't Null, but because comparing anything to `Null`
+  with `=` always evaluates to `Null` itself, which VBA treats as not
+  True. `IsNull(x)` is the only reliable way to test for it.
+</Callout>
+
+## Common errors
+
+### A direct equality comparison silently never matches
+
+<ExcelCode>{`If x = Null Then ... → never runs, even when x really is Null`}</ExcelCode>
+
+Comparing to `Null` with `=` always produces `Null`, not `True`. Use
+`IsNull` instead:
+
+<ExcelCode>{`If IsNull(x) Then ...`}</ExcelCode>
+
+### Confusing Null with Empty
+
+`IsNull` returns `False` for an uninitialized Variant — that's
+`Empty`, a different special value entirely. Use `IsEmpty` to test
+for that case instead; the two are not interchangeable.
+
+### A calculation involving Null returns Null instead of erroring
+
+<ExcelCode>{`total = total + cellValue → total becomes Null if cellValue is Null`}</ExcelCode>
+
+`Null` propagates through arithmetic silently rather than raising an
+error, which can make a bug travel far from its actual source. Check
+for `Null` with `IsNull` before using a value in a calculation if it
+might come from a database field or an empty cell read as a Variant.
+
+export const faqs = [
+  {
+    question: 'Why does If x = Null Then never work?',
+    answer: "Comparing anything to Null with = always evaluates to Null itself, not True or False — VBA's three-valued logic means that comparison can never be true as written. IsNull(x) is the only reliable way to test for Null.",
+  },
+  {
+    question: 'What is the difference between Null and Empty?',
+    answer: "Empty is what an uninitialized Variant holds by default — it's never been assigned anything. Null is a deliberate marker meaning \"no valid data,\" typically from a database field or an explicit assignment. IsEmpty and IsNull test for these two different things and aren't interchangeable.",
+  },
+  {
+    question: 'Where does Null typically come from in Excel VBA code?',
+    answer: 'Most often from ADO/DAO database queries, where a missing field value comes back as Null — or from reading a worksheet cell into a Variant when the cell is part of a merged range or otherwise returns Null in edge cases.',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Function SafeValue(v As Variant) As String
+  If IsNull(v) Then
+    SafeValue = "(no data)"
+  ElseIf IsEmpty(v) Then
+    SafeValue = "(not set)"
+  Else
+    SafeValue = CStr(v)
+  End If
+End Function
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IsEmpty](/docs/vba/isempty) — tests for an uninitialized Variant,
+  a different special value from Null.
+- [IsNumeric](/docs/vba/isnumeric) — tests whether a value can be
+  evaluated as a number, returning False for both Null and Empty.
+- [ISBLANK](/docs/info/isblank) and [ISNA](/docs/info/isna) — the
+  worksheet-formula equivalents for testing absence in a cell,
+  rather than in VBA code.

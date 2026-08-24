@@ -1,0 +1,31 @@
+---
+title: IsEmpty examples
+description: Worked examples for IsEmpty — checking an optional argument, a freshly declared Variant, and the silent-zero gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Checking an optional argument was supplied" formula={`Function Greet(Optional name As Variant)\n  If IsEmpty(name) Then name = "there"\n  Greet = "Hello, " & name\nEnd Function`}>
+  Detects that an Optional Variant parameter was left out of the call
+  entirely, filling in a default value.
+</ExampleCard>
+
+<ExampleCard number="02" label="A freshly declared Variant" formula={`Dim v As Variant\nDebug.Print IsEmpty(v)`}>
+  Prints True — a Variant is Empty from the moment it's declared,
+  before anything is ever assigned to it.
+</ExampleCard>
+
+<ExampleCard number="03" label="No longer Empty after assignment" formula={`Dim v As Variant\nv = 0\nDebug.Print IsEmpty(v)`}>
+  Prints False — assigning 0 (or any value, including "" or Null)
+  clears the Empty state permanently.
+</ExampleCard>
+
+<ExampleCard number="04" label="The silent-zero bug" formula={`Dim total As Variant\ntotal = total + 100\nDebug.Print total`}>
+  Prints 100 with no error — the uninitialized total is treated as 0
+  in the addition, masking a forgotten initialization.
+</ExampleCard>
+
+<ExampleCard number="05" label="String and Long types are never Empty" formula={`Dim s As String\nDebug.Print IsEmpty(s)`}>
+  Prints False — a String variable defaults to "" immediately, not
+  the special Empty state that only applies to Variant.
+</ExampleCard>

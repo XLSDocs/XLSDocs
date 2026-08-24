@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-24',
+    title: 'IsNull, IsEmpty, and IsNumeric',
+    description:
+      "Three more VBA functions, covering one of the language's classic gotchas: If x = Null Then never works (only IsNull does), Null and Empty are different special values, and an uninitialized Variant surprisingly counts as numeric.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-24',
     title: 'ISLOGICAL, ISFORMULA, and NA',
     description:
       "Three more Info functions: ISLOGICAL tests for a genuine TRUE/FALSE (not text or a number standing in for one), ISFORMULA flags which cells actually calculate something, and NA deliberately creates a #N/A placeholder — useful for leaving a real gap in a chart instead of plotting a misleading zero.",

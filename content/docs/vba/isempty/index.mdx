@@ -1,0 +1,138 @@
+---
+title: IsEmpty
+description: Test whether a Variant has never been assigned a value — a fresh, uninitialized Variant, distinct from Null or a zero-length string.
+---
+
+Test whether a Variant has never been assigned anything — the
+default state of a freshly declared `Variant` variable, or an array
+element that was never explicitly set.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'True only for a genuinely uninitialized Variant', type: 'warn' },
+  { text: 'Empty is not the same as Null, 0, or ""', type: 'warn' },
+  { text: 'Only meaningful for Variant variables', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'IsEmpty(expression)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`IsEmpty(expression)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'variant',
+    required: true,
+    description: 'The Variant to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`True` if `expression` is an uninitialized Variant. `False` once the
+variable has been assigned any value at all — including `0`, `""`,
+or even `Null`.
+
+## Description
+
+Every `Variant` starts life as `Empty` the moment it's declared,
+before any value has ever been assigned to it — `IsEmpty` is how
+code checks for that specific starting state. It's commonly used to
+detect whether an optional argument was actually supplied, or whether
+a loop variable was ever set inside a conditional branch that might
+have been skipped.
+
+<Callout type="warn">
+  `Empty` behaves like `0` in a numeric context and `""` in a string
+  context, which means code that doesn't explicitly check `IsEmpty`
+  often runs without erroring even when a variable was never actually
+  set — silently masking what should have been a caught
+  initialization bug.
+</Callout>
+
+## Common errors
+
+### Assuming a variable that "worked" was actually assigned
+
+<ExcelCode>{`total = total + neverSetValue → runs fine, adds 0`}</ExcelCode>
+
+An uninitialized Variant behaves as `0` here with no error — the bug
+(forgetting to assign `neverSetValue`) goes unnoticed unless code
+explicitly checks `IsEmpty` first.
+
+### Confusing Empty with Null
+
+`IsEmpty` returns `False` for `Null` — a Variant that's been
+explicitly assigned `Null` has been assigned *something*, even though
+that something represents "no valid data." Use `IsNull` to test for
+that case instead.
+
+### Using IsEmpty on a non-Variant type
+
+Declaring a variable `As String` or `As Long` instead of `As
+Variant` means it can never be `Empty` — those types default to `""`
+or `0` immediately, not the special Empty state, so `IsEmpty` on them
+always returns `False`.
+
+export const faqs = [
+  {
+    question: 'What is the difference between Empty and Null?',
+    answer: "Empty is the default state of a Variant that's never been assigned anything. Null is a deliberate value meaning \"no valid data,\" typically assigned explicitly or returned from a database. IsEmpty is False for a variable holding Null, since it has technically been assigned a value.",
+  },
+  {
+    question: 'Does IsEmpty work on String or Long variables?',
+    answer: 'Only on Variant. A variable declared As String or As Long is never Empty — it defaults to "" or 0 immediately upon declaration, so IsEmpty always returns False for those types.',
+  },
+  {
+    question: 'How is IsEmpty different from checking against ""?',
+    answer: 'A variable can hold "" (an explicitly assigned zero-length string) without being Empty — IsEmpty specifically means "never assigned at all," which is a different state from "assigned an empty value."',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Function DescribeVariant(v As Variant) As String
+  If IsEmpty(v) Then
+    DescribeVariant = "Never assigned"
+  ElseIf IsNull(v) Then
+    DescribeVariant = "Explicitly no data"
+  Else
+    DescribeVariant = "Has a value: " & CStr(v)
+  End If
+End Function
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IsNull](/docs/vba/isnull) — tests for a deliberately assigned "no
+  valid data" marker, a different special value from Empty.
+- [IsNumeric](/docs/vba/isnumeric) — tests whether a value can be
+  evaluated as a number; surprisingly, an Empty Variant actually
+  counts as numeric (it evaluates as 0).
+- [ISBLANK](/docs/info/isblank) — the worksheet-formula equivalent
+  for testing an empty cell, rather than an uninitialized variable.

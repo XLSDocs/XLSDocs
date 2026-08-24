@@ -1,0 +1,32 @@
+---
+title: IsNull examples
+description: Worked examples for IsNull — testing a database field, the failed equality-comparison gotcha, and distinguishing Null from Empty.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Testing a database field" formula={`If IsNull(rs.Fields("MiddleName").Value) Then middleName = "" Else middleName = rs.Fields("MiddleName").Value`}>
+  A classic ADO/DAO pattern — database fields with no value come back
+  as Null, and IsNull is the reliable way to catch that before using
+  the value.
+</ExampleCard>
+
+<ExampleCard number="02" label="The equality-comparison bug" formula={`If x = Null Then Debug.Print "is null"`}>
+  This never prints, even when x really is Null — comparing to Null
+  with = always evaluates to Null itself, never True.
+</ExampleCard>
+
+<ExampleCard number="03" label="The correct fix" formula={`If IsNull(x) Then Debug.Print "is null"`}>
+  Replacing the direct comparison with IsNull makes the check actually
+  work.
+</ExampleCard>
+
+<ExampleCard number="04" label="Distinguishing Null from an unset variable" formula={`Dim v As Variant\nDebug.Print IsNull(v), IsEmpty(v)`}>
+  Prints False, True — a freshly declared Variant is Empty, not Null,
+  even though both represent "no real value" informally.
+</ExampleCard>
+
+<ExampleCard number="05" label="Null propagating through a calculation" formula={`total = 10 + Null`}>
+  total becomes Null, not an error and not 10 — Null silently spreads
+  through arithmetic instead of raising an exception.
+</ExampleCard>

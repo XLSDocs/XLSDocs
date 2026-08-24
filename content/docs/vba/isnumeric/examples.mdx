@@ -1,0 +1,31 @@
+---
+title: IsNumeric examples
+description: Worked examples for IsNumeric — validating user input, the Empty-counts-as-zero gotcha, and the overflow trap.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Validating InputBox text before converting" formula={`response = InputBox("Enter your age:")\nIf IsNumeric(response) Then age = CInt(response) Else MsgBox "Not a number"`}>
+  Guards a conversion from InputBox's always-String return value,
+  avoiding a runtime error on non-numeric input.
+</ExampleCard>
+
+<ExampleCard number="02" label="Numbers with spaces and signs" formula={`IsNumeric(" -42.5 ")`}>
+  Returns True — leading/trailing spaces and a leading sign don't
+  disqualify a value from being numeric.
+</ExampleCard>
+
+<ExampleCard number="03" label="An uninitialized Variant" formula={`Dim v As Variant\nIsNumeric(v)`}>
+  Returns True — Empty evaluates as 0 in a numeric context, even
+  though the variable was never explicitly assigned.
+</ExampleCard>
+
+<ExampleCard number="04" label="Non-numeric text" formula={`IsNumeric("42 dollars")`}>
+  Returns False — trailing non-numeric text disqualifies the whole
+  expression, unlike leading/trailing whitespace.
+</ExampleCard>
+
+<ExampleCard number="05" label="Passes IsNumeric but overflows CInt" formula={`IsNumeric("500000") → True, but CInt("500000") → Overflow error`}>
+  CInt's range tops out at 32,767 — IsNumeric only confirms the value
+  is numeric, not that it fits the target type.
+</ExampleCard>

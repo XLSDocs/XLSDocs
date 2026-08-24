@@ -1,0 +1,142 @@
+---
+title: IsNumeric
+description: Test whether an expression can be evaluated as a number, before converting it with CInt, CDbl, or a similar function.
+---
+
+Test whether a value — typically a String read from a cell or user
+input — can actually be evaluated as a number, before risking a
+runtime error by converting it directly with `CInt`, `CDbl`, or
+similar.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'An uninitialized (Empty) Variant counts as numeric — it evaluates as 0', type: 'warn' },
+  { text: 'Passing IsNumeric doesn\'t guarantee CInt/CByte won\'t overflow', type: 'warn' },
+  { text: 'Null and a zero-length string both return False', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'IsNumeric(expression)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`IsNumeric(expression)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'variant',
+    required: true,
+    description: 'The value to test — commonly a String, but any Variant works.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`True` if `expression` can be evaluated as a number. `False`
+otherwise — including for `Null` and a zero-length string `""`.
+
+## Description
+
+IsNumeric exists to guard a conversion — checking user input or a
+cell's text value before handing it to `CInt`, `CDbl`, `CLng`, or a
+similar type-conversion function, which raise a runtime error on
+genuinely non-numeric input instead of failing gracefully. It's
+permissive about format: leading and trailing spaces, a leading sign,
+decimals, and scientific notation are all accepted as numeric.
+
+<Callout type="warn">
+  An **uninitialized Variant is numeric** to IsNumeric — `IsNumeric`
+  on a freshly declared, never-assigned Variant returns `True`,
+  because `Empty` evaluates as `0` in a numeric context. Checking
+  `IsEmpty` first (if "was this ever actually set" matters) catches
+  what `IsNumeric` alone silently treats as a valid zero.
+</Callout>
+
+## Common errors
+
+### Trusting IsNumeric to guarantee a conversion won't overflow
+
+<ExcelCode>{`IsNumeric("999999999999") → True, but CInt("999999999999") → Overflow error`}</ExcelCode>
+
+IsNumeric only confirms a value is numeric **in principle** — it
+doesn't check whether the value actually fits the target type's
+range. Use a wider type (`CDbl`, `CLng`) or wrap the conversion in
+error handling if the input's size isn't guaranteed.
+
+### Expecting Empty to fail the check
+
+<ExcelCode>{`Dim v As Variant\nIsNumeric(v) → True (v is Empty, which evaluates as 0)`}</ExcelCode>
+
+An uninitialized Variant passes IsNumeric — check `IsEmpty` first if
+distinguishing "never set" from "genuinely zero" matters.
+
+### Assuming an empty string is numeric
+
+<ExcelCode>{`IsNumeric("") → False`}</ExcelCode>
+
+Unlike `Empty`, a zero-length string is **not** treated as numeric —
+only an uninitialized Variant gets that special treatment.
+
+export const faqs = [
+  {
+    question: 'Why does IsNumeric return True for a variable I never set?',
+    answer: "An uninitialized Variant is Empty, and Empty evaluates as 0 in a numeric context — so IsNumeric correctly (if surprisingly) reports it as numeric. Check IsEmpty first if the distinction between \"never set\" and \"actually zero\" matters.",
+  },
+  {
+    question: 'Does passing IsNumeric guarantee CInt or CLng will succeed?',
+    answer: "No — IsNumeric only confirms the value is numeric in principle, not that it fits the target type's range. A very large numeric string passes IsNumeric but still overflows CInt, which only holds values from -32,768 to 32,767.",
+  },
+  {
+    question: 'Does IsNumeric accept numbers with spaces or a leading sign?',
+    answer: 'Yes — leading and trailing spaces, a leading + or -, decimal points, and scientific notation (like "1E10") are all accepted as numeric by IsNumeric.',
+  },
+  {
+    question: 'Why does IsNumeric return False for Null but True for Empty?',
+    answer: "They're different special values with different conversion rules: Empty evaluates as 0 (numeric), while Null represents genuinely missing data and can't be evaluated as any number at all.",
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Function SafeToLong(v As Variant) As Long
+  If IsNumeric(v) And Not IsEmpty(v) Then
+    On Error Resume Next
+    SafeToLong = CLng(v)
+    On Error GoTo 0
+  Else
+    SafeToLong = 0
+  End If
+End Function
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IsEmpty](/docs/vba/isempty) — tests specifically for an
+  uninitialized Variant, which IsNumeric alone treats as a valid 0.
+- [IsNull](/docs/vba/isnull) — tests for a deliberate "no valid data"
+  marker, which IsNumeric always reports as False.
+- [ISNUMBER](/docs/info/isnumber) — the worksheet-formula equivalent
+  for testing a cell's value, rather than a VBA variable.
