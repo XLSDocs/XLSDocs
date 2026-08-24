@@ -1,0 +1,148 @@
+---
+title: HSTACK
+description: Combine two or more ranges or arrays into one, stacked side by side horizontally.
+---
+
+Combine multiple ranges or arrays into a single spilled array, joined
+side by side — VSTACK's horizontal counterpart, for putting separate
+columns or tables next to each other instead of one below another.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Mismatched row counts get padded with #N/A, not rejected', type: 'warn' },
+  { text: 'Accepts up to 254 arrays', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=HSTACK(array1, [array2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HSTACK(array1, [array2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first range or array to combine.',
+  },
+  {
+    name: 'array2, ...',
+    type: 'range',
+    required: false,
+    description: 'Up to 253 more ranges or arrays, placed to the right in the order given.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single dynamic array containing every column from every argument,
+side by side in order, spilled into the cells to the right of/below
+the formula.
+
+## Description
+
+HSTACK is VSTACK turned sideways — instead of stacking rows on top of
+each other, it lines columns up next to each other. It's the formula
+way to combine separate lookup results, or bring columns from two
+different ranges (even different sheets) into one contiguous block,
+without copy-pasting.
+
+<Callout type="warn">
+  If the arguments have different numbers of rows, HSTACK doesn't
+  error — it pads the shorter columns with `#N/A` at the bottom so
+  every column in the result has the same height. A mismatched row
+  count is usually a sign the wrong ranges were selected, even though
+  HSTACK itself won't complain.
+</Callout>
+
+## Common errors
+
+### #N/A padding from mismatched row counts
+
+<ExcelCode>{`HSTACK(A1:A10, C1:C5) → the second column gets #N/A padding below row 5`}</ExcelCode>
+
+Both ranges need the same number of rows to combine cleanly — adjust
+the range heights to match:
+
+<ExcelCode>{`HSTACK(A1:A10, C1:C10)`}</ExcelCode>
+
+### #SPILL! — blocked spill range
+
+Cells to the right of or below the formula already contain data.
+Clear the spill range, or move the formula somewhere clear.
+
+export const faqs = [
+  {
+    question: 'How is HSTACK different from VSTACK?',
+    answer: 'They combine arrays the same way, just in different directions — VSTACK stacks rows on top of each other, HSTACK places columns side by side.',
+  },
+  {
+    question: 'Do the arrays being combined need the same number of rows?',
+    answer: "They don't have to — HSTACK will still combine them, but any column from a shorter array gets padded with #N/A at the bottom to match the tallest array's row count.",
+  },
+  {
+    question: 'Can HSTACK combine columns from different sheets?',
+    answer: 'Yes — each argument can reference any sheet: HSTACK(Sheet1!A:A, Sheet2!A:A) places both columns side by side into one array.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HSTACK from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HSTACK(A1:A10, C1:C10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim combined As Variant
+    combined = Application.WorksheetFunction.HStack( _
+      Range("A1:A10"), Range("C1:C10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    combined = pd.concat([df["A"], df["C"]], axis=1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VSTACK](/docs/arrays/vstack) — the vertical counterpart, stacking
+  rows on top of each other instead of placing columns side by side.
+- [TAKE](/docs/arrays/take) — often combined with HSTACK to pull just
+  the first or last few columns/rows before combining.
+- [UNIQUE](/docs/arrays/unique) — can wrap HSTACK's result to
+  deduplicate combined rows.

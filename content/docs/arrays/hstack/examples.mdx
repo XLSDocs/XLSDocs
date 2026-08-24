@@ -1,0 +1,31 @@
+---
+title: HSTACK examples
+description: Worked examples for HSTACK — combining columns from two ranges, joining sheets, and the row-count padding gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Combine two columns side by side" formula={`=HSTACK(A1:A10, C1:C10)`}>
+  Places column A and column C next to each other as one spilled
+  array, skipping over column B entirely.
+</ExampleCard>
+
+<ExampleCard number="02" label="Combine columns from two sheets" formula={`=HSTACK(Jan!B:B, Feb!B:B)`}>
+  Pulls the same column from two different sheets and places them
+  side by side for an easy month-over-month comparison.
+</ExampleCard>
+
+<ExampleCard number="03" label="Add a calculated column next to source data" formula={`=HSTACK(A1:A10, MAP(B1:B10, LAMBDA(x, x*1.08)))`}>
+  Combines a source column with a MAP-transformed version of another
+  column, building a two-column result in one formula.
+</ExampleCard>
+
+<ExampleCard number="04" label="Mismatched row counts" formula={`=HSTACK(A1:A10, C1:C5)`}>
+  The second column is shorter, so rows 6-10 of that column show
+  `#N/A` — HSTACK pads instead of rejecting the mismatch.
+</ExampleCard>
+
+<ExampleCard number="05" label="Combine with VSTACK for a full table rebuild" formula={`=VSTACK(HSTACK("Name","Score"), HSTACK(A2:A10,B2:B10))`}>
+  Builds a header row with HSTACK, then stacks it on top of the
+  combined data columns — a fully formula-built table.
+</ExampleCard>

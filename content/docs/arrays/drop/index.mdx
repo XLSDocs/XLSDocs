@@ -1,0 +1,165 @@
+---
+title: DROP
+description: Remove a specified number of contiguous rows or columns from the start or end of an array.
+---
+
+Remove a specific number of rows and/or columns from an array — skip
+the header row, drop the last few blank rows, or both — the inverse
+of TAKE.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A negative number drops from the end instead of the start', type: 'warn' },
+  { text: 'Dropping more rows/columns than exist returns #CALC!', type: 'warn' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DROP(array, rows, [columns])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DROP(array, rows, [columns])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to remove rows/columns from.',
+  },
+  {
+    name: 'rows',
+    type: 'number',
+    required: true,
+    description: 'How many rows to remove. Positive removes from the top, negative removes from the bottom. 0 removes none.',
+  },
+  {
+    name: 'columns',
+    type: 'number',
+    required: false,
+    description: 'How many columns to remove. Positive removes from the left, negative removes from the right. Omit to keep all columns.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array with the requested rows and/or columns removed from
+`array`, keeping everything else in its original order.
+
+## Description
+
+DROP is TAKE's mirror image: instead of specifying what to keep, it
+specifies what to remove. The most common use is stripping a header
+row before feeding a range into another array function
+(`DROP(A1:C100, 1)` skips row 1), or trimming known blank/junk rows
+off the end of an inconsistent export.
+
+<Callout type="info">
+  `DROP(array, -3)` removes the **last** 3 rows, not the first — same
+  sign convention as TAKE. Combine both a row and column argument to
+  drop from two directions in one call, e.g. `DROP(array, 1, -1)`
+  removes the first row and the last column together.
+</Callout>
+
+## Common errors
+
+### #CALC! — dropping more rows/columns than the array has
+
+<ExcelCode>{`DROP(A1:A5, 10) → #CALC!`}</ExcelCode>
+
+Unlike TAKE (which just returns what's available), DROP errors if
+asked to remove more rows or columns than actually exist — there's
+nothing left to return.
+
+### The wrong end gets removed
+
+<ExcelCode>{`DROP(A1:A20, 5) → removes the first 5 rows, not the last 5`}</ExcelCode>
+
+A positive `rows` argument always removes from the top. For the last
+5 rows instead, use a negative number:
+
+<ExcelCode>{`DROP(A1:A20, -5)`}</ExcelCode>
+
+### Forgetting DROP returns an array, not a modified range
+
+DROP doesn't delete anything from the original range — it returns a
+new spilled array with certain rows/columns excluded, leaving the
+source data completely untouched.
+
+export const faqs = [
+  {
+    question: 'How do I skip a header row before running another array function?',
+    answer: 'Wrap the range in DROP first: DROP(A1:C100, 1) removes row 1, so SORT(DROP(A1:C100, 1), 2) sorts just the data rows without the header getting mixed in.',
+  },
+  {
+    question: 'How is DROP different from TAKE?',
+    answer: "They're inverses — TAKE specifies how many rows/columns to keep, DROP specifies how many to remove. DROP(array, 1) and TAKE(array, -1*(ROWS(array)-1)) can produce the same result, but DROP reads far more directly for 'remove the header.'",
+  },
+  {
+    question: 'What happens if I try to drop more rows than the array has?',
+    answer: "DROP returns #CALC! — unlike TAKE, which just returns whatever's available, DROP treats over-dropping as an error since there'd be nothing left in the result.",
+  },
+  {
+    question: 'Does DROP modify the original data?',
+    answer: "No — DROP, like every array function, only affects the spilled formula result. The source range is completely unchanged.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DROP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DROP(A1:C100, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim dataOnly As Range
+    Set dataOnly = Range("A1:C100").Offset(1, 0).Resize(99)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # pandas' read_excel already treats row 1 as headers,
+    # so no equivalent "drop" step is usually needed
+    df = pd.read_excel("workbook.xlsx")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TAKE](/docs/arrays/take) — the inverse: keeps rows/columns instead
+  of removing them.
+- [HSTACK](/docs/arrays/hstack) and [VSTACK](/docs/arrays/vstack) —
+  often paired with DROP to strip a header before combining ranges.
+- [FILTER](/docs/arrays/filter) — removes rows by a condition instead
+  of by position/count.

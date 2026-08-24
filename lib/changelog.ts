@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-24',
+    title: 'HSTACK, TAKE, and DROP',
+    description:
+      "VSTACK's horizontal counterpart, plus the pair for slicing an array by position — TAKE keeps the first or last N rows/columns, DROP removes them, both with a negative-number flip for counting from the end instead of the start.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-24',
     title: 'MAP, REDUCE, and SCAN',
     description:
       'The functions that actually apply a LAMBDA across an array — transforming every element, collapsing an array to one accumulated value, or accumulating one while keeping every intermediate step.',

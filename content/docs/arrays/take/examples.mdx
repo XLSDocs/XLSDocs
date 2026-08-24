@@ -1,0 +1,31 @@
+---
+title: TAKE examples
+description: Worked examples for TAKE — the first and last rows, combining row and column limits, and the direction-sign gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="First 10 rows" formula={`=TAKE(A1:C1000, 10)`}>
+  Returns just the first 10 rows across all 3 columns, regardless of
+  how many rows the source range actually has.
+</ExampleCard>
+
+<ExampleCard number="02" label="Last 10 rows" formula={`=TAKE(A1:C1000, -10)`}>
+  The negative sign flips the direction — this pulls the 10 most
+  recent rows instead of the first 10.
+</ExampleCard>
+
+<ExampleCard number="03" label="First 3 columns only" formula={`=TAKE(A1:F100, 100, 3)`}>
+  Keeps every row but limits the result to just the first 3 columns
+  of a 6-column range.
+</ExampleCard>
+
+<ExampleCard number="04" label="Last 5 rows of the last 2 columns" formula={`=TAKE(A1:F100, -5, -2)`}>
+  Combining two negative arguments pulls from the bottom-right
+  corner of the range — the last 5 rows of the last 2 columns.
+</ExampleCard>
+
+<ExampleCard number="05" label="A live 'most recent orders' snapshot" formula={`=SORT(TAKE(SORT(A2:C500, 3, -1), 5), 3, -1)`}>
+  Sorts by date descending, takes the top 5 (most recent), then
+  re-sorts them back into chronological order for display.
+</ExampleCard>

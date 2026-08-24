@@ -1,0 +1,162 @@
+---
+title: TAKE
+description: Return a specified number of contiguous rows or columns from the start or end of an array.
+---
+
+Pull a specific number of rows and/or columns from an array — the
+first 5 rows, the last 3 columns, or both at once — without slicing a
+range by hand or counting cells.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A negative number takes from the end instead of the start', type: 'warn' },
+  { text: 'Taking more rows/columns than exist just returns what\'s available', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TAKE(array, rows, [columns])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TAKE(array, rows, [columns])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to take rows/columns from.',
+  },
+  {
+    name: 'rows',
+    type: 'number',
+    required: true,
+    description: 'How many rows to take. Positive takes from the top, negative takes from the bottom. 0 takes none.',
+  },
+  {
+    name: 'columns',
+    type: 'number',
+    required: false,
+    description: 'How many columns to take. Positive takes from the left, negative takes from the right. Omit to keep all columns.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array containing just the requested rows and/or columns
+from `array`, in their original order.
+
+## Description
+
+TAKE is a formula-based alternative to manually selecting a smaller
+range out of a larger one — "just the first 10 rows," "just the last
+3 columns," or both together. The sign of each argument controls the
+direction: positive counts from the start (top or left), negative
+counts from the end (bottom or right), which makes "the last N rows"
+a one-argument formula instead of a COUNTA-and-OFFSET combination.
+
+<Callout type="info">
+  `TAKE(array, -5)` takes the **last** 5 rows, not the first — the
+  negative sign is what flips the direction. This is the cleanest way
+  to grab "the most recent N rows" from a table that keeps growing,
+  without OFFSET or a manually maintained row count.
+</Callout>
+
+## Common errors
+
+### The wrong end of the array gets returned
+
+<ExcelCode>{`TAKE(A1:A20, 5) → first 5 rows, not the last 5`}</ExcelCode>
+
+A positive `rows` argument always takes from the top. For the last 5
+rows instead, use a negative number:
+
+<ExcelCode>{`TAKE(A1:A20, -5)`}</ExcelCode>
+
+### #VALUE! — rows or columns isn't a whole number
+
+Both arguments must be integers — a fractional row/column count (like
+`2.5`) returns an error rather than rounding.
+
+### Asking for more rows than the array has
+
+This isn't an error — TAKE simply returns every row available if
+`rows` exceeds the array's actual size, rather than padding or
+erroring.
+
+export const faqs = [
+  {
+    question: 'How do I get the last N rows instead of the first N?',
+    answer: 'Pass a negative number for rows — TAKE(array, -10) returns the last 10 rows. The sign controls direction: positive from the start, negative from the end.',
+  },
+  {
+    question: 'Can TAKE grab both specific rows and specific columns at once?',
+    answer: 'Yes — pass both arguments: TAKE(array, 5, 3) returns the first 5 rows of the first 3 columns. Either argument can be negative independently.',
+  },
+  {
+    question: 'What happens if I ask for more rows than the array contains?',
+    answer: "TAKE just returns the whole array — it doesn't error or pad, unlike VSTACK/HSTACK's mismatched-size behavior.",
+  },
+  {
+    question: 'How is TAKE different from INDEX for grabbing a subset of a range?',
+    answer: "INDEX pulls a single cell or a range defined by explicit row/column numbers you calculate yourself. TAKE is purpose-built for 'the first/last N rows or columns' and reads more directly for that specific, common case.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TAKE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TAKE(A1:C100, -10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim lastRows As Range
+    Set lastRows = Range("A1:C100").Rows(91).Resize(10)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    last_10 = df.tail(10)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DROP](/docs/arrays/drop) — the inverse: removes rows/columns
+  instead of keeping them.
+- [HSTACK](/docs/arrays/hstack) and [VSTACK](/docs/arrays/vstack) —
+  often paired with TAKE to combine a sliced-down array with another.
+- [FILTER](/docs/arrays/filter) — filters by a condition instead of
+  by position/count.

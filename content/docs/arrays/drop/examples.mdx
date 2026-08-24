@@ -1,0 +1,33 @@
+---
+title: DROP examples
+description: Worked examples for DROP — skipping a header row, trimming trailing rows, and the over-dropping error.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Skip a header row" formula={`=DROP(A1:C100, 1)`}>
+  Removes row 1, leaving just the 99 data rows below it — the most
+  common use of DROP, feeding a header-free range into another array
+  function.
+</ExampleCard>
+
+<ExampleCard number="02" label="Remove the last row" formula={`=DROP(A1:C100, -1)`}>
+  The negative sign removes from the bottom instead of the top —
+  useful for trimming a known trailing "Total" row before further
+  calculation.
+</ExampleCard>
+
+<ExampleCard number="03" label="Drop the first column" formula={`=DROP(A1:D100, 0, 1)`}>
+  A rows value of 0 keeps every row; the columns argument removes
+  just the leftmost column, keeping the rest.
+</ExampleCard>
+
+<ExampleCard number="04" label="Drop a header row and a trailing summary row" formula={`=DROP(DROP(A1:C100, 1), -1)`}>
+  Nesting two DROP calls strips the header from the top and a
+  summary row from the bottom in one combined formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="Over-dropping error" formula={`=DROP(A1:A5, 10)`}>
+  Returns `#CALC!` — the range only has 5 rows, so removing 10 leaves
+  nothing, which DROP treats as an error rather than an empty result.
+</ExampleCard>
