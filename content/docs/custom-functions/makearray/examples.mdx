@@ -1,0 +1,33 @@
+---
+title: MAKEARRAY examples
+description: Worked examples for MAKEARRAY — a multiplication table, an identity matrix, and a grid that references outside data.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="5x5 multiplication table" formula={`=MAKEARRAY(5, 5, LAMBDA(r,c, r*c))`}>
+  Builds a full multiplication grid from scratch — each cell is the
+  product of its own row and column number.
+</ExampleCard>
+
+<ExampleCard number="02" label="Identity matrix" formula={`=MAKEARRAY(4, 4, LAMBDA(r,c, IF(r=c, 1, 0)))`}>
+  Places a 1 on the diagonal (where the row number equals the column
+  number) and 0 everywhere else.
+</ExampleCard>
+
+<ExampleCard number="03" label="Row and column labels combined" formula={`=MAKEARRAY(3, 3, LAMBDA(r,c, "R"&r&"C"&c))`}>
+  Generates a text label for every position, useful for visually
+  confirming how MAKEARRAY's row/column numbering works.
+</ExampleCard>
+
+<ExampleCard number="04" label="A grid built from outside data" formula={`=MAKEARRAY(5, 3, LAMBDA(r,c, INDEX(A1:C10, r, c) * 1.1))`}>
+  Uses the row/column position to look up a value from an existing
+  range and apply a 10% markup, effectively transforming a sub-range
+  of an existing table.
+</ExampleCard>
+
+<ExampleCard number="05" label="Wrong parameter count" formula={`=MAKEARRAY(3, 3, LAMBDA(x, x*2))`}>
+  Returns `#VALUE!` — MAKEARRAY's lambda always needs exactly two
+  parameters (row, then column), even for a calculation that only
+  ends up using one of them.
+</ExampleCard>

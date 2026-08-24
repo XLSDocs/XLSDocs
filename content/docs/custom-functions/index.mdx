@@ -6,14 +6,17 @@ description: Name intermediate values, build reusable functions, and apply them 
 LET names intermediate values inside a single formula, and LAMBDA
 builds an entire reusable, custom function out of one — no VBA, no
 macro-enabled workbook, and it works in Excel for the web. MAP,
-REDUCE, and SCAN are the functions that actually apply a LAMBDA across
-an array: transforming every element, accumulating a single result,
-or accumulating one while keeping every step along the way.
+BYROW, BYCOL, REDUCE, and SCAN apply a LAMBDA across an array —
+element by element, row by row, or column by column — and MAKEARRAY
+builds a brand new array from a size and a rule.
 
 <Cards className="grid-cols-3">
   <Card title="LET" description="Assign names to intermediate values within a formula." href="/docs/custom-functions/let" />
   <Card title="LAMBDA" description="Build a custom, reusable function out of a formula." href="/docs/custom-functions/lambda" />
   <Card title="MAP" description="Apply a LAMBDA to every element of one or more arrays." href="/docs/custom-functions/map" />
+  <Card title="BYROW" description="Apply a LAMBDA to each row of an array, one result per row." href="/docs/custom-functions/byrow" />
+  <Card title="BYCOL" description="Apply a LAMBDA to each column of an array, one result per column." href="/docs/custom-functions/bycol" />
   <Card title="REDUCE" description="Collapse an array to a single accumulated value with a LAMBDA." href="/docs/custom-functions/reduce" />
   <Card title="SCAN" description="Accumulate a value across an array, returning every intermediate step." href="/docs/custom-functions/scan" />
+  <Card title="MAKEARRAY" description="Build a new array by calling a LAMBDA for every row/column position." href="/docs/custom-functions/makearray" />
 </Cards>

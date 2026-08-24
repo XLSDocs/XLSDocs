@@ -1,0 +1,31 @@
+---
+title: BYCOL examples
+description: Worked examples for BYCOL — a totals row, per-column averages, a max-per-column summary, and indexing into a column's rows.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Totals row under a table" formula={`=BYCOL(A2:C10, LAMBDA(col, SUM(col)))`}>
+  Spills a single row of column totals — one formula produces the
+  entire summary row instead of one SUM per column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Per-column average" formula={`=BYCOL(A2:F10, LAMBDA(col, AVERAGE(col)))`}>
+  Averages each of the 6 columns independently, spilling one average
+  per column in a single row.
+</ExampleCard>
+
+<ExampleCard number="03" label="Highest value in each column" formula={`=BYCOL(A2:C10, LAMBDA(col, MAX(col)))`}>
+  Returns the maximum value from each column side by side — a
+  best-value-per-category summary row.
+</ExampleCard>
+
+<ExampleCard number="04" label="Count values over a threshold, per column" formula={`=BYCOL(A2:C10, LAMBDA(col, COUNTIF(col, ">100")))`}>
+  Applies COUNTIF inside the lambda to count qualifying values
+  independently within each column.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing a specific row across columns" formula={`=BYCOL(A2:C10, LAMBDA(col, INDEX(col,1) - INDEX(col,9)))`}>
+  Indexes into the first and last row of each column to calculate
+  the change from start to end, per column.
+</ExampleCard>

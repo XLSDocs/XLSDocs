@@ -1,0 +1,164 @@
+---
+title: BYROW
+description: Apply a LAMBDA to each row of an array as a whole, returning one result per row in a single column.
+---
+
+Run a calculation across each row of a table and get back one value
+per row — a row total, a per-row flag, a weighted average — without
+a helper column repeated down the sheet.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'lambda takes exactly one parameter: the entire row as an array', type: 'warn' },
+  { text: 'lambda\'s calculation must reduce the row to a single value', type: 'warn' },
+  { text: 'Requires Excel 365 — not available in the perpetual 2021 release', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BYROW(array, lambda)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BYROW(array, lambda)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to process one row at a time.',
+  },
+  {
+    name: 'lambda',
+    type: 'function',
+    required: true,
+    description: 'A LAMBDA taking exactly one parameter — an entire row, passed in as an array — and returning a single value for it.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single-column spilled array with one row per row of `array`, each
+holding whatever `lambda` returned for that row.
+
+## Description
+
+BYROW is MAP's row-at-a-time sibling: instead of calling `lambda`
+once per individual element, it calls `lambda` once per **whole
+row**, passing the entire row in as a single array argument. That
+makes it the natural fit for anything that needs to combine several
+columns per row into one number — a row total across quarterly
+columns, a weighted score, or a TRUE/FALSE flag based on several
+fields in that row at once.
+
+<Callout type="warn">
+  `lambda`'s calculation has to reduce the row down to **one value**
+  — wrapping the row in `SUM`, `AVERAGE`, an `IF`, or similar. A
+  LAMBDA that just returns the row unchanged (like `LAMBDA(row, row)`)
+  produces a nested array in each result cell instead of the single
+  value BYROW is meant to collapse each row into.
+</Callout>
+
+## Common errors
+
+### #VALUE! — lambda takes more than one parameter
+
+<ExcelCode>{`BYROW(A2:C10, LAMBDA(x,y, x+y)) → #VALUE!`}</ExcelCode>
+
+`lambda` must take exactly one parameter representing the whole row.
+To combine specific columns within that row, index into the row array
+inside the calculation instead of adding more parameters.
+
+### The result shows a spilled array in each row instead of one number
+
+This means `lambda`'s calculation didn't actually reduce the row to a
+single value — check that the calculation ends in something like
+`SUM(row)` rather than returning `row` (or a slice of it) directly.
+
+### Confusing BYROW with MAP
+
+MAP calls `lambda` once per **element**; BYROW calls it once per
+**whole row**. Using BYROW where MAP was needed (or the reverse)
+produces either a #VALUE! error or a result shaped completely
+differently than expected.
+
+export const faqs = [
+  {
+    question: 'How is BYROW different from MAP?',
+    answer:
+      "MAP applies a lambda to every individual element of an array. BYROW applies a lambda to each entire row at once, passing the whole row in as a single array argument — the right tool for combining multiple columns into one per-row result.",
+  },
+  {
+    question: 'Why do I get a nested array instead of a single number per row?',
+    answer:
+      "The lambda's calculation needs to reduce the row to one value, typically by wrapping it in SUM, AVERAGE, COUNT, or a similar aggregate. Returning the row itself (or a slice of it) leaves each result as an array instead of a single value.",
+  },
+  {
+    question: 'Can I reference specific columns within the row inside the lambda?',
+    answer: 'Yes — since the row comes in as an array, INDEX(row, 1), INDEX(row, 2), and so on pull out individual columns from that row for a calculation that treats certain columns differently.',
+  },
+  {
+    question: 'Is there a column-wise equivalent of BYROW?',
+    answer: 'Yes — BYCOL works identically but processes one whole column at a time instead of one row, returning a single row of results instead of a single column.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BYROW from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BYROW(A2:C10, LAMBDA(row, SUM(row)))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim r As Range, total As Double
+    For Each r In Range("A2:C10").Rows
+      total = Application.WorksheetFunction.Sum(r)
+      r.Cells(1, 4).Value = total
+    Next r
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", usecols="A:C")
+    row_totals = df.sum(axis=1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BYCOL](/docs/custom-functions/bycol) — the column-wise equivalent,
+  processing one whole column at a time instead of one row.
+- [MAP](/docs/custom-functions/map) — applies a lambda to every
+  individual element instead of a whole row at once.
+- [LAMBDA](/docs/custom-functions/lambda) — defines the one-parameter
+  calculation BYROW runs on each row.

@@ -1,0 +1,163 @@
+---
+title: BYCOL
+description: Apply a LAMBDA to each column of an array as a whole, returning one result per column in a single row.
+---
+
+Run a calculation across each column of a table and get back one
+value per column — a column total, a per-column average, a max — the
+column-wise counterpart to BYROW.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'lambda takes exactly one parameter: the entire column as an array', type: 'warn' },
+  { text: 'lambda\'s calculation must reduce the column to a single value', type: 'warn' },
+  { text: 'Requires Excel 365 — not available in the perpetual 2021 release', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BYCOL(array, lambda)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BYCOL(array, lambda)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to process one column at a time.',
+  },
+  {
+    name: 'lambda',
+    type: 'function',
+    required: true,
+    description: 'A LAMBDA taking exactly one parameter — an entire column, passed in as an array — and returning a single value for it.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single-row spilled array with one column per column of `array`,
+each holding whatever `lambda` returned for that column.
+
+## Description
+
+BYCOL is BYROW turned sideways: it calls `lambda` once per **whole
+column**, passing the entire column in as one array argument, and
+spills a single row of results — one per source column. It's the
+formula behind a summary row underneath a table (a total, an average,
+a count) built without a separate SUM formula in every column.
+
+<Callout type="warn">
+  `lambda`'s calculation has to reduce the column down to **one
+  value** — wrapping it in `SUM`, `AVERAGE`, `MAX`, or similar. A
+  LAMBDA that just returns the column unchanged produces a nested
+  array in each result cell instead of the single summary value BYCOL
+  is meant to collapse each column into.
+</Callout>
+
+## Common errors
+
+### #VALUE! — lambda takes more than one parameter
+
+<ExcelCode>{`BYCOL(A1:C10, LAMBDA(x,y, x+y)) → #VALUE!`}</ExcelCode>
+
+`lambda` must take exactly one parameter representing the whole
+column. To combine specific rows within that column, index into the
+column array inside the calculation instead of adding more
+parameters.
+
+### The result shows a spilled array in each column instead of one number
+
+This means `lambda`'s calculation didn't actually reduce the column
+to a single value — check that it ends in something like `SUM(col)`
+rather than returning `col` (or a slice of it) directly.
+
+### Confusing BYCOL with BYROW
+
+BYCOL processes one whole **column** at a time and spills a row of
+results; BYROW processes one whole **row** at a time and spills a
+column of results. Mixing them up produces a result transposed from
+what was expected.
+
+export const faqs = [
+  {
+    question: 'How is BYCOL different from BYROW?',
+    answer:
+      "They're mirror images — BYROW processes each row as a whole and returns one column of results; BYCOL processes each column as a whole and returns one row of results.",
+  },
+  {
+    question: 'Why do I get a nested array instead of a single number per column?',
+    answer:
+      "The lambda's calculation needs to reduce the column to one value, typically by wrapping it in SUM, AVERAGE, MAX, or a similar aggregate. Returning the column itself leaves each result as an array instead of a single value.",
+  },
+  {
+    question: 'Can BYCOL build a summary row under a table?',
+    answer: 'Yes — BYCOL(table, LAMBDA(col, SUM(col))) spills one total per column in a single row, which is exactly the shape of a totals row placed directly beneath the table.',
+  },
+  {
+    question: 'Can I reference specific rows within the column inside the lambda?',
+    answer: 'Yes — since the column comes in as an array, INDEX(col, 1), INDEX(col, 2), and so on pull out individual rows from that column for a calculation that treats certain rows differently.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BYCOL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BYCOL(A1:C10, LAMBDA(col, SUM(col)))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim c As Range, total As Double
+    For Each c In Range("A1:C10").Columns
+      total = Application.WorksheetFunction.Sum(c)
+      c.Cells(11, 1).Value = total
+    Next c
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", usecols="A:C")
+    column_totals = df.sum(axis=0)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BYROW](/docs/custom-functions/byrow) — the row-wise equivalent,
+  processing one whole row at a time instead of one column.
+- [MAP](/docs/custom-functions/map) — applies a lambda to every
+  individual element instead of a whole column at once.
+- [LAMBDA](/docs/custom-functions/lambda) — defines the one-parameter
+  calculation BYCOL runs on each column.

@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-24',
+    title: 'BYROW, BYCOL, and MAKEARRAY',
+    description:
+      "Rounds out Custom Functions to 8 pages: BYROW and BYCOL apply a LAMBDA to a whole row or column at once instead of element by element, and MAKEARRAY builds a brand new array from a size and a rule — a multiplication table, an identity matrix, anything whose values depend on position.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
+    date: '2026-08-24',
     title: 'HSTACK, TAKE, and DROP',
     description:
       "VSTACK's horizontal counterpart, plus the pair for slicing an array by position — TAKE keeps the first or last N rows/columns, DROP removes them, both with a negative-number flip for counting from the end instead of the start.",

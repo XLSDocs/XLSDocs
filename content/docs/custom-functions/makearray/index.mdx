@@ -1,0 +1,166 @@
+---
+title: MAKEARRAY
+description: Build a spilled array of a given size by calling a LAMBDA once for every row/column position, using the row and column numbers.
+---
+
+Generate an entire array from scratch, one calculated cell at a
+time — a multiplication table, a distance-from-center grid, or any
+array whose values depend on their own row and column position.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'lambda takes exactly two parameters: the row number, then the column number', type: 'warn' },
+  { text: 'Row/column numbers passed to lambda are 1-based, not 0-based', type: 'warn' },
+  { text: 'Requires Excel 365 — not available in the perpetual 2021 release', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MAKEARRAY(rows, columns, lambda)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MAKEARRAY(rows, columns, lambda)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rows',
+    type: 'number',
+    required: true,
+    description: 'The number of rows in the resulting array.',
+  },
+  {
+    name: 'columns',
+    type: 'number',
+    required: true,
+    description: 'The number of columns in the resulting array.',
+  },
+  {
+    name: 'lambda',
+    type: 'function',
+    required: true,
+    description: 'A LAMBDA taking exactly two parameters — the current row number, then the current column number (both starting at 1) — and returning the value for that position.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array of exactly `rows` × `columns` values, where the value
+at each position is whatever `lambda` returned for that row and
+column number.
+
+## Description
+
+Every other array-building function (SEQUENCE, VSTACK, HSTACK) starts
+from existing values. MAKEARRAY starts from nothing but a size and a
+rule — it calls `lambda(row, column)` for every position in the grid,
+which makes it the tool for arrays whose values are a function of
+their own position, like a multiplication table (`row * column`) or a
+grid measuring distance from a center cell.
+
+<Callout type="warn">
+  The row and column numbers passed into `lambda` are **1-based** —
+  the top-left cell of the result is position `(1, 1)`, not `(0, 0)`.
+  Formulas ported from a 0-indexed language (Python, JavaScript)
+  often need a `-1` adjustment to line up correctly.
+</Callout>
+
+## Common errors
+
+### #VALUE! — lambda doesn't take exactly two parameters
+
+<ExcelCode>{`MAKEARRAY(3, 3, LAMBDA(x, x*2)) → #VALUE!`}</ExcelCode>
+
+`lambda` must take exactly two parameters: row number, then column
+number, in that order — a single-parameter LAMBDA built for MAP won't
+work here.
+
+### The grid is off by one compared to a 0-indexed version
+
+This usually means a formula was adapted from Python or JavaScript
+without accounting for MAKEARRAY's 1-based row/column numbers —
+subtract 1 from `row`/`column` inside the calculation if the logic
+was originally written assuming a 0-based index.
+
+### #VALUE! — rows or columns isn't a positive whole number
+
+Both size arguments must be positive integers — a fractional or
+zero/negative size produces an error rather than an empty or
+partial array.
+
+export const faqs = [
+  {
+    question: 'Are the row and column numbers 0-based or 1-based?',
+    answer: "1-based — the first row and first column are both numbered 1, not 0. This matters when porting a formula idea from a 0-indexed language, where an explicit -1 adjustment is usually needed.",
+  },
+  {
+    question: 'What is MAKEARRAY actually good for, compared to SEQUENCE?',
+    answer: "SEQUENCE generates a simple range of increasing numbers. MAKEARRAY is for when each cell's value depends on a calculation involving both its row and column position — a multiplication table, a checkerboard pattern, or a distance-from-center grid — not just a straight sequence.",
+  },
+  {
+    question: 'Can MAKEARRAY reference cells outside the array being built?',
+    answer: "Yes — the lambda's calculation can reference any other range or cell normally, combining the row/column position with outside data, like looking up a value based on the current row number.",
+  },
+  {
+    question: 'Does MAKEARRAY work with LET inside the lambda?',
+    answer: "Yes — LET can name intermediate values inside MAKEARRAY's lambda the same way it does inside any other LAMBDA, which helps keep more complex per-cell calculations readable.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MAKEARRAY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MAKEARRAY(5, 5, LAMBDA(r,c, r*c))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim r As Integer, c As Integer
+    For r = 1 To 5
+      For c = 1 To 5
+        Cells(r, c).Value = r * c
+      Next c
+    Next r
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    grid = [[r * c for c in range(1, 6)] for r in range(1, 6)]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SEQUENCE](/docs/arrays/sequence) — generates a simple increasing
+  sequence; MAKEARRAY is for values that depend on both row and
+  column position, not just a straight count.
+- [LAMBDA](/docs/custom-functions/lambda) — defines the two-parameter
+  calculation MAKEARRAY runs for every position.
+- [MAP](/docs/custom-functions/map) — transforms an existing array's
+  elements, rather than building a new array from scratch.
