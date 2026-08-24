@@ -1,0 +1,159 @@
+---
+title: ISFORMULA
+description: Test whether a cell contains a formula, as opposed to a typed-in value.
+---
+
+Test whether a cell's contents are a formula, rather than a plain
+typed-in value — the tool behind auditing a sheet to find which cells
+actually calculate something versus which ones were hand-entered.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'reference must be an actual cell reference, not a plain value', type: 'warn' },
+  { text: 'Introduced in Excel 2013 — works in every version this site tracks', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ISFORMULA(reference)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISFORMULA(reference)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'reference',
+    required: true,
+    description: 'A reference to the cell to test — must be an actual cell reference, not a computed value.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `reference` points to a cell containing a formula. `FALSE`
+for a cell holding a plain typed-in value, or an empty cell.
+
+## Description
+
+ISFORMULA answers a question none of the other type-testing functions
+can: not what kind of *value* a cell holds, but whether that value
+came from a *formula* in the first place. That makes it the basis for
+auditing a workbook — highlighting every formula cell with
+conditional formatting, or flagging a range where a formula was
+accidentally overwritten with a hardcoded number.
+
+<Callout type="warn">
+  `reference` has to be an actual **cell reference** — unlike
+  ISBLANK, ISNUMBER, and the rest of the IS-functions, ISFORMULA
+  can't test a computed value or a literal directly. `ISFORMULA(A1)`
+  works; `ISFORMULA(A1+1)` doesn't, because `A1+1` isn't a reference
+  to any single cell.
+</Callout>
+
+## Common errors
+
+### #VALUE! from passing a computed value instead of a reference
+
+<ExcelCode>{`ISFORMULA(A1+1) → #VALUE!`}</ExcelCode>
+
+`reference` must point directly to a cell. Test the cell itself,
+then use its value separately if needed:
+
+<ExcelCode>{`ISFORMULA(A1)`}</ExcelCode>
+
+### Highlighting formula cells across a whole range
+
+ISFORMULA tests one cell at a time — for conditional formatting
+across a range, apply the rule `=ISFORMULA(A1)` to the range with A1
+as the anchor (Excel adjusts the reference per cell automatically),
+rather than expecting one formula to check the whole range at once.
+
+### Confusing "contains a formula" with "the formula returns a number"
+
+ISFORMULA only checks whether the cell's content **is** a formula —
+it says nothing about what that formula evaluates to. A formula that
+returns an error, text, or a blank-looking result is still `TRUE` to
+ISFORMULA.
+
+export const faqs = [
+  {
+    question: 'Why do I get #VALUE! when I pass a calculation into ISFORMULA?',
+    answer: 'ISFORMULA needs an actual cell reference, not a computed expression — ISFORMULA(A1) works, but ISFORMULA(A1+1) fails because A1+1 isn\'t a reference to any single cell.',
+  },
+  {
+    question: 'How do I highlight every formula cell in a sheet?',
+    answer: 'Use conditional formatting with the formula =ISFORMULA(A1), applied to the whole range starting from its top-left cell — Excel adjusts the reference for each cell in the range automatically.',
+  },
+  {
+    question: 'Does ISFORMULA tell me what the formula calculates?',
+    answer: "No — it only reports whether the cell's content is a formula at all, not what that formula does or returns. A formula returning an error or blank text still counts as TRUE.",
+  },
+  {
+    question: 'Can ISFORMULA detect a formula that was pasted as a value?',
+    answer: 'No — once a formula is pasted as values (Paste Special > Values), the cell holds a plain result with no formula behind it, so ISFORMULA correctly returns FALSE for it.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISFORMULA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISFORMULA(A2), "Formula", "Hardcoded value")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If Range("A2").HasFormula Then
+      Range("B2").Value = "Formula"
+    Else
+      Range("B2").Value = "Hardcoded value"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import openpyxl
+
+    wb = openpyxl.load_workbook("workbook.xlsx")
+    cell = wb["Sheet1"]["A2"]
+    is_formula = isinstance(cell.value, str) and cell.value.startswith("=")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISBLANK](/docs/info/isblank) — tests whether a cell is empty,
+  regardless of whether it holds a formula or a value.
+- [ISERROR](/docs/info/iserror) — tests whether a cell's result is an
+  error, regardless of whether it's a formula or a hardcoded error
+  value.
+- [ISNUMBER](/docs/info/isnumber) and [ISTEXT](/docs/info/istext) —
+  test what kind of value a cell holds, rather than whether that
+  value came from a formula.

@@ -1,0 +1,33 @@
+---
+title: ISLOGICAL examples
+description: Worked examples for ISLOGICAL — a real comparison result, text that looks like a boolean, and a number used as a flag.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="A genuine comparison result" formula={`=ISLOGICAL(A1>10)`}>
+  Returns TRUE — a comparison like `A1>10` always produces a real
+  logical value.
+</ExampleCard>
+
+<ExampleCard number="02" label="Literal TRUE/FALSE" formula={`=ISLOGICAL(TRUE)`}>
+  Returns TRUE — typing TRUE or FALSE directly creates a genuine
+  logical value, not text.
+</ExampleCard>
+
+<ExampleCard number="03" label="Text that looks like a boolean" formula={`=ISLOGICAL("TRUE")`}>
+  Returns FALSE — this is a text string that reads "TRUE," common in
+  data imported from CSV, not an actual logical value.
+</ExampleCard>
+
+<ExampleCard number="04" label="A number used as a flag" formula={`=ISLOGICAL(1)`}>
+  Returns FALSE — even though 1 often behaves like TRUE in
+  calculations, it's a number to Excel's type system, not a genuine
+  boolean.
+</ExampleCard>
+
+<ExampleCard number="05" label="Validating a LAMBDA's result before using it" formula={`=IF(ISLOGICAL(A1), A1, A1="TRUE")`}>
+  Uses A1 directly if it's already a real boolean, otherwise falls
+  back to comparing it against the text "TRUE" — a defensive pattern
+  for inconsistent imported data.
+</ExampleCard>

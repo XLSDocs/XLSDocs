@@ -1,0 +1,152 @@
+---
+title: NA
+description: Deliberately return the #N/A error — used as a chart placeholder, or to flag a value as not yet available.
+---
+
+Deliberately produce the `#N/A` error on purpose — not a mistake to
+fix, but a placeholder that tells a chart to skip a point, or flags a
+cell as "not yet available" in a way that flows correctly through
+ISNA and IFNA elsewhere in the sheet.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Takes no arguments — always written as NA()', type: 'check' },
+  { text: 'Excel charts skip #N/A points entirely, instead of plotting them as zero', type: 'check' },
+  { text: 'Propagates through most formulas — wrap dependents in IFERROR/IFNA', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NA()'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NA()`}</ExcelCode>
+
+## Parameters
+
+NA takes no parameters — it's always written as `NA()` with empty
+parentheses.
+
+## Return value
+
+The `#N/A` error value, every time, unconditionally.
+
+## Description
+
+NA exists to make `#N/A` a deliberate, readable choice instead of an
+accidental one. The most common use is in chart data: Excel charts
+skip over a cell containing `#N/A` entirely, leaving a genuine gap in
+the line or bars — unlike a blank cell (often plotted as zero) or a
+`0` (which is a real data point, not a missing one). It's also used
+as a "value not available yet" placeholder in a data table, one that
+correctly triggers `ISNA`/`IFNA` checks in any formula that
+references it.
+
+<Callout type="warn">
+  `#N/A` from `NA()` behaves exactly like `#N/A` from any other
+  source — it **propagates** through most formulas that reference it
+  (`SUM`, `AVERAGE`, a lookup, and so on all return `#N/A` too if any
+  input is `#N/A`). Wrap dependent formulas in `IFERROR` or `IFNA` if
+  they need to tolerate a deliberate placeholder without breaking.
+</Callout>
+
+## Common errors
+
+### A downstream SUM or AVERAGE breaks
+
+<ExcelCode>{`SUM(A1:A10) → #N/A (if any cell in the range is NA())`}</ExcelCode>
+
+This is expected, not a bug — `#N/A` propagates through SUM just like
+any other error. Use `AGGREGATE` with an error-ignoring option, or
+wrap the calculation in `IFERROR`, if the placeholder shouldn't break
+the total:
+
+<ExcelCode>{`=AGGREGATE(9, 6, A1:A10)`}</ExcelCode>
+
+### Confusing NA() with ISNA()
+
+`NA()` **creates** the `#N/A` error. `ISNA()` **tests** for it. They
+sound alike and are often used together (`NA()` to mark a placeholder,
+`ISNA()` elsewhere to detect it) but do opposite jobs.
+
+### Expecting a chart to plot #N/A as zero
+
+Charts treat `#N/A` as "no data point here" and leave a gap — if a
+zero value is actually wanted on the chart, use `0` instead of
+`NA()`; they produce visibly different results.
+
+export const faqs = [
+  {
+    question: 'How is NA() different from ISNA()?',
+    answer: 'NA() creates a #N/A error on purpose. ISNA() tests whether a value already is #N/A. They\'re often paired — NA() marks a placeholder, and ISNA() elsewhere detects it — but one produces the error and the other only checks for it.',
+  },
+  {
+    question: 'Why use NA() instead of just leaving a cell blank in a chart?',
+    answer: 'A blank cell is often plotted as zero, which visually implies "the value is zero" rather than "the value is missing." NA() makes Excel skip that point entirely, leaving a genuine gap that correctly represents missing data.',
+  },
+  {
+    question: 'Will NA() break formulas that reference that cell?',
+    answer: "Yes, by default — #N/A propagates through most functions the same as any other error. Wrap dependent formulas in IFERROR or IFNA (or use AGGREGATE with an error-ignoring option for a range) if they need to tolerate the placeholder.",
+  },
+  {
+    question: 'Can NA() take an argument to customize the error message?',
+    answer: 'No — NA() always takes zero arguments and always returns the plain #N/A error. There\'s no way to attach custom text to it the way a comment or a separate cell note could.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(B2="", NA(), B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If Range("B2").Value = "" Then
+      Range("C2").Value = CVErr(xlErrNA)
+    Else
+      Range("C2").Value = Range("B2").Value
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["C"] = df["B"].replace("", np.nan)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISNA](/docs/info/isna) — tests whether a value is specifically
+  the #N/A error that NA() creates.
+- [IFNA](/docs/logical/ifna) — replaces a #N/A result (including one
+  from NA()) with a fallback value in one step.
+- [IFERROR](/docs/logical/iferror) — catches any error, not just
+  #N/A, replacing it with a fallback value.

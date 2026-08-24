@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-24',
+    title: 'ISLOGICAL, ISFORMULA, and NA',
+    description:
+      "Three more Info functions: ISLOGICAL tests for a genuine TRUE/FALSE (not text or a number standing in for one), ISFORMULA flags which cells actually calculate something, and NA deliberately creates a #N/A placeholder — useful for leaving a real gap in a chart instead of plotting a misleading zero.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-24',
     title: 'BYROW, BYCOL, and MAKEARRAY',
     description:
       "Rounds out Custom Functions to 8 pages: BYROW and BYCOL apply a LAMBDA to a whole row or column at once instead of element by element, and MAKEARRAY builds a brand new array from a size and a rule — a multiplication table, an identity matrix, anything whose values depend on position.",

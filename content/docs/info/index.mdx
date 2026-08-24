@@ -1,17 +1,22 @@
 ---
 title: Info
-description: Test the type or state of a value — is it blank, a number, text, or an error.
+description: Test the type or state of a value — is it blank, a number, text, a formula, or an error.
 ---
 
-Information functions test a single value and return `TRUE` or
-`FALSE` — is this cell blank, is that result a number, did this
-formula error. Almost always used inside IF, or nested inside another
-function like NOT, to branch on the answer.
+Information functions test a single value and almost always return
+`TRUE` or `FALSE` — is this cell blank, is that result a number, did
+this formula error, is this cell a formula at all. Almost always used
+inside IF, or nested inside another function like NOT, to branch on
+the answer. NA is the one exception: instead of testing for
+something, it deliberately creates a placeholder error on purpose.
 
 <Cards className="grid-cols-3">
   <Card title="ISBLANK" description="Test whether a cell is empty." href="/docs/info/isblank" />
   <Card title="ISNUMBER" description="Test whether a value is a number." href="/docs/info/isnumber" />
   <Card title="ISTEXT" description="Test whether a value is text." href="/docs/info/istext" />
+  <Card title="ISLOGICAL" description="Test whether a value is a genuine TRUE/FALSE." href="/docs/info/islogical" />
   <Card title="ISERROR" description="Test whether a value is any error." href="/docs/info/iserror" />
   <Card title="ISNA" description="Test whether a value is specifically the #N/A error." href="/docs/info/isna" />
+  <Card title="ISFORMULA" description="Test whether a cell contains a formula." href="/docs/info/isformula" />
+  <Card title="NA" description="Deliberately return the #N/A error, on purpose." href="/docs/info/na" />
 </Cards>

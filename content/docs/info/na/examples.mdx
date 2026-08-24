@@ -1,0 +1,33 @@
+---
+title: NA examples
+description: Worked examples for NA — a chart gap placeholder, a not-yet-available flag, and recovering a SUM broken by a placeholder.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Placeholder for a missing chart data point" formula={`=IF(B2="", NA(), B2)`}>
+  Shows the real value if present, or NA() if the source cell is
+  empty — a chart based on this column shows a genuine gap instead
+  of a dip to zero.
+</ExampleCard>
+
+<ExampleCard number="02" label="Marking a value as not yet available" formula={`=NA()`}>
+  A plain placeholder in a data table for a value that hasn't come in
+  yet, which correctly triggers ISNA/IFNA checks anywhere else in the
+  sheet that references this cell.
+</ExampleCard>
+
+<ExampleCard number="03" label="A SUM broken by a placeholder" formula={`=SUM(A1:A10)`}>
+  Returns `#N/A` if any cell in the range contains NA() — the error
+  propagates through SUM exactly like any other error would.
+</ExampleCard>
+
+<ExampleCard number="04" label="Summing while ignoring NA() placeholders" formula={`=AGGREGATE(9, 6, A1:A10)`}>
+  AGGREGATE's error-ignoring option (6) sums the range while skipping
+  over any #N/A (or other error) cells instead of failing entirely.
+</ExampleCard>
+
+<ExampleCard number="05" label="Detecting a placeholder elsewhere in the sheet" formula={`=IF(ISNA(A1), "Pending", A1)`}>
+  ISNA specifically detects the #N/A NA() produces, displaying
+  "Pending" instead of letting the error show through.
+</ExampleCard>

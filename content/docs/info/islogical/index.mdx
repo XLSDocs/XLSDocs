@@ -1,0 +1,158 @@
+---
+title: ISLOGICAL
+description: Test whether a value is a genuine logical value — TRUE or FALSE, not the text "TRUE" or a number.
+---
+
+Test whether a value is a real logical `TRUE`/`FALSE` value, as
+opposed to text that merely looks like one, or a number standing in
+for one. Almost always used inside IF, or wrapped in NOT to test the
+opposite.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'TRUE only for a genuine boolean — not the text "TRUE" or the number 1', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ISLOGICAL(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISLOGICAL(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell or value to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is a genuine logical value (the result of a
+comparison, or a literal `TRUE`/`FALSE`). `FALSE` for everything
+else, including text or numbers that merely resemble one.
+
+## Description
+
+ISLOGICAL is the strictest of the type-testing functions when it
+comes to booleans — it only returns `TRUE` for an actual logical
+value, the kind produced by a comparison (`A1>10`) or typed directly
+as `TRUE`/`FALSE`. Text that reads as "TRUE" (typed with a leading
+apostrophe, or imported from a CSV) and numbers like `1`/`0` that are
+sometimes used to represent true/false both fail this test, even
+though they're often treated as equivalent elsewhere in Excel.
+
+<Callout type="warn">
+  `ISLOGICAL("TRUE")` returns `FALSE` — that's a text string that
+  merely says "TRUE," not an actual logical value. This distinction
+  matters most with data imported from CSV or another system, where
+  values that look like booleans often arrive as plain text instead.
+</Callout>
+
+## Common errors
+
+### Text that looks like a boolean returns FALSE
+
+<ExcelCode>{`ISLOGICAL("TRUE") → FALSE`}</ExcelCode>
+
+The cell holds text, not a genuine logical value. Convert it first if
+a real boolean is needed:
+
+<ExcelCode>{`=(A1="TRUE")`}</ExcelCode>
+
+### A number used as a flag also returns FALSE
+
+<ExcelCode>{`ISLOGICAL(1) → FALSE`}</ExcelCode>
+
+Even though `1` and `0` are often treated as TRUE/FALSE equivalents
+in calculations, ISLOGICAL only accepts genuine logical values —
+compare the number instead if that's the actual check needed:
+`A1=1`.
+
+### Confusing ISLOGICAL with ISNUMBER on a comparison result
+
+A formula like `A1>10` produces a real logical value, so
+`ISLOGICAL(A1>10)` is `TRUE` — but so would `ISNUMBER` be `FALSE`
+for the same input, since a logical value isn't a number to Excel's
+type system, despite `TRUE`/`FALSE` behaving like `1`/`0` in
+arithmetic.
+
+export const faqs = [
+  {
+    question: 'Why does ISLOGICAL return FALSE for the text "TRUE"?',
+    answer: 'ISLOGICAL only recognizes genuine logical values — the kind produced by a comparison or typed directly as TRUE/FALSE. Text that merely reads "TRUE" (common in CSV imports) is a string, not a boolean, to Excel\'s type system.',
+  },
+  {
+    question: 'Does ISLOGICAL treat 1 and 0 as TRUE and FALSE?',
+    answer: 'No — even though 1 and 0 behave like TRUE and FALSE in many calculations, ISLOGICAL only accepts an actual logical value. A plain number always returns FALSE, regardless of whether it\'s 1, 0, or anything else.',
+  },
+  {
+    question: 'When is ISLOGICAL actually useful?',
+    answer: 'It\'s most useful for validating that a cell (or the result of a formula passed into a LAMBDA) is genuinely a TRUE/FALSE value before using it in logic that assumes one — catching cases where a comparison unexpectedly produced text or an error instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISLOGICAL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISLOGICAL(A2), "Valid flag", "Not a real TRUE/FALSE")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If VarType(Range("A2").Value) = vbBoolean Then
+      Range("B2").Value = "Valid flag"
+    Else
+      Range("B2").Value = "Not a real TRUE/FALSE"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    df["IsLogical"] = df["A"].map(lambda v: isinstance(v, bool))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISNUMBER](/docs/info/isnumber) — tests whether a value is a
+  number, instead of a genuine logical value.
+- [ISTEXT](/docs/info/istext) — tests whether a value is text.
+- [NOT](/docs/logical/not) — often wraps ISLOGICAL to test "is not a
+  genuine boolean" instead.
+- [AND](/docs/logical/and) and [OR](/docs/logical/or) — expect
+  genuine logical inputs, which ISLOGICAL can validate beforehand.

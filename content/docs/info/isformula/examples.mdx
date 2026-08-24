@@ -1,0 +1,32 @@
+---
+title: ISFORMULA examples
+description: Worked examples for ISFORMULA — auditing a cell, conditional formatting across a range, and the invalid-reference error.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Test a single cell" formula={`=ISFORMULA(A2)`}>
+  Returns TRUE if A2 contains a formula, FALSE if it holds a plain
+  typed-in value or is empty.
+</ExampleCard>
+
+<ExampleCard number="02" label="Label formula vs hardcoded cells" formula={`=IF(ISFORMULA(A2), "Formula", "Hardcoded")`}>
+  A quick audit label for a neighboring column, flagging which cells
+  in a range actually calculate something.
+</ExampleCard>
+
+<ExampleCard number="03" label="Conditional formatting rule for a whole range" formula={`=ISFORMULA(A1)`}>
+  Applied as a conditional formatting rule to range A1:D100 (with A1
+  as the anchor), this highlights every formula cell — Excel adjusts
+  the reference per cell automatically, unlike a plain array formula.
+</ExampleCard>
+
+<ExampleCard number="04" label="Flagging a formula that was overwritten" formula={`=IF(NOT(ISFORMULA(B2)), "Check: was this overwritten?", "")`}>
+  Useful in a template where B2 is expected to always hold a formula
+  — flags the cell if someone accidentally typed a value over it.
+</ExampleCard>
+
+<ExampleCard number="05" label="Invalid reference error" formula={`=ISFORMULA(A1+1)`}>
+  Returns `#VALUE!` — `A1+1` is a calculation, not a reference to a
+  single cell, and ISFORMULA requires an actual cell reference.
+</ExampleCard>
