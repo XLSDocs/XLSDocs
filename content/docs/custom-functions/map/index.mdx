@@ -1,0 +1,169 @@
+---
+title: MAP
+description: Apply a LAMBDA to every element of one or more arrays, returning an array of the same shape with the results.
+---
+
+Apply a custom calculation to every element of an array (or several
+arrays at once, element by element) without a helper column — the
+array-formula equivalent of a loop that transforms each item.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'lambda must take exactly as many parameters as arrays passed to MAP', type: 'warn' },
+  { text: 'Result is always the same shape/size as the input array(s)', type: 'check' },
+  { text: 'Requires Excel 365 — not available in the perpetual 2021 release', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MAP(array1, [array2, ...], lambda)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MAP(array1, [array2, ...], lambda)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'array',
+    required: true,
+    description: 'The first array (or range) to transform.',
+  },
+  {
+    name: 'array2, ...',
+    type: 'array',
+    required: false,
+    description: 'Additional arrays of the same size — lambda receives one element from each, per position.',
+  },
+  {
+    name: 'lambda',
+    type: 'function',
+    required: true,
+    description: 'A LAMBDA taking exactly one parameter per array passed in, defining the calculation for each element.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array the same size and shape as the input array(s), with
+every element replaced by the result of calling `lambda` on it (or on
+the corresponding elements, if multiple arrays were passed).
+
+## Description
+
+MAP is the array-formula version of "do this to every item in the
+list" — instead of writing one formula and dragging it down a column,
+MAP spills the whole transformed array from a single formula. Passing
+more than one array lets `lambda` combine corresponding elements
+(like a row-by-row calculation across two columns) without SUMPRODUCT
+or a helper column.
+
+<Callout type="warn">
+  Every array passed to MAP must be the **same size** — MAP calls
+  `lambda` once per position across all of them together, so a
+  mismatched size (or an argument count in `lambda` that doesn't
+  match the number of arrays) produces an error instead of a result.
+</Callout>
+
+## Common errors
+
+### #VALUE! — lambda's parameter count doesn't match the number of arrays
+
+<ExcelCode>{`MAP(A2:A10, LAMBDA(x, y, x+y)) → #VALUE!`}</ExcelCode>
+
+One array was passed, but `lambda` expects two parameters. Either
+pass a second array, or reduce `lambda` to one parameter.
+
+### The result looks like one repeated value instead of a transformed array
+
+This usually means `lambda`'s calculation doesn't actually reference
+its parameter — double-check the parameter name inside the
+calculation matches what's declared, and that it's actually used.
+
+### Mismatched array sizes
+
+<ExcelCode>{`MAP(A2:A10, B2:B5, LAMBDA(x,y,x+y)) → #VALUE!`}</ExcelCode>
+
+All arrays passed to MAP must have the same dimensions — a 9-row
+array paired with a 4-row array can't be matched element by element.
+
+export const faqs = [
+  {
+    question: 'How is MAP different from just dragging a formula down a column?',
+    answer:
+      "MAP spills the entire transformed result from one formula, with no helper column and no dragging — it stays a single, self-contained formula that automatically resizes if the input array's size changes.",
+  },
+  {
+    question: 'Can MAP combine two columns element by element?',
+    answer:
+      "Yes — pass both arrays and give lambda two parameters. MAP calls lambda once per row position, with the corresponding element from each array, which is a clean alternative to SUMPRODUCT-style row math.",
+  },
+  {
+    question: 'Does MAP work with BYROW or BYCOL instead of whole arrays?',
+    answer:
+      "MAP, BYROW, and BYCOL are siblings, not the same function — MAP transforms element by element across whole arrays, while BYROW/BYCOL apply a lambda to one entire row or column at a time (useful for a per-row aggregate like a row total).",
+  },
+  {
+    question: 'What happens if lambda returns an error for one element?',
+    answer:
+      "That position in the output array shows the error (like #DIV/0!), while every other position still calculates normally — one bad element doesn't stop the rest of MAP's array from resolving.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MAP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MAP(A2:A10, LAMBDA(x, x*1.08))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim cell As Range
+    For Each cell In Range("A2:A10")
+      cell.Offset(0, 1).Value = cell.Value * 1.08
+    Next cell
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    values = [10, 20, 30]
+    result = list(map(lambda x: x * 1.08, values))
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LAMBDA](/docs/custom-functions/lambda) — defines the calculation
+  MAP applies to each element.
+- [REDUCE](/docs/custom-functions/reduce) — collapses an array to a
+  single accumulated value instead of transforming it element by
+  element.
+- [SCAN](/docs/custom-functions/scan) — like REDUCE, but returns every
+  intermediate accumulated value as an array.

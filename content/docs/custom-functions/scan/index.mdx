@@ -1,0 +1,176 @@
+---
+title: SCAN
+description: Apply a LAMBDA across an array while accumulating a running result, returning every intermediate accumulated value as an array.
+---
+
+Like REDUCE, but instead of returning only the final accumulated
+value, SCAN spills every intermediate step along the way — the
+formula behind a running total column, without a helper column or a
+dragged-down formula.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'lambda takes exactly two parameters: the accumulator, then the current value', type: 'warn' },
+  { text: 'Result is always the same size as the input array', type: 'check' },
+  { text: 'Requires Excel 365 — not available in the perpetual 2021 release', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SCAN([initial_value], array, lambda)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SCAN([initial_value], array, lambda)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'initial_value',
+    type: 'any',
+    required: false,
+    description: 'The starting value for the accumulator. If omitted, the array\'s first element is used as the starting point instead.',
+  },
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array (or range) to process, one element at a time.',
+  },
+  {
+    name: 'lambda',
+    type: 'function',
+    required: true,
+    description: 'A LAMBDA taking exactly two parameters: the running accumulator, then the current array element.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array the same size as `array`, where each position holds
+the accumulated value **as of that step** — the last element of the
+result matches what REDUCE would return for the same inputs.
+
+## Description
+
+SCAN and REDUCE run the exact same step-by-step accumulation — the
+only difference is what each one returns. REDUCE throws away every
+intermediate result and keeps just the final value; SCAN keeps all of
+them, spilled as an array the same size as the input. That makes SCAN
+the direct formula for anything that needs a running value at every
+row, not just a single total at the end.
+
+<Callout type="info">
+  If `initial_value` is provided, SCAN's result array is the **same
+  size** as `array` (one accumulated value per input element, not
+  counting the initial value itself as a separate row). Omitting
+  `initial_value` uses the first element as the starting accumulator,
+  and that first element becomes the first row of the result
+  unchanged.
+</Callout>
+
+## Common errors
+
+### #VALUE! — lambda doesn't take exactly two parameters
+
+<ExcelCode>{`SCAN(0, A2:A10, LAMBDA(x, x*2)) → #VALUE!`}</ExcelCode>
+
+`lambda` must take exactly two parameters — the accumulator first,
+then the current element, same requirement as REDUCE.
+
+### Only the final value is needed, not the whole column
+
+If just the end result matters (not a running value at every row),
+REDUCE is the simpler, more direct choice — SCAN's array output is
+solving a different problem.
+
+### The running total column doesn't line up with the source rows
+
+This usually means `array`'s range doesn't start on the same row as
+where the result is spilling — since SCAN's output is exactly the
+same size and row-order as the input, a misaligned starting row will
+make the running total look shifted by one or more rows.
+
+export const faqs = [
+  {
+    question: 'How is SCAN different from REDUCE?',
+    answer:
+      "They run the identical accumulation logic — REDUCE returns only the final accumulated value, while SCAN returns every intermediate value along the way as a spilled array the same size as the input.",
+  },
+  {
+    question: "What's the simplest use case for SCAN?",
+    answer:
+      "A running total column: SCAN(0, A2:A10, LAMBDA(acc,x, acc+x)) spills a full column where each row shows the cumulative sum up to that row — no helper column, no dragged formula.",
+  },
+  {
+    question: 'Does SCAN work for anything other than running totals?',
+    answer:
+      "Yes — any accumulation works, not just addition: a running maximum, a running concatenated string, or a running count of values meeting a condition are all valid SCAN calculations, same as with REDUCE.",
+  },
+  {
+    question: 'Why is the parameter order accumulator-then-value, not value-then-accumulator?',
+    answer:
+      "It matches REDUCE's lambda signature exactly, since the two functions share the same underlying step logic — keeping the argument order consistent means a lambda written for REDUCE can usually be reused in SCAN unchanged.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SCAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SCAN(0, A2:A10, LAMBDA(acc,x, acc+x))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double, cell As Range
+    total = 0
+    For Each cell In Range("A2:A10")
+      total = total + cell.Value
+      cell.Offset(0, 1).Value = total
+    Next cell
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from itertools import accumulate
+
+    values = [10, 20, 30]
+    running_total = list(accumulate(values))
+    print(running_total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [REDUCE](/docs/custom-functions/reduce) — the same accumulation
+  logic, but returns only the final value instead of every step.
+- [LAMBDA](/docs/custom-functions/lambda) — defines the two-parameter
+  accumulator calculation SCAN runs at each step.
+- [MAP](/docs/custom-functions/map) — transforms every element
+  independently instead of carrying an accumulated result between
+  them.

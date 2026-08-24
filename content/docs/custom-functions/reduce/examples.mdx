@@ -1,0 +1,33 @@
+---
+title: REDUCE examples
+description: Worked examples for REDUCE — a running total, string concatenation, a running max, and the missing-initial-value gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Sum a range (the simplest case)" formula={`=REDUCE(0, A2:A10, LAMBDA(acc,x, acc+x))`}>
+  Starts the accumulator at 0 and adds each element — equivalent to
+  SUM, just spelled out step by step.
+</ExampleCard>
+
+<ExampleCard number="02" label="Build a comma-separated string" formula={`=REDUCE("", A2:A5, LAMBDA(acc,x, acc & IF(acc="","",", ") & x))`}>
+  Concatenates every element into one string, inserting a comma
+  between items but not before the first one.
+</ExampleCard>
+
+<ExampleCard number="03" label="Running maximum" formula={`=REDUCE(A2, A3:A10, LAMBDA(acc,x, MAX(acc,x)))`}>
+  Uses the first cell as the starting accumulator, then keeps the
+  larger of the accumulator or each subsequent value.
+</ExampleCard>
+
+<ExampleCard number="04" label="Count values meeting a condition" formula={`=REDUCE(0, A2:A10, LAMBDA(acc,x, acc + (x>100)))`}>
+  Adds 1 to the accumulator for every element greater than 100 — a
+  conditional count built from a plain accumulation.
+</ExampleCard>
+
+<ExampleCard number="05" label="Wrong parameter order" formula={`=REDUCE(0, A2:A10, LAMBDA(x,acc, acc+x))`}>
+  Still adds up correctly here since addition doesn't care about
+  order, but for anything non-commutative (like string building),
+  swapping the accumulator and current-value parameters silently
+  produces the wrong result.
+</ExampleCard>

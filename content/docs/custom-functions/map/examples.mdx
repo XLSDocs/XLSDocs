@@ -1,0 +1,32 @@
+---
+title: MAP examples
+description: Worked examples for MAP — transforming one array, combining two arrays, and using named parameters for clarity.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Add 8% tax to every price" formula={`=MAP(A2:A10, LAMBDA(price, price*1.08))`}>
+  Spills a full column of tax-inclusive prices from one formula — no
+  helper column, and no dragging a formula down.
+</ExampleCard>
+
+<ExampleCard number="02" label="Combine two columns element by element" formula={`=MAP(A2:A10, B2:B10, LAMBDA(price, qty, price*qty))`}>
+  Two arrays and a two-parameter LAMBDA — multiplies corresponding
+  rows of price and quantity together, spilling a full column of
+  line totals.
+</ExampleCard>
+
+<ExampleCard number="03" label="Turn negative values into zero" formula={`=MAP(A2:A10, LAMBDA(x, MAX(x, 0)))`}>
+  A simple cleanup transform — every negative number in the range
+  becomes 0, everything else is unchanged.
+</ExampleCard>
+
+<ExampleCard number="04" label="Convert text to title case" formula={`=MAP(A2:A10, LAMBDA(t, PROPER(TRIM(t))))`}>
+  Wraps two existing functions inside the LAMBDA to clean and
+  reformat a whole column of names in one spilled formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="Mismatched parameter count" formula={`=MAP(A2:A10, LAMBDA(x, y, x+y))`}>
+  Returns `#VALUE!` — one array was passed but the LAMBDA expects two
+  parameters; the argument counts have to match.
+</ExampleCard>

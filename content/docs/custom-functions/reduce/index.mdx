@@ -1,0 +1,174 @@
+---
+title: REDUCE
+description: Collapse an array to a single accumulated value by applying a LAMBDA across it, carrying a running result from one element to the next.
+---
+
+Collapse an entire array down to one value by processing it element
+by element, carrying an accumulated result forward each step — a
+running total, a concatenated string, or any calculation that needs
+to "remember" what came before.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'lambda takes exactly two parameters: the accumulator, then the current value', type: 'warn' },
+  { text: 'Skipping initial_value uses the array\'s first element as the starting accumulator', type: 'warn' },
+  { text: 'Requires Excel 365 — not available in the perpetual 2021 release', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=REDUCE([initial_value], array, lambda)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=REDUCE([initial_value], array, lambda)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'initial_value',
+    type: 'any',
+    required: false,
+    description: 'The starting value for the accumulator. If omitted, the array\'s first element is used as the starting point instead.',
+  },
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array (or range) to process, one element at a time.',
+  },
+  {
+    name: 'lambda',
+    type: 'function',
+    required: true,
+    description: 'A LAMBDA taking exactly two parameters: the running accumulator, then the current array element.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single value — whatever the accumulator holds after `lambda` has
+run once for every element in `array`.
+
+## Description
+
+REDUCE processes an array left to right, calling `lambda` once per
+element with two arguments: the accumulated result so far, and the
+current element. Whatever `lambda` returns becomes the accumulator
+for the next element — after the last one, that final accumulator
+value is REDUCE's result.
+
+<Callout type="info">
+  Skipping `initial_value` uses the array's **first element** as the
+  starting accumulator, and `lambda` runs starting from the second
+  element. This matters for calculations that aren't simply additive
+  (like string concatenation) — leaving out an explicit
+  `initial_value` when one is needed produces a subtly wrong result,
+  not an error.
+</Callout>
+
+## Common errors
+
+### The result is off by one element
+
+This usually means `initial_value` was omitted when the calculation
+actually needed a real starting point (like `0` for a sum that should
+include every element, or `""` for building a string from scratch) —
+without it, the first array element becomes the starting accumulator
+and is never passed through `lambda` itself.
+
+### #VALUE! — lambda doesn't take exactly two parameters
+
+<ExcelCode>{`REDUCE(0, A2:A10, LAMBDA(x, x*2)) → #VALUE!`}</ExcelCode>
+
+`lambda` must take exactly two parameters — the accumulator first,
+then the current element. A single-parameter LAMBDA (built for MAP)
+won't work here.
+
+### Confusing REDUCE with SCAN
+
+REDUCE returns only the **final** accumulated value; if the running
+total at every step is needed (not just the end result), that's what
+SCAN is for — the two share the same argument shape.
+
+export const faqs = [
+  {
+    question: 'What order do the two lambda parameters go in?',
+    answer:
+      "The accumulator (running result) comes first, then the current array element — lambda(accumulator, current_value). Reversing them is a common mistake that silently produces the wrong calculation instead of an error.",
+  },
+  {
+    question: 'Why do I need initial_value?',
+    answer:
+      "Without it, REDUCE starts from the array's first element as the accumulator and begins calling lambda from the second element onward. That's fine for something like a running product, but wrong for anything that needs a true starting point, like 0 for a sum or an empty string for concatenation.",
+  },
+  {
+    question: 'How is REDUCE different from SUM or a simple SUMPRODUCT?',
+    answer:
+      "For plain addition, SUM is simpler and faster. REDUCE earns its keep when the accumulation logic is more than addition — building a string, tracking a running max with a condition, or any step-by-step calculation SUM can't express.",
+  },
+  {
+    question: 'How is REDUCE different from SCAN?',
+    answer:
+      "They share the same arguments and the same step-by-step logic — REDUCE returns only the final accumulated value, while SCAN returns every intermediate value along the way as a spilled array.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REDUCE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REDUCE(0, A2:A10, LAMBDA(acc, x, acc+x))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double, cell As Range
+    total = 0
+    For Each cell In Range("A2:A10")
+      total = total + cell.Value
+    Next cell
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from functools import reduce
+
+    values = [10, 20, 30]
+    total = reduce(lambda acc, x: acc + x, values, 0)
+    print(total)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SCAN](/docs/custom-functions/scan) — the same accumulation logic,
+  but returns every intermediate value instead of just the final one.
+- [LAMBDA](/docs/custom-functions/lambda) — defines the two-parameter
+  accumulator calculation REDUCE runs at each step.
+- [MAP](/docs/custom-functions/map) — transforms every element
+  independently instead of accumulating a single result across them.

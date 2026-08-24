@@ -1,0 +1,31 @@
+---
+title: SCAN examples
+description: Worked examples for SCAN — a running total column, a running maximum, and comparing the result to REDUCE.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Running total column" formula={`=SCAN(0, A2:A10, LAMBDA(acc,x, acc+x))`}>
+  Spills a full column of cumulative sums — each row shows the total
+  up through that row, with no helper column needed.
+</ExampleCard>
+
+<ExampleCard number="02" label="Running maximum" formula={`=SCAN(A2, A3:A10, LAMBDA(acc,x, MAX(acc,x)))`}>
+  Each row shows the highest value seen so far, updating only when a
+  new element beats the current running max.
+</ExampleCard>
+
+<ExampleCard number="03" label="Running count of values over a threshold" formula={`=SCAN(0, A2:A10, LAMBDA(acc,x, acc + (x>100)))`}>
+  A running tally that increments by 1 only on rows where the value
+  exceeds 100, spilled down the whole range.
+</ExampleCard>
+
+<ExampleCard number="04" label="Only the last value equals REDUCE's result" formula={`=INDEX(SCAN(0, A2:A10, LAMBDA(acc,x, acc+x)), COUNT(A2:A10))`}>
+  Pulling the last element out of SCAN's array gives the exact same
+  number REDUCE would return directly for the same inputs.
+</ExampleCard>
+
+<ExampleCard number="05" label="Running concatenated string" formula={`=SCAN("", A2:A5, LAMBDA(acc,x, acc & IF(acc="","",", ") & x))`}>
+  Each row shows the comma-joined string built so far, growing by one
+  item per row down the array.
+</ExampleCard>

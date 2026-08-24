@@ -12,6 +12,27 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-24',
+    title: 'MAP, REDUCE, and SCAN',
+    description:
+      'The functions that actually apply a LAMBDA across an array — transforming every element, collapsing an array to one accumulated value, or accumulating one while keeping every intermediate step.',
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-23',
+    title: 'Ask Claude is now part of the same subscription',
+    description:
+      'Free visitors get 5 questions a day; the $5/mo subscription that unlocks the Formula Builder now covers unlimited Ask Claude too — one plan, not a second paywall.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-23',
+    title: 'AI Formula Builder Pro — a $5/mo subscription',
+    description:
+      'Unlimited Formula Builder use for $5/mo, with a free tier that still works with no sign-up. Built on Stripe Checkout and a self-serve billing portal for managing or canceling anytime.',
+    tags: ['Feature', 'Milestone'],
+  },
+  {
     date: '2026-08-23',
     title: 'NPER, PPMT, and IPMT',
     description:
