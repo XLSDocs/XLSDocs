@@ -33,7 +33,7 @@ export function PostNav({ category, readTime }: { category: string; readTime: st
   return (
     <div className="sticky top-0 z-40">
       <header className="border-b border-fd-border bg-fd-background/80 backdrop-blur-lg">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link
             href="/"
             aria-label="xlsdocs.com home"
