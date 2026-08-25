@@ -1,0 +1,29 @@
+---
+title: COLUMNS examples
+description: Worked examples for COLUMNS — sizing a table, validating two ranges before combining them, and the position-vs-count gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Count the columns in a table" formula={`=COLUMNS(A1:F1)`}>
+  Returns 6 — the number of columns spanned by the range.
+</ExampleCard>
+
+<ExampleCard number="02" label="Checking two ranges are the same width" formula={`=COLUMNS(A1:C1)=COLUMNS(D1:F1)`}>
+  Returns TRUE if both ranges have the same number of columns — a
+  quick sanity check before combining them with VSTACK.
+</ExampleCard>
+
+<ExampleCard number="03" label="Measuring the width of a generated array" formula={`=COLUMNS(SEQUENCE(3,5))`}>
+  Returns 5 — COLUMNS measures the dimensions of any array or
+  reference, not just a literal worksheet range.
+</ExampleCard>
+
+<ExampleCard number="04" label="A single cell always counts as 1" formula={`=COLUMNS(A1)`}>
+  Returns 1 — a single-cell reference is a 1-column range.
+</ExampleCard>
+
+<ExampleCard number="05" label="Confusing COLUMNS with COLUMN" formula={`=COLUMNS(A1:C1)`}>
+  Returns 3 (a count) — not 1, which is what COLUMN(A1:C1) would
+  return as a position in a legacy formula.
+</ExampleCard>

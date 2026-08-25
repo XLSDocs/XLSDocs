@@ -1,0 +1,147 @@
+---
+title: COLUMNS
+description: Count how many columns are in a range or array — a count, not a position.
+---
+
+Count how many columns a range or array spans — the horizontal
+counterpart to ROWS, and the sizing half of COLUMN's position.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a count, not a column position — see COLUMN for position', type: 'warn' },
+  { text: 'Works on an array or a named range, not just a plain cell reference', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COLUMNS(array)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COLUMNS(array)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range, array, or array formula to count columns in.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of columns in `array`, as a single number — never an
+array, regardless of how many columns the input has.
+
+## Description
+
+COLUMNS is ROWS turned sideways — instead of counting how tall a
+range is, it counts how wide it is. It's used to validate that ranges
+being combined (with HSTACK, for instance) share a compatible width,
+or to check how many fields a table actually has without hardcoding
+a number that goes stale as columns are added or removed.
+
+<Callout type="warn">
+  COLUMNS and COLUMN are easy to mix up by name alone, the same way
+  ROWS and ROW are. `COLUMN(A1:C1)` answers "what column is this?"
+  (position); `COLUMNS(A1:C1)` answers "how many columns is this?"
+  (count, always `3` here).
+</Callout>
+
+## Common errors
+
+### Confusing COLUMNS with COLUMN
+
+<ExcelCode>{`COLUMNS(A1:C1) → 3, not a column position`}</ExcelCode>
+
+If a column **number** was actually wanted instead of a count, COLUMN
+is the right function:
+
+<ExcelCode>{`COLUMN(A1) → 1`}</ExcelCode>
+
+### Expecting COLUMNS to count only non-blank columns
+
+COLUMNS counts every column within the reference's dimensions,
+regardless of whether those columns actually contain any data — it
+has no concept of "blank" the way COUNTA does for cells.
+
+### Passing a value instead of a range
+
+<ExcelCode>{`COLUMNS(5) → 1`}</ExcelCode>
+
+A single value is treated as a 1-row, 1-column array, so COLUMNS
+always returns `1` for it — not an error, but rarely the intended
+input.
+
+export const faqs = [
+  {
+    question: 'How is COLUMNS different from COLUMN?',
+    answer: 'COLUMNS counts how many columns are in a range (a count). COLUMN returns which column a specific cell is in (a position). COLUMNS(A1:C1) is 3; COLUMN(A1:C1) is 1 (in a legacy, non-array formula).',
+  },
+  {
+    question: 'What is COLUMNS actually useful for?',
+    answer: "Validating that two ranges have matching widths before combining them with HSTACK, sizing a dynamic named range horizontally, or calculating how many fields a table has without hardcoding a count.",
+  },
+  {
+    question: 'Does COLUMNS work on an array formula result, not just a plain range?',
+    answer: "Yes — COLUMNS(SEQUENCE(3,5)) returns 5, since it measures the dimensions of whatever array or reference it's given, not just a literal worksheet range.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COLUMNS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COLUMNS(A1:F1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim colCount As Long
+    colCount = Range("A1:F1").Columns.Count
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    col_count = len(df.columns)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COLUMN](/docs/lookup/column) — returns a single column's position,
+  instead of counting how many columns are in a range.
+- [ROWS](/docs/lookup/rows) — the vertical counterpart, counting rows
+  instead of columns.
+- [HSTACK](/docs/arrays/hstack) — often validated with COLUMNS
+  beforehand to confirm ranges combine cleanly.

@@ -1,0 +1,156 @@
+---
+title: ROW
+description: Return the row number of a reference, or the row number of the formula's own cell if no reference is given.
+---
+
+Return the row number of a specific cell, or — with no argument at
+all — the row number of the cell the formula itself is sitting in.
+The building block behind self-numbering lists and dragged-down
+sequential formulas.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'With no argument, returns the formula\'s own row', type: 'check' },
+  { text: 'A multi-row reference spills an array of row numbers in Excel 365', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ROW([reference])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ROW([reference])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'range',
+    required: false,
+    description: 'The cell or range to get the row number of. Omit it to get the row number of the cell containing the ROW formula itself.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The row number of `reference` (or the formula's own cell, if
+omitted) as a plain number — `1` for row 1, `2` for row 2, and so on.
+Given a multi-row reference in a dynamic-array version of Excel, it
+returns a spilled array of every row number in that range.
+
+## Description
+
+ROW without an argument is a self-aware trick: it returns whichever
+row the formula is currently sitting in, which makes it useful for
+generating a sequential number that survives being dragged, copied,
+or moved (unlike typing `1`, `2`, `3` manually, which doesn't adjust
+if a row gets inserted above). Paired with a fixed anchor
+(`ROW()-ROW($A$1)+1`), it produces a counter that always starts at 1
+regardless of which row the formula actually lives on.
+
+<Callout type="info">
+  `ROW(A1:A10)` behaves differently depending on the Excel version:
+  in a dynamic-array version (365), it automatically spills the full
+  array `{1;2;3;...;10}`. In a legacy, pre-dynamic-array version, the
+  same formula (without being entered as an old-style Ctrl+Shift+Enter
+  array formula) returns just `1` — the row of the first cell only.
+</Callout>
+
+## Common errors
+
+### Expecting an array without Excel 365's dynamic arrays
+
+<ExcelCode>{`ROW(A1:A10) → 1 (in a legacy, non-dynamic-array version of Excel)`}</ExcelCode>
+
+Older Excel versions need this entered as a Ctrl+Shift+Enter array
+formula to spill every row number — in 365, the same formula spills
+automatically with no special entry required.
+
+### Using ROW() alone as a counter, then having it break when sorted
+
+<ExcelCode>{`ROW()-ROW($A$1)+1 → breaks if the anchor cell moves during a sort`}</ExcelCode>
+
+Sorting a range can move the anchor cell along with the data,
+throwing off the counter. For a sort-safe sequence, SEQUENCE is
+usually a more robust choice than a ROW()-based counter.
+
+### Confusing ROW (position) with ROWS (count)
+
+`ROW(A1:A10)` in a legacy formula returns `1` — the position of the
+first row. To find out **how many** rows are in a range instead, use
+`ROWS(A1:A10)`, which returns `10`. The similar names are a common
+source of mix-ups.
+
+export const faqs = [
+  {
+    question: 'What does ROW() return with no argument at all?',
+    answer: "The row number of the cell the formula itself is in — a self-referential trick often used to build a sequential number that stays correct when the formula is copied or dragged to a new row.",
+  },
+  {
+    question: 'How is ROW different from ROWS?',
+    answer: 'ROW returns a position (which row is this?). ROWS returns a count (how many rows are in this range?). ROW(A1:A10) gives 1 in a legacy formula; ROWS(A1:A10) gives 10.',
+  },
+  {
+    question: 'Why does ROW(A1:A10) return an array in some workbooks but not others?',
+    answer: "Excel 365's dynamic arrays let ROW spill an array of every row number automatically. A legacy, pre-dynamic-array version of Excel returns just the first row's number unless the formula is entered as an old-style Ctrl+Shift+Enter array formula.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ROW from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ROW()-ROW($A$1)+1`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim r As Long
+    r = ActiveCell.Row
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    df["RowNumber"] = range(1, len(df) + 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ROWS](/docs/lookup/rows) — counts how many rows are in a range,
+  instead of returning a single row's position.
+- [COLUMN](/docs/lookup/column) — the horizontal counterpart,
+  returning a column number instead of a row number.
+- [SEQUENCE](/docs/arrays/sequence) — a more robust way to generate a
+  sequential number that doesn't depend on the formula's own position.
+- [INDEX](/docs/lookup/index) — often paired with ROW to build a
+  dynamic row reference inside a lookup.

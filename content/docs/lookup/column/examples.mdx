@@ -1,0 +1,31 @@
+---
+title: COLUMN examples
+description: Worked examples for COLUMN — a horizontal counter, a specific cell's column number, and getting the column letter instead.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="The formula's own column number" formula={`=COLUMN()`}>
+  Returns whatever column the formula itself is in — 1 if it's in
+  column A, 3 if it's in column C.
+</ExampleCard>
+
+<ExampleCard number="02" label="A horizontal counter starting at 1" formula={`=COLUMN()-COLUMN($A$1)+1`}>
+  Anchored to column A, this returns 1 regardless of which column the
+  table actually starts in, incrementing cleanly when dragged right.
+</ExampleCard>
+
+<ExampleCard number="03" label="The column number of a specific cell" formula={`=COLUMN(D1)`}>
+  Returns 4 — the column of the referenced cell, independent of
+  where the formula itself lives.
+</ExampleCard>
+
+<ExampleCard number="04" label="Converting the number back to a letter" formula={`=SUBSTITUTE(ADDRESS(1,COLUMN(C5),4),"1","")`}>
+  Returns "C" — COLUMN alone only returns the number, so this wraps
+  it in ADDRESS to build a full reference, then strips the row part.
+</ExampleCard>
+
+<ExampleCard number="05" label="Picking a value based on column position" formula={`=CHOOSE(COLUMN()-COLUMN($A$1)+1, "Low", "Medium", "High")`}>
+  Uses the column-relative position to select a different label
+  depending on which of three columns the formula sits in.
+</ExampleCard>

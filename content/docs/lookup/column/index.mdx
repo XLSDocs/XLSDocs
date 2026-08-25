@@ -1,0 +1,153 @@
+---
+title: COLUMN
+description: Return the column number of a reference, or the column number of the formula's own cell if no reference is given.
+---
+
+Return the column number of a specific cell — as a **number**, not
+the letter shown on the column header — or, with no argument, the
+column number of the cell the formula itself is sitting in.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a number (A=1, B=2, ...), never the column letter', type: 'warn' },
+  { text: 'With no argument, returns the formula\'s own column', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COLUMN([reference])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COLUMN([reference])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'range',
+    required: false,
+    description: 'The cell or range to get the column number of. Omit it to get the column number of the cell containing the COLUMN formula itself.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The column number of `reference` (or the formula's own cell, if
+omitted) as a plain number — `1` for column A, `2` for column B, and
+so on. Given a multi-column reference in a dynamic-array version of
+Excel, it returns a spilled array of every column number in that
+range.
+
+## Description
+
+COLUMN is ROW turned sideways — the same self-aware "which position
+am I in" trick, just across columns instead of down rows. It's the
+standard way to generate a horizontal sequence (`1, 2, 3...` across a
+row) that survives being dragged or copied, and it's commonly paired
+with CHOOSE or INDEX to pick a value based on which column a formula
+happens to be sitting in.
+
+<Callout type="warn">
+  `COLUMN(A1)` returns `1`, not the letter `"A"` — expecting the
+  actual column letter back is the single most common surprise with
+  this function. Getting a letter requires wrapping the result (for
+  example, `SUBSTITUTE(ADDRESS(1,COLUMN(A1),4),"1","")`), not a
+  built-in option of COLUMN itself.
+</Callout>
+
+## Common errors
+
+### Expecting a letter instead of a number
+
+<ExcelCode>{`COLUMN(A1) → 1, not "A"`}</ExcelCode>
+
+COLUMN always returns a number. To get the letter, use ADDRESS
+combined with SUBSTITUTE, or a small LET-based helper formula.
+
+### Confusing COLUMN (position) with COLUMNS (count)
+
+`COLUMN(A1:C1)` in a legacy formula returns `1` — the position of
+the first column. To find out **how many** columns are in a range
+instead, use `COLUMNS(A1:C1)`, which returns `3`.
+
+### Relying on COLUMN() for a counter that survives inserted columns
+
+<ExcelCode>{`COLUMN()-COLUMN($A$1)+1`}</ExcelCode>
+
+This anchored pattern is generally safe, but inserting a new column
+between the anchor and the formula shifts both references together —
+double-check the anchor is genuinely fixed with `$` if a column gets
+inserted nearby.
+
+export const faqs = [
+  {
+    question: 'Why does COLUMN return a number instead of a letter?',
+    answer: 'Excel\'s internal column addressing is numeric — COLUMN exposes that directly. Getting the letter form requires an extra step, typically ADDRESS combined with SUBSTITUTE to strip out the row part.',
+  },
+  {
+    question: 'How is COLUMN different from COLUMNS?',
+    answer: 'COLUMN returns a position (which column is this?). COLUMNS returns a count (how many columns are in this range?). COLUMN(A1:C1) gives 1 in a legacy formula; COLUMNS(A1:C1) gives 3.',
+  },
+  {
+    question: 'What is COLUMN() with no argument used for?',
+    answer: "The same trick as ROW() — a self-referential value equal to whichever column the formula is in, often anchored to build a horizontal counter, or used inside CHOOSE to vary behavior by column position.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COLUMN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COLUMN()-COLUMN($A$1)+1`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim c As Long
+    c = ActiveCell.Column
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from openpyxl.utils import column_index_from_string
+
+    col_number = column_index_from_string("C")  # 3
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COLUMNS](/docs/lookup/columns) — counts how many columns are in a
+  range, instead of returning a single column's position.
+- [ROW](/docs/lookup/row) — the vertical counterpart, returning a row
+  number instead of a column number.
+- [CHOOSE](/docs/lookup/choose) — often paired with COLUMN to select
+  a value based on which column a formula is in.
+- [INDEX](/docs/lookup/index) — often paired with COLUMN to build a
+  dynamic column reference inside a lookup.

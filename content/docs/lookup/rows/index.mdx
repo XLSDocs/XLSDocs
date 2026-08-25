@@ -1,0 +1,151 @@
+---
+title: ROWS
+description: Count how many rows are in a range or array — a count, not a position.
+---
+
+Count how many rows a range or array spans — not which row something
+is on, but how many rows there are in total. The sizing half of
+building a dynamic range, paired with ROW for position.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a count, not a row position — see ROW for position', type: 'warn' },
+  { text: 'Works on an array or a named range, not just a plain cell reference', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ROWS(array)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ROWS(array)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range, array, or array formula to count rows in.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of rows in `array`, as a single number — never an array,
+regardless of how many rows the input has.
+
+## Description
+
+ROWS answers "how many rows" instead of "which row" — the count
+behind sizing a dynamic named range, checking whether two ranges are
+compatible sizes before combining them, or figuring out how far down
+a table actually extends without hardcoding a row count that goes
+stale as data is added.
+
+<Callout type="warn">
+  ROWS and ROW are easy to mix up by name alone. `ROW(A1:A10)`
+  answers "what row is this?" (position); `ROWS(A1:A10)` answers "how
+  many rows is this?" (count, always `10` here). Reaching for the
+  wrong one produces a plausible-looking number that's actually
+  answering the wrong question.
+</Callout>
+
+## Common errors
+
+### Confusing ROWS with ROW
+
+<ExcelCode>{`ROWS(A1:A10) → 10, not a row position`}</ExcelCode>
+
+If a row **number** was actually wanted instead of a count, ROW is
+the right function:
+
+<ExcelCode>{`ROW(A1) → 1`}</ExcelCode>
+
+### Expecting ROWS to count only non-blank rows
+
+<ExcelCode>{`ROWS(A1:A100) → 100, even if most rows are empty`}</ExcelCode>
+
+ROWS counts every row in the reference's dimensions, blank or not —
+it isn't aware of which cells actually contain data. Use COUNTA for
+a count of non-blank cells instead.
+
+### Passing a value instead of a range
+
+<ExcelCode>{`ROWS(5) → 1`}</ExcelCode>
+
+A single value (not a range reference) is treated as a 1-row, 1-column
+array, so ROWS always returns `1` for it — not an error, but rarely
+the intended input.
+
+export const faqs = [
+  {
+    question: 'How is ROWS different from ROW?',
+    answer: 'ROWS counts how many rows are in a range (a count). ROW returns which row a specific cell is on (a position). ROWS(A1:A10) is 10; ROW(A1:A10) is 1 (in a legacy, non-array formula).',
+  },
+  {
+    question: 'Does ROWS only count rows that have data in them?',
+    answer: "No — ROWS counts every row within the reference's dimensions, regardless of whether those rows are blank. Use COUNTA(range) to count non-blank cells instead.",
+  },
+  {
+    question: 'What is ROWS actually useful for?',
+    answer: "Sizing dynamic named ranges, validating that two ranges have matching dimensions before combining them (like with VSTACK), or calculating how many data rows exist below a header row.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ROWS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ROWS(A2:A100)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rowCount As Long
+    rowCount = Range("A2:A100").Rows.Count
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx")
+    row_count = len(df)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ROW](/docs/lookup/row) — returns a single row's position, instead
+  of counting how many rows are in a range.
+- [COLUMNS](/docs/lookup/columns) — the horizontal counterpart,
+  counting columns instead of rows.
+- [COUNTA](/docs/math/counta) — counts non-blank cells, rather than
+  every row regardless of content.

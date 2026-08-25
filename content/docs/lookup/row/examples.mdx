@@ -1,0 +1,31 @@
+---
+title: ROW examples
+description: Worked examples for ROW — a self-numbering list, an anchored counter, and spilling every row number in a range.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="The formula's own row number" formula={`=ROW()`}>
+  Returns whatever row the formula itself is in — 5 if typed into
+  row 5, 12 if moved to row 12.
+</ExampleCard>
+
+<ExampleCard number="02" label="A sequential counter starting at 1" formula={`=ROW()-ROW($A$1)+1`}>
+  Anchored to A1, this returns 1 regardless of which row the table
+  actually starts on, and increments cleanly when dragged down.
+</ExampleCard>
+
+<ExampleCard number="03" label="The row number of a specific cell" formula={`=ROW(D12)`}>
+  Returns 12 — the row of the referenced cell, independent of where
+  the formula itself lives.
+</ExampleCard>
+
+<ExampleCard number="04" label="Spilling every row number in a range (Excel 365)" formula={`=ROW(A1:A10)`}>
+  Spills the array {"{1;2;3;4;5;6;7;8;9;10}"} automatically — no
+  Ctrl+Shift+Enter needed in a dynamic-array version of Excel.
+</ExampleCard>
+
+<ExampleCard number="05" label="Flagging every other row" formula={`=MOD(ROW(),2)=0`}>
+  Returns TRUE on even rows, FALSE on odd rows — a common building
+  block for manual striped-row formatting.
+</ExampleCard>

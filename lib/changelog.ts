@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-25',
+    title: 'ROW, ROWS, COLUMN, and COLUMNS',
+    description:
+      "Four Lookup & Reference functions that resolve a naming trap of their own: ROW/COLUMN return a position, ROWS/COLUMNS return a count — easy to mix up, and each pair gets its own page explaining the difference.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-08-24',
     title: 'IsNull, IsEmpty, and IsNumeric',
     description:

@@ -1,0 +1,31 @@
+---
+title: ROWS examples
+description: Worked examples for ROWS — sizing a range, comparing two ranges, and the counting-blank-rows gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Count the rows in a table" formula={`=ROWS(A2:D100)`}>
+  Returns 99 — the number of rows spanned by the range, regardless of
+  how many actually contain data.
+</ExampleCard>
+
+<ExampleCard number="02" label="Checking two ranges are the same height" formula={`=ROWS(A2:A100)=ROWS(B2:B100)`}>
+  Returns TRUE if both ranges have the same number of rows — a quick
+  sanity check before combining them with HSTACK.
+</ExampleCard>
+
+<ExampleCard number="03" label="Finding the last data row dynamically" formula={`=ROWS(A2:A1000)-COUNTBLANK(A2:A1000)`}>
+  Subtracts blank cells from the total row count to estimate how many
+  rows actually contain data within an oversized reference range.
+</ExampleCard>
+
+<ExampleCard number="04" label="A single cell always counts as 1" formula={`=ROWS(A1)`}>
+  Returns 1 — a single-cell reference is a 1-row range.
+</ExampleCard>
+
+<ExampleCard number="05" label="Confusing ROWS with ROW" formula={`=ROWS(A1:A10)`}>
+  Returns 10 (a count) — not 1, which is what ROW(A1:A10) would
+  return as a position in a legacy formula. The similar names are
+  easy to mix up.
+</ExampleCard>
