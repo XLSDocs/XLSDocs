@@ -58,7 +58,7 @@ export function Faq({ items }: { items: FaqItem[] }) {
               <span>{item.question}</span>
               <span
                 aria-hidden
-                className="flex size-5 shrink-0 items-center justify-center rounded-full border border-fd-border font-mono text-sm text-fd-muted-foreground"
+                className="flex size-7 shrink-0 items-center justify-center rounded-full border border-fd-border bg-fd-background font-mono text-base font-semibold text-fd-muted-foreground"
               >
                 {isOpen ? '−' : '+'}
               </span>
