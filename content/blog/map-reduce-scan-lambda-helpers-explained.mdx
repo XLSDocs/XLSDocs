@@ -1,0 +1,154 @@
+---
+title: "MAP, REDUCE, and SCAN: Excel's LAMBDA Helpers, Explained"
+description: LAMBDA gets all the attention, but it can't actually run itself across an array. MAP, BYROW, BYCOL, REDUCE, and SCAN are the functions that do — and picking the wrong one gives you a plausible-looking wrong answer, not an error.
+date: "2026-08-25"
+category: Tutorials
+author: Dana Okafor
+readTime: 7 min read
+---
+
+LAMBDA gets the headlines — "build your own Excel function, no VBA
+required" is a genuinely great pitch. What doesn't get explained
+nearly as often is that a LAMBDA sitting by itself doesn't loop over
+anything. To actually run one across a range, you need a second
+function to drive it, and Excel ships five of them: MAP, BYROW,
+BYCOL, REDUCE, and SCAN. They look interchangeable if you squint.
+They aren't, and picking the wrong one is one of the few LAMBDA
+mistakes that doesn't throw an error — it just quietly gives you a
+shape you didn't ask for.
+
+## LAMBDA doesn't iterate on its own
+
+<ExcelCode>{`=LAMBDA(x, x*1.08)`}</ExcelCode>
+
+Typed into a cell by itself, this is a `#CALC!` error — a LAMBDA is a
+function definition, not a value. Even called correctly, it only
+ever operates on the one input it's given:
+
+<ExcelCode>{`=LAMBDA(x, x*1.08)(50)  →  54`}</ExcelCode>
+
+Running that same calculation across a whole column needs something
+to feed it each row's value in turn. That's the actual job of MAP,
+BYROW, BYCOL, REDUCE, and SCAN — none of them do any math themselves,
+they just call your LAMBDA repeatedly and assemble the results
+differently.
+
+## MAP: one calculation, every element, same shape back
+
+<ExcelCode>{`=MAP(A2:A10, LAMBDA(price, price*1.08))`}</ExcelCode>
+
+MAP is the one that matches intuition: it calls the LAMBDA once per
+cell and spills a result the same size as the input. Nine prices in,
+nine tax-inclusive prices out, one per row, no helper column. Pass
+two arrays instead of one and the LAMBDA takes two parameters — MAP
+calls it with the matching element from each array at every
+position, which replaces a lot of SUMPRODUCT-flavored row math:
+
+<ExcelCode>{`=MAP(A2:A10, B2:B10, LAMBDA(price, qty, price*qty))`}</ExcelCode>
+
+## BYROW and BYCOL: same idea, but the "element" is a whole row or column
+
+This is where it stops being obvious. MAP transforms *each cell*.
+BYROW and BYCOL transform *each row* or *each column* — the LAMBDA
+receives the entire row (or column) as one array argument, not one
+cell at a time.
+
+<ExcelCode>{`=BYROW(A2:C10, LAMBDA(row, SUM(row)))`}</ExcelCode>
+
+<Callout type="warn">
+  The LAMBDA's calculation has to collapse that row down to a single
+  value — wrap it in SUM, AVERAGE, an IF, anything that returns one
+  number. A LAMBDA that just returns the row unchanged
+  (`LAMBDA(row, row)`) doesn't error; it silently puts a nested array
+  inside every result cell instead of the single total you meant to
+  compute. It's an easy mistake to make and an easy one to miss,
+  since the sheet doesn't look obviously broken.
+</Callout>
+
+BYCOL is the identical idea turned sideways — one call per column,
+spilling a single row of results instead of a single column. It's
+the formula behind a totals row sitting under a table, built without
+a separate SUM in every column:
+
+<ExcelCode>{`=BYCOL(A2:C10, LAMBDA(col, SUM(col)))`}</ExcelCode>
+
+## REDUCE and SCAN: accumulating one thing across everything
+
+MAP, BYROW, and BYCOL all keep every result. REDUCE and SCAN throw
+most of them away on purpose — they carry a running value from one
+element to the next and only care about where that running value
+ends up.
+
+<ExcelCode>{`=REDUCE(0, A2:A10, LAMBDA(acc, x, acc+x))`}</ExcelCode>
+
+This is a spelled-out SUM: start the accumulator at `0`, and for
+every element add it to what's been accumulated so far. REDUCE
+returns only the final number — a spelled-out SUM isn't the point,
+REDUCE earns its keep once the accumulation is something SUM can't
+express, like building a running string or tracking a conditional
+count.
+
+SCAN runs the *exact same* accumulation, with one difference: instead
+of throwing away every intermediate value, it keeps all of them,
+spilled as an array the same size as the input.
+
+<ExcelCode>{`=SCAN(0, A2:A10, LAMBDA(acc, x, acc+x))`}</ExcelCode>
+
+Same formula, same accumulator logic — but now every row shows the
+running total up through that row, not just the grand total at the
+bottom. If you've ever built a "cumulative sales this month" column
+by dragging a `=D2+C3` formula down and hoping nobody inserts a row
+above it, SCAN is the version that can't be broken that way.
+
+## Picking the right one
+
+The fastest way to choose is to ask what shape the answer needs to
+be:
+
+- **One result per cell, same shape as the input** → MAP
+- **One result per row** → BYROW
+- **One result per column** → BYCOL
+- **One final result for the whole array** → REDUCE
+- **One result per step, showing the running value at each point** → SCAN
+
+Notice none of these produce an error if you reach for the wrong
+one — REDUCE and SCAN take the identical arguments, so swapping them
+just gives you a single number where you wanted a column, or a full
+column where you wanted a single number. Both are "valid" as far as
+Excel is concerned; only one of them is the answer to the question
+actually being asked.
+
+## The bottom line
+
+None of these five functions do anything on their own — they're
+delivery mechanisms for a LAMBDA you already wrote. The useful
+mental model isn't "which function is more powerful," it's "what
+shape does my answer need": an unchanged-size transform is MAP, a
+row or column squashed to one value is BYROW/BYCOL, and an
+accumulation is REDUCE if only the ending matters or SCAN if every
+step does.
+
+Full reference pages for [LAMBDA](/docs/custom-functions/lambda),
+[MAP](/docs/custom-functions/map), [BYROW](/docs/custom-functions/byrow),
+[BYCOL](/docs/custom-functions/bycol), [REDUCE](/docs/custom-functions/reduce),
+and [SCAN](/docs/custom-functions/scan) cover the full syntax, error
+cases, and more worked examples for each.
+
+export const faqs = [
+  {
+    question: 'Do I need to learn all five of these functions?',
+    answer: "Not necessarily all at once — MAP covers the most common case (transform every element) and is worth learning first. BYROW/BYCOL and REDUCE/SCAN are worth reaching for once a specific need comes up: a per-row or per-column summary, or a running accumulation.",
+  },
+  {
+    question: 'What happens if I use REDUCE when I actually needed SCAN?',
+    answer: "You get a single final number instead of a column of running values — not an error, just the wrong shape. Since both take identical arguments, this is an easy swap to make by accident and easy to miss until the output looks off.",
+  },
+  {
+    question: 'Can BYROW reference specific columns within the row, not just the whole row?',
+    answer: "Yes — since the row comes into the lambda as an array, INDEX(row, 1), INDEX(row, 2), and so on pull out individual positions for a calculation that treats certain columns differently, like a weighted score.",
+  },
+  {
+    question: 'Are MAP, BYROW, BYCOL, REDUCE, and SCAN available in Excel 2021 or older?',
+    answer: 'No — all five require Excel 365, the same requirement as LAMBDA itself. They also work in Excel for the web, but not in the perpetual 2021, 2019, or 2016 releases.',
+  },
+];
