@@ -135,7 +135,7 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
         <div className="flex items-center justify-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-fd-border px-3 py-1 font-mono text-xs text-fd-muted-foreground">
             <Sparkles className="size-3 text-fd-primary" />
-            Powered by Claude
+            AI-powered
           </span>
           {isSubscriber && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-fd-primary/30 bg-fd-primary/10 px-3 py-1 font-mono text-xs text-fd-primary">

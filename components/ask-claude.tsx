@@ -143,7 +143,7 @@ interface Message {
   content: string;
 }
 
-const FREE_LIMIT_MESSAGE = "You've hit the free limit for Ask Claude today — upgrade for unlimited, or try again tomorrow.";
+const FREE_LIMIT_MESSAGE = "You've hit the free limit for Ask AI today — upgrade for unlimited, or try again tomorrow.";
 
 export function AskClaude({ pageTitle }: { pageTitle: string }) {
   const [open, setOpen] = useState(false);
@@ -212,7 +212,7 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
         className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border bg-fd-primary/10 border-fd-primary/20 text-fd-primary hover:bg-fd-primary/20 transition-colors"
       >
         <Sparkles className="w-3.5 h-3.5" />
-        Ask Claude
+        Ask AI
       </button>
 
       {open && (
@@ -227,7 +227,7 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-fd-primary" />
-                Ask Claude about {pageTitle}
+                Ask AI about {pageTitle}
               </div>
               <button onClick={() => setOpen(false)} className="p-1 rounded hover:bg-fd-muted">
                 <X className="w-4 h-4" />

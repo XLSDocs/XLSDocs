@@ -17,7 +17,7 @@ const marketingPages = [
     title: 'xlsdocs.com — Excel function reference',
     description: 'Excel function reference, blog, and AI formula builder.',
     structuredData: textIndex(
-      'Excel function reference, blog tutorials, and an AI-powered formula builder. Browse functions by category or ask Claude to write a formula for you.',
+      'Excel function reference, blog tutorials, and an AI-powered formula builder. Browse functions by category or ask AI to write a formula for you.',
     ),
   },
   {
@@ -35,7 +35,7 @@ const marketingPages = [
     title: 'AI Formula Builder',
     description: 'Describe what you need in plain English and get a working Excel formula.',
     structuredData: textIndex(
-      'AI Formula Builder — describe what you need in plain English and Claude writes the Excel formula for you, with a breakdown of each part.',
+      'AI Formula Builder — describe what you need in plain English and AI writes the Excel formula for you, with a breakdown of each part.',
     ),
   },
 ];

@@ -26,7 +26,7 @@ export function Hero() {
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-fd-muted-foreground">
           Every formula, VBA function, and custom LAMBDA documented. An AI
-          formula builder that actually works, plus a Claude-powered
+          formula builder that actually works, plus a built-in AI
           assistant on every page. The Excel reference site power users
           deserve.
         </p>

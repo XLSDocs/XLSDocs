@@ -55,9 +55,9 @@ const entries: ChangelogEntry[] = [
   },
   {
     date: '2026-08-23',
-    title: 'Ask Claude is now part of the same subscription',
+    title: 'Ask AI is now part of the same subscription',
     description:
-      'Free visitors get 5 questions a day; the $5/mo subscription that unlocks the Formula Builder now covers unlimited Ask Claude too — one plan, not a second paywall.',
+      'Free visitors get 5 questions a day; the $5/mo subscription that unlocks the Formula Builder now covers unlimited Ask AI too — one plan, not a second paywall.',
     tags: ['Feature'],
   },
   {
@@ -104,7 +104,7 @@ const entries: ChangelogEntry[] = [
     date: '2026-08-21',
     title: 'A homepage that actually explains the site',
     description:
-      'New sections show every category at a glance with live function counts, and what the Ask Claude panel looks like on a real page — both were previously invisible unless you\'d already found your way into the docs.',
+      'New sections show every category at a glance with live function counts, and what the Ask AI panel looks like on a real page — both were previously invisible unless you\'d already found your way into the docs.',
     tags: ['Feature'],
   },
   {

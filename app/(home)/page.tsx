@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: { absolute: 'xlsdocs.com — The Excel Reference Built for the AI Era' },
   description:
-    'Every Excel formula, VBA function, and custom LAMBDA documented, with an AI formula builder and a Claude-powered assistant on every page.',
+    'Every Excel formula, VBA function, and custom LAMBDA documented, with an AI formula builder and a built-in AI assistant on every page.',
   alternates: {
     canonical: '/',
   },

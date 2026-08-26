@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSubscriber } from '@/lib/subscription';
 
-// Same subscription that unlocks the Formula Builder also covers Ask Claude —
+// Same subscription that unlocks the Formula Builder also covers Ask AI —
 // one $5/mo tier, not a second paywall. Free tier is a daily cap, not hourly:
 // an hourly reset let anyone dodge it by just waiting, which undermined the
 // point of capping it at all.
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   if (!allowed) {
     const message = subscriber.isSubscriber
       ? "You've hit an unusually high usage spike — try again shortly."
-      : "You've hit the free limit for Ask Claude today — upgrade for unlimited, or try again tomorrow.";
+      : "You've hit the free limit for Ask AI today — upgrade for unlimited, or try again tomorrow.";
     const res = NextResponse.json({ error: message }, { status: 429 });
     if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return res;
@@ -73,6 +73,6 @@ export async function POST(req: NextRequest) {
     if (subscriber.setCookieHeader) successRes.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return successRes;
   } catch {
-    return NextResponse.json({ error: 'Failed to reach Claude API.' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to reach the AI service.' }, { status: 500 });
   }
 }

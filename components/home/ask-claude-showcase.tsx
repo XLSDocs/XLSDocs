@@ -10,23 +10,23 @@ export function AskClaudeShowcase() {
           </p>
           <h2 className="mt-2 text-3xl">
             Stuck on a formula?{' '}
-            <span className="font-serif text-fd-primary italic">Ask Claude</span> right there
+            <span className="font-serif text-fd-primary italic">Ask AI</span> right there
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
-            Every function page has a Claude-powered chat built in — scoped
+            Every function page has an AI-powered chat built in — scoped
             to exactly what you're reading. Ask for a real-world example,
             what a specific error means, or how it compares to a similar
             function, without leaving the page or opening a new tab.
           </p>
           <p className="mt-4 text-sm text-fd-muted-foreground">
-            Free, no sign-up — same as the rest of xlsdocs.
+            Free to try, no sign-up — $5/mo for unlimited.
           </p>
         </div>
 
         <div className="gradient-border-card overflow-hidden rounded-xl">
           <div className="flex items-center gap-2 border-b border-fd-border px-4 py-3">
             <Sparkles className="size-3.5 text-fd-primary" />
-            <span className="text-sm font-semibold">Ask Claude about XLOOKUP</span>
+            <span className="text-sm font-semibold">Ask AI about XLOOKUP</span>
           </div>
           <div className="flex flex-col gap-3 p-4">
             <div className="self-end max-w-[85%] rounded-lg border border-fd-primary/20 bg-fd-primary/10 px-3 py-2 text-sm">

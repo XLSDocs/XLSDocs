@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     const parsed = JSON.parse(jsonMatch[0]);
     if (typeof parsed.formula !== 'string' || !Array.isArray(parsed.breakdown)) {
-      return NextResponse.json({ error: 'Malformed response from Claude.' }, { status: 500 });
+      return NextResponse.json({ error: 'Malformed response from the AI.' }, { status: 500 });
     }
 
     const successRes = NextResponse.json({
@@ -99,6 +99,6 @@ export async function POST(req: NextRequest) {
     if (subscriber.setCookieHeader) successRes.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return successRes;
   } catch {
-    return NextResponse.json({ error: 'Failed to reach Claude API.' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to reach the AI service.' }, { status: 500 });
   }
 }

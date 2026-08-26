@@ -87,7 +87,7 @@ export default function PrivacyPage() {
               never to build a profile of you.
             </p>
 
-            <h3>AI Formula Builder and Ask Claude prompts</h3>
+            <h3>AI Formula Builder and Ask AI prompts</h3>
             <p>
               What you type into either tool is sent to Anthropic's Claude
               API to generate a response. xlsdocs.com doesn't store your
@@ -122,7 +122,7 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <strong>Anthropic</strong> — processes prompts you submit to
-                the AI Formula Builder or Ask Claude, in order to generate a
+                the AI Formula Builder or Ask AI, in order to generate a
                 response.
               </li>
               <li>
