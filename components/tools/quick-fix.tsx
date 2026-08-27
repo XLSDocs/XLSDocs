@@ -2,19 +2,38 @@
 
 import { useRef, useState } from 'react';
 import Link from 'next/link';
-import { Sparkles, Loader2, Sparkle } from 'lucide-react';
+import { Wrench, Loader2, Sparkle } from 'lucide-react';
 import { ExcelCode } from '@/components/excel-code';
 import { CodeRainBackground } from '@/components/shared/code-rain';
 
-const MAX_LENGTH = 400;
+const MAX_LENGTH = 500;
 
-const EXAMPLE_PROMPTS = [
-  { category: 'SUMIF', prompt: "Sum all sales in column C where the region in column A is \"West\"" },
-  { category: 'LOOKUP', prompt: "Look up an employee's salary from their ID in another sheet" },
-  { category: 'TEXT', prompt: 'Combine first and last name columns with a space between them' },
-  { category: 'NESTED IF', prompt: 'Grade a test score as A/B/C/D/F based on thresholds' },
-  { category: 'DYNAMIC ARRAY', prompt: 'Get a unique, sorted list of customer names from column B' },
-  { category: 'DATE LOGIC', prompt: 'Calculate the number of business days between two dates' },
+const EXAMPLE_FORMULAS = [
+  {
+    category: '#N/A',
+    formula: '=VLOOKUP(A2,B:C,2,FALSE)',
+    context: 'Returns #N/A even though the value is clearly in column B',
+  },
+  {
+    category: '#REF!',
+    formula: '=VLOOKUP(A2,B:E,5,FALSE)',
+    context: 'Returns #REF! after a column in the middle of the table was deleted',
+  },
+  {
+    category: '#VALUE!',
+    formula: '=SUMIFS(C:C,A:A,"West",B:B)',
+    context: 'Returns #VALUE! — trying to sum sales in the West region for Q4',
+  },
+  {
+    category: '#DIV/0!',
+    formula: '=B2/C2',
+    context: "Returns #DIV/0! on some rows where C2 hasn't been filled in yet",
+  },
+  {
+    category: 'Wrong result',
+    formula: '=IF(A2>10 AND A2<20,"Mid","Other")',
+    context: 'Meant to check if a number is between 10 and 20',
+  },
 ];
 
 interface BreakdownItem {
@@ -22,26 +41,26 @@ interface BreakdownItem {
   description: string;
 }
 
-interface Build {
-  prompt: string;
+interface Fix {
+  input: string;
   formula: string;
   explanation: string;
   breakdown: BreakdownItem[];
 }
 
-interface FormulaBuilderProps {
+interface QuickFixProps {
   initialIsSubscriber: boolean;
   billingEnabled: boolean;
   checkoutStatus: 'upgraded' | 'canceled' | null;
 }
 
-export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutStatus }: FormulaBuilderProps) {
-  const [prompt, setPrompt] = useState('');
+export function QuickFix({ initialIsSubscriber, billingEnabled, checkoutStatus }: QuickFixProps) {
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [rateLimited, setRateLimited] = useState(false);
-  const [result, setResult] = useState<Build | null>(null);
-  const [recent, setRecent] = useState<Build[]>([]);
+  const [result, setResult] = useState<Fix | null>(null);
+  const [recent, setRecent] = useState<Fix[]>([]);
   const [upgrading, setUpgrading] = useState(false);
   const [billingError, setBillingError] = useState('');
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -49,7 +68,7 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
 
   const isSubscriber = initialIsSubscriber;
 
-  async function build(text: string) {
+  async function fix(text: string) {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
     setLoading(true);
@@ -57,10 +76,10 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
     setRateLimited(false);
 
     try {
-      const res = await fetch('/api/formula-builder', {
+      const res = await fetch('/api/quick-fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: trimmed }),
+        body: JSON.stringify({ formula: trimmed }),
       });
       const data = (await res.json()) as {
         error?: string;
@@ -72,14 +91,14 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
         setError(data.error);
         setRateLimited(res.status === 429);
       } else {
-        const build: Build = {
-          prompt: trimmed,
+        const fixResult: Fix = {
+          input: trimmed,
           formula: data.formula ?? '',
           explanation: data.explanation ?? '',
           breakdown: data.breakdown ?? [],
         };
-        setResult(build);
-        setRecent((prev) => [build, ...prev.filter((b) => b.prompt !== trimmed)].slice(0, 8));
+        setResult(fixResult);
+        setRecent((prev) => [fixResult, ...prev.filter((f) => f.input !== trimmed)].slice(0, 8));
       }
     } catch {
       setError('Something went wrong. Please try again.');
@@ -135,7 +154,7 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
       <div className="relative z-10 mx-auto max-w-3xl px-6 pt-20 pb-8 text-center">
         <div className="flex items-center justify-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-fd-border px-3 py-1 font-mono text-xs text-fd-muted-foreground">
-            <Sparkles className="size-3 text-fd-primary" />
+            <Wrench className="size-3 text-fd-primary" />
             AI-powered
           </span>
           {isSubscriber && (
@@ -146,11 +165,12 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
           )}
         </div>
         <h1 className="mt-6 text-4xl font-normal md:text-5xl">
-          AI Formula <span className="font-serif text-fd-primary italic">Builder</span>
+          Quick <span className="font-serif text-fd-primary italic">Fix</span>
         </h1>
         <p className="mx-auto mt-4 max-w-lg text-fd-muted-foreground">
-          Describe what you want in plain English. Get the exact Excel formula
-          — with a full breakdown of every argument.
+          Paste a broken formula and whatever it's doing wrong. Get back a
+          corrected version — with an explanation of what was actually
+          broken.
         </p>
 
         {checkoutStatus && !bannerDismissed && (
@@ -163,7 +183,7 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
           >
             <span>
               {checkoutStatus === 'upgraded'
-                ? "You're upgraded — unlimited builds unlocked."
+                ? "You're upgraded — unlimited fixes unlocked."
                 : 'Checkout canceled — no charge was made.'}
             </span>
             <button
@@ -201,26 +221,26 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
 
         <div className="mx-auto mt-8 rounded-xl border border-fd-border bg-fd-card/80 p-3 text-left">
           <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value.slice(0, MAX_LENGTH))}
+            value={input}
+            onChange={(e) => setInput(e.target.value.slice(0, MAX_LENGTH))}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) build(prompt);
+              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) fix(input);
             }}
-            placeholder="e.g. Sum all invoices over $500 that are still unpaid"
+            placeholder={'e.g. =VLOOKUP(A2,B:C,2,FALSE) — returns #N/A even though the value is in column B'}
             rows={3}
             className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-fd-muted-foreground"
           />
           <div className="flex items-center justify-between border-t border-fd-border pt-2">
             <span className="font-mono text-xs text-fd-muted-foreground">
-              {prompt.length}/{MAX_LENGTH}
+              {input.length}/{MAX_LENGTH}
             </span>
             <button
-              onClick={() => build(prompt)}
-              disabled={loading || !prompt.trim()}
+              onClick={() => fix(input)}
+              disabled={loading || !input.trim()}
               className="flex items-center gap-1.5 rounded-full bg-fd-primary px-4 py-1.5 text-sm font-medium text-fd-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {loading ? <Loader2 className="size-3.5 animate-spin" /> : null}
-              {loading ? 'Building…' : 'Build formula →'}
+              {loading ? 'Fixing…' : 'Fix formula →'}
             </button>
           </div>
         </div>
@@ -239,9 +259,9 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
           </div>
         )}
         <p className="mt-4 text-xs text-fd-muted-foreground">
-          Got a formula that's already broken instead?{' '}
-          <Link href="/tools/quick-fix" className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground">
-            Try Quick Fix
+          Building a formula from scratch instead?{' '}
+          <Link href="/tools/formula-builder" className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground">
+            Try the AI Formula Builder
           </Link>
           .
         </p>
@@ -253,7 +273,7 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
             <div className="not-prose mb-10 rounded-xl border border-fd-border bg-fd-card overflow-hidden">
               <div className="flex items-center gap-2 border-b border-fd-border px-4 py-2 text-[11px] font-mono uppercase tracking-wider text-fd-muted-foreground">
                 <span className="size-1.5 rounded-full bg-fd-primary" />
-                Result
+                Fixed
               </div>
               <div className="px-4 pt-3">
                 <ExcelCode>{result.formula}</ExcelCode>
@@ -264,7 +284,7 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
               {result.breakdown.length > 0 && (
                 <div className="border-t border-fd-border px-4 py-3">
                   <span className="text-[10px] uppercase tracking-wide text-fd-muted-foreground">
-                    Breakdown
+                    What changed
                   </span>
                   <div className="mt-2 flex flex-col gap-2">
                     {result.breakdown.map((item, i) => (
@@ -281,19 +301,21 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
 
           <h2 className="mb-4 text-lg font-medium">Try an example</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {EXAMPLE_PROMPTS.map((ex) => (
+            {EXAMPLE_FORMULAS.map((ex) => (
               <button
                 key={ex.category}
                 onClick={() => {
-                  setPrompt(ex.prompt);
-                  build(ex.prompt);
+                  const combined = `${ex.formula} — ${ex.context}`;
+                  setInput(combined);
+                  fix(combined);
                 }}
                 className="rounded-xl border border-fd-border bg-fd-card p-4 text-left transition-colors hover:border-fd-primary/50"
               >
                 <div className="font-mono text-[11px] uppercase tracking-wider text-fd-primary">
                   {ex.category}
                 </div>
-                <p className="mt-1.5 text-sm text-fd-muted-foreground">{ex.prompt}</p>
+                <p className="mt-1.5 font-mono text-xs text-fd-foreground">{ex.formula}</p>
+                <p className="mt-1 text-sm text-fd-muted-foreground">{ex.context}</p>
               </button>
             ))}
           </div>
@@ -302,25 +324,25 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
         <aside className="hidden w-64 shrink-0 md:block">
           <div className="sticky top-24">
             <span className="text-[10px] uppercase tracking-wide text-fd-muted-foreground">
-              Recent builds
+              Recent fixes
             </span>
             <div className="mt-2 flex flex-col gap-1.5">
               {recent.length === 0 && (
                 <p className="text-xs text-fd-muted-foreground">
-                  Your builds this session will show up here.
+                  Your fixes this session will show up here.
                 </p>
               )}
-              {recent.map((b, i) => (
+              {recent.map((f, i) => (
                 <button
                   key={i}
                   onClick={() => {
-                    setPrompt(b.prompt);
-                    setResult(b);
+                    setInput(f.input);
+                    setResult(f);
                   }}
                   className="rounded-md border border-fd-border px-3 py-2 text-left text-xs transition-colors hover:bg-fd-card"
                 >
-                  <div className="truncate text-fd-muted-foreground">{b.prompt}</div>
-                  <div className="mt-0.5 truncate font-mono text-fd-primary">{b.formula}</div>
+                  <div className="truncate text-fd-muted-foreground">{f.input}</div>
+                  <div className="mt-0.5 truncate font-mono text-fd-primary">{f.formula}</div>
                 </button>
               ))}
             </div>

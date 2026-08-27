@@ -6,6 +6,7 @@ const FOOTER_LINKS = [
   { href: '/functions', label: 'Functions' },
   { href: '/blog', label: 'Blog' },
   { href: '/tools/formula-builder', label: 'Formula Builder' },
+  { href: '/tools/quick-fix', label: 'Quick Fix' },
   { href: '/docs', label: 'Docs' },
   { href: '/changelog', label: 'Changelog' },
   { href: '/faq', label: 'FAQ' },

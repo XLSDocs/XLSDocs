@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-27',
+    title: 'Quick Fix — a tool for broken formulas',
+    description:
+      "Paste a broken or misbehaving Excel formula, plus the error it throws or the wrong result it returns, and get back a corrected version with an explanation of what was actually wrong. Shares the same free allowance and $5/mo subscription as the AI Formula Builder and Ask AI, not a third paywall.",
+    tags: ['Feature'],
+  },
+  {
     date: '2026-08-25',
     title: 'ROW, ROWS, COLUMN, and COLUMNS',
     description:

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const faqs: FaqItem[] = [
   {
     question: 'Is xlsdocs.com free to use?',
-    answer: 'Yes — every function page, the blog, and the AI Formula Builder are free, with no sign-up required.',
+    answer: 'Every function page and the blog are completely free, with no sign-up required. The AI Formula Builder, Quick Fix, and Ask AI each have a free usage allowance, then $5/mo unlocks unlimited use across all three.',
   },
   {
     question: 'Do I need to create an account?',
@@ -31,7 +31,11 @@ const faqs: FaqItem[] = [
   },
   {
     question: 'What is the AI Formula Builder?',
-    answer: 'A tool that turns a plain-English description of what you need into a working Excel formula, with a breakdown of what each part does. Free to use, no sign-up required.',
+    answer: 'A tool that turns a plain-English description of what you need into a working Excel formula, with a breakdown of what each part does. No sign-up required — free to try, $5/mo for unlimited use.',
+  },
+  {
+    question: 'What is Quick Fix?',
+    answer: 'Paste a broken or misbehaving Excel formula, along with the error it throws or the wrong result it returns, and it diagnoses the problem and returns a corrected formula with an explanation. Shares the same free allowance and $5/mo subscription as the AI Formula Builder and Ask AI.',
   },
   {
     question: 'Is xlsdocs affiliated with Microsoft?',

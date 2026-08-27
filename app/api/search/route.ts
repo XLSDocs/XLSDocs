@@ -38,6 +38,15 @@ const marketingPages = [
       'AI Formula Builder — describe what you need in plain English and AI writes the Excel formula for you, with a breakdown of each part.',
     ),
   },
+  {
+    id: '/tools/quick-fix',
+    url: '/tools/quick-fix',
+    title: 'Quick Fix',
+    description: 'Paste a broken Excel formula and get back a corrected version.',
+    structuredData: textIndex(
+      'Quick Fix — paste a broken or misbehaving Excel formula, and AI diagnoses what\'s wrong and returns a corrected version with an explanation.',
+    ),
+  },
 ];
 
 export const { GET } = createSearchAPI('advanced', {
