@@ -15,6 +15,7 @@ import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { gitConfig } from '@/lib/shared';
 import { AskClaude } from '@/components/ask-claude';
 import { Feedback } from '@/components/feedback';
+import { QuickFixPromo } from '@/components/quick-fix-promo';
 import type { FaqItem } from '@/components/faq';
 import { VersionBadges, type CompatibilityItem } from '@/components/version-badges';
 import { CategoryBreadcrumb } from '@/components/category-breadcrumb';
@@ -92,6 +93,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
             a: createRelativeLink(source, page),
           })}
         />
+        {page.slugs.length === 2 && <QuickFixPromo />}
       </DocsBody>
       {/* The TOC sidebar (and its Feedback footer above) is hidden below Tailwind's
           xl breakpoint, so this duplicate covers everything from mobile through
