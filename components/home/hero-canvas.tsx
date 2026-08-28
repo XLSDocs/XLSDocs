@@ -212,6 +212,13 @@ export function HeroCanvas({ containerRef }: { containerRef: RefObject<HTMLEleme
       const H = canvas!.height;
       ctx!.clearRect(0, 0, W, H);
       ht += 0.012;
+      // Vignette base color: near-black blends into the dark page background;
+      // in light mode that same near-opaque black instead sits as a stark
+      // patch on top of an otherwise white page, so it needs its own,
+      // near-white base to blend in the same way. Checked live each frame
+      // (cheap) so toggling the theme mid-session updates it immediately.
+      const isDark = document.documentElement.classList.contains('dark');
+      const vignetteRgb = isDark ? '10,10,10' : '245,245,245';
 
       for (let i = scanners.length - 1; i >= 0; i--) {
         const s = scanners[i];
@@ -326,15 +333,15 @@ export function HeroCanvas({ containerRef }: { containerRef: RefObject<HTMLEleme
       }
 
       const vL = ctx!.createLinearGradient(0, 0, W * 0.46, 0);
-      vL.addColorStop(0, 'rgba(10,10,10,0.93)');
-      vL.addColorStop(0.36, 'rgba(10,10,10,0.26)');
-      vL.addColorStop(1, 'rgba(10,10,10,0)');
+      vL.addColorStop(0, `rgba(${vignetteRgb},0.93)`);
+      vL.addColorStop(0.36, `rgba(${vignetteRgb},0.26)`);
+      vL.addColorStop(1, `rgba(${vignetteRgb},0)`);
       ctx!.fillStyle = vL;
       ctx!.fillRect(0, 0, W, H);
 
       const vB = ctx!.createLinearGradient(0, H * 0.6, 0, H);
-      vB.addColorStop(0, 'rgba(10,10,10,0)');
-      vB.addColorStop(1, 'rgba(10,10,10,0.55)');
+      vB.addColorStop(0, `rgba(${vignetteRgb},0)`);
+      vB.addColorStop(1, `rgba(${vignetteRgb},0.55)`);
       ctx!.fillStyle = vB;
       ctx!.fillRect(0, 0, W, H);
 
