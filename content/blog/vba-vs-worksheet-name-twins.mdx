@@ -1,0 +1,125 @@
+---
+title: "VBA vs Worksheet Functions: The Name Twins That Aren't Twins At All"
+description: InStr, Replace, and DateDiff all have worksheet-formula lookalikes with nearly identical names — and meaningfully different behavior. Porting logic between the two without checking is how a "quick VBA version" of a formula quietly does the wrong thing.
+date: "2026-08-28"
+category: VBA
+author: Priya Shah
+readTime: 6 min read
+---
+
+Writing a VBA version of a worksheet formula feels like it should be
+mechanical — find the VBA function with the matching name, swap the
+syntax, done. For a surprising number of function pairs, that
+assumption is exactly backwards. VBA and worksheet formulas each grew
+their own function libraries over decades, mostly independently, and
+where the names collide or nearly collide, the behavior often
+doesn't.
+
+## Replace: it's not REPLACE, it's SUBSTITUTE
+
+This is the sharpest trap of the three. Worksheet `REPLACE` swaps out
+characters by **position and length** — "replace 5 characters
+starting at position 7." VBA's `Replace` does something completely
+different: it finds and swaps **matching text**, exactly like
+worksheet `SUBSTITUTE`.
+
+```vb title="VBA Replace — finds text, doesn't touch position"
+Replace("Hello World", "World", "Excel")
+' → "Hello Excel"
+```
+
+If you came looking for VBA's version of worksheet `REPLACE`
+(position and length), it doesn't exist under that name — `Replace`
+already means something else. Slicing a string by position in VBA
+means falling back to `Left`/`Mid`/`Right` instead.
+
+<Callout type="warn">
+  There's no VBA equivalent of worksheet REPLACE's position-and-
+  length behavior under any name that matches. If code needs to
+  replace "5 characters starting at position 7" the way the worksheet
+  function does, build it from Left/Mid/Right — Replace can't do it.
+</Callout>
+
+## DateDiff vs DATEDIF: same name, different math
+
+`DateDiff` and worksheet `DATEDIF` measure the same general idea —
+the gap between two dates — but disagree on both argument order and,
+more dangerously, on what actually counts as "one year" or "one
+month" apart.
+
+```vb title="A one-day gap, reported as a full year"
+DateDiff("yyyy", #12/31/2026#, #1/1/2027#)
+' → 1
+```
+
+Barely a day separates those two dates. `DateDiff` still returns `1`
+because it counts **calendar boundaries crossed** — December 31 to
+January 1 crosses a year boundary, full stop, regardless of how much
+time actually elapsed. Worksheet `DATEDIF` counts **complete elapsed
+years** instead, and would return `0` for the same pair.
+
+The argument order flips too: `DateDiff` takes the interval code
+first (`"yyyy"`, `"m"`, `"d"`), then the two dates. `DATEDIF` takes
+the two dates first, then the unit, as its last argument. Code or
+formulas ported between the two without checking both differences
+produce a plausible, wrong number — not an error.
+
+## InStr: closer, but still not a free pass
+
+`InStr` is the gentlest of the three — it genuinely does the same
+job as worksheet `FIND`/`SEARCH`, locating a substring's position.
+The gotcha here is narrower: `InStr` is case-sensitive by default,
+matching `FIND`'s behavior, while worksheet `SEARCH` is
+case-insensitive by default. Assume `InStr` behaves like `SEARCH`
+and a case mismatch silently returns `0` instead of the position you
+expected.
+
+```vb title="Matching SEARCH's case-insensitivity explicitly"
+InStr(1, "Hello World", "world", vbTextCompare)
+' → 7
+```
+
+## Why this keeps happening
+
+VBA's string and date functions largely predate Excel's modern
+worksheet-formula library, or evolved alongside it without a shared
+naming committee. `Replace` existing as VBA's "find and swap text
+by content" was set well before worksheet `REPLACE` claimed the
+same word for a completely different, position-based operation.
+Neither side is "wrong" — they're just two libraries built at
+different times for different callers, exports that were named
+independently.
+
+## The habit worth building
+
+Before assuming a VBA function mirrors its worksheet-formula
+namesake, check what it actually does with the specific inputs that
+matter — position vs. matching text, exact boundaries vs. elapsed
+time, default case sensitivity. The name overlap is real; the
+implementation is not.
+
+Full reference pages for [Replace](/docs/vba/replace),
+[DateDiff](/docs/vba/datediff), and [InStr](/docs/vba/instr) cover
+each one's exact syntax, common errors, and worked examples — along
+with their worksheet-formula counterparts,
+[REPLACE](/docs/text/replace), [SUBSTITUTE](/docs/text/substitute),
+and [DATEDIF](/docs/date/datedif).
+
+export const faqs = [
+  {
+    question: 'Is there a VBA function that works like worksheet REPLACE (position and length)?',
+    answer: "No — VBA's Replace already means something else (find-and-swap by matching text, like SUBSTITUTE). For position-and-length string editing in VBA, build it from Left, Mid, and Right instead.",
+  },
+  {
+    question: 'Why does DateDiff("yyyy", ...) sometimes return 1 for dates only a day apart?',
+    answer: 'DateDiff counts calendar year boundaries crossed, not complete elapsed years. Two dates on either side of December 31/January 1 count as "1 year" apart to DateDiff even if barely a day has passed. Worksheet DATEDIF counts full elapsed years instead.',
+  },
+  {
+    question: 'Is InStr case-sensitive by default?',
+    answer: "Yes, matching worksheet FIND's default — not worksheet SEARCH's case-insensitive default. Pass vbTextCompare as InStr's compare argument to match case-insensitively.",
+  },
+  {
+    question: 'Why do VBA and worksheet functions with similar names behave differently at all?',
+    answer: "They're separate function libraries that grew independently over Excel and VBA's history, rather than a single shared design — name overlaps happened without any guarantee the behavior would match.",
+  },
+];

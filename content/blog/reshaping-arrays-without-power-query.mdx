@@ -1,0 +1,113 @@
+---
+title: Reshaping Data in Excel Without Power Query
+description: Combining ranges, flattening tables, and pulling specific rows or columns used to mean Power Query, a helper sheet, or a fragile paste-special. Eight modern array functions now do most of it in a single formula.
+date: "2026-08-28"
+category: Tutorials
+author: Dana Okafor
+readTime: 7 min read
+---
+
+Reshaping data — combining two ranges, flattening a table into a
+list, pulling out just a few specific columns — used to mean reaching
+for Power Query, a manual helper sheet, or a paste-special that broke
+the moment the source data changed. Eight dynamic array functions
+now cover most of that ground directly in a formula, live and
+recalculating, with no separate query to maintain.
+
+## Combining ranges: VSTACK and HSTACK
+
+Stacking two tables on top of each other, or placing two ranges side
+by side, used to mean copy-paste or a query merge. Now it's one
+formula each direction:
+
+<ExcelCode>{`=VSTACK(Jan!A1:C10, Feb!A1:C10, Mar!A1:C10)`}</ExcelCode>
+
+<ExcelCode>{`=HSTACK(A1:A10, C1:C10)`}</ExcelCode>
+
+Both tolerate mismatched sizes rather than erroring — a narrower
+range gets padded with `#N/A` instead of blocking the whole
+combination, which is usually a sign the wrong ranges were selected,
+not something to silently work around.
+
+## Flattening: TOROW and TOCOL
+
+A table doesn't always need to stay a table. `TOROW` and `TOCOL`
+collapse a whole 2D range into one flat row or column, with an
+optional argument to drop blanks and errors in the same step:
+
+<ExcelCode>{`=TOCOL(A1:D10, 3)`}</ExcelCode>
+
+That's a full table flattened into a clean, single-column list —
+blanks and errors removed — in one formula. It's the fast path to a
+data-validation dropdown source, or a single flat list a chart or
+COUNTIF can work across.
+
+## Picking specific pieces: TAKE, DROP, CHOOSEROWS, CHOOSECOLS
+
+Four functions cover different flavors of "give me part of this
+array":
+
+- **TAKE** grabs a contiguous block from the start or end —
+  `TAKE(range, -10)` for the last 10 rows.
+- **DROP** removes a contiguous block instead — `DROP(range, 1)` to
+  skip a header row.
+- **CHOOSEROWS** and **CHOOSECOLS** go further: an explicit,
+  non-contiguous, reorderable list of positions.
+
+<ExcelCode>{`=CHOOSECOLS(A1:F10, 1, 3, -1)`}</ExcelCode>
+
+That pulls columns 1 and 3 plus the last column, in that order,
+skipping everything else — a selection TAKE and DROP can't express
+on their own, since they only work on contiguous blocks.
+
+<Callout type="info">
+  CHOOSEROWS and CHOOSECOLS accept the same position more than once
+  and in any order — `CHOOSEROWS(range, 3, 1, 3)` is valid, and
+  useful for deliberately reordering or duplicating rows, not just
+  filtering them down.
+</Callout>
+
+## Why this replaces so much manual work
+
+None of these eight functions are complicated on their own. What
+changes is the combination: a table can now be filtered, reshaped,
+recombined, and flattened in one cell, staying live as the source
+data changes — no refresh button, no separate query definition to
+maintain alongside the sheet. Power Query still wins for genuinely
+heavy transformation (joining across many sources, complex type
+conversions) — but "give me these three columns, stacked under last
+month's data, as one flat list" no longer needs it.
+
+## The bottom line
+
+If a sheet still has a manual "paste values here after reshaping"
+step, or a Power Query hooked up just to combine two ranges, it's
+worth checking whether one of these eight functions replaces it
+directly. The formula version updates automatically; the manual step
+never does.
+
+Full reference pages for [VSTACK](/docs/arrays/vstack),
+[HSTACK](/docs/arrays/hstack), [TOROW](/docs/arrays/torow),
+[TOCOL](/docs/arrays/tocol), [TAKE](/docs/arrays/take),
+[DROP](/docs/arrays/drop), [CHOOSEROWS](/docs/arrays/chooserows), and
+[CHOOSECOLS](/docs/arrays/choosecols) cover each function's full
+syntax, error cases, and more worked examples.
+
+export const faqs = [
+  {
+    question: 'Do these functions require Excel 365?',
+    answer: 'Yes — all eight (VSTACK, HSTACK, TOROW, TOCOL, TAKE, DROP, CHOOSEROWS, CHOOSECOLS) require Excel 365. None are available in the perpetual 2021, 2019, or 2016 releases.',
+  },
+  {
+    question: 'What happens if VSTACK or HSTACK combine ranges of different sizes?',
+    answer: "They don't error — the shorter range gets padded with #N/A to match the larger one's dimensions. That padding is usually worth double-checking, since it often means the wrong range was selected.",
+  },
+  {
+    question: 'How is CHOOSEROWS different from TAKE for selecting rows?',
+    answer: "TAKE grabs a contiguous block from the start or end of an array. CHOOSEROWS takes an explicit list of row numbers that can be non-contiguous, reordered, or repeated — more flexible, but each row has to be listed.",
+  },
+  {
+    question: 'Should Power Query be replaced entirely by these functions?',
+    answer: "No — Power Query still handles heavier transformations (joining many sources, complex type conversions, scheduled refreshes) better. These functions cover the simpler, everyday reshaping that doesn't need a full query.",
+  },
+];
