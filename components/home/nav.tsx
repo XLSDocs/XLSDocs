@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { MobileNav } from './mobile-nav';
 import { NavSearchButton } from './nav-search-button';
+import { ThemeSwitch } from 'fumadocs-ui/layouts/shared/slots/theme-switch';
 
 const NAV_LINKS = [
   { href: '/functions', label: 'Functions' },
@@ -34,6 +35,7 @@ export function HomeNav() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <ThemeSwitch mode="light-dark" />
           <NavSearchButton />
           <Link
             href="/docs"
