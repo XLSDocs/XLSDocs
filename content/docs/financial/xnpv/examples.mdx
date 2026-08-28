@@ -1,0 +1,31 @@
+---
+title: XNPV examples
+description: Worked examples for XNPV — an irregular investment schedule, comparing two projects, and the mismatched-size error.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Present value of an irregular investment" formula={`=XNPV(8%, {-50000,20000,35000}, {"2026-03-01","2026-07-15","2027-02-01"})`}>
+  Discounts two unevenly spaced returns back to the investment date
+  at an 8% annual rate.
+</ExampleCard>
+
+<ExampleCard number="02" label="Using table columns instead of literal arrays" formula={`=XNPV(8%, Cashflows[Amount], Cashflows[Date])`}>
+  The typical real-world usage — referencing an Excel Table's amount
+  and date columns directly.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing two projects at the same rate" formula={`=XNPV(10%, ProjectA[Amount], ProjectA[Date]) - XNPV(10%, ProjectB[Amount], ProjectB[Date])`}>
+  A positive result means Project A is worth more in today's dollars
+  than Project B, at the same discount rate.
+</ExampleCard>
+
+<ExampleCard number="04" label="Sensitivity to the discount rate" formula={`=XNPV(15%, A2:A4, B2:B4)`}>
+  Re-running XNPV at a higher assumed rate shows how much the present
+  value shrinks as the discount rate rises.
+</ExampleCard>
+
+<ExampleCard number="05" label="Mismatched sizes" formula={`=XNPV(8%, A2:A6, B2:B5)`}>
+  Errors out — `values` has 5 entries but `dates` only has 4; the two
+  ranges must be exactly the same size.
+</ExampleCard>

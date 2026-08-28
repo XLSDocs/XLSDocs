@@ -1,0 +1,170 @@
+---
+title: XNPV
+description: Calculate the net present value of a series of cash flows that happen on irregular, specific dates, at a given discount rate.
+---
+
+Calculate the present value of cash flows that land on real,
+unevenly spaced calendar dates — the realistic version of NPV for
+investments that don't pay out on a perfectly regular schedule.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'dates and values must be the same size, matched by position', type: 'warn' },
+  { text: 'The first date is treated as the valuation date everything discounts back to', type: 'warn' },
+  { text: 'rate is a known annual rate you supply, not something XNPV solves for', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=XNPV(rate, values, dates)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=XNPV(rate, values, dates)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The annual discount rate to apply.',
+  },
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The cash flows — typically a negative initial investment followed by positive returns.',
+  },
+  {
+    name: 'dates',
+    type: 'range',
+    required: true,
+    description: 'The actual calendar date for each cash flow in values, same size as values.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The net present value of the dated cash flows, discounted back to
+the date of the **first** entry in `dates` using `rate`.
+
+## Description
+
+NPV assumes cash flows happen at even, regular intervals and
+discounts each one by a whole number of periods. XNPV instead uses
+the actual number of days between each cash flow's real date and the
+first date, which is what makes it accurate for investments that pay
+out on a genuine, irregular calendar rather than a tidy period-by-
+period schedule.
+
+<Callout type="info">
+  Unlike NPV, XNPV's first cash flow **is** included in the
+  discounting (though at zero discount, since it falls on the
+  valuation date itself) — there's no separate "add the initial
+  investment outside the function" step the way plain NPV requires.
+</Callout>
+
+## Common errors
+
+### Mismatched values and dates sizes
+
+<ExcelCode>{`XNPV(8%, A2:A5, B2:B4) → error`}</ExcelCode>
+
+`values` and `dates` must contain exactly the same number of
+entries, each pair at the same row position.
+
+### Confusing XNPV's date handling with NPV's period handling
+
+<ExcelCode>{`NPV(8%, A2:A5) → assumes evenly spaced periods, no dates involved`}</ExcelCode>
+
+If the cash flows don't actually land on a regular schedule, NPV's
+result will be inaccurate — that's exactly the gap XNPV closes by
+using real dates instead.
+
+### Expecting the initial investment to be added separately
+
+XNPV doesn't have NPV's "leave the first cash flow out, add it back
+manually" convention — every cash flow, including the initial
+investment, belongs inside `values` alongside its matching date.
+
+export const faqs = [
+  {
+    question: 'How is XNPV different from NPV?',
+    answer: 'NPV assumes cash flows happen at even, regular intervals and discounts by whole periods. XNPV uses the actual date of each cash flow and discounts based on the real number of days elapsed — more accurate for investments with an irregular payment schedule.',
+  },
+  {
+    question: 'What date do the cash flows get discounted back to?',
+    answer: "The date of the first entry in dates — that becomes the valuation date, and every other cash flow is discounted relative to how many days away it falls from that first date.",
+  },
+  {
+    question: 'Does XNPV require the initial investment to be added outside the function, like NPV does?',
+    answer: "No — every cash flow, including the initial investment, goes inside values paired with its date. There's no separate add-it-back-afterward step.",
+  },
+  {
+    question: 'How do XIRR and XNPV relate to each other?',
+    answer: 'They use the same dated-cash-flow shape — XNPV computes the present value at a rate you supply, while XIRR solves for the rate that would make that present value exactly zero.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with XNPV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=XNPV(8%, Cashflows[Amount], Cashflows[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim presentValue As Double
+    presentValue = Application.WorksheetFunction.Xnpv( _
+      0.08, Range("Cashflows[Amount]"), Range("Cashflows[Date]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def xnpv(rate, values, dates):
+        d0 = dates[0]
+        return sum(v / (1 + rate) ** ((d - d0).days / 365) for v, d in zip(values, dates))
+
+    cash_flows = [-50000, 20000, 35000]
+    dates = [date(2026, 3, 1), date(2026, 7, 15), date(2027, 2, 1)]
+    present_value = xnpv(0.08, cash_flows, dates)
+    print(present_value)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [XIRR](/docs/financial/xirr) — solves for the rate that makes
+  XNPV's result exactly zero, instead of computing it at a known rate.
+- [NPV](/docs/financial/npv) — the same idea for evenly spaced cash
+  flows, with no dates required.
+- [IRR](/docs/financial/irr) — solves for the rate on evenly spaced
+  cash flows.

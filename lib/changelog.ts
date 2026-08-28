@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-28',
+    title: 'XIRR, XNPV, and SLN',
+    description:
+      "The realistic versions of IRR and NPV for cash flows that land on actual, irregular calendar dates instead of neat even periods — plus SLN, the simplest depreciation method, spreading an asset's cost evenly across its useful life.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-08-27',
     title: 'Quick Fix — a tool for broken formulas',
     description:

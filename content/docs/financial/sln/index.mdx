@@ -1,0 +1,167 @@
+---
+title: SLN
+description: Calculate the straight-line depreciation of an asset for one period, spreading the cost evenly over its useful life.
+---
+
+Calculate the depreciation expense for one period using the
+straight-line method — the same fixed amount every period, spreading
+an asset's cost evenly over its useful life.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns the same amount every period — no front-loading like other depreciation methods', type: 'check' },
+  { text: 'cost, salvage, and life must all use the same currency/time units', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SLN(cost, salvage, life)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SLN(cost, salvage, life)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'cost',
+    type: 'number',
+    required: true,
+    description: 'The initial cost of the asset.',
+  },
+  {
+    name: 'salvage',
+    type: 'number',
+    required: true,
+    description: "The asset's estimated value at the end of its useful life.",
+  },
+  {
+    name: 'life',
+    type: 'number',
+    required: true,
+    description: 'The number of periods over which the asset is depreciated.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The depreciation expense for one period: `(cost - salvage) / life`
+— identical for every period over the asset's life.
+
+## Description
+
+SLN is the simplest depreciation method Excel offers: it subtracts
+the asset's expected salvage value from its cost, then divides the
+remainder evenly across every period of its useful life. Every
+period gets the exact same expense, unlike accelerated methods
+(`DDB`, `DB`) that front-load larger depreciation in the earlier
+periods and taper off later.
+
+<Callout type="info">
+  `life` and the period length implied by `cost`/`salvage` should
+  agree on units — if `life` is expressed in years, the result is an
+  **annual** depreciation figure; divide by 12 separately for a
+  monthly figure. SLN itself has no separate period argument the way
+  `DDB` does.
+</Callout>
+
+## Common errors
+
+### Forgetting to subtract salvage value first
+
+<ExcelCode>{`SLN(50000, 0, 10) → 5000/year (only correct if salvage is genuinely $0)`}</ExcelCode>
+
+If the asset actually has a resale/scrap value at the end of its
+life, leaving `salvage` at 0 overstates depreciation — use the real
+expected salvage value:
+
+<ExcelCode>{`SLN(50000, 5000, 10) → 4500/year`}</ExcelCode>
+
+### Expecting a declining depreciation amount
+
+<ExcelCode>{`SLN(50000, 5000, 10) → 4500 every year, not decreasing`}</ExcelCode>
+
+This is expected — straight-line depreciation is flat by definition.
+For a front-loaded schedule instead, a different method like `DDB`
+is needed.
+
+### Mismatched time units between life and the depreciation period needed
+
+If `life` is in years but a monthly figure is actually needed, divide
+SLN's result by 12 separately — the function itself doesn't take a
+period-length argument to do that conversion automatically.
+
+export const faqs = [
+  {
+    question: 'Why does SLN return the same number every period?',
+    answer: "That's the defining trait of straight-line depreciation — it spreads the depreciable amount (cost minus salvage) evenly across every period, unlike accelerated methods that depreciate more in earlier periods.",
+  },
+  {
+    question: 'What happens if salvage value is set to 0 but the asset will actually be worth something later?',
+    answer: "Depreciation gets overstated for every period, since the full cost is spread across the asset's life instead of just the cost minus its real expected resale value.",
+  },
+  {
+    question: 'How is SLN different from DDB?',
+    answer: 'SLN spreads depreciation evenly across every period. DDB (double-declining balance) front-loads larger depreciation amounts in the earlier periods and progressively smaller amounts later, better matching how some assets actually lose value fastest when new.',
+  },
+  {
+    question: 'Can SLN give a monthly depreciation figure directly?',
+    answer: "Not directly — if life is in years, SLN's result is annual. Divide the result by 12 separately for a monthly figure; SLN has no period-length argument the way some other depreciation functions do.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SLN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SLN(50000, 5000, 10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim annualDepreciation As Double
+    annualDepreciation = Application.WorksheetFunction.Sln(50000, 5000, 10)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def sln(cost, salvage, life):
+        return (cost - salvage) / life
+
+    annual_depreciation = sln(50000, 5000, 10)
+    print(annual_depreciation)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PMT](/docs/financial/pmt) — a different fixed-per-period
+  calculation, for loan payments rather than depreciation.
+- [NPV](/docs/financial/npv) and [XNPV](/docs/financial/xnpv) —
+  value a series of cash flows rather than allocating an asset's
+  cost over time.

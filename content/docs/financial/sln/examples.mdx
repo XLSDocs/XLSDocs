@@ -1,0 +1,33 @@
+---
+title: SLN examples
+description: Worked examples for SLN — a basic depreciation schedule, zero salvage value, and building a full period-by-period table.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Basic annual depreciation" formula={`=SLN(50000, 5000, 10)`}>
+  A $50,000 asset with a $5,000 salvage value over 10 years
+  depreciates $4,500 every year.
+</ExampleCard>
+
+<ExampleCard number="02" label="No expected salvage value" formula={`=SLN(12000, 0, 5)`}>
+  With salvage at 0, the full $12,000 cost is spread evenly across 5
+  years — $2,400 per year.
+</ExampleCard>
+
+<ExampleCard number="03" label="Converting to a monthly figure" formula={`=SLN(50000, 5000, 10)/12`}>
+  Divides the annual figure by 12 to get a monthly depreciation
+  amount, since SLN itself only returns a per-`life`-unit figure.
+</ExampleCard>
+
+<ExampleCard number="04" label="Remaining book value after 3 years" formula={`=50000 - SLN(50000, 5000, 10)*3`}>
+  Subtracts three years of accumulated depreciation from the
+  original cost to find the asset's book value partway through its
+  life.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing straight-line to declining-balance totals" formula={`=SLN(50000, 5000, 10)*10`}>
+  Confirms the total depreciated over the full 10-year life equals
+  cost minus salvage ($45,000) — true for straight-line, but not for
+  accelerated methods without careful period handling.
+</ExampleCard>

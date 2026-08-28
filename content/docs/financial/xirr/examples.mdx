@@ -1,0 +1,32 @@
+---
+title: XIRR examples
+description: Worked examples for XIRR — an irregular investment schedule, a supplied guess, and the mismatched-size error.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="An investment with two irregular returns" formula={`=XIRR({-50000,20000,35000}, {"2026-03-01","2026-07-15","2027-02-01"})`}>
+  Calculates the annualized rate of return across an investment and
+  two partial returns landing on real, unevenly spaced dates.
+</ExampleCard>
+
+<ExampleCard number="02" label="Using table columns instead of literal arrays" formula={`=XIRR(Cashflows[Amount], Cashflows[Date])`}>
+  The typical real-world usage — referencing an Excel Table's amount
+  and date columns directly.
+</ExampleCard>
+
+<ExampleCard number="03" label="Supplying a guess to help convergence" formula={`=XIRR(A2:A6, B2:B6, 0.2)`}>
+  Starts the iterative solver at 20% instead of the 10% default,
+  useful when the expected real rate is known to be well above the
+  default guess.
+</ExampleCard>
+
+<ExampleCard number="04" label="No sign change" formula={`=XIRR({1000,2000,3000}, {"2026-01-01","2026-06-01","2027-01-01"})`}>
+  Returns `#NUM!` — every value is positive, so there's no initial
+  investment to calculate a return against.
+</ExampleCard>
+
+<ExampleCard number="05" label="Mismatched sizes" formula={`=XIRR(A2:A6, B2:B5)`}>
+  Errors out — `values` has 5 entries but `dates` only has 4; the two
+  ranges must be exactly the same size.
+</ExampleCard>

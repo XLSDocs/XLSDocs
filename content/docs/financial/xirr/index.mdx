@@ -1,0 +1,173 @@
+---
+title: XIRR
+description: Find the annualized rate of return for a series of cash flows that happen on irregular, specific dates.
+---
+
+Find the annualized rate of return for cash flows that don't happen
+on a neat, regular schedule — the realistic version of IRR for
+investments with payments on actual calendar dates instead of evenly
+spaced periods.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'dates and values must be the same size, in any order (Excel sorts internally)', type: 'warn' },
+  { text: 'Requires at least one negative and one positive value', type: 'warn' },
+  { text: 'Always returns an annualized rate, regardless of the gaps between dates', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=XIRR(values, dates, [guess])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=XIRR(values, dates, [guess])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The cash flows — at least one negative (investment) and one positive (return) value.',
+  },
+  {
+    name: 'dates',
+    type: 'range',
+    required: true,
+    description: 'The actual calendar date for each cash flow in values, same size as values.',
+  },
+  {
+    name: 'guess',
+    type: 'number',
+    required: false,
+    description: 'A starting estimate for the rate, to help the iterative solver converge. Defaults to 10%.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The annualized rate of return that makes the net present value of
+the dated cash flows equal to zero. Returns `#NUM!` if the solver
+can't converge, or if `values` contains no sign change.
+
+## Description
+
+IRR assumes every cash flow is evenly spaced (one per period).
+XIRR drops that assumption entirely — each cash flow gets its own
+real date, and the annualized rate accounts for the actual number of
+days between them. That makes it the correct choice for real
+investments, which almost never land on a perfectly even schedule:
+an initial investment in March, a partial return in July, another in
+next February.
+
+<Callout type="warn">
+  `values` and `dates` must be the **same size**, and each date
+  corresponds to the cash flow at the same position — reordering one
+  without the other silently produces a wrong (but plausible-looking)
+  rate rather than an error.
+</Callout>
+
+## Common errors
+
+### #NUM! — no sign change in values
+
+<ExcelCode>{`XIRR({1000,2000,3000}, {dates...}) → #NUM!`}</ExcelCode>
+
+Same requirement as IRR: at least one negative value (the
+investment) and one positive value (the return) are both needed.
+
+### Mismatched values and dates sizes
+
+<ExcelCode>{`XIRR(A2:A5, B2:B4) → #NUM! or #VALUE!`}</ExcelCode>
+
+`values` and `dates` must contain exactly the same number of
+entries, each pair at the same row position.
+
+### Using XIRR when the cash flows really are evenly spaced
+
+If payments genuinely land on a regular schedule (monthly, exactly),
+plain IRR is simpler and doesn't require a separate dates column —
+XIRR earns its keep specifically when the spacing is irregular.
+
+export const faqs = [
+  {
+    question: 'How is XIRR different from IRR?',
+    answer: 'IRR assumes cash flows happen at even, regular intervals. XIRR takes an actual date for each cash flow and accounts for the real number of days between them — the more accurate choice whenever payments don\'t land on a perfectly even schedule.',
+  },
+  {
+    question: 'Do the dates need to be in chronological order?',
+    answer: "No — Excel sorts internally by date. What matters is that each value stays paired with its correct corresponding date at the same position in both ranges.",
+  },
+  {
+    question: 'Why did I get #NUM! from XIRR?',
+    answer: "Either there's no sign change in values (need at least one negative and one positive), or the iterative solver failed to converge — try supplying a guess closer to the expected real rate.",
+  },
+  {
+    question: 'Is the rate XIRR returns annualized, even for a short time period?',
+    answer: 'Yes — XIRR always expresses its result as an annual rate, regardless of whether the actual cash flows span a few months or several years.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with XIRR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=XIRR(Cashflows[Amount], Cashflows[Date])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rateOfReturn As Double
+    rateOfReturn = Application.WorksheetFunction.Xirr( _
+      Range("Cashflows[Amount]"), Range("Cashflows[Date]"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.optimize import brentq
+    from datetime import date
+
+    def xnpv(rate, values, dates):
+        d0 = dates[0]
+        return sum(v / (1 + rate) ** ((d - d0).days / 365) for v, d in zip(values, dates))
+
+    cash_flows = [-50000, 20000, 35000]
+    dates = [date(2026, 3, 1), date(2026, 7, 15), date(2027, 2, 1)]
+    rate_of_return = brentq(lambda r: xnpv(r, cash_flows, dates), -0.99, 10)
+    print(rate_of_return)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [XNPV](/docs/financial/xnpv) — the present value at a known rate
+  for dated cash flows, instead of solving for the rate itself.
+- [IRR](/docs/financial/irr) — the same idea for evenly spaced cash
+  flows, with no dates required.
+- [NPV](/docs/financial/npv) — the present value for evenly spaced
+  cash flows at a known rate.
