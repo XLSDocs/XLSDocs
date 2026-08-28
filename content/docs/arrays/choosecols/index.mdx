@@ -1,0 +1,166 @@
+---
+title: CHOOSECOLS
+description: Return specific columns from an array or range, by column number, in any order.
+---
+
+Pull out one or more specific columns from an array by number — the
+first column, the last column, or any combination in any order —
+CHOOSEROWS's horizontal counterpart.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A negative column number counts from the end — -1 is the last column', type: 'warn' },
+  { text: 'Columns can be selected more than once, and in any order', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHOOSECOLS(array, col_num1, [col_num2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHOOSECOLS(array, col_num1, [col_num2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to pull columns from.',
+  },
+  {
+    name: 'col_num1',
+    type: 'number',
+    required: true,
+    description: 'The column number to return. Positive counts from the left, negative counts from the right (-1 is the last column).',
+  },
+  {
+    name: 'col_num2, ...',
+    type: 'number',
+    required: false,
+    description: 'Additional column numbers, in the order they should appear in the result. Up to 254 total.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array containing the requested columns from `array`, in
+the exact order the column numbers were given — not necessarily
+their original order.
+
+## Description
+
+CHOOSECOLS is CHOOSEROWS turned sideways: instead of a whole list of
+row numbers, it takes a list of column numbers and returns every row
+for each of them, in whatever order they're listed. It's a common
+way to reorder or reduce a wide table down to just the columns
+actually needed, without deleting or hiding columns in the source
+data itself.
+
+<Callout type="info">
+  Column numbers don't have to be in order, and the **same column can
+  be selected more than once** — `CHOOSECOLS(array, 3, 1, 3)` returns
+  column 3, then column 1, then column 3 again. Useful for reordering
+  or duplicating columns, not just picking a subset.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a column number is out of range
+
+<ExcelCode>{`CHOOSECOLS(A1:C10, 5) → #VALUE! (only 3 columns exist)`}</ExcelCode>
+
+Every column number must fall within `array`'s actual column count —
+unlike TAKE, CHOOSECOLS doesn't just return what's available.
+
+### Expecting contiguous columns without listing each one
+
+For a simple contiguous block of columns from the start or end,
+`TAKE` (with its column argument) is simpler than listing every
+individual column number.
+
+### Forgetting that order in equals order out
+
+<ExcelCode>{`CHOOSECOLS(A1:D10, 4, 1) → column 4 first, then column 1 — not sorted`}</ExcelCode>
+
+The result follows the order the column numbers were given in, not
+their original position in `array` — useful for reordering
+columns, but a surprise if ascending order was assumed.
+
+export const faqs = [
+  {
+    question: 'How do I get the last column of an array with CHOOSECOLS?',
+    answer: 'Use -1 as the column number: CHOOSECOLS(array, -1) returns the last column. Negative numbers count from the end, the same convention TAKE and DROP use.',
+  },
+  {
+    question: 'Can CHOOSECOLS reorder columns from a table?',
+    answer: 'Yes — since the result follows the order the column numbers are listed in, CHOOSECOLS(array, 3, 1, 2) returns the columns in that exact new order.',
+  },
+  {
+    question: 'How is CHOOSECOLS different from TAKE?',
+    answer: "TAKE grabs a contiguous block of columns from the start or end. CHOOSECOLS takes an explicit list of column numbers, which can be non-contiguous, reordered, or repeated.",
+  },
+  {
+    question: 'Is there a row equivalent of CHOOSECOLS?',
+    answer: 'Yes — CHOOSEROWS works identically, selecting specific rows by number instead of columns.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHOOSECOLS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHOOSECOLS(A1:E10, 1, -1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim firstCol As Range, lastCol As Range
+    Set firstCol = Range("A1:E10").Columns(1)
+    Set lastCol = Range("A1:E10").Columns(Range("A1:E10").Columns.Count)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", usecols="A:E")
+    selected = df.iloc[:, [0, -1]]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHOOSEROWS](/docs/arrays/chooserows) — the row-wise equivalent,
+  selecting specific rows instead of columns.
+- [TAKE](/docs/arrays/take) — simpler for a contiguous block of
+  columns from the start or end, rather than an explicit, arbitrary
+  list.
+- [HSTACK](/docs/arrays/hstack) — often paired with CHOOSECOLS to
+  rebuild a table from reordered or selected columns.

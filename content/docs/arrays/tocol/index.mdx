@@ -1,0 +1,165 @@
+---
+title: TOCOL
+description: Flatten a 2D array or range into a single column.
+---
+
+Flatten a multi-row, multi-column array down into a single column —
+TOROW's vertical counterpart, for turning a table into a flat list
+that reads down the sheet instead of across it.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Scans row by row by default — left to right, then down to the next row', type: 'warn' },
+  { text: 'Can optionally drop blanks and/or errors while flattening', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TOCOL(array, [ignore], [scan_by_column])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TOCOL(array, [ignore], [scan_by_column])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to flatten.',
+  },
+  {
+    name: 'ignore',
+    type: 'number',
+    required: false,
+    description: '0 (default) keep everything · 1 ignore blanks · 2 ignore errors · 3 ignore both blanks and errors.',
+  },
+  {
+    name: 'scan_by_column',
+    type: 'boolean',
+    required: false,
+    description: 'FALSE (default) reads left-to-right within each row, then moves down. TRUE reads top-to-bottom within each column, then moves right.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single-column spilled array containing every value from `array`,
+in the order determined by `scan_by_column`.
+
+## Description
+
+TOCOL is TOROW turned sideways — same flattening logic, same
+`ignore`/`scan_by_column` arguments, just spilling down a column
+instead of across a row. It's the natural shape for feeding a
+flattened list into something that expects a vertical range, like a
+data validation list or a single-column chart series.
+
+<Callout type="info">
+  `scan_by_column` changes the **order** values come out in, not just
+  the shape. With the default `FALSE`, a 2-row, 3-column array reads
+  row 1 fully, then row 2. With `TRUE`, it reads column 1 fully
+  (both rows), then column 2 — the same values, a different sequence.
+</Callout>
+
+## Common errors
+
+### Unexpected value order
+
+<ExcelCode>{`TOCOL(A1:B2) → A1, B1, A2, B2 (row by row, the default)`}</ExcelCode>
+
+If column-by-column order was actually wanted, pass `TRUE` for
+`scan_by_column`:
+
+<ExcelCode>{`TOCOL(A1:B2, 0, TRUE) → A1, A2, B1, B2`}</ExcelCode>
+
+### Blanks or errors showing up unexpectedly in the result
+
+<ExcelCode>{`TOCOL(A1:C5) → includes blank cells and any #N/A or other errors present`}</ExcelCode>
+
+Pass an `ignore` value to drop them during flattening instead of
+filtering afterward:
+
+<ExcelCode>{`TOCOL(A1:C5, 3)`}</ExcelCode>
+
+### Expecting TOCOL to remove duplicates
+
+TOCOL only reshapes — it doesn't deduplicate. Wrap the result in
+`UNIQUE` if distinct values are also needed:
+`UNIQUE(TOCOL(A1:C5))`.
+
+export const faqs = [
+  {
+    question: 'How is TOCOL different from TOROW?',
+    answer: "They flatten the same way, just into a different final shape — TOCOL produces a single column, TOROW produces a single row.",
+  },
+  {
+    question: 'Can TOCOL skip blank cells while flattening?',
+    answer: 'Yes — pass 1 for ignore to skip blanks, 2 to skip errors, or 3 to skip both, all in the same step as the flattening itself.',
+  },
+  {
+    question: 'What is TOCOL useful for beyond just reshaping?',
+    answer: "A common use is feeding a flattened, single-column list into a data validation dropdown or a chart series that expects a vertical range, when the source data is naturally a wider table.",
+  },
+  {
+    question: 'Does TOCOL remove duplicate values?',
+    answer: "No — it only reshapes the array. Wrap the result in UNIQUE (UNIQUE(TOCOL(range))) if a distinct, flattened list is needed.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TOCOL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TOCOL(A1:C5, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim flat As Variant
+    flat = Application.WorksheetFunction.ToCol(Range("A1:C5"), 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", usecols="A:C")
+    flat = df.values.flatten()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TOROW](/docs/arrays/torow) — the same flattening, into a single
+  row instead of a single column.
+- [CHOOSEROWS](/docs/arrays/chooserows) and [CHOOSECOLS](/docs/arrays/choosecols) —
+  pull out specific rows/columns instead of flattening everything.
+- [UNIQUE](/docs/arrays/unique) — often wraps TOCOL's result to
+  deduplicate a flattened list.

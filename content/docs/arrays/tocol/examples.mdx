@@ -1,0 +1,31 @@
+---
+title: TOCOL examples
+description: Worked examples for TOCOL — a data validation source list, skipping blanks, and reading column by column instead.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Flatten a small table" formula={`=TOCOL(A1:C3)`}>
+  Turns a 3-row, 3-column range into a single column of 9 values,
+  read left-to-right then down.
+</ExampleCard>
+
+<ExampleCard number="02" label="A source list for data validation" formula={`=TOCOL(A1:D10, 1)`}>
+  Flattens a wide table into a single column with blanks removed —
+  ready to use as a data validation dropdown's source list.
+</ExampleCard>
+
+<ExampleCard number="03" label="Reading column by column" formula={`=TOCOL(A1:B3, 0, TRUE)`}>
+  Returns the same values as the default, but in column-first order:
+  all of column A, then all of column B.
+</ExampleCard>
+
+<ExampleCard number="04" label="A flattened, deduplicated list" formula={`=UNIQUE(TOCOL(A1:D10, 1))`}>
+  Flattens a range, drops blanks, and removes duplicates in one
+  combined formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="A single-column chart series from a wide table" formula={`=TOCOL(SalesByMonth[#Data], 3)`}>
+  Flattens a table's data cells (excluding headers) into one column
+  suitable for a simple chart series, dropping any blanks or errors.
+</ExampleCard>

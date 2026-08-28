@@ -1,0 +1,31 @@
+---
+title: CHOOSECOLS examples
+description: Worked examples for CHOOSECOLS — first and last column, reordering columns, and the out-of-range error.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="First and last column only" formula={`=CHOOSECOLS(A1:E10, 1, -1)`}>
+  Returns just column A and the last column, skipping everything in
+  between.
+</ExampleCard>
+
+<ExampleCard number="02" label="Reordering columns from a table" formula={`=CHOOSECOLS(A1:D10, 3, 1, 2, 4)`}>
+  Rebuilds the table with column 3 moved to the front, everything
+  else following in the new specified order.
+</ExampleCard>
+
+<ExampleCard number="03" label="Dropping a column from the middle" formula={`=CHOOSECOLS(A1:D10, 1, 2, 4)`}>
+  Selects columns 1, 2, and 4 — effectively excluding column 3
+  without deleting it from the source data.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combining with HSTACK to rebuild a table" formula={`=HSTACK(CHOOSECOLS(A1:D10,1), MAP(CHOOSECOLS(A1:D10,3), LAMBDA(x,x*1.1)))`}>
+  Selects the first column unchanged and a transformed third column,
+  then combines them side by side.
+</ExampleCard>
+
+<ExampleCard number="05" label="Out-of-range column number" formula={`=CHOOSECOLS(A1:C10, 5)`}>
+  Returns `#VALUE!` — the range only has 3 columns, so column 5
+  doesn't exist.
+</ExampleCard>

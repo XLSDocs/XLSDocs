@@ -1,0 +1,31 @@
+---
+title: TOROW examples
+description: Worked examples for TOROW — flattening a table, skipping blanks, and reading column by column instead.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Flatten a small table" formula={`=TOROW(A1:C3)`}>
+  Turns a 3-row, 3-column range into a single row of 9 values, read
+  left-to-right then down.
+</ExampleCard>
+
+<ExampleCard number="02" label="Skip blanks and errors while flattening" formula={`=TOROW(A1:D10, 3)`}>
+  Drops any blank cells and error values from the result in the same
+  step as flattening.
+</ExampleCard>
+
+<ExampleCard number="03" label="Reading column by column" formula={`=TOROW(A1:B3, 0, TRUE)`}>
+  Returns the same values as the default, but in column-first order:
+  all of column A, then all of column B.
+</ExampleCard>
+
+<ExampleCard number="04" label="A flattened, deduplicated list" formula={`=UNIQUE(TOROW(A1:D10, 1))`}>
+  Flattens a range, drops blanks, and removes duplicates in one
+  combined formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="Counting values across a whole table" formula={`=COUNTIF(TOROW(A1:D10), ">100")`}>
+  Flattens first so COUNTIF can evaluate every cell in the table as
+  one continuous list.
+</ExampleCard>

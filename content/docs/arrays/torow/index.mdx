@@ -1,0 +1,166 @@
+---
+title: TOROW
+description: Flatten a 2D array or range into a single row.
+---
+
+Flatten a multi-row, multi-column array down into a single row — a
+one-step way to turn a table into a flat list without nested
+formulas or nested nested FILTER/HSTACK combinations.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Scans row by row by default — left to right, then down to the next row', type: 'warn' },
+  { text: 'Can optionally drop blanks and/or errors while flattening', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TOROW(array, [ignore], [scan_by_column])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TOROW(array, [ignore], [scan_by_column])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to flatten.',
+  },
+  {
+    name: 'ignore',
+    type: 'number',
+    required: false,
+    description: '0 (default) keep everything · 1 ignore blanks · 2 ignore errors · 3 ignore both blanks and errors.',
+  },
+  {
+    name: 'scan_by_column',
+    type: 'boolean',
+    required: false,
+    description: 'FALSE (default) reads left-to-right within each row, then moves down. TRUE reads top-to-bottom within each column, then moves right.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single-row spilled array containing every value from `array`, in
+the order determined by `scan_by_column`.
+
+## Description
+
+TOROW collapses a 2D range into one flat row, which is useful
+whenever downstream logic (a chart, a COUNTIF, a text join) needs a
+simple list rather than a grid shape. The `ignore` argument means
+blank cells or error values scattered through a range don't have to
+be cleaned up first — TOROW can skip them while flattening in the
+same step.
+
+<Callout type="info">
+  `scan_by_column` changes the **order** values come out in, not just
+  the shape. With the default `FALSE`, a 2-row, 3-column array reads
+  row 1 fully, then row 2. With `TRUE`, it reads column 1 fully
+  (both rows), then column 2 — the same values, a different sequence.
+</Callout>
+
+## Common errors
+
+### Unexpected value order
+
+<ExcelCode>{`TOROW(A1:B2) → A1, B1, A2, B2 (row by row, the default)`}</ExcelCode>
+
+If column-by-column order was actually wanted, pass `TRUE` for
+`scan_by_column`:
+
+<ExcelCode>{`TOROW(A1:B2, 0, TRUE) → A1, A2, B1, B2`}</ExcelCode>
+
+### Blanks or errors showing up unexpectedly in the result
+
+<ExcelCode>{`TOROW(A1:C5) → includes blank cells and any #N/A or other errors present`}</ExcelCode>
+
+Pass an `ignore` value to drop them during flattening instead of
+filtering afterward:
+
+<ExcelCode>{`TOROW(A1:C5, 3)`}</ExcelCode>
+
+### Expecting TOROW to remove duplicates
+
+TOROW only reshapes — it doesn't deduplicate. Wrap the result in
+`UNIQUE` if distinct values are also needed:
+`UNIQUE(TOROW(A1:C5))`.
+
+export const faqs = [
+  {
+    question: 'What order does TOROW flatten values in by default?',
+    answer: 'Row by row — it reads left to right across the first row, then the second row, and so on. Pass TRUE for scan_by_column to read column by column instead.',
+  },
+  {
+    question: 'Can TOROW skip blank cells while flattening?',
+    answer: 'Yes — pass 1 for ignore to skip blanks, 2 to skip errors, or 3 to skip both, all in the same step as the flattening itself.',
+  },
+  {
+    question: 'How is TOROW different from TOCOL?',
+    answer: "They flatten the same way, just into a different final shape — TOROW produces a single row, TOCOL produces a single column.",
+  },
+  {
+    question: 'Does TOROW remove duplicate values?',
+    answer: "No — it only reshapes the array. Wrap the result in UNIQUE (UNIQUE(TOROW(range))) if a distinct, flattened list is needed.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TOROW from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TOROW(A1:C5, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim flat As Variant
+    flat = Application.WorksheetFunction.ToRow(Range("A1:C5"), 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", usecols="A:C")
+    flat = df.values.flatten()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TOCOL](/docs/arrays/tocol) — the same flattening, into a single
+  column instead of a single row.
+- [CHOOSEROWS](/docs/arrays/chooserows) and [CHOOSECOLS](/docs/arrays/choosecols) —
+  pull out specific rows/columns instead of flattening everything.
+- [UNIQUE](/docs/arrays/unique) — often wraps TOROW's result to
+  deduplicate a flattened list.

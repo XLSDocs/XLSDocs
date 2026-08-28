@@ -1,0 +1,169 @@
+---
+title: CHOOSEROWS
+description: Return specific rows from an array or range, by row number, in any order.
+---
+
+Pull out one or more specific rows from an array by number — the
+first row, the last row, or any combination in any order — without
+slicing a range by hand or nesting INDEX calls.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A negative row number counts from the end — -1 is the last row', type: 'warn' },
+  { text: 'Rows can be selected more than once, and in any order', type: 'check' },
+  { text: 'Requires Excel 365', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHOOSEROWS(array, row_num1, [row_num2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHOOSEROWS(array, row_num1, [row_num2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array or range to pull rows from.',
+  },
+  {
+    name: 'row_num1',
+    type: 'number',
+    required: true,
+    description: 'The row number to return. Positive counts from the top, negative counts from the bottom (-1 is the last row).',
+  },
+  {
+    name: 'row_num2, ...',
+    type: 'number',
+    required: false,
+    description: 'Additional row numbers, in the order they should appear in the result. Up to 254 total.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array containing the requested rows from `array`, in the
+exact order the row numbers were given — not necessarily their
+original order.
+
+## Description
+
+CHOOSEROWS is a generalized, multi-row version of what INDEX does
+for a single cell — instead of one row/column position, it takes a
+whole list of row numbers and returns every column for each of them,
+in whatever order they're listed. That makes it useful for pulling a
+specific handful of rows (row 1 and the last row, say) or even
+reordering rows deliberately, not just selecting a contiguous block
+the way TAKE does.
+
+<Callout type="info">
+  Row numbers don't have to be in order, and the **same row can be
+  selected more than once** — `CHOOSEROWS(array, 3, 1, 3)` returns
+  row 3, then row 1, then row 3 again. This makes CHOOSEROWS useful
+  for reordering or duplicating rows, not just picking a subset.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a row number is out of range
+
+<ExcelCode>{`CHOOSEROWS(A1:C10, 15) → #VALUE! (only 10 rows exist)`}</ExcelCode>
+
+Every row number must fall within `array`'s actual row count —
+unlike TAKE, CHOOSEROWS doesn't just return what's available.
+
+### Expecting contiguous rows without listing each one
+
+<ExcelCode>{`CHOOSEROWS(A1:C10, 1:5) → not valid syntax`}</ExcelCode>
+
+CHOOSEROWS needs each row number listed individually (or generated
+by another array, like `SEQUENCE(5)`) — for a simple contiguous block
+from the start or end, `TAKE` is simpler.
+
+### Forgetting that order in equals order out
+
+<ExcelCode>{`CHOOSEROWS(A1:C10, 5, 1) → row 5 first, then row 1 — not sorted`}</ExcelCode>
+
+The result follows the order the row numbers were given in, not
+their original position in `array` — this is a feature for
+reordering, but a surprise if ascending order was assumed.
+
+export const faqs = [
+  {
+    question: 'How do I get the last row of an array with CHOOSEROWS?',
+    answer: 'Use -1 as the row number: CHOOSEROWS(array, -1) returns the last row. Negative numbers count from the end, the same convention TAKE and DROP use.',
+  },
+  {
+    question: 'Can CHOOSEROWS select the same row more than once?',
+    answer: "Yes — CHOOSEROWS(array, 1, 1, 2) returns row 1 twice followed by row 2. There's no requirement that row numbers be unique.",
+  },
+  {
+    question: 'How is CHOOSEROWS different from TAKE?',
+    answer: "TAKE grabs a contiguous block from the start or end of an array. CHOOSEROWS takes an explicit list of row numbers, which can be non-contiguous, reordered, or repeated — more flexible, but requires listing exactly what's wanted.",
+  },
+  {
+    question: 'Is there a column equivalent of CHOOSEROWS?',
+    answer: 'Yes — CHOOSECOLS works identically, selecting specific columns by number instead of rows.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHOOSEROWS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHOOSEROWS(A1:C10, 1, -1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim firstRow As Range, lastRow As Range
+    Set firstRow = Range("A1:C10").Rows(1)
+    Set lastRow = Range("A1:C10").Rows(Range("A1:C10").Rows.Count)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", usecols="A:C")
+    selected = df.iloc[[0, -1]]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHOOSECOLS](/docs/arrays/choosecols) — the column-wise equivalent,
+  selecting specific columns instead of rows.
+- [TAKE](/docs/arrays/take) — simpler for a contiguous block of rows
+  from the start or end, rather than an explicit, arbitrary list.
+- [INDEX](/docs/lookup/index) — returns a single cell or range by
+  position, the single-row/column building block CHOOSEROWS
+  generalizes.

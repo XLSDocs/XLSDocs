@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-28',
+    title: 'TOROW, TOCOL, CHOOSEROWS, and CHOOSECOLS',
+    description:
+      "Two more matched pairs round out Arrays: TOROW and TOCOL flatten a 2D range into a single row or column, and CHOOSEROWS/CHOOSECOLS pull out specific, non-contiguous rows or columns by number — including reordering or repeating them, not just picking a contiguous block.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-28',
     title: 'CStr, Replace, and DateDiff',
     description:
       "Three more VBA functions, two of them genuine naming traps: VBA's Replace behaves like worksheet SUBSTITUTE, not worksheet REPLACE despite the shared name, and DateDiff counts calendar boundaries crossed rather than complete elapsed intervals the way worksheet DATEDIF does.",
