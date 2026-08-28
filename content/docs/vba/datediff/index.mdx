@@ -1,0 +1,164 @@
+---
+title: DateDiff
+description: Calculate the number of time intervals (days, months, years, and more) between two dates.
+---
+
+Calculate how many complete time intervals separate two dates —
+similar in spirit to the worksheet's `DATEDIF`, but with a
+different argument order, different interval codes, and different
+rules for counting boundaries, despite the near-identical name.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Counts calendar boundaries crossed, not necessarily full elapsed intervals', type: 'warn' },
+  { text: 'interval codes are short strings like "d", "m", "yyyy" — different from DATEDIF\'s units', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'DateDiff(interval, date1, date2, [firstdayofweek], [firstweekofyear])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`DateDiff(interval, date1, date2, [firstdayofweek], [firstweekofyear])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'interval',
+    type: 'string',
+    required: true,
+    description: 'The unit to measure in: "yyyy" (year), "q" (quarter), "m" (month), "y" (day of year), "d" (day), "w" (weekday), "ww" (week), "h" (hour), "n" (minute), "s" (second).',
+  },
+  {
+    name: 'date1',
+    type: 'date',
+    required: true,
+    description: 'The starting date.',
+  },
+  {
+    name: 'date2',
+    type: 'date',
+    required: true,
+    description: 'The ending date.',
+  },
+  {
+    name: 'firstdayofweek',
+    type: 'number',
+    required: false,
+    description: 'Which day counts as the start of the week, relevant only when interval is "ww". Defaults to Sunday.',
+  },
+  {
+    name: 'firstweekofyear',
+    type: 'number',
+    required: false,
+    description: 'Which week counts as the first week of the year, relevant only when interval is "ww". Defaults to the week containing January 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of interval boundaries crossed between `date1` and
+`date2`, as a whole number (negative if `date2` is earlier than
+`date1`).
+
+## Description
+
+DateDiff counts how many times a given boundary (a new day, a new
+month, a new year) is crossed between two dates — which is subtly
+different from counting complete elapsed intervals. `DateDiff("yyyy",
+"12/31/2026", "1/1/2027")` returns `1`, even though barely a day has
+actually elapsed, because a year boundary (December 31 to January 1)
+was crossed. Worksheet `DATEDIF`, by contrast, counts complete
+elapsed years/months/days and would return `0` for that same pair.
+
+<Callout type="warn">
+  DateDiff and worksheet DATEDIF share a nearly identical name but
+  use **different argument orders** (DateDiff takes `interval` first;
+  DATEDIF takes the two dates first, then the unit) and **different
+  counting rules** at period boundaries. Code or formulas ported
+  between the two without adjusting for both differences will produce
+  plausible-looking but wrong results.
+</Callout>
+
+## Common errors
+
+### Assuming DateDiff counts complete elapsed intervals like DATEDIF
+
+<ExcelCode>{`DateDiff("yyyy", #12/31/2026#, #1/1/2027#) → 1 (a boundary was crossed, not a full year)`}</ExcelCode>
+
+DateDiff counts calendar boundary crossings, not whole elapsed
+periods — worksheet `DATEDIF` is the one that counts full elapsed
+units instead.
+
+### Mixing up the argument order with DATEDIF
+
+<ExcelCode>{`DateDiff(startDate, endDate, "d") → wrong argument order`}</ExcelCode>
+
+DateDiff's `interval` comes **first**, unlike DATEDIF's unit
+argument, which comes last:
+
+<ExcelCode>{`DateDiff("d", startDate, endDate)`}</ExcelCode>
+
+### Using the wrong interval code
+
+<ExcelCode>{`DateDiff("y", date1, date2) → day-of-year difference, not years`}</ExcelCode>
+
+`"y"` means day-of-year in DateDiff, not "years" — `"yyyy"` is the
+code for a full year difference, an easy one to get backwards.
+
+export const faqs = [
+  {
+    question: 'Is DateDiff the same as the worksheet DATEDIF function?',
+    answer: "No, despite the near-identical name. They take arguments in a different order, use different unit codes, and count differently at period boundaries — DateDiff counts boundary crossings, DATEDIF counts complete elapsed intervals.",
+  },
+  {
+    question: 'What does interval "y" mean in DateDiff?',
+    answer: 'It means day-of-year (the difference in day-of-year numbers), not "years" — that\'s a common mix-up. Use "yyyy" for a year-to-year difference.',
+  },
+  {
+    question: 'Why did DateDiff return 1 year when barely a day passed?',
+    answer: 'DateDiff("yyyy", ...) counts how many year boundaries (December 31 to January 1) were crossed, not how many complete 365-day years elapsed. Two dates a day apart but on either side of New Year\'s still count as 1 year apart.',
+  },
+  {
+    question: 'Can DateDiff calculate a difference in weeks?',
+    answer: 'Yes — use interval "ww". The optional firstdayofweek argument controls which day of the week the count treats as the boundary.',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Function DaysUntilDue(dueDate As Date) As Long
+  DaysUntilDue = DateDiff("d", Date, dueDate)
+End Function
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DATEDIF](/docs/date/datedif) — the worksheet-formula equivalent,
+  sharing a similar name but a different argument order and different
+  boundary-counting behavior.
+- [Format](/docs/vba/format) — often formats the dates being compared
+  for display alongside a DateDiff result.
+- [DATE](/docs/date/date) — builds the date values DateDiff compares.

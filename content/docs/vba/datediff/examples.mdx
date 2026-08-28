@@ -1,0 +1,32 @@
+---
+title: DateDiff examples
+description: Worked examples for DateDiff — days until a deadline, a year-boundary surprise, and comparing it to DATEDIF.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Days until a deadline" formula={`DateDiff("d", Date, #4/15/2027#)`}>
+  Returns the number of days between today and a fixed due date —
+  negative if the due date has already passed.
+</ExampleCard>
+
+<ExampleCard number="02" label="Months between two dates" formula={`DateDiff("m", #1/15/2026#, #6/1/2027#)`}>
+  Counts month boundaries crossed, returning 17 — from January 2026
+  to June 2027.
+</ExampleCard>
+
+<ExampleCard number="03" label="The year-boundary surprise" formula={`DateDiff("yyyy", #12/31/2026#, #1/1/2027#)`}>
+  Returns 1, even though only a single day separates the two dates —
+  DateDiff counts the year boundary crossed, not elapsed time.
+</ExampleCard>
+
+<ExampleCard number="04" label="Weeks between two dates" formula={`DateDiff("ww", #1/1/2027#, #3/1/2027#)`}>
+  Returns the number of week boundaries crossed between the two
+  dates, using Sunday as the default start of the week.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing to worksheet DATEDIF" formula={`DateDiff("yyyy", #12/31/2026#, #1/1/2027#) vs DATEDIF(DATE(2026,12,31), DATE(2027,1,1), "y")`}>
+  DateDiff returns 1 (a boundary was crossed); DATEDIF returns 0 (no
+  full year has actually elapsed) — same intent, genuinely different
+  answers.
+</ExampleCard>

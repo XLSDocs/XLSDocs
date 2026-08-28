@@ -1,0 +1,179 @@
+---
+title: Replace
+description: Replace every occurrence of one substring with another within a string.
+---
+
+Replace every occurrence of a substring with another string —
+despite sharing a name with Excel's worksheet `REPLACE` function,
+VBA's `Replace` actually works like the worksheet's `SUBSTITUTE`
+(find-and-replace by text), not like worksheet `REPLACE`
+(position-and-length based).
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Finds and replaces by matching text, not by position — despite the name overlap with worksheet REPLACE', type: 'warn' },
+  { text: 'Case-sensitive by default, unlike Excel\'s SUBSTITUTE', type: 'warn' },
+  { text: 'Replaces every occurrence unless count limits it', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'Replace(expression, find, replaceWith, [start], [count], [compare])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`Replace(expression, find, replaceWith, [start], [count], [compare])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'string',
+    required: true,
+    description: 'The string to search within.',
+  },
+  {
+    name: 'find',
+    type: 'string',
+    required: true,
+    description: 'The substring to search for.',
+  },
+  {
+    name: 'replaceWith',
+    type: 'string',
+    required: true,
+    description: 'The substring to replace each match with. An empty string removes matches entirely.',
+  },
+  {
+    name: 'start',
+    type: 'number',
+    required: false,
+    description: 'The character position to begin searching from. Defaults to 1.',
+  },
+  {
+    name: 'count',
+    type: 'number',
+    required: false,
+    description: 'The maximum number of replacements to make. Defaults to -1 (replace all occurrences).',
+  },
+  {
+    name: 'compare',
+    type: 'number',
+    required: false,
+    description: 'vbBinaryCompare (0, default) for case-sensitive matching, or vbTextCompare (1) to ignore case.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A new string with every occurrence of `find` (up to `count`, if
+given) replaced by `replaceWith`, starting the search from `start`.
+
+## Description
+
+The name is the trap here: Excel's worksheet `REPLACE` function
+replaces characters at a specific **position and length**, with no
+concept of matching text. VBA's `Replace` does the opposite — it
+finds occurrences of an actual substring and swaps them out, which is
+exactly what the worksheet's `SUBSTITUTE` function does. Anyone
+porting logic between VBA and worksheet formulas who assumes the two
+`Replace`/`REPLACE` functions behave the same way will get very
+different results.
+
+<Callout type="warn">
+  VBA's `Replace` behaves like worksheet `SUBSTITUTE`, **not**
+  worksheet `REPLACE` — despite having the matching name. If
+  position-and-length replacement is actually needed inside VBA, use
+  string slicing with `Left`/`Mid`/`Right` instead; `Replace` has no
+  equivalent to worksheet REPLACE's position-based behavior at all.
+</Callout>
+
+## Common errors
+
+### Assuming Replace works like worksheet REPLACE
+
+<ExcelCode>{`Replace("Hello World", 1, 5) → not valid — Replace doesn't take a position and length`}</ExcelCode>
+
+VBA's `Replace` always matches by text, never by position — there's
+no direct VBA equivalent of worksheet `REPLACE`'s position/length
+arguments.
+
+### Assuming case-insensitivity by default
+
+<ExcelCode>{`Replace("Hello World", "world", "Earth") → "Hello World" (no match, case differs)`}</ExcelCode>
+
+Like `InStr`, `Replace` is case-sensitive by default. Pass
+`vbTextCompare` to match regardless of case:
+
+<ExcelCode>{`Replace("Hello World", "world", "Earth", 1, -1, vbTextCompare)`}</ExcelCode>
+
+### Passing compare without start and count
+
+`start` and `count` are both required whenever `compare` is
+supplied — they can't be skipped just because the defaults (position
+1, replace all) are wanted:
+
+<ExcelCode>{`Replace("Hello World", "world", "Earth", 1, -1, vbTextCompare)`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Does VBA\'s Replace work like Excel\'s worksheet REPLACE function?',
+    answer: "No, despite the identical name — VBA's Replace finds and swaps out matching text, which is exactly what worksheet SUBSTITUTE does. Worksheet REPLACE works by character position and length instead, which VBA's Replace has no equivalent for.",
+  },
+  {
+    question: 'How do I replace only the first occurrence, not all of them?',
+    answer: 'Pass a count argument of 1 (and a start of 1): Replace(text, find, replaceWith, 1, 1) — the default count of -1 means "replace every occurrence."',
+  },
+  {
+    question: 'Is Replace case-sensitive?',
+    answer: 'Yes, by default — the same as InStr. Pass vbTextCompare as the compare argument (with start and count both supplied) to match regardless of case.',
+  },
+  {
+    question: 'What happens if replaceWith is an empty string?',
+    answer: 'Every match of find gets removed entirely, since it\'s replaced with nothing — a common way to strip out a specific substring from text.',
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Function CleanPhone(raw As String) As String
+  Dim result As String
+  result = Replace(raw, "-", "")
+  result = Replace(result, " ", "")
+  result = Replace(result, "(", "")
+  result = Replace(result, ")", "")
+  CleanPhone = result
+End Function
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [InStr](/docs/vba/instr) — finds the position of a substring
+  without replacing it; shares Replace's case-sensitivity default.
+- [Split](/docs/vba/split) — breaks a string into an array around a
+  delimiter, instead of substituting text within it.
+- [SUBSTITUTE](/docs/text/substitute) — the worksheet-formula
+  equivalent of VBA's Replace, for use inside a cell instead of code.
+- [REPLACE](/docs/text/replace) — the worksheet function that
+  actually matches VBA Replace's *name*, but works completely
+  differently (position and length, not text matching).

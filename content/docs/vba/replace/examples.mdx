@@ -1,0 +1,31 @@
+---
+title: Replace examples
+description: Worked examples for Replace — cleaning up formatted text, case-insensitive matching, and limiting the replacement count.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Strip formatting characters from a phone number" formula={`Replace("(555) 123-4567", "-", "")`}>
+  Returns "(555) 1234567" — removes every hyphen; chaining several
+  Replace calls strips out parentheses and spaces too.
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive replacement" formula={`Replace("Hello World", "WORLD", "Excel", 1, -1, vbTextCompare)`}>
+  Returns "Hello Excel" — matches regardless of case, unlike the
+  case-sensitive default.
+</ExampleCard>
+
+<ExampleCard number="03" label="Replace only the first occurrence" formula={`Replace("a-b-a-b-a", "a", "X", 1, 1)`}>
+  Returns "X-b-a-b-a" — limiting count to 1 stops after the first
+  match instead of replacing every occurrence.
+</ExampleCard>
+
+<ExampleCard number="04" label="Remove a substring entirely" formula={`Replace("Product #12345#", "#", "")`}>
+  Returns "Product 12345" — an empty replaceWith deletes every match
+  of find outright.
+</ExampleCard>
+
+<ExampleCard number="05" label="Assuming it works like worksheet REPLACE" formula={`Replace("Hello World", 7, 5)`}>
+  Not valid VBA — Replace has no position-and-length mode; that's
+  worksheet REPLACE's behavior, not this function's.
+</ExampleCard>

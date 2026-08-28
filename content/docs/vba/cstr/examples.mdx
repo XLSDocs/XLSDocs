@@ -1,0 +1,31 @@
+---
+title: CStr examples
+description: Worked examples for CStr — converting a number and date, guarding against Null, and the locale-formatting gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Convert a number to text" formula={`CStr(1234.5)`}>
+  Returns "1234.5" as a genuine String, not a Variant/Double that
+  merely displays like one.
+</ExampleCard>
+
+<ExampleCard number="02" label="Convert a Boolean" formula={`CStr(True)`}>
+  Returns "True" — VBA's default text representation for Boolean
+  values.
+</ExampleCard>
+
+<ExampleCard number="03" label="Convert a date" formula={`CStr(#1/15/2027#)`}>
+  Returns the date formatted using the system's current short date
+  setting, e.g. "1/15/2027".
+</ExampleCard>
+
+<ExampleCard number="04" label="Guarding against Null before converting" formula={`If IsNull(rs.Fields("Notes").Value) Then s = "" Else s = CStr(rs.Fields("Notes").Value)`}>
+  Checks for Null first — a common pattern when converting values
+  read from a database recordset.
+</ExampleCard>
+
+<ExampleCard number="05" label="Runtime error on Null" formula={`CStr(Null)`}>
+  Raises runtime error 94 ("Invalid use of Null") — CStr doesn't
+  silently coerce Null the way string concatenation with & does.
+</ExampleCard>

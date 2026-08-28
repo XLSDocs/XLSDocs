@@ -1,0 +1,139 @@
+---
+title: CStr
+description: Explicitly convert an expression to the String data type.
+---
+
+Explicitly convert a value to a `String` — the standard way to
+guarantee a variable is genuinely text before concatenating it,
+displaying it, or passing it somewhere that expects a String type
+specifically rather than a Variant that merely behaves like one.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Converts using the system\'s current locale settings (decimal separator, date format)', type: 'warn' },
+  { text: 'Raises a runtime error on Null, unlike the "&" concatenation operator', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'CStr(expression)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`CStr(expression)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'expression',
+    type: 'variant',
+    required: true,
+    description: 'Any valid expression to convert to a String.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`expression` converted to a `String`. Numbers, dates, and Booleans
+all get sensible default text representations (`True`/`False` for
+Booleans, the system's short date format for dates).
+
+## Description
+
+CStr is one of several VBA type-conversion functions (alongside
+`CInt`, `CDbl`, `CBool`, and others) that force a value into a
+specific type instead of relying on VBA's automatic Variant
+coercion. Using CStr explicitly — rather than just concatenating with
+`&`, which coerces implicitly — makes the intent clear and catches
+type problems (like a `Null`) at the exact line where they occur
+instead of somewhere downstream.
+
+<Callout type="warn">
+  `CStr(Null)` raises a runtime error ("Invalid use of Null") — unlike
+  the `&` operator, which silently treats `Null` as an empty string
+  when concatenating. If a value might genuinely be `Null` (common
+  with database fields), check `IsNull` first rather than wrapping it
+  directly in `CStr`.
+</Callout>
+
+## Common errors
+
+### Runtime error converting Null
+
+<ExcelCode>{`CStr(Null) → runtime error 94: Invalid use of Null`}</ExcelCode>
+
+Check for `Null` before converting:
+
+<ExcelCode>{`If IsNull(v) Then result = "" Else result = CStr(v)`}</ExcelCode>
+
+### Locale-dependent formatting surprises
+
+<ExcelCode>{`CStr(1234.5) → "1234.5" or "1234,5" depending on the system's decimal separator`}</ExcelCode>
+
+CStr uses the current locale's settings for numbers and dates, which
+can produce a comma instead of a period on some systems — a real
+concern for code shared across machines with different regional
+settings. `Format` with an explicit pattern avoids this ambiguity.
+
+### Expecting CStr to fail loudly on every bad input
+
+CStr converts almost anything without error, including numbers,
+dates, and Booleans — it only raises an error for genuinely
+unconvertible values like `Null`. Don't rely on it to validate that
+an input "makes sense" as text.
+
+export const faqs = [
+  {
+    question: 'Why does CStr(Null) raise an error but "" & Null doesn\'t?',
+    answer: 'CStr requires a genuinely convertible value and treats Null as invalid. The & concatenation operator has its own, more forgiving coercion rules and silently treats Null as an empty string instead.',
+  },
+  {
+    question: 'Is CStr the same as just using & to build a string?',
+    answer: "They often produce the same result, but CStr makes the type conversion explicit and fails predictably on Null, while & relies on VBA's implicit coercion rules and stays silent about problems like Null.",
+  },
+  {
+    question: 'Does CStr format dates and numbers consistently across computers?',
+    answer: "No — CStr uses the current system's locale settings, so a date or decimal number can render differently on a machine with different regional settings. Use Format with an explicit pattern when consistent output matters.",
+  },
+];
+
+<Faq items={faqs} />
+
+## In practice
+
+```vb lineNumbers
+Function DescribeCell(v As Variant) As String
+  If IsNull(v) Then
+    DescribeCell = "(no data)"
+  Else
+    DescribeCell = "Value: " & CStr(v)
+  End If
+End Function
+```
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IsNull](/docs/vba/isnull) — check for Null before converting,
+  since CStr raises a runtime error on it directly.
+- [Format](/docs/vba/format) — converts to a String with an explicit
+  pattern, avoiding CStr's locale-dependent default formatting.
+- [IsNumeric](/docs/vba/isnumeric) — the reverse direction: checking
+  whether a String can be converted back into a number.

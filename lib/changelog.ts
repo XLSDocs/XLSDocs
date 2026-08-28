@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-28',
+    title: 'CStr, Replace, and DateDiff',
+    description:
+      "Three more VBA functions, two of them genuine naming traps: VBA's Replace behaves like worksheet SUBSTITUTE, not worksheet REPLACE despite the shared name, and DateDiff counts calendar boundaries crossed rather than complete elapsed intervals the way worksheet DATEDIF does.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-28',
     title: 'XIRR, XNPV, and SLN',
     description:
       "The realistic versions of IRR and NPV for cash flows that land on actual, irregular calendar dates instead of neat even periods — plus SLN, the simplest depreciation method, spreading an asset's cost evenly across its useful life.",
