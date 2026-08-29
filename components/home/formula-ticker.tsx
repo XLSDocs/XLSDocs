@@ -21,7 +21,7 @@ export function FormulaTicker({
     'AI formula builder',
     '2026–27 blog coverage',
     'Mobile fully responsive',
-    'Dark mode only — as it should be',
+    'Light and dark mode',
     `${functionCount} functions documented`,
     `${categoryCount} categories covered`,
     'Excel 365 fully supported',
