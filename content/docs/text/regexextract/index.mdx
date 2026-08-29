@@ -1,0 +1,189 @@
+---
+title: REGEXEXTRACT
+description: Extract text matching a regular expression pattern — the first match, every match, or specific capturing groups.
+---
+
+Pull the part of a text string that matches a regular expression,
+instead of a fixed character position — the pattern-matching upgrade
+to MID/FIND-based extraction formulas.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'No match found returns #N/A, not blank', type: 'warn' },
+  { text: 'Excel for Microsoft 365 only — returns #NAME? on older versions', type: 'warn' },
+  { text: 'Always returns text — wrap in VALUE() for numbers', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=REGEXEXTRACT(text, pattern, [return_mode], [case_sensitivity])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=REGEXEXTRACT(text, pattern, [return_mode], [case_sensitivity])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to search within, or a cell reference containing it.',
+  },
+  {
+    name: 'pattern',
+    type: 'text',
+    required: true,
+    description: 'A regular expression, written in the PCRE2 regex flavor.',
+  },
+  {
+    name: 'return_mode',
+    type: 'number',
+    required: false,
+    description: '0 = the first match (default). 1 = every match, as a spilled array. 2 = the capturing groups from the first match, as a spilled array.',
+  },
+  {
+    name: 'case_sensitivity',
+    type: 'number',
+    required: false,
+    description: '0 for case-sensitive matching (default), 1 for case-insensitive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The matching text as a string — REGEXEXTRACT always returns text,
+even when the match looks numeric, so a result meant to be used in
+arithmetic needs wrapping in `VALUE()`. Returns `#N/A` if `pattern`
+never matches anywhere in `text`.
+
+## Description
+
+`return_mode` controls how much comes back:
+
+- **0 (default):** just the first match, as a single value.
+- **1:** every match in `text`, spilled as an array.
+- **2:** the capturing groups — parts of the pattern wrapped in
+  `()` — from the first match only, spilled as an array in the order
+  the groups appear in `pattern`.
+
+<Callout type="warn">
+  A no-match result is `#N/A`, not an empty string. Wrap the formula
+  in `IFERROR(REGEXEXTRACT(...), "")` (or a more specific fallback
+  value) if a blank result is preferred over a visible error for text
+  that might not match.
+</Callout>
+
+REGEXTEST is worth running first when building a REGEXEXTRACT
+formula against messy or inconsistent data — confirming the pattern
+matches at all is faster than debugging an `#N/A` after the fact.
+
+## Common errors
+
+### #N/A — no match found
+
+<ExcelCode>{`REGEXEXTRACT("hello world", "[0-9]+") → #N/A`}</ExcelCode>
+
+`text` doesn't contain anything matching `pattern` at all — there are
+no digits in `"hello world"`. This is the expected result for a
+genuine non-match, not a malfunction; wrap in `IFERROR` if a blank or
+fallback value is preferred.
+
+### #VALUE! — invalid pattern syntax
+
+An unclosed bracket, unmatched parenthesis, or unsupported construct
+in `pattern` produces `#VALUE!` regardless of what `text` contains.
+
+### #NAME? — function not yet available
+
+REGEXEXTRACT requires a current Microsoft 365 build — it returns
+`#NAME?` on Excel 2021, 2019, 2016, or a 365 install that hasn't
+received the update yet.
+
+### Numbers extracted as text don't add up
+
+<ExcelCode>{`=REGEXEXTRACT(A1,"[0-9]+")+5 → #VALUE!`}</ExcelCode>
+
+REGEXEXTRACT's result is always text, even when it looks like a
+number. Wrap it in `VALUE()` before using it in arithmetic:
+<ExcelCode>{`=VALUE(REGEXEXTRACT(A1,"[0-9]+"))+5`}</ExcelCode>
+
+export const faqs = [
+  {
+    question: 'Why does REGEXEXTRACT return #N/A instead of a blank cell?',
+    answer: '#N/A specifically means the pattern found nothing to match in the text — it\'s the expected result for a genuine non-match, not an error condition. Wrap the formula in IFERROR to substitute a blank string or a custom fallback instead.',
+  },
+  {
+    question: 'How do I get every match instead of just the first one?',
+    answer: 'Set return_mode to 1. The formula then spills every matching substring as an array, in the order they appear in text, instead of returning only the first match.',
+  },
+  {
+    question: 'How do I extract capturing groups instead of the whole match?',
+    answer: 'Set return_mode to 2. This returns the capturing groups — the parts of pattern wrapped in parentheses — from the first match, spilled as an array in the order the groups appear in the pattern.',
+  },
+  {
+    question: 'Why can\'t I use the extracted result in a calculation?',
+    answer: "REGEXEXTRACT always returns text, even for a numeric-looking match. Wrap the result in VALUE() to convert it to a real number before using it in arithmetic.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REGEXEXTRACT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REGEXEXTRACT(A1, "[0-9]+")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' REGEXEXTRACT isn't exposed as a WorksheetFunction — VBA uses
+    ' its own Regular Expressions reference instead.
+    Dim re As Object, m As Object
+    Set re = CreateObject("VBScript.RegExp")
+    re.Pattern = "[0-9]+"
+    Set m = re.Execute(Range("A1").Value)
+    Dim firstMatch As String
+    If m.Count > 0 Then firstMatch = m(0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import re
+
+    match = re.search(r"\d+", text)
+    first_match = match.group() if match else None
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [REGEXTEST](/docs/text/regextest) — checks whether a pattern
+  matches at all, without extracting anything.
+- [REGEXREPLACE](/docs/text/regexreplace) — replaces matching text
+  instead of extracting it.
+- [MID](/docs/text/mid) and [FIND](/docs/text/find) — the older,
+  position-based way to extract a substring without regex.

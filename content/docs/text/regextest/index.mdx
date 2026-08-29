@@ -1,0 +1,178 @@
+---
+title: REGEXTEST
+description: Test whether any part of a text string matches a regular expression pattern, returning TRUE or FALSE.
+---
+
+Check whether text matches a pattern described with a regular
+expression, rather than a fixed string — one formula standing in for
+what would otherwise take several nested SEARCH/ISNUMBER formulas to
+approximate.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Excel for Microsoft 365 only — returns #NAME? on older versions', type: 'warn' },
+  { text: 'Uses the PCRE2 regex flavor', type: 'check' },
+  { text: 'Case-sensitive by default', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=REGEXTEST(text, pattern, [case_sensitivity])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=REGEXTEST(text, pattern, [case_sensitivity])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to test, or a cell reference containing it.',
+  },
+  {
+    name: 'pattern',
+    type: 'text',
+    required: true,
+    description: 'A regular expression, written in the PCRE2 regex flavor.',
+  },
+  {
+    name: 'case_sensitivity',
+    type: 'number',
+    required: false,
+    description: '0 for case-sensitive matching (default), 1 for case-insensitive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if any part of `text` matches `pattern`, `FALSE` otherwise.
+REGEXTEST never returns an error for a non-match — only for an
+invalid pattern.
+
+## Description
+
+REGEXTEST answers a yes/no question — does this text match a
+pattern at all — without extracting or replacing anything. It's the
+natural first step when building a more complex REGEXEXTRACT or
+REGEXREPLACE formula: confirm the pattern actually matches before
+building extraction logic on top of it.
+
+<Callout type="warn">
+  REGEXTEST, REGEXEXTRACT, and REGEXREPLACE are rolling out to
+  **Excel for Microsoft 365 only** — not Excel 2021, 2019, or 2016,
+  and not currently listed as supported in Excel for the web. A
+  workbook using these on a 365 install that hasn't received the
+  update yet shows `#NAME?`, which looks like a typo in the function
+  name but actually means the function isn't available yet in that
+  build.
+</Callout>
+
+Excel's regex functions use the **PCRE2** flavor of regular
+expressions — broadly similar to what most other tools use, but worth
+knowing if a pattern that works in, say, Python's `re` module doesn't
+behave identically here.
+
+## Common errors
+
+### #VALUE! — invalid pattern syntax
+
+<ExcelCode>{`REGEXTEST("abc123", "[0-9") → #VALUE!`}</ExcelCode>
+
+An unclosed bracket, an unmatched parenthesis, or an unsupported
+regex construct in `pattern` produces `#VALUE!`. Testing the pattern
+in an online regex tester first (matching PCRE2 rather than another
+flavor) catches most syntax mistakes before they hit the formula.
+
+### #NAME? — function not yet available
+
+If REGEXTEST returns `#NAME?` instead of `TRUE`/`FALSE`, the Excel
+installation hasn't received these functions yet — they require a
+current Microsoft 365 build, not a perpetual-license version like
+Excel 2021 or 2019.
+
+### It matches when it shouldn't (or vice versa)
+
+The most common cause is the `case_sensitivity` default: REGEXTEST is
+**case-sensitive unless told otherwise**. A pattern like `"excel"`
+won't match `"Excel"` unless `case_sensitivity` is explicitly set to
+`1`.
+
+export const faqs = [
+  {
+    question: 'Why does REGEXTEST return #NAME? instead of TRUE or FALSE?',
+    answer: "#NAME? means this Excel installation doesn't have the regex functions yet — they're rolling out to Microsoft 365 only, not perpetual-license versions like Excel 2021 or 2019. Check for Microsoft 365 updates if this happens on a subscription that should otherwise support it.",
+  },
+  {
+    question: 'Is REGEXTEST case-sensitive by default?',
+    answer: 'Yes — case_sensitivity defaults to 0 (case-sensitive). Pass 1 explicitly for a case-insensitive match.',
+  },
+  {
+    question: 'What regex flavor does REGEXTEST use?',
+    answer: "PCRE2. It's broadly similar to most other regex implementations, but a pattern written for a different flavor (like .NET or JavaScript regex) may need small adjustments to work identically here.",
+  },
+  {
+    question: 'How is REGEXTEST different from ISNUMBER(SEARCH(...))?',
+    answer: 'SEARCH only matches a literal substring (with limited wildcard support via ? and *). REGEXTEST matches a full regular expression — character classes, quantifiers, alternation, and more — in a single readable pattern instead of a workaround formula.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REGEXTEST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REGEXTEST(A1, "^[0-9]{3}-[0-9]{4}$")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' REGEXTEST isn't exposed as a WorksheetFunction — VBA uses its
+    ' own Regular Expressions reference instead.
+    Dim re As Object
+    Set re = CreateObject("VBScript.RegExp")
+    re.Pattern = "^[0-9]{3}-[0-9]{4}$"
+    Dim isMatch As Boolean
+    isMatch = re.Test(Range("A1").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import re
+
+    is_match = bool(re.search(r"^\d{3}-\d{4}$", text))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [REGEXEXTRACT](/docs/text/regexextract) — pulls the actual matching
+  text out, instead of just testing whether a match exists.
+- [REGEXREPLACE](/docs/text/regexreplace) — replaces matching text
+  with something else.
+- [SEARCH](/docs/text/search) — the older, non-regex way to find a
+  substring case-insensitively, with limited wildcard support.

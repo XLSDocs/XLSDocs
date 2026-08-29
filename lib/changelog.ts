@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-29',
+    title: 'REGEXTEST, REGEXEXTRACT, and REGEXREPLACE',
+    description:
+      "Excel's native regex functions join the Text category — REGEXTEST checks whether a pattern matches, REGEXEXTRACT pulls out matching text (or specific capturing groups), and REGEXREPLACE can reorder text using those groups, not just swap it out. Rolling out to Microsoft 365 only for now — older perpetual versions return #NAME?.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-29',
     title: 'Web functions: WEBSERVICE, FILTERXML, and ENCODEURL',
     description:
       "A new category for Excel's built-in HTTP client: WEBSERVICE fetches a URL's contents into a cell, FILTERXML pulls specific values out of an XML response with XPath, and ENCODEURL safely percent-encodes text for use inside a URL. Includes the not-obvious gotcha that none of the three work in Excel for the web, and all three silently fail on Mac.",

@@ -1,0 +1,33 @@
+---
+title: REGEXTEST examples
+description: Worked examples for REGEXTEST — a phone-number pattern, case-insensitive matching, alternation, and the two common errors.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Validating a fixed-format code" formula={`=REGEXTEST(A1, "^[0-9]{3}-[0-9]{4}$")`}>
+  Returns `TRUE` only if A1 is exactly three digits, a hyphen, then
+  four digits — nothing more, nothing less, thanks to the `^`/`$`
+  anchors.
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive matching" formula={`=REGEXTEST(A1, "excel", 1)`}>
+  Matches `"Excel"`, `"EXCEL"`, or `"excel"` anywhere in A1 — the
+  third argument overrides the case-sensitive default.
+</ExampleCard>
+
+<ExampleCard number="03" label="Matching one of several alternatives" formula={`=REGEXTEST(A1, "cat|dog|bird")`}>
+  The `|` character means OR in regex — this returns `TRUE` if A1
+  contains any of the three words.
+</ExampleCard>
+
+<ExampleCard number="04" label="#VALUE! from an invalid pattern" formula={`=REGEXTEST("abc123", "[0-9")`}>
+  Returns `#VALUE!` because the character class `[0-9` is missing its
+  closing bracket.
+</ExampleCard>
+
+<ExampleCard number="05" label="#NAME? on an unsupported Excel version" formula={`=REGEXTEST(A1, "[0-9]+")`}>
+  Returns `#NAME?` if this Excel installation hasn't received the
+  regex functions yet — they require a current Microsoft 365 build,
+  not Excel 2021 or earlier.
+</ExampleCard>

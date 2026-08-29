@@ -1,0 +1,187 @@
+---
+title: REGEXREPLACE
+description: Replace text matching a regular expression pattern with new text, including reordering content using capturing groups.
+---
+
+Find every piece of text matching a pattern and replace it —
+optionally reusing parts of the match itself in the replacement,
+which is what lets REGEXREPLACE reorder text, not just swap it out.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'No match found returns the original text unchanged, not an error', type: 'check' },
+  { text: 'Capturing groups in pattern are reused in replacement as $1, $2, etc.', type: 'check' },
+  { text: 'Excel for Microsoft 365 only — returns #NAME? on older versions', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=REGEXREPLACE(text, pattern, replacement, [occurrence], [case_sensitivity])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=REGEXREPLACE(text, pattern, replacement, [occurrence], [case_sensitivity])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to search within, or a cell reference containing it.',
+  },
+  {
+    name: 'pattern',
+    type: 'text',
+    required: true,
+    description: 'A regular expression, written in the PCRE2 regex flavor.',
+  },
+  {
+    name: 'replacement',
+    type: 'text',
+    required: true,
+    description: 'The text to substitute for each match. Can reference capturing groups from pattern as $1, $2, and so on.',
+  },
+  {
+    name: 'occurrence',
+    type: 'number',
+    required: false,
+    description: '0 replaces every match (default). A positive number replaces only that match, counting from the start; a negative number counts from the end.',
+  },
+  {
+    name: 'case_sensitivity',
+    type: 'number',
+    required: false,
+    description: '0 for case-sensitive matching (default), 1 for case-insensitive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with the matched portion(s) replaced by `replacement`. If
+`pattern` doesn't match anywhere, REGEXREPLACE returns `text`
+completely unchanged — this is normal behavior, not an error.
+
+## Description
+
+Wrapping part of `pattern` in parentheses creates a **capturing
+group**, which can then be reused inside `replacement` as `$1` (the
+first group), `$2` (the second), and so on. This is what makes
+REGEXREPLACE capable of reordering text, not just deleting or
+swapping fixed substrings — a "Last, First" name pattern rearranged
+into "First Last" is a single formula instead of a combination of
+FIND/MID/CONCATENATE.
+
+<Callout type="check">
+  Unlike REGEXEXTRACT's `#N/A` on no match, REGEXREPLACE simply
+  returns the original text unchanged when nothing matches. This
+  makes it safe to apply broadly across a column without needing an
+  `IFERROR` wrapper for cells where the pattern doesn't apply.
+</Callout>
+
+## Common errors
+
+### #VALUE! — invalid pattern syntax
+
+An unclosed bracket, unmatched parenthesis, or unsupported construct
+in `pattern` produces `#VALUE!`.
+
+### #NAME? — function not yet available
+
+REGEXREPLACE requires a current Microsoft 365 build — it returns
+`#NAME?` on Excel 2021, 2019, 2016, or a 365 install that hasn't
+received the update yet.
+
+### The replacement includes a literal "$1" instead of the captured text
+
+This happens when `replacement` references a capturing group number
+that doesn't exist in `pattern` — for example, using `$2` when
+`pattern` only has one set of parentheses. Count the parenthesized
+groups in `pattern` carefully against every `$n` used in
+`replacement`.
+
+### Only one occurrence changed when every match should have
+
+`occurrence` defaults to `0` (replace all), but an explicit positive
+or negative number restricts the replacement to just that one match.
+Double-check the `occurrence` argument if a formula that should
+replace every match only affects one.
+
+export const faqs = [
+  {
+    question: 'What happens if the pattern doesn\'t match anything?',
+    answer: "REGEXREPLACE returns the original text completely unchanged — not an error. This makes it safe to apply across a whole column of mixed data without wrapping every formula in IFERROR.",
+  },
+  {
+    question: 'How do I reorder text instead of just replacing it?',
+    answer: 'Wrap the parts of pattern you want to keep in parentheses to create capturing groups, then reference them in replacement as $1, $2, and so on in whatever order you want them to appear — for example, turning "Smith, John" into "John Smith".',
+  },
+  {
+    question: 'Can I replace just the second or third match instead of all of them?',
+    answer: 'Yes — set occurrence to that match\'s position, counting from the start (a positive number) or from the end (a negative number). Leaving occurrence at its default of 0 replaces every match.',
+  },
+  {
+    question: 'Is REGEXREPLACE case-sensitive by default?',
+    answer: 'Yes — case_sensitivity defaults to 0 (case-sensitive), matching REGEXTEST and REGEXEXTRACT. Pass 1 explicitly for a case-insensitive replacement.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REGEXREPLACE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REGEXREPLACE(A1, "([A-Za-z]+), ([A-Za-z]+)", "$2 $1")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' REGEXREPLACE isn't exposed as a WorksheetFunction — VBA uses
+    ' its own Regular Expressions reference instead.
+    Dim re As Object
+    Set re = CreateObject("VBScript.RegExp")
+    re.Pattern = "([A-Za-z]+), ([A-Za-z]+)"
+    re.Global = True
+    Dim result As String
+    result = re.Replace(Range("A1").Value, "$2 $1")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import re
+
+    result = re.sub(r"([A-Za-z]+), ([A-Za-z]+)", r"\2 \1", text)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [REGEXTEST](/docs/text/regextest) — checks whether a pattern
+  matches, without replacing anything.
+- [REGEXEXTRACT](/docs/text/regexextract) — pulls matching text out
+  instead of replacing it.
+- [SUBSTITUTE](/docs/text/substitute) — the older, non-regex way to
+  replace one exact piece of text with another.

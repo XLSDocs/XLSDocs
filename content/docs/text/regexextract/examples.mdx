@@ -1,0 +1,33 @@
+---
+title: REGEXEXTRACT examples
+description: Worked examples for REGEXEXTRACT — the first match, all matches, capturing groups, and the #N/A no-match case.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Extracting the first number in a string" formula={`=REGEXEXTRACT("Order #4521, qty 3", "[0-9]+")`}>
+  Returns `"4521"` — the first run of digits found, ignoring the
+  second number later in the string.
+</ExampleCard>
+
+<ExampleCard number="02" label="Extracting every match" formula={`=REGEXEXTRACT("Order #4521, qty 3", "[0-9]+", 1)`}>
+  With return_mode set to 1, this spills both `"4521"` and `"3"` as
+  an array instead of stopping at the first match.
+</ExampleCard>
+
+<ExampleCard number="03" label="Extracting capturing groups" formula={`=REGEXEXTRACT("2024-06-15", "([0-9]{4})-([0-9]{2})-([0-9]{2})", 2)`}>
+  With return_mode set to 2, this spills `"2024"`, `"06"`, and `"15"`
+  — the three parenthesized groups from the first match, not the
+  whole matched string.
+</ExampleCard>
+
+<ExampleCard number="04" label="Converting a match to a real number" formula={`=VALUE(REGEXEXTRACT("Total: $1,240", "[0-9,]+"))`}>
+  REGEXEXTRACT always returns text — wrapping it in VALUE() (after
+  the match itself excludes the currency symbol) converts it for use
+  in arithmetic.
+</ExampleCard>
+
+<ExampleCard number="05" label="#N/A when nothing matches" formula={`=REGEXEXTRACT("hello world", "[0-9]+")`}>
+  Returns `#N/A` because there are no digits anywhere in the text —
+  wrap in IFERROR to substitute a blank or fallback value instead.
+</ExampleCard>
