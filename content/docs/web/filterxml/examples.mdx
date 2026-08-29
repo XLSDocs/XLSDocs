@@ -1,0 +1,32 @@
+---
+title: FILTERXML examples
+description: Worked examples for FILTERXML — extracting a single value, spilling multiple matches, chaining with WEBSERVICE, and the invalid-XML #VALUE! error.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Extracting a single value" formula={`=FILTERXML(A1, "//price")`}>
+  With A1 holding an XML string containing a `<price>` element, this
+  returns just that element's text content.
+</ExampleCard>
+
+<ExampleCard number="02" label="Extracting an attribute instead of an element" formula={`=FILTERXML(A1, "//product/@id")`}>
+  XPath's `@` syntax targets an attribute rather than an element's
+  text content — here, the `id` attribute of a `<product>` element.
+</ExampleCard>
+
+<ExampleCard number="03" label="Spilling every match as a dynamic array" formula={`=FILTERXML(A1, "//item/name")`}>
+  In Excel 365, entered in a range with room to spill, this returns
+  every matching `<name>` element as an array instead of just the
+  first one.
+</ExampleCard>
+
+<ExampleCard number="04" label="Chained directly with WEBSERVICE" formula={`=FILTERXML(WEBSERVICE("https://api.example.com/data.xml"), "//price")`}>
+  Skips the helper cell entirely — WEBSERVICE's raw XML response goes
+  straight into FILTERXML's first argument.
+</ExampleCard>
+
+<ExampleCard number="05" label="#VALUE! from malformed XML" formula={`=FILTERXML("<price>19.99", "//price")`}>
+  Returns `#VALUE!` because the XML is missing its closing `</price>`
+  tag — FILTERXML requires genuinely well-formed XML.
+</ExampleCard>

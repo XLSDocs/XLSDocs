@@ -1,0 +1,168 @@
+---
+title: FILTERXML
+description: Extract a specific value from an XML string using an XPath expression — commonly paired with WEBSERVICE to parse an API or feed response.
+---
+
+Pull a specific value, or set of values, out of an XML string by
+matching an XPath expression against it. FILTERXML is XML's answer to
+the question WEBSERVICE's raw text output raises: "which part of this
+response do I actually need?"
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'xpath is limited to 1,024 characters', type: 'warn' },
+  { text: 'Not available in Excel for the web, and silently fails on Mac', type: 'warn' },
+  { text: 'Introduced in Excel 2013', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FILTERXML(xml, xpath)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FILTERXML(xml, xpath)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'xml',
+    type: 'text',
+    required: true,
+    description: 'A valid XML string — often the direct output of a WEBSERVICE call.',
+  },
+  {
+    name: 'xpath',
+    type: 'text',
+    required: true,
+    description: 'A standard XPath expression identifying the node(s) to extract. Limited to 1,024 characters.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The text content of the node(s) matching `xpath`. Entered as a
+single-cell formula, only the first matching node's value is
+returned. In Excel 365, a formula that can match multiple nodes
+automatically spills the full set as a dynamic array; in pre-365
+Excel, the formula must be confirmed with **Ctrl+Shift+Enter** as a
+legacy array formula to get more than the first match.
+
+## Description
+
+FILTERXML expects a genuinely well-formed XML string — not JSON, and
+not loosely-formatted markup. It's most useful directly on
+WEBSERVICE's output, turning a full XML API response into just the
+one or two fields actually needed on the sheet.
+
+<Callout type="warn">
+  Like WEBSERVICE, FILTERXML **does not work in Excel for the web**,
+  and it appears in the Excel for Mac function gallery without ever
+  returning results there — both depend on Windows operating system
+  features.
+</Callout>
+
+XML namespaces are supported, but only if the XPath expression uses a
+matching, validly-formed prefix — many real-world feeds (RSS/Atom
+feeds especially) declare a default namespace without a prefix at
+all, which is a common source of an unmatched XPath that looks
+correct but returns nothing.
+
+## Common errors
+
+### #VALUE! — xml isn't valid XML
+
+<ExcelCode>{`FILTERXML("not xml", "//price") → #VALUE!`}</ExcelCode>
+
+FILTERXML requires well-formed XML — a missing closing tag, an
+unescaped `&`, or content that's actually JSON or HTML will all
+produce this error.
+
+### #VALUE! — an invalid namespace prefix
+
+If the XML string contains a namespace declared with an invalid
+prefix, FILTERXML returns `#VALUE!` rather than attempting to work
+around it. Check the raw XML for how the namespace prefix is actually
+declared before writing the XPath.
+
+### The formula only returns the first match
+
+If `xpath` matches multiple nodes but the formula was entered as an
+ordinary single-cell formula (not confirmed with Ctrl+Shift+Enter in
+pre-365 Excel, or in a range sized for the spill in 365), only the
+first match comes back. This looks like a bug but is expected
+behavior — resize the formula's output range or use dynamic arrays to
+see every match.
+
+export const faqs = [
+  {
+    question: 'Why does FILTERXML only return one value when the XPath should match several nodes?',
+    answer: 'A formula entered normally only returns the first match. In Excel 365, entering it in a range sized to spill returns every match as a dynamic array; in pre-365 Excel, confirm the formula with Ctrl+Shift+Enter as a legacy array formula instead.',
+  },
+  {
+    question: 'Does FILTERXML support the full XPath standard?',
+    answer: "FILTERXML supports standard XPath expressions but the query string itself is capped at 1,024 characters, which can be a real constraint for deeply nested or highly conditional XPath expressions.",
+  },
+  {
+    question: 'Why does my XPath look correct but FILTERXML returns nothing or an error?',
+    answer: "The most common cause is an XML namespace — many feeds declare a default namespace without an explicit prefix, and FILTERXML's XPath needs a validly-declared prefix to match namespaced elements. Check exactly how the namespace is declared in the raw XML.",
+  },
+  {
+    question: 'Can FILTERXML parse JSON instead of XML?',
+    answer: 'No — FILTERXML requires well-formed XML and returns #VALUE! on anything else, including JSON. Excel has no native JSON-path equivalent; Power Query is the usual tool for parsing JSON.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FILTERXML from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FILTERXML(A1, "//price")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim price As String
+    price = Application.WorksheetFunction.FilterXML( _
+        xmlString, "//price")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from lxml import etree
+
+    tree = etree.fromstring(xml_string.encode())
+    price = tree.xpath("//price/text()")[0]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [WEBSERVICE](/docs/web/webservice) — fetches the raw XML string
+  that FILTERXML typically parses.
+- [ENCODEURL](/docs/web/encodeurl) — percent-encodes text for use in
+  the URL passed to WEBSERVICE, upstream of FILTERXML.

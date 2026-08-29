@@ -1,0 +1,141 @@
+---
+title: ENCODEURL
+description: URL-encode text so it's safe to insert into a web address — spaces and symbols become percent-encoded, matching standard URI encoding.
+---
+
+Percent-encode a piece of text so it's safe to drop into a URL —
+turning spaces, punctuation, and other characters a URL can't contain
+literally into their `%XX` hexadecimal equivalents.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Spaces become %20, not + — this is URI encoding, not form encoding', type: 'warn' },
+  { text: 'No native DECODEURL counterpart exists', type: 'warn' },
+  { text: 'Not available in Excel for the web, and silently fails on Mac', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ENCODEURL(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ENCODEURL(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to URL-encode — typically a value that will be inserted into a larger URL string.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The input text with non-alphanumeric characters replaced by a `%`
+followed by their hexadecimal code — standard percent-encoding.
+Letters, digits, and a small set of characters that are already safe
+in a URL are left unchanged.
+
+## Description
+
+ENCODEURL exists almost entirely to be nested inside a
+[WEBSERVICE](/docs/web/webservice) URL: any part of a URL built from
+a cell value — a search term, a name, free-text input — can contain
+spaces or symbols that would otherwise break the request or silently
+change its meaning.
+
+<Callout type="warn">
+  ENCODEURL encodes a space as **`%20`**, standard URI encoding — not
+  as a `+`, which is what form-encoded (`application/x-www-form-
+  urlencoded`) query strings expect instead. Most modern web APIs
+  accept `%20` for spaces in a query string, but a service that
+  specifically expects `+` will need a manual `SUBSTITUTE(..., " ",
+  "+")` instead of relying on ENCODEURL alone.
+</Callout>
+
+Excel has no built-in DECODEURL function — reversing percent-encoding
+back to plain text isn't natively supported and would need a helper
+formula or Power Query's `Uri.UnescapeDataString` equivalent.
+
+## Common errors
+
+ENCODEURL has no documented error conditions of its own — it always
+returns a text value. Problems downstream are more often a sign that
+encoding wasn't applied where it should have been (a raw, un-encoded
+cell value breaking a WEBSERVICE URL), or that the target API expects
+`+` instead of `%20` for spaces.
+
+export const faqs = [
+  {
+    question: 'Does ENCODEURL encode a space as %20 or +?',
+    answer: 'Always %20 — standard URI encoding. If a specific API expects form-style encoding with + for spaces instead, wrap the result in SUBSTITUTE to swap %20 for + after ENCODEURL runs.',
+  },
+  {
+    question: 'Is there a DECODEURL function to reverse this?',
+    answer: "No — Excel has no built-in function to decode a percent-encoded string back to plain text. Power Query's Uri.UnescapeDataString handles decoding if that's needed.",
+  },
+  {
+    question: 'When should I use ENCODEURL instead of just typing the URL directly?',
+    answer: 'Whenever any part of the URL comes from a cell value rather than being hardcoded — user input, search terms, or any text that might contain spaces, ampersands, or other characters that have special meaning inside a URL.',
+  },
+  {
+    question: 'Does ENCODEURL work in Excel for the web?',
+    answer: "No — like WEBSERVICE and FILTERXML, ENCODEURL isn't available in Excel for the web, and it appears in the Excel for Mac function gallery without ever returning results there.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ENCODEURL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ENCODEURL("profit & loss.xlsx")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim encoded As String
+    encoded = Application.WorksheetFunction.EncodeUrl( _
+        "profit & loss.xlsx")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from urllib.parse import quote
+
+    encoded = quote("profit & loss.xlsx")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [WEBSERVICE](/docs/web/webservice) — the function ENCODEURL's
+  output is almost always built for, keeping a dynamic URL valid.
+- [FILTERXML](/docs/web/filterxml) — extracts specific values from
+  WEBSERVICE's response, downstream of ENCODEURL in a typical chain.

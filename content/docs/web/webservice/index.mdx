@@ -1,0 +1,162 @@
+---
+title: WEBSERVICE
+description: Fetch the contents of a URL directly into a worksheet cell — Excel's built-in HTTP GET client, no VBA or Power Query required.
+---
+
+Call a web service over HTTP or HTTPS and return its response as
+text, right inside a cell. WEBSERVICE only issues GET requests and
+has no support for headers, authentication, or POST bodies — it's a
+lightweight way to pull a URL's contents in, not a full HTTP client.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'GET requests only — no headers, auth, or POST bodies', type: 'warn' },
+  { text: 'Not available in Excel for the web, and silently fails on Mac', type: 'warn' },
+  { text: 'Introduced in Excel 2013', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=WEBSERVICE(url)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=WEBSERVICE(url)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'url',
+    type: 'text',
+    required: true,
+    description: 'The address of the web service, as http:// or https:// only. Limited to 2,048 characters — the limit for a GET request.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The response body as text, up to Excel's 32,767-character cell
+limit. WEBSERVICE recalculates like any other worksheet function —
+whenever the workbook recalculates — rather than on a timer or a
+fixed refresh schedule.
+
+## Description
+
+WEBSERVICE is the simplest way to bring live web data into a
+worksheet without VBA or Power Query, but it's deliberately narrow:
+GET requests only, no custom headers, no authentication beyond
+whatever's embedded in the URL itself, and no way to send a request
+body. For anything beyond "fetch this URL and show me the text," Power
+Query or VBA's `MSXML2.XMLHTTP` are the more capable tools.
+
+<Callout type="warn">
+  WEBSERVICE **does not work in Excel for the web**, and it appears in
+  the Excel for Mac function gallery but never actually returns
+  results there — it depends on Windows operating system features.
+  Any workbook that leans on WEBSERVICE needs to be opened in
+  Windows desktop Excel to actually fetch data.
+</Callout>
+
+WEBSERVICE is almost always paired with [ENCODEURL](/docs/web/encodeurl)
+when any part of the URL comes from a cell value — user-entered text
+or data can easily contain spaces or symbols that would otherwise
+break the URL.
+
+## Common errors
+
+### #VALUE! — URL too long
+
+<ExcelCode>{`WEBSERVICE(very_long_url) → #VALUE!`}</ExcelCode>
+
+The GET request limit is 2,048 characters for the whole URL. A URL
+built by concatenating several cell values can exceed this
+unexpectedly — check the total length if a normally reliable
+WEBSERVICE call suddenly errors.
+
+### #VALUE! — response too large
+
+The response from the web service exceeds Excel's 32,767-character
+cell limit. There's no way to retrieve a longer response with
+WEBSERVICE directly — a paginated API or an external tool would be
+needed instead.
+
+### #VALUE! — unsupported protocol or unreachable URL
+
+WEBSERVICE only supports `http://` and `https://` — an `ftp://` or
+`file://` URL returns `#VALUE!` immediately. A `https://` URL can
+also fail if the service is down, requires authentication WEBSERVICE
+can't provide, or blocks requests without a browser-like User-Agent
+header.
+
+export const faqs = [
+  {
+    question: 'Why does WEBSERVICE work in desktop Excel but not for a coworker using Excel Online?',
+    answer: "WEBSERVICE isn't available in Excel for the web at all — it only functions in the Windows desktop version of Excel. A workbook using it needs to be opened in desktop Excel on Windows for the formula to return data.",
+  },
+  {
+    question: 'Can WEBSERVICE send a POST request or custom headers?',
+    answer: "No — WEBSERVICE only issues GET requests, with no support for custom headers, authentication, or a request body. Anything beyond a simple GET call needs Power Query or VBA's MSXML2.XMLHTTP instead.",
+  },
+  {
+    question: 'Why do I need ENCODEURL alongside WEBSERVICE?',
+    answer: 'Any part of a URL built from cell values — a search term, a name, a date — can contain spaces or symbols that break the URL. Wrapping that part in ENCODEURL percent-encodes it safely before it reaches WEBSERVICE.',
+  },
+  {
+    question: 'Does WEBSERVICE refresh automatically, like a live feed?',
+    answer: "No — it recalculates the same way any other worksheet function does, whenever the workbook recalculates (opening the file, pressing F9, or editing a dependent cell). There's no built-in polling or scheduled refresh.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with WEBSERVICE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=WEBSERVICE("https://api.example.com/status")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim response As String
+    response = Application.WorksheetFunction.WebService( _
+        "https://api.example.com/status")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import requests
+
+    response = requests.get("https://api.example.com/status")
+    text = response.text
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ENCODEURL](/docs/web/encodeurl) — percent-encodes text so it's
+  safe to insert into a WEBSERVICE URL.
+- [FILTERXML](/docs/web/filterxml) — extracts specific values out of
+  an XML response, often used directly on WEBSERVICE's output.

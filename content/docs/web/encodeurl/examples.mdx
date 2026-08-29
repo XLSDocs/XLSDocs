@@ -1,0 +1,31 @@
+---
+title: ENCODEURL examples
+description: Worked examples for ENCODEURL — encoding spaces and symbols, building a dynamic WEBSERVICE URL, and the %20-vs-+ gotcha.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Encoding spaces and an ampersand" formula={`=ENCODEURL("profit & loss.xlsx")`}>
+  Returns `profit%20%26%20loss.xlsx` — the space becomes `%20` and
+  the ampersand becomes `%26`, both otherwise unsafe inside a URL.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building a search URL from a cell value" formula={`="https://api.example.com/search?q=" & ENCODEURL(A1)`}>
+  Wrapping A1 in ENCODEURL before concatenating it keeps the URL
+  valid no matter what text the cell contains.
+</ExampleCard>
+
+<ExampleCard number="03" label="Feeding directly into WEBSERVICE" formula={`=WEBSERVICE("https://api.example.com/search?q=" & ENCODEURL(A1))`}>
+  The full pattern in one formula: encode the dynamic piece, then
+  fetch the resulting URL.
+</ExampleCard>
+
+<ExampleCard number="04" label="Swapping %20 for + when an API requires form encoding" formula={`=SUBSTITUTE(ENCODEURL(A1), "%20", "+")`}>
+  A rare case, but some older or form-style APIs expect a literal `+`
+  for spaces rather than `%20` — SUBSTITUTE converts after the fact.
+</ExampleCard>
+
+<ExampleCard number="05" label="Alphanumeric text passes through unchanged" formula={`=ENCODEURL("Invoice2024")`}>
+  Returns `Invoice2024` exactly as entered — letters and digits never
+  need encoding.
+</ExampleCard>

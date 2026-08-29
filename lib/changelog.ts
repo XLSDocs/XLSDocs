@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-08-29',
+    title: 'Web functions: WEBSERVICE, FILTERXML, and ENCODEURL',
+    description:
+      "A new category for Excel's built-in HTTP client: WEBSERVICE fetches a URL's contents into a cell, FILTERXML pulls specific values out of an XML response with XPath, and ENCODEURL safely percent-encodes text for use inside a URL. Includes the not-obvious gotcha that none of the three work in Excel for the web, and all three silently fail on Mac.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-29',
     title: 'Database functions: DSUM, DCOUNT, and DGET',
     description:
       "A new category covering Excel's original criteria-range functions — the same mechanic behind the classic Advanced Filter, predating SUMIFS/COUNTIFS and dynamic-array FILTER by decades. Still the cleanest way to combine independent OR conditions across multiple fields, and DGET's strict single-match requirement doubles as a duplicate-record check.",

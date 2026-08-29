@@ -1,0 +1,31 @@
+---
+title: WEBSERVICE examples
+description: Worked examples for WEBSERVICE — a basic fetch, pairing it with ENCODEURL, and the two common #VALUE! causes.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Fetching a simple text response" formula={`=WEBSERVICE("https://api.example.com/status")`}>
+  Returns whatever text the endpoint sends back, up to Excel's
+  32,767-character cell limit — no parsing applied.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building the URL from a cell, safely" formula={`=WEBSERVICE("https://api.example.com/search?q=" & ENCODEURL(A1))`}>
+  Wrapping the cell value in ENCODEURL before concatenating it into
+  the URL prevents spaces or symbols in A1 from breaking the request.
+</ExampleCard>
+
+<ExampleCard number="03" label="Extracting one value from a JSON-like or XML response" formula={`=FILTERXML(WEBSERVICE("https://api.example.com/data.xml"), "//price")`}>
+  WEBSERVICE's raw text output is commonly piped straight into
+  FILTERXML to pull out a specific field, without a helper cell.
+</ExampleCard>
+
+<ExampleCard number="04" label="#VALUE! from a URL over 2,048 characters" formula={`=WEBSERVICE(A1&B1&C1&D1)`}>
+  Returns `#VALUE!` if concatenating several cells produces a URL
+  longer than 2,048 characters — the GET request limit.
+</ExampleCard>
+
+<ExampleCard number="05" label="#VALUE! from an unsupported protocol" formula={`=WEBSERVICE("ftp://files.example.com/data.txt")`}>
+  Returns `#VALUE!` immediately — WEBSERVICE only supports `http://`
+  and `https://` URLs.
+</ExampleCard>
