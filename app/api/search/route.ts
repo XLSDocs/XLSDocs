@@ -30,6 +30,15 @@ const marketingPages = [
     ),
   },
   {
+    id: '/pricing',
+    url: '/pricing',
+    title: 'Pricing',
+    description: 'Free vs. Pro — what the $5/mo subscription unlocks.',
+    structuredData: textIndex(
+      'Pricing — xlsdocs.com is free to use. $5/mo unlocks unlimited use of the AI Formula Builder, Quick Fix, and Ask AI, one subscription covering all three tools.',
+    ),
+  },
+  {
     id: '/tools/formula-builder',
     url: '/tools/formula-builder',
     title: 'AI Formula Builder',

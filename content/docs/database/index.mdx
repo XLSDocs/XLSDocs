@@ -1,0 +1,18 @@
+---
+title: Database
+description: Aggregate or retrieve values from a list using a separate criteria range — Excel's original filter-and-summarize functions, predating FILTER and SUMIFS.
+---
+
+Database functions summarize or retrieve values from a table using a
+**separate criteria range**, rather than conditions written directly
+into the formula — the same underlying mechanic as Excel's classic
+Advanced Filter. They predate SUMIFS/COUNTIFS and dynamic-array
+FILTER by decades, but the criteria-range approach still does things
+those newer functions can't as directly, like combining multiple
+independent OR conditions across several fields at once.
+
+<Cards className="grid-cols-3">
+  <Card title="DSUM" description="Sum a field across records matching a separate criteria range." href="/docs/database/dsum" />
+  <Card title="DCOUNT" description="Count numeric values in a field across matching records." href="/docs/database/dcount" />
+  <Card title="DGET" description="Retrieve a single field's value from the one record matching criteria." href="/docs/database/dget" />
+</Cards>

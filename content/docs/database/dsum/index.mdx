@@ -1,0 +1,182 @@
+---
+title: DSUM
+description: Sum a numeric field across the records in a database range that match a separate criteria range — Excel's original conditional-sum function.
+---
+
+Sum a numeric column across all the rows in a table that satisfy
+conditions listed in a **separate criteria range**, instead of
+conditions written directly into the formula — the same underlying
+mechanic as Excel's classic Advanced Filter.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+  { text: 'field can be the header text or a 1-based column number', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DSUM(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DSUM(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to sum — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of `field` across every record in `database` that matches
+every condition in `criteria`. Returns `0` if no records match.
+
+## Description
+
+DSUM's criteria range is a small table of its own: a header row
+copied from (or matching) the database's headers, with condition
+values underneath. The rules that make it powerful, and occasionally
+confusing:
+
+- **Two conditions on the same row** are combined with **AND** — a
+  record must satisfy both to count.
+- **Two conditions on separate rows** are combined with **OR** — a
+  record matching either row counts.
+- A criteria column can be left blank to mean "no condition on this
+  field."
+
+<Callout type="warn">
+  The criteria range's headers must **match the database's headers
+  exactly** — same text, same case is fine, but not a typo or a
+  synonym. A header that doesn't exist in the database makes DSUM
+  ignore that row of criteria entirely rather than throwing an error,
+  which is a quiet way for a formula to silently stop filtering.
+</Callout>
+
+This OR-across-rows behavior is the one thing DSUM can do that
+SUMIFS can't do directly: SUMIFS combines every condition with AND,
+so expressing "Region is East OR Region is West, AND Amount > 1000"
+needs either two SUMIFS calls added together or an array formula.
+DSUM expresses it as two criteria rows.
+
+## Common errors
+
+### The result is 0, but matching rows clearly exist
+
+The most common cause is a criteria header that doesn't exactly match
+a database header — a trailing space, a different word, or a merged
+cell copied incorrectly. Since DSUM doesn't error on a bad header, it
+just silently returns 0 instead of pointing at the mistake.
+
+### #VALUE! from the field argument
+
+<ExcelCode>{`DSUM(A1:D10, "Amont", F1:G2) → #VALUE!`}</ExcelCode>
+
+`field` was passed as text but doesn't match any header in `database`
+at all (not even a near-miss inside the criteria range — this is the
+database's own headers). Check the spelling against the database's
+actual header row.
+
+### Numbers stored as text aren't summed
+
+Like SUM and SUMIFS, DSUM only totals genuine numeric values. A
+column of numbers formatted or entered as text (common after a CSV
+import) will be skipped, understating the total without any error.
+
+export const faqs = [
+  {
+    question: 'How is DSUM different from SUMIFS?',
+    answer:
+      "SUMIFS takes its conditions as inline arguments and always combines multiple conditions with AND. DSUM reads its conditions from a separate criteria range, where conditions on the same row are AND but conditions on separate rows are OR — useful for combining independent OR conditions across different fields, which SUMIFS can't express directly.",
+  },
+  {
+    question: 'Why does DSUM return 0 when I know matching rows exist?',
+    answer:
+      "Almost always a criteria header that doesn't exactly match a database header — DSUM silently ignores a criteria column with an unrecognized header instead of erroring, so it looks like nothing matched.",
+  },
+  {
+    question: 'Can field be a column number instead of a header name?',
+    answer:
+      'Yes — field accepts either the header text in quotes or the column’s 1-based position within the database range. Using the header text is usually safer if columns get reordered later.',
+  },
+  {
+    question: 'Do the criteria range and database need to be next to each other?',
+    answer:
+      'No — they can be anywhere on the sheet, or even on different sheets. Keeping the criteria range separate from the database is actually the whole point: it lets the same database be summarized multiple ways from different criteria ranges.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DSUM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DSUM(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double
+    total = Application.WorksheetFunction.DSum( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DSUM's job is ordinary conditional filtering + sum in pandas
+    total = df.query('Region == "East" and Amount > 1000')['Amount'].sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DCOUNT](/docs/database/dcount) — counts numeric values in a field
+  instead of summing them, using the same criteria-range mechanic.
+- [DGET](/docs/database/dget) — retrieves a single field's value from
+  the one record that matches criteria.
+- [SUMIFS](/docs/math/sumifs) — the more common modern alternative
+  for AND-only conditions written directly into the formula.

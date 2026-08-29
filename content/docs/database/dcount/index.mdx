@@ -1,0 +1,172 @@
+---
+title: DCOUNT
+description: Count numeric values in a field across the records in a database range that match a separate criteria range.
+---
+
+Count how many records in a table have a **numeric** value in a
+given field, restricted to rows that match conditions listed in a
+separate criteria range — DSUM's counting counterpart.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'only counts numeric values in field — text and blanks are skipped', type: 'warn' },
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DCOUNT(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DCOUNT(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: false,
+    description: 'Which column to count numeric values in — header text in quotes, or a 1-based column number. If omitted, DCOUNT counts matching records in the database as a whole.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of records matching `criteria` that also have a **numeric**
+value in `field`. Returns `0` if nothing matches.
+
+## Description
+
+DCOUNT shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but counts
+records instead of summing a column. The one detail that trips
+people up: DCOUNT only counts a record if `field` holds a **number**
+for that record. A row that matches every criterion but has a blank
+or text value in the counted field is excluded from the total.
+
+<Callout type="warn">
+  Need to count matching records regardless of what type of value is
+  in a field — including text, or just presence/absence? That's
+  **DCOUNTA**, a related function that counts any non-blank value.
+  DCOUNT specifically restricts itself to numeric values, which makes
+  it the right choice for "how many records have a valid number
+  here?" rather than "how many records exist here at all?"
+</Callout>
+
+## Common errors
+
+### The count is lower than expected
+
+Check whether the counted field actually contains numbers for every
+matching record — a blank cell, or a number stored as text (common
+after importing data), won't be counted by DCOUNT even though the
+record matches the criteria.
+
+### The result is 0, but matching rows clearly exist
+
+As with DSUM, the most common cause is a criteria header that doesn't
+exactly match a database header. DCOUNT doesn't error on a
+non-matching header — it just ignores that criteria row, which can
+silently produce 0 instead of pointing at the typo.
+
+### field was omitted and the count looks too high or too low
+
+Without `field`, DCOUNT counts records matching `criteria` that have
+**at least one numeric value anywhere** in the record — not a specific
+column. This form is rarely what's intended; specifying `field`
+explicitly avoids the ambiguity.
+
+export const faqs = [
+  {
+    question: 'How is DCOUNT different from COUNTIFS?',
+    answer:
+      "COUNTIFS takes its conditions as inline arguments, always combined with AND. DCOUNT reads conditions from a separate criteria range, where same-row conditions are AND and separate-row conditions are OR — plus DCOUNT only counts numeric values in the specified field, while COUNTIFS counts matching rows regardless of the counted column's data type.",
+  },
+  {
+    question: 'How is DCOUNT different from DCOUNTA?',
+    answer:
+      'DCOUNT only counts records where the specified field holds a number. DCOUNTA counts records where that field holds any non-blank value — text, dates, or numbers — making it the right choice when the field being checked isn’t necessarily numeric.',
+  },
+  {
+    question: 'Why is my count lower than the number of matching rows?',
+    answer:
+      'DCOUNT excludes any matching record whose value in field is blank or non-numeric (including numbers stored as text). Check the counted column for blanks or text-formatted numbers if the total looks short.',
+  },
+  {
+    question: 'What happens if I omit the field argument?',
+    answer:
+      'DCOUNT then counts matching records that contain at least one numeric value anywhere in the record, rather than in one specific column — a rarely useful form. Specifying field explicitly is almost always clearer.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DCOUNT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DCOUNT(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim n As Long
+    n = Application.WorksheetFunction.DCount( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DCOUNT's job is filtering + counting non-null numeric values
+    matched = df.query('Region == "East" and Amount > 1000')
+    n = matched['Amount'].apply(lambda v: isinstance(v, (int, float))).sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DSUM](/docs/database/dsum) — sums a numeric field instead of
+  counting it, using the same criteria-range mechanic.
+- [DGET](/docs/database/dget) — retrieves a single field's value from
+  the one record that matches criteria.
+- [COUNTIFS](/docs/math/countifs) — the more common modern
+  alternative for AND-only conditions written directly into the
+  formula.

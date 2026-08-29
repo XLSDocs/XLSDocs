@@ -12,6 +12,20 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-08-29',
+    title: 'Database functions: DSUM, DCOUNT, and DGET',
+    description:
+      "A new category covering Excel's original criteria-range functions — the same mechanic behind the classic Advanced Filter, predating SUMIFS/COUNTIFS and dynamic-array FILTER by decades. Still the cleanest way to combine independent OR conditions across multiple fields, and DGET's strict single-match requirement doubles as a duplicate-record check.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-08-29',
+    title: 'A dedicated pricing page',
+    description:
+      "The $5/mo subscription that unlocks unlimited AI Formula Builder, Quick Fix, and Ask AI now has one clear place to compare it against the free tier, instead of being scattered copy on each individual tool.",
+    tags: ['Feature'],
+  },
+  {
     date: '2026-08-28',
     title: 'TOROW, TOCOL, CHOOSEROWS, and CHOOSECOLS',
     description:

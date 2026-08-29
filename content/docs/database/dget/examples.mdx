@@ -1,0 +1,36 @@
+---
+title: DGET examples
+description: Worked examples for DGET — a clean single-record lookup, the zero-match #VALUE! error, the duplicate-match #NUM! error, and using it as a duplicate-record check.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="A clean single-record lookup" formula={`=DGET(A1:D20, "Amount", F1:G2)`}>
+  With a criteria range matching one unique OrderID, this returns
+  that order's Amount directly — no need to scan for the first match
+  the way VLOOKUP would.
+</ExampleCard>
+
+<ExampleCard number="02" label="Retrieving a different field from the same criteria" formula={`=DGET(A1:D20, "CustomerName", F1:G2)`}>
+  The same criteria range used above can retrieve any other column —
+  here, the customer name instead of the amount — from the same
+  uniquely matched record.
+</ExampleCard>
+
+<ExampleCard number="03" label="#VALUE! when nothing matches" formula={`=DGET(A1:D20, "Amount", F1:G2)`}>
+  Returns `#VALUE!` because no record satisfies the criteria — check
+  for a typo in the criteria value, or a criteria header that doesn't
+  exactly match a database header.
+</ExampleCard>
+
+<ExampleCard number="04" label="#NUM! when more than one record matches" formula={`=DGET(A1:D20, "Amount", F1:F2)`}>
+  Returns `#NUM!` because the criteria (say, just `Region = "East"`)
+  match multiple records. Add another condition, like an ID, to
+  narrow it down to exactly one.
+</ExampleCard>
+
+<ExampleCard number="05" label="Using DGET to check for duplicate IDs" formula={`=IFERROR(DGET(A1:D20, "Amount", F1:G2), "duplicate or missing ID")`}>
+  Wrapping DGET in IFERROR turns its strict matching into a data-
+  quality check: any `#NUM!` (duplicate) or `#VALUE!` (missing) result
+  gets replaced with a message flagging the ID as needing review.
+</ExampleCard>

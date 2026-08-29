@@ -1,0 +1,38 @@
+---
+title: DSUM examples
+description: Worked examples for DSUM — single-condition and multi-condition sums, an OR-across-rows case SUMIFS can't do directly, and the silent-zero header mismatch.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Single condition" formula={`=DSUM(A1:D20, "Amount", F1:F2)`}>
+  With a criteria range whose header is `Region` and whose single
+  value below it is `East`, this sums the Amount column for every
+  record where Region is East.
+</ExampleCard>
+
+<ExampleCard number="02" label="Two conditions, same row (AND)" formula={`=DSUM(A1:D20, "Amount", F1:G2)`}>
+  A criteria range with headers `Region` and `Amount` and one row
+  below (`East`, `>1000`) sums Amount only where Region is East
+  **and** Amount is over 1000 — both conditions on the same row.
+</ExampleCard>
+
+<ExampleCard number="03" label="Two conditions, separate rows (OR)" formula={`=DSUM(A1:D20, "Amount", F1:F3)`}>
+  A criteria range with header `Region` and two rows below it
+  (`East`, `West`) sums Amount for records where Region is East
+  **or** West — this is the OR-across-rows behavior SUMIFS can't
+  express in a single call.
+</ExampleCard>
+
+<ExampleCard number="04" label="Field by column number instead of header" formula={`=DSUM(A1:D20, 3, F1:G2)`}>
+  Passing `3` instead of `"Amount"` sums the third column of the
+  database range — useful when column headers are dynamic, but more
+  fragile if columns get reordered.
+</ExampleCard>
+
+<ExampleCard number="05" label="Silent zero from a mistyped criteria header" formula={`=DSUM(A1:D20, "Amount", F1:G2)`}>
+  Returns `0` if the criteria range's header (say, `"Regoin"`) doesn't
+  exactly match a header in the database — DSUM ignores that
+  criteria column instead of erroring, so double-check spelling
+  first whenever a result looks wrong.
+</ExampleCard>

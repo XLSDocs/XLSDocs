@@ -1,0 +1,185 @@
+---
+title: DGET
+description: Retrieve a single field's value from the one record in a database range that matches a separate criteria range, erroring if zero or multiple records match.
+---
+
+Retrieve a single value from a table by matching a separate criteria
+range against a database — but only when **exactly one** record
+matches. DGET is built to fail loudly rather than guess, unlike most
+lookup functions.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: '0 matching records returns #VALUE!', type: 'warn' },
+  { text: '2 or more matching records returns #NUM!', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DGET(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DGET(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to retrieve — header text in quotes, or a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus a row of conditions that should match exactly one record.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value in `field` for the single record matching `criteria`.
+Returns `#VALUE!` if no record matches, and `#NUM!` if more than one
+record matches.
+
+## Description
+
+DGET is a lookup function with a deliberately strict contract: it
+only ever returns a value when the criteria uniquely identify one
+record. This is the opposite behavior from VLOOKUP or XLOOKUP, which
+silently return the *first* match and never warn about duplicates.
+
+<Callout type="warn">
+  DGET's all-or-nothing behavior is a feature for data validation: if
+  criteria that should be unique (like an ID or an order number)
+  ever match more than one row, DGET surfaces that as a `#NUM!` error
+  instead of quietly returning the wrong record. Using DGET on a key
+  that should be unique doubles as a duplicate-record check.
+</Callout>
+
+Like DSUM and DCOUNT, DGET's criteria range supports the same
+AND-within-a-row, OR-across-rows structure — but since DGET requires
+exactly one match, most real DGET criteria ranges use a single row of
+AND conditions specific enough to isolate one record (an ID, or a
+name plus a date).
+
+## Common errors
+
+### #VALUE! — no record matches
+
+<ExcelCode>{`DGET(A1:D20, "Amount", F1:F2) → #VALUE!`}</ExcelCode>
+
+No record in `database` satisfies every condition in `criteria`.
+Double-check the criteria values for typos, and confirm the criteria
+header text exactly matches a database header — a mismatched header
+is silently ignored (same as in DSUM/DCOUNT), which can make criteria
+that look specific actually match nothing.
+
+### #NUM! — more than one record matches
+
+<ExcelCode>{`DGET(A1:D20, "Amount", F1:F2) → #NUM!`}</ExcelCode>
+
+More than one record satisfies the criteria. Either the criteria
+aren't specific enough (add another condition, such as a unique ID),
+or the underlying data has duplicate records that need cleaning up —
+DGET just surfaced that duplication rather than hiding it.
+
+### Wrong value returned entirely
+
+This isn't actually possible with DGET the way it can happen with
+VLOOKUP — DGET either returns the one unambiguous match or errors.
+If a formula that looks like DGET is returning an unexpected value
+silently, check whether it's actually a different lookup function
+returning its "first match" instead.
+
+export const faqs = [
+  {
+    question: 'How is DGET different from VLOOKUP or XLOOKUP?',
+    answer:
+      "VLOOKUP and XLOOKUP return the first matching row and never complain about duplicates. DGET requires exactly one match — zero matches gives #VALUE!, and two or more gives #NUM! — making it useful specifically when you need to know a lookup is unambiguous.",
+  },
+  {
+    question: 'Can I use DGET with multiple conditions?',
+    answer:
+      'Yes, using the same criteria-range mechanic as DSUM and DCOUNT: multiple conditions on one row are combined with AND. Since DGET needs the result to be a single record, most real DGET criteria use several AND conditions together (like a name plus a date) to pin down one row.',
+  },
+  {
+    question: 'Why does DGET return #NUM! instead of just picking one match?',
+    answer:
+      "That's DGET's whole design: it refuses to guess. A #NUM! error on criteria that should be unique is usually pointing at a real duplicate-record problem in the underlying data, which VLOOKUP or XLOOKUP would have silently hidden by returning just the first match.",
+  },
+  {
+    question: 'Does the field argument work the same way as in DSUM and DCOUNT?',
+    answer:
+      'Yes — field can be the column header text in quotes or a 1-based column number, exactly as in DSUM and DCOUNT, since all three functions share the same database/criteria mechanic.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DGET from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DGET(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.DGet( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    matched = df.query('OrderID == 10248')
+    if len(matched) != 1:
+        raise ValueError("expected exactly one match")
+    result = matched.iloc[0]['Amount']
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DSUM](/docs/database/dsum) — sums a numeric field across every
+  matching record, instead of requiring exactly one.
+- [DCOUNT](/docs/database/dcount) — counts numeric values across
+  matching records, instead of requiring exactly one.
+- [XLOOKUP](/docs/lookup/xlookup) — returns the first matching value
+  without erroring on duplicates, the opposite tradeoff from DGET.
+- [VLOOKUP](/docs/lookup/vlookup) — the classic single-match lookup;
+  like XLOOKUP, it never checks for duplicate matches the way DGET does.

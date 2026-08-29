@@ -1,0 +1,35 @@
+---
+title: DCOUNT examples
+description: Worked examples for DCOUNT — single and multi-condition counts, the numeric-only gotcha, and the omitted-field edge case.
+---
+
+<FunctionNav />
+
+<ExampleCard number="01" label="Single condition" formula={`=DCOUNT(A1:D20, "Amount", F1:F2)`}>
+  With a criteria range of header `Region` and value `East`, this
+  counts how many East records have a numeric value in the Amount
+  column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Two conditions, same row (AND)" formula={`=DCOUNT(A1:D20, "Amount", F1:G2)`}>
+  A criteria range of `Region` / `Amount` headers with one row
+  (`East`, `>1000`) counts records where Region is East **and**
+  Amount is over 1000.
+</ExampleCard>
+
+<ExampleCard number="03" label="Two conditions, separate rows (OR)" formula={`=DCOUNT(A1:D20, "Amount", F1:F3)`}>
+  A criteria range with header `Region` and two rows (`East`, `West`)
+  counts records where Region is East **or** West.
+</ExampleCard>
+
+<ExampleCard number="04" label="Blanks and text are excluded" formula={`=DCOUNT(A1:D20, "Notes", F1:F2)`}>
+  If the Notes column holds text rather than numbers, this returns
+  `0` even with matching records — DCOUNT only counts numeric values
+  in the specified field. DCOUNTA would count the same text values.
+</ExampleCard>
+
+<ExampleCard number="05" label="Counting the whole database with a single condition" formula={`=DCOUNT(A1:D20, "Amount", F1:F2)`}>
+  Used with a single-column criteria range and no other filters, this
+  is a quick way to answer "how many East records have a numeric
+  Amount?" without a helper column.
+</ExampleCard>

@@ -231,6 +231,8 @@ export const compatibility = [
 - [LOOKUP](/docs/lookup/lookup) — the oldest lookup function, with
   no exact-match option and a strict sorted-data requirement XLOOKUP
   doesn't share.
+- [DGET](/docs/database/dget) — the opposite tradeoff: errors on zero
+  or multiple matches instead of silently returning the first one.
 - [IFERROR](/docs/logical/iferror) — wraps a formula to catch `#N/A`,
   as an alternative to XLOOKUP's own `if_not_found` argument.
 
