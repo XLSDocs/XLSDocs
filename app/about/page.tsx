@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { HomeNav } from '@/components/home/nav';
 import { Footer } from '@/components/home/footer';
-import { gitConfig, contactEmail } from '@/lib/shared';
+import { gitConfig } from '@/lib/shared';
 
 export const metadata: Metadata = {
   title: 'About',
@@ -86,12 +86,9 @@ export default function AboutPage() {
 
             <h2>Get in touch</h2>
             <p>
-              Questions, feedback, or a function that's missing? Email{' '}
-              <a href={`mailto:${contactEmail}`}>{contactEmail}</a>, or{' '}
-              <a href={issuesUrl} target="_blank" rel="noreferrer noopener">
-                open an issue on GitHub
-              </a>
-              .
+              Questions, feedback, or a function that's missing? Visit the{' '}
+              <a href="/contact">contact page</a> for the fastest way to
+              reach out.
             </p>
           </article>
         </div>
