@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSubscriber } from '@/lib/subscription';
+import {
+  AI_TOOLS_ROUTE_KEY,
+  AI_TOOLS_ROUTE_KEY_SUB,
+  AI_TOOLS_FREE_LIMIT,
+  AI_TOOLS_SUBSCRIBER_LIMIT,
+  AI_TOOLS_WINDOW_SECONDS,
+  AI_TOOLS_FREE_LIMIT_MESSAGE,
+  AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE,
+} from '@/lib/ai-rate-limit';
 
-// Same subscription that unlocks the Formula Builder also covers Ask AI —
-// one $5/mo tier, not a second paywall. Free tier is a daily cap, not hourly:
-// an hourly reset let anyone dodge it by just waiting, which undermined the
-// point of capping it at all.
-const SUBSCRIBER_LIMIT = 200;
-const FREE_LIMIT = 5;
-const DAY_SECONDS = 60 * 60 * 24;
+// Shares the same pool as Formula Builder and Quick Fix, via the constants
+// in lib/ai-rate-limit.ts — one $5/mo subscription unlocks unlimited use of
+// all three, so the free tier is one combined daily allowance, not three
+// separate ones that add up to more than intended.
 
 interface AskClaudeRequestBody {
   messages: { role: 'user' | 'assistant'; content: string }[];
@@ -23,13 +29,13 @@ interface AnthropicMessagesResponse {
 export async function POST(req: NextRequest) {
   const subscriber = await checkSubscriber(req);
   const { allowed } = subscriber.isSubscriber
-    ? await checkRateLimit(req, 'ask-claude-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
-    : await checkRateLimit(req, 'ask-claude', FREE_LIMIT, undefined, DAY_SECONDS);
+    ? await checkRateLimit(req, AI_TOOLS_ROUTE_KEY_SUB, AI_TOOLS_SUBSCRIBER_LIMIT, subscriber.customerId)
+    : await checkRateLimit(req, AI_TOOLS_ROUTE_KEY, AI_TOOLS_FREE_LIMIT, undefined, AI_TOOLS_WINDOW_SECONDS);
 
   if (!allowed) {
     const message = subscriber.isSubscriber
-      ? "You've hit an unusually high usage spike — try again shortly."
-      : "You've hit the free limit for Ask AI today — upgrade for unlimited, or try again tomorrow.";
+      ? AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE
+      : AI_TOOLS_FREE_LIMIT_MESSAGE;
     const res = NextResponse.json({ error: message }, { status: 429 });
     if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return res;

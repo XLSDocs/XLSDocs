@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { X, Sparkles, Send } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
+import { AI_TOOLS_FREE_LIMIT_MESSAGE } from '@/lib/ai-rate-limit';
 
 
 function formatMarkdown(text: string) {
@@ -143,8 +144,6 @@ interface Message {
   content: string;
 }
 
-const FREE_LIMIT_MESSAGE = "You've hit the free limit for Ask AI today — upgrade for unlimited, or try again tomorrow.";
-
 export function AskClaude({ pageTitle }: { pageTitle: string }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -194,7 +193,7 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
       const data = (await res.json()) as { reply?: string; error?: string };
       if (data.error) {
         setMessages([...next, { role: 'assistant', content: `Error: ${data.error}` }]);
-        if (res.status === 429 && data.error === FREE_LIMIT_MESSAGE) setRateLimited(true);
+        if (res.status === 429 && data.error === AI_TOOLS_FREE_LIMIT_MESSAGE) setRateLimited(true);
       } else {
         setMessages([...next, { role: 'assistant', content: data.reply ?? '' }]);
       }

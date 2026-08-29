@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 const faqs: FaqItem[] = [
   {
     question: 'Is xlsdocs.com free to use?',
-    answer: 'Every function page and the blog are completely free, with no sign-up required. The AI Formula Builder, Quick Fix, and Ask AI each have a free usage allowance, then $5/mo unlocks unlimited use across all three.',
+    answer: 'Every function page and the blog are completely free, with no sign-up required. The AI Formula Builder, Quick Fix, and Ask AI share one combined free usage allowance (5/day total), then $5/mo unlocks unlimited use across all three.',
   },
   {
     question: 'Do I need to create an account?',

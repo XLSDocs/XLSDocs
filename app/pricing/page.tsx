@@ -20,9 +20,7 @@ export const metadata: Metadata = {
 const FREE_FEATURES = [
   'Every function, VBA, and Custom Function page',
   'The blog, in full',
-  'AI Formula Builder — 5 free builds/day',
-  'Quick Fix — shares that same free allowance',
-  'Ask AI — 5 free questions/day',
+  'AI Formula Builder, Quick Fix & Ask AI — 5 free uses/day, combined',
 ];
 
 const PRO_FEATURES = [
@@ -44,7 +42,7 @@ const PRICING_FAQS: FaqItem[] = [
   },
   {
     question: 'What happens to my free usage if I don\'t subscribe?',
-    answer: 'Nothing — the free tiers keep working on their own schedule. The AI Formula Builder allows 5 free builds/day (Quick Fix shares that same allowance), and Ask AI allows 5 free questions/day. Every function, VBA, and Custom Function page, plus the blog, stay free either way.',
+    answer: 'Nothing — it keeps working on its own schedule. The AI Formula Builder, Quick Fix, and Ask AI share one combined allowance of 5 free uses per day across all three (not 5 each). Every function, VBA, and Custom Function page, plus the blog, stay free either way.',
   },
   {
     question: 'Do I need to create an account to subscribe?',

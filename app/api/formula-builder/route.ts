@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSubscriber } from '@/lib/subscription';
-
-// Generous, but not fully unlimited — bounds worst-case Anthropic API cost
-// from a leaked/shared cookie or a KV outage forcing fail-open, while being
-// effectively unlimited for any real single user of this tool.
-const SUBSCRIBER_LIMIT = 300;
-// Daily cap, not hourly — same reasoning as Ask AI: 15/hour was 360/day in
-// practice, high enough that it removed any real reason to subscribe. An
-// hourly reset is also trivially dodged by just waiting; a daily one isn't.
-const FREE_LIMIT = 5;
-const DAY_SECONDS = 60 * 60 * 24;
+import {
+  AI_TOOLS_ROUTE_KEY,
+  AI_TOOLS_ROUTE_KEY_SUB,
+  AI_TOOLS_FREE_LIMIT,
+  AI_TOOLS_SUBSCRIBER_LIMIT,
+  AI_TOOLS_WINDOW_SECONDS,
+  AI_TOOLS_FREE_LIMIT_MESSAGE,
+  AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE,
+} from '@/lib/ai-rate-limit';
 
 const SYSTEM_PROMPT = `You are an Excel formula expert. The user will describe, in plain English, a spreadsheet task. Respond with the exact Excel formula that accomplishes it, plus a breakdown of each part.
 
@@ -37,13 +36,13 @@ interface AnthropicMessagesResponse {
 export async function POST(req: NextRequest) {
   const subscriber = await checkSubscriber(req);
   const { allowed } = subscriber.isSubscriber
-    ? await checkRateLimit(req, 'formula-builder-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
-    : await checkRateLimit(req, 'formula-builder', FREE_LIMIT, undefined, DAY_SECONDS);
+    ? await checkRateLimit(req, AI_TOOLS_ROUTE_KEY_SUB, AI_TOOLS_SUBSCRIBER_LIMIT, subscriber.customerId)
+    : await checkRateLimit(req, AI_TOOLS_ROUTE_KEY, AI_TOOLS_FREE_LIMIT, undefined, AI_TOOLS_WINDOW_SECONDS);
 
   if (!allowed) {
     const message = subscriber.isSubscriber
-      ? "You've hit an unusually high usage spike — try again shortly."
-      : "You've hit the free limit for the Formula Builder today — upgrade for unlimited, or try again tomorrow.";
+      ? AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE
+      : AI_TOOLS_FREE_LIMIT_MESSAGE;
     const res = NextResponse.json({ error: message }, { status: 429 });
     if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return res;

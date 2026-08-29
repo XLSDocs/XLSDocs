@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { checkSubscriber } from '@/lib/subscription';
+import {
+  AI_TOOLS_ROUTE_KEY,
+  AI_TOOLS_ROUTE_KEY_SUB,
+  AI_TOOLS_FREE_LIMIT,
+  AI_TOOLS_SUBSCRIBER_LIMIT,
+  AI_TOOLS_WINDOW_SECONDS,
+  AI_TOOLS_FREE_LIMIT_MESSAGE,
+  AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE,
+} from '@/lib/ai-rate-limit';
 
-// Shares the Formula Builder's own rate-limit pool and $5/mo subscription
-// rather than a separate cap — same tool, same cost profile, just fixing a
-// formula instead of writing one from scratch. A second pool would just
-// double the effective free tier for no real reason.
-//
-// FREE_LIMIT and the window must stay identical to formula-builder/route.ts
-// — both read/write the same shared KV counter, so a mismatch here would
-// let one route enforce a different cap than the other on the same pool.
-const SUBSCRIBER_LIMIT = 300;
-const FREE_LIMIT = 5;
-const DAY_SECONDS = 60 * 60 * 24;
+// Shares the same pool as Formula Builder and Ask AI, via the constants in
+// lib/ai-rate-limit.ts — one $5/mo subscription unlocks unlimited use of
+// all three, so the free tier is one combined allowance too, not a second
+// one that would double it for no real reason.
 
 const SYSTEM_PROMPT = `You are an Excel formula debugging expert. The user will paste a broken or misbehaving Excel formula, usually along with the error it throws or the wrong result it returns. Diagnose the actual problem and respond with a corrected formula.
 
@@ -39,13 +41,13 @@ interface AnthropicMessagesResponse {
 export async function POST(req: NextRequest) {
   const subscriber = await checkSubscriber(req);
   const { allowed } = subscriber.isSubscriber
-    ? await checkRateLimit(req, 'formula-builder-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
-    : await checkRateLimit(req, 'formula-builder', FREE_LIMIT, undefined, DAY_SECONDS);
+    ? await checkRateLimit(req, AI_TOOLS_ROUTE_KEY_SUB, AI_TOOLS_SUBSCRIBER_LIMIT, subscriber.customerId)
+    : await checkRateLimit(req, AI_TOOLS_ROUTE_KEY, AI_TOOLS_FREE_LIMIT, undefined, AI_TOOLS_WINDOW_SECONDS);
 
   if (!allowed) {
     const message = subscriber.isSubscriber
-      ? "You've hit an unusually high usage spike — try again shortly."
-      : "You've hit the free limit for the AI formula tools today — upgrade for unlimited, or try again tomorrow.";
+      ? AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE
+      : AI_TOOLS_FREE_LIMIT_MESSAGE;
     const res = NextResponse.json({ error: message }, { status: 429 });
     if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return res;
