@@ -4,6 +4,7 @@ import { Check } from 'lucide-react';
 import { HomeNav } from '@/components/home/nav';
 import { Footer } from '@/components/home/footer';
 import { PricingButtons } from '@/components/pricing-buttons';
+import { Faq, type FaqItem } from '@/components/faq';
 import { SUBSCRIBER_COOKIE, verifySubscriberCookie } from '@/lib/subscriber-cookie';
 import Link from 'next/link';
 
@@ -32,17 +33,57 @@ const PRO_FEATURES = [
   'Cancel anytime, self-serve',
 ];
 
+const PRICING_FAQS: FaqItem[] = [
+  {
+    question: 'Can I cancel anytime?',
+    answer: 'Yes — cancel yourself from the billing portal, no email or phone call needed. Access stays unlimited through the end of the billing period you already paid for; it just won\'t renew after that.',
+  },
+  {
+    question: 'Does $5/mo cover all three AI tools, or is each one separate?',
+    answer: 'One subscription. $5/mo unlocks unlimited use of the AI Formula Builder, Quick Fix, and Ask AI together — not three separate charges.',
+  },
+  {
+    question: 'What happens to my free usage if I don\'t subscribe?',
+    answer: 'Nothing — the free tiers keep working on their own schedule. The AI Formula Builder allows 15 free builds/hour (Quick Fix shares that same allowance), and Ask AI allows 5 free questions/day. Every function, VBA, and Custom Function page, plus the blog, stay free either way.',
+  },
+  {
+    question: 'Do I need to create an account to subscribe?',
+    answer: 'No. Checkout and the billing portal are handled entirely by Stripe — xlsdocs never sees or stores your card details, and there\'s no separate login to manage.',
+  },
+  {
+    question: 'Is there a refund for the current period if I cancel partway through?',
+    answer: 'No — canceling stops the subscription from renewing, but the current paid period isn\'t prorated or refunded. You keep unlimited access until it ends.',
+  },
+];
+
 export default async function PricingPage() {
   const secret = process.env.COOKIE_SIGNING_SECRET;
   const raw = (await cookies()).get(SUBSCRIBER_COOKIE)?.value;
   const isSubscriber = Boolean(raw && secret && (await verifySubscriberCookie(raw, secret)));
   const billingEnabled = Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_ID);
 
+  const faqJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: PRICING_FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <HomeNav />
       <main className="flex-1">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+          />
           <h1 className="text-4xl font-normal md:text-5xl">
             Simple <span className="font-serif text-fd-primary italic">pricing</span>
           </h1>
@@ -100,9 +141,15 @@ export default async function PricingPage() {
             </div>
           </div>
 
+          <div className="mt-16 text-left">
+            <h2 className="text-lg font-medium">Pricing FAQ</h2>
+            <div className="mt-4">
+              <Faq items={PRICING_FAQS} />
+            </div>
+          </div>
+
           <p className="mt-8 text-sm text-fd-muted-foreground">
-            One subscription covers all three AI tools — not three
-            separate charges. Questions about billing? Check the{' '}
+            Question not covered here? Check the full{' '}
             <Link href="/faq" className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground">
               FAQ
             </Link>
