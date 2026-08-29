@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: '/functions', label: 'Functions' },
   { href: '/blog', label: 'Blog' },
   { href: '/tools/formula-builder', label: 'Formula Builder' },
+  { href: '/pricing', label: 'Pricing' },
   { href: '/docs', label: 'Docs' },
 ];
 
