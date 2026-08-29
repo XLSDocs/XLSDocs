@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { List } from 'lucide-react';
 
 export interface LegalTocItem {
   id: string;
@@ -58,7 +59,8 @@ export function LegalToc({ items }: { items: LegalTocItem[] }) {
 
   return (
     <nav aria-label="On this page" className="sticky top-24 hidden w-52 shrink-0 self-start xl:block">
-      <p className="mb-3 text-xs font-medium tracking-wider text-fd-muted-foreground uppercase">
+      <p className="mb-3 flex items-center gap-1.5 text-xs font-medium tracking-wider text-fd-muted-foreground uppercase">
+        <List className="size-3.5" />
         On this page
       </p>
       <ul className="flex flex-col gap-1 border-l border-fd-border">
