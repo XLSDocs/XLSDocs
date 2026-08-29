@@ -11,7 +11,9 @@ const FOOTER_LINKS = [
   { href: '/docs', label: 'Docs' },
   { href: '/changelog', label: 'Changelog' },
   { href: '/faq', label: 'FAQ' },
+  { href: '/about', label: 'About' },
   { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
 ];
 
 function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {

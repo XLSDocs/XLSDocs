@@ -13,7 +13,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/blog`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${siteUrl}/changelog`, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${siteUrl}/faq`, changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${siteUrl}/about`, changeFrequency: 'monthly', priority: 0.5 },
     { url: `${siteUrl}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${siteUrl}/terms`, changeFrequency: 'yearly', priority: 0.3 },
   ];
 
   const docsRoutes: MetadataRoute.Sitemap = source.getPages().map((page) => ({
