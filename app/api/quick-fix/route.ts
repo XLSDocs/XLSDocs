@@ -6,8 +6,13 @@ import { checkSubscriber } from '@/lib/subscription';
 // rather than a separate cap — same tool, same cost profile, just fixing a
 // formula instead of writing one from scratch. A second pool would just
 // double the effective free tier for no real reason.
+//
+// FREE_LIMIT and the window must stay identical to formula-builder/route.ts
+// — both read/write the same shared KV counter, so a mismatch here would
+// let one route enforce a different cap than the other on the same pool.
 const SUBSCRIBER_LIMIT = 300;
-const FREE_LIMIT = 15;
+const FREE_LIMIT = 5;
+const DAY_SECONDS = 60 * 60 * 24;
 
 const SYSTEM_PROMPT = `You are an Excel formula debugging expert. The user will paste a broken or misbehaving Excel formula, usually along with the error it throws or the wrong result it returns. Diagnose the actual problem and respond with a corrected formula.
 
@@ -35,12 +40,12 @@ export async function POST(req: NextRequest) {
   const subscriber = await checkSubscriber(req);
   const { allowed } = subscriber.isSubscriber
     ? await checkRateLimit(req, 'formula-builder-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
-    : await checkRateLimit(req, 'formula-builder', FREE_LIMIT);
+    : await checkRateLimit(req, 'formula-builder', FREE_LIMIT, undefined, DAY_SECONDS);
 
   if (!allowed) {
     const message = subscriber.isSubscriber
       ? "You've hit an unusually high usage spike — try again shortly."
-      : "You've hit the free limit for the AI formula tools this hour — upgrade for unlimited, or try again later.";
+      : "You've hit the free limit for the AI formula tools today — upgrade for unlimited, or try again tomorrow.";
     const res = NextResponse.json({ error: message }, { status: 429 });
     if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return res;

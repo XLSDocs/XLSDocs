@@ -6,7 +6,11 @@ import { checkSubscriber } from '@/lib/subscription';
 // from a leaked/shared cookie or a KV outage forcing fail-open, while being
 // effectively unlimited for any real single user of this tool.
 const SUBSCRIBER_LIMIT = 300;
-const FREE_LIMIT = 15;
+// Daily cap, not hourly — same reasoning as Ask AI: 15/hour was 360/day in
+// practice, high enough that it removed any real reason to subscribe. An
+// hourly reset is also trivially dodged by just waiting; a daily one isn't.
+const FREE_LIMIT = 5;
+const DAY_SECONDS = 60 * 60 * 24;
 
 const SYSTEM_PROMPT = `You are an Excel formula expert. The user will describe, in plain English, a spreadsheet task. Respond with the exact Excel formula that accomplishes it, plus a breakdown of each part.
 
@@ -34,12 +38,12 @@ export async function POST(req: NextRequest) {
   const subscriber = await checkSubscriber(req);
   const { allowed } = subscriber.isSubscriber
     ? await checkRateLimit(req, 'formula-builder-sub', SUBSCRIBER_LIMIT, subscriber.customerId)
-    : await checkRateLimit(req, 'formula-builder', FREE_LIMIT);
+    : await checkRateLimit(req, 'formula-builder', FREE_LIMIT, undefined, DAY_SECONDS);
 
   if (!allowed) {
     const message = subscriber.isSubscriber
       ? "You've hit an unusually high usage spike — try again shortly."
-      : "You've hit the free limit for the Formula Builder this hour — upgrade for unlimited, or try again later.";
+      : "You've hit the free limit for the Formula Builder today — upgrade for unlimited, or try again tomorrow.";
     const res = NextResponse.json({ error: message }, { status: 429 });
     if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
     return res;
