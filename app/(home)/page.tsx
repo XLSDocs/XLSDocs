@@ -5,6 +5,7 @@ import { Categories } from '@/components/home/categories';
 import { AskClaudeShowcase } from '@/components/home/ask-claude-showcase';
 import { QuickFixShowcase } from '@/components/home/quick-fix-showcase';
 import { TryItShowcase } from '@/components/home/try-it-showcase';
+import { LlmsShowcase } from '@/components/home/llms-showcase';
 import { getFunctionCatalog } from '@/lib/source';
 import type { Metadata } from 'next';
 
@@ -26,6 +27,7 @@ export default function HomePage() {
       <Hero />
       <FormulaTicker functionCount={functionCount} categoryCount={categories.length} />
       <Categories categories={categories} />
+      <LlmsShowcase />
       <CodeWriterSection />
       <TryItShowcase />
       <AskClaudeShowcase />
