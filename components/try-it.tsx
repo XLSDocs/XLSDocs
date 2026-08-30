@@ -25,6 +25,15 @@ interface TryItProps {
     cols: string[];
     rowCount: number;
     values: Record<string, string>;
+    /** Maps the raw input value to the cell/range reference to highlight —
+     *  for a function whose argument isn't itself a reference (OFFSET's
+     *  numeric row offset, say). Plain data, not a function, since this
+     *  is a Client Component and MDX bodies are Server Components — same
+     *  reason `label` can't be a function either. Falls back to
+     *  highlighting `value` directly when omitted, which covers the
+     *  common case (ROW, COLUMN, ROWS, COLUMNS all take a real reference
+     *  as their argument already). */
+    highlightMap?: Record<string, string>;
   };
 }
 
@@ -65,7 +74,12 @@ export function TryIt({
       <div className="p-4 flex flex-col gap-2">
         {grid && (
           <div className="mb-1">
-            <MiniGrid cols={grid.cols} rowCount={grid.rowCount} values={grid.values} highlight={value} />
+            <MiniGrid
+              cols={grid.cols}
+              rowCount={grid.rowCount}
+              values={grid.values}
+              highlight={grid.highlightMap ? (grid.highlightMap[value.trim().toLowerCase()] ?? '') : value}
+            />
           </div>
         )}
         <div className="grid grid-cols-[110px_1fr] items-center gap-2">

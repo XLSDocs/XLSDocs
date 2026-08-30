@@ -63,6 +63,11 @@ a number that goes stale as columns are added or removed.
   defaultValue="A1:C1"
   label={'Live preview — =COLUMNS({value})'}
   fieldLabel="array"
+  grid={{
+    cols: ['A', 'B', 'C', 'D', 'E'],
+    rowCount: 5,
+    values: { a1: 'Q1', b1: 'Q2', c1: 'Q3', d1: 'Q4', e1: 'Total', b2: 'Jan', c2: 'Feb', d2: 'Mar' },
+  }}
 />
 
 ## Common errors

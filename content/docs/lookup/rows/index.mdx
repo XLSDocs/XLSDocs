@@ -65,6 +65,15 @@ stale as data is added.
   defaultValue="A1:A5"
   label={'Live preview — =ROWS({value})'}
   fieldLabel="array"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 10,
+    values: {
+      a1: 'Jan', a2: 'Feb', a3: 'Mar', a4: 'Apr', a5: 'May',
+      a6: 'Jun', a7: 'Jul', a8: 'Aug', a9: 'Sep', a10: 'Oct',
+      b2: '20', b3: '25', b4: '30', c1: 'Total',
+    },
+  }}
 />
 
 ## Common errors
