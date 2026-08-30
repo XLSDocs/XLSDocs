@@ -1,8 +1,8 @@
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { MDXComponents } from 'mdx/types';
 import type { ComponentProps } from 'react';
+import { FlaskConical } from 'lucide-react';
 import { TryIt } from './try-it';
-import { TryItHeading } from './try-it-heading';
 import { ExcelCode } from './excel-code';
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
@@ -22,8 +22,26 @@ export function getMDXComponents(components?: MDXComponents) {
         <defaultMdxComponents.pre {...props} />
       </CodeWrapToggle>
     ),
+    // The "## Try it" heading stays literal markdown (not a custom
+    // component) on purpose — fumadocs' remark-heading plugin builds the
+    // right-side "On this page" TOC by scanning the raw MDX source for
+    // real heading AST nodes, which a JSX component call never produces.
+    // A custom TryItHeading component looked identical on the page but
+    // silently vanished from the TOC. Overriding h2 here instead adds the
+    // icon only when its id is "try-it", while every other heading (and
+    // the TOC) passes through fumadocs' own renderer unchanged.
+    h2: (props: ComponentProps<'h2'>) =>
+      props.id === 'try-it' ? (
+        <defaultMdxComponents.h2 {...props}>
+          <span className="inline-flex items-center gap-1.5">
+            <FlaskConical className="size-[0.85em] text-fd-primary" />
+            {props.children}
+          </span>
+        </defaultMdxComponents.h2>
+      ) : (
+        <defaultMdxComponents.h2 {...props} />
+      ),
     TryIt,
-    TryItHeading,
     ExcelCode,
     Tabs,
     Tab,
