@@ -70,7 +70,7 @@ lookups (`VLOOKUP`, `XLOOKUP`, `INDEX`/`MATCH`) and calculations
 <TryIt
   data={{ e101: 'Engineering', e102: 'Sales', e103: 'Finance' }}
   defaultValue="E101"
-  label={'Live preview — IFERROR(VLOOKUP("{value}", Employees!A:B, 2, FALSE), "Not found")'}
+  label={'Live preview — =IFERROR(VLOOKUP("{value}", Employees!A:B, 2, FALSE), "Not found")'}
   fieldLabel="employee_id"
   errorValue="Not found"
 />

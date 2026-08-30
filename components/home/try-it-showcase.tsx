@@ -27,7 +27,7 @@ export function TryItShowcase() {
           <TryIt
             data={{ a5: '5', b10: '10', c1: '1', d8: '8' }}
             defaultValue="A5"
-            label={'Live preview — ROW({value})'}
+            label={'Live preview — =ROW({value})'}
             fieldLabel="reference"
             grid={{
               cols: ['A', 'B', 'C', 'D'],
