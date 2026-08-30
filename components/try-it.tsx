@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { MiniGrid } from './mini-grid';
 
 interface TryItProps {
   data: Record<string, string>;
@@ -16,6 +17,15 @@ interface TryItProps {
    *  fallback" (e.g. IFERROR) demo that fallback honestly instead of
    *  always showing the raw unwrapped error. */
   errorValue?: string;
+  /** Optional mini spreadsheet shown above the input, for functions where
+   *  seeing an actual cell/range highlighted makes the demo click (ROW,
+   *  COLUMN, OFFSET, and the like) — skipped entirely for functions where
+   *  a fake grid wouldn't add anything (most value-lookup demos). */
+  grid?: {
+    cols: string[];
+    rowCount: number;
+    values: Record<string, string>;
+  };
 }
 
 export function TryIt({
@@ -24,6 +34,7 @@ export function TryIt({
   label = 'Live preview',
   fieldLabel = 'lookup_value',
   errorValue = '#N/A',
+  grid,
 }: TryItProps) {
   const [value, setValue] = useState(defaultValue);
   const resolvedLabel = label.includes('{value}') ? label.replaceAll('{value}', value) : label;
@@ -45,6 +56,11 @@ export function TryIt({
         {resolvedLabel}
       </div>
       <div className="p-4 flex flex-col gap-2">
+        {grid && (
+          <div className="mb-1">
+            <MiniGrid cols={grid.cols} rowCount={grid.rowCount} values={grid.values} highlight={value} />
+          </div>
+        )}
         <div className="grid grid-cols-[110px_1fr] items-center gap-2">
           <span className="font-mono text-xs text-fd-primary">{fieldLabel}</span>
           <input

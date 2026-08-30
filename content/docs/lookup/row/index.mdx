@@ -66,10 +66,15 @@ regardless of which row the formula actually lives on.
 ## Try it
 
 <TryIt
-  data={{ a5: '5', b10: '10', c1: '1', d100: '100' }}
+  data={{ a5: '5', b10: '10', c1: '1', d8: '8' }}
   defaultValue="A5"
   label={'Live preview — ROW({value})'}
   fieldLabel="reference"
+  grid={{
+    cols: ['A', 'B', 'C', 'D'],
+    rowCount: 10,
+    values: { a5: 'Apple', b10: '42', c1: 'SKU', d8: '99.99' },
+  }}
 />
 
 ## Common errors
