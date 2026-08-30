@@ -45,9 +45,16 @@ export function TryIt({
   }, [value, data, errorValue]);
 
   const found = result !== errorValue;
-  const tryValues = Object.keys(data)
-    .map((k) => k.charAt(0).toUpperCase() + k.slice(1))
-    .join(', ');
+
+  // Cell/range references (e.g. "a5", "a1:c1") display fully uppercase,
+  // matching Excel's own convention — capitalizing only the first letter
+  // would leave a range like "a1:a5" as "A1:a5". Anything else (a plain
+  // word like "apple" or "west") just gets its first letter capitalized.
+  const isReference = (key: string) => /^[a-z]+\d+(:[a-z]+\d+)?$/.test(key);
+  const displayLabel = (key: string) =>
+    isReference(key) ? key.toUpperCase() : key.charAt(0).toUpperCase() + key.slice(1);
+
+  const isTryValueActive = (key: string) => value.trim().toLowerCase() === key;
 
   return (
     <div className="not-prose rounded-xl border bg-fd-card overflow-hidden my-4">
@@ -69,9 +76,23 @@ export function TryIt({
             onChange={(e) => setValue(e.target.value)}
           />
         </div>
-        <p className="pl-[118px] text-[11px] text-fd-muted-foreground">
-          Edit the field above — try {tryValues}
-        </p>
+        <div className="flex flex-wrap items-center gap-1.5 pl-[118px] text-[11px] text-fd-muted-foreground">
+          <span>Try:</span>
+          {Object.keys(data).map((key) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setValue(displayLabel(key))}
+              className={`rounded border px-1.5 py-0.5 font-mono text-[10px] transition-colors ${
+                isTryValueActive(key)
+                  ? 'border-fd-primary/50 bg-fd-primary/15 text-fd-primary'
+                  : 'border-fd-border bg-fd-muted text-fd-muted-foreground hover:border-fd-primary/40 hover:text-fd-primary'
+              }`}
+            >
+              {displayLabel(key)}
+            </button>
+          ))}
+        </div>
         <div className="grid grid-cols-[110px_1fr] items-center gap-2 border-t pt-2.5 mt-1">
           <span className="font-mono text-[10px] uppercase tracking-wide text-fd-muted-foreground">
             Result
