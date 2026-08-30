@@ -27,11 +27,11 @@ export default function HomePage() {
       <Hero />
       <FormulaTicker functionCount={functionCount} categoryCount={categories.length} />
       <Categories categories={categories} />
-      <LlmsShowcase />
       <CodeWriterSection />
       <TryItShowcase />
       <AskClaudeShowcase />
       <QuickFixShowcase />
+      <LlmsShowcase />
     </div>
   );
 }
