@@ -81,12 +81,17 @@ export function ExcelCode({ children }: { children: string }) {
   const showLineNumbers = lines.length > 1;
 
   return (
-    <CodeWrapToggle>
+    <CodeWrapToggle snippet={children}>
       <CodeBlock>
         <Pre>
           <code className="excel-code font-mono text-[13px] leading-relaxed">
             {lines.map((line, i) => (
-              <div key={i} className={`px-4 ${showLineNumbers ? 'flex gap-4' : ''}`}>
+              // First line only gets extra right padding — it's the one
+              // line the absolutely-positioned toolbar icons (copy, wrap
+              // toggle, ask AI) actually overlap, since they're pinned to
+              // the block's top-right corner. Without it, a long enough
+              // single-line formula runs text straight under the icons.
+              <div key={i} className={`px-4 ${i === 0 ? 'pr-28' : ''} ${showLineNumbers ? 'flex gap-4' : ''}`}>
                 {showLineNumbers && (
                   <span className="w-4 shrink-0 text-right text-fd-muted-foreground/60 select-none">
                     {i + 1}

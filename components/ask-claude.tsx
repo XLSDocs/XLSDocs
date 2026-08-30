@@ -5,6 +5,7 @@ import { X, Sparkles, Send } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { CodeBlock, Pre } from 'fumadocs-ui/components/codeblock';
 import { AI_TOOLS_FREE_LIMIT_MESSAGE } from '@/lib/ai-rate-limit';
+import { ASK_AI_SNIPPET_EVENT } from '@/lib/ask-ai-events';
 
 
 function formatMarkdown(text: string) {
@@ -175,6 +176,22 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, loading]);
+
+  // A formula box's "Ask AI about this" button (see code-wrap-toggle.tsx)
+  // fires this instead of calling send() directly — pre-fills the input so
+  // the free-tier/rate-limited request only actually goes out once the
+  // user reviews it and hits send themselves, not the instant the icon is
+  // clicked.
+  useEffect(() => {
+    function handleSnippetRequest(e: Event) {
+      const snippet = (e as CustomEvent<string>).detail;
+      if (!snippet) return;
+      setInput(`Explain this formula: ${snippet.replace(/\s+/g, ' ').trim()}`);
+      setOpen(true);
+    }
+    window.addEventListener(ASK_AI_SNIPPET_EVENT, handleSnippetRequest);
+    return () => window.removeEventListener(ASK_AI_SNIPPET_EVENT, handleSnippetRequest);
+  }, []);
 
   async function send(text: string) {
     if (!text.trim() || loading) return;

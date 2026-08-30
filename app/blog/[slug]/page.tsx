@@ -5,6 +5,7 @@ import { getMDXComponents } from '@/components/mdx';
 import { PostNav } from '@/components/blog/post-nav';
 import { PostToc } from '@/components/blog/post-toc';
 import { Faq, type FaqItem } from '@/components/faq';
+import { AskClaude } from '@/components/ask-claude';
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -54,6 +55,9 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
           </span>
           <h1>{post.title}</h1>
           <p className="lead text-fd-muted-foreground">{post.description}</p>
+          <div className="not-prose mb-6">
+            <AskClaude pageTitle={post.title} />
+          </div>
           <MDX components={getMDXComponents()} />
           {faqs && faqs.length > 0 && (
             <>
