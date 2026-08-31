@@ -73,6 +73,45 @@ next February.
   rate rather than an error.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ conservative: '-16.08%', base: '14.19%', aggressive: '47.93%' }}
+  defaultValue="base"
+  label={'Live preview — =XIRR({value} scenario cash flows, dates)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    rowsByInput: {
+      conservative: {
+        a1: 'Date', b1: 'Cash Flow',
+        a2: '3/1/26', b2: '-$50,000',
+        a3: '7/15/26', b3: '$16,000',
+        a4: '2/1/27', b4: '$28,000',
+      },
+      base: {
+        a1: 'Date', b1: 'Cash Flow',
+        a2: '3/1/26', b2: '-$50,000',
+        a3: '7/15/26', b3: '$20,000',
+        a4: '2/1/27', b4: '$35,000',
+      },
+      aggressive: {
+        a1: 'Date', b1: 'Cash Flow',
+        a2: '3/1/26', b2: '-$50,000',
+        a3: '7/15/26', b3: '$24,000',
+        a4: '2/1/27', b4: '$42,000',
+      },
+    },
+  }}
+/>
+
+Same $50,000 investment and the same two irregular dates in every
+scenario — only the return amounts change. The annualized rate
+swings from negative to nearly 50% across these three cases, even
+though the calendar dates never move, which is exactly the sensitivity
+XIRR is built to surface.
+
 ## Common errors
 
 ### #NUM! — no sign change in values

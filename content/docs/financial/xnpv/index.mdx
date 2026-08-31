@@ -70,6 +70,45 @@ period schedule.
   investment outside the function" step the way plain NPV requires.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '5': '$3,098.03', '8': '$2,033.93', '12': '$695.91' }}
+  defaultValue="8"
+  label={'Live preview — =XNPV({value}%, cash flows, dates)'}
+  fieldLabel="rate %"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 4,
+    rowsByInput: {
+      '5': {
+        a1: 'Date', b1: 'Cash Flow', c1: 'Present Value',
+        a2: '3/1/26', b2: '-$50,000', c2: '-$50,000.00',
+        a3: '7/15/26', b3: '$20,000', c3: '$19,639.70',
+        a4: '2/1/27', b4: '$35,000', c4: '$33,458.33',
+      },
+      '8': {
+        a1: 'Date', b1: 'Cash Flow', c1: 'Present Value',
+        a2: '3/1/26', b2: '-$50,000', c2: '-$50,000.00',
+        a3: '7/15/26', b3: '$20,000', c3: '$19,434.63',
+        a4: '2/1/27', b4: '$35,000', c4: '$32,599.30',
+      },
+      '12': {
+        a1: 'Date', b1: 'Cash Flow', c1: 'Present Value',
+        a2: '3/1/26', b2: '-$50,000', c2: '-$50,000.00',
+        a3: '7/15/26', b3: '$20,000', c3: '$19,173.05',
+        a4: '2/1/27', b4: '$35,000', c4: '$31,522.86',
+      },
+    },
+  }}
+/>
+
+The first row never discounts — it's on the valuation date itself, so
+its present value always equals its face amount, exactly as the
+callout above describes. The other two rows use the actual day count
+(136 days, then 337 days) rather than a clean "period 1, period 2,"
+which is the entire reason XNPV exists instead of plain NPV here.
+
 ## Common errors
 
 ### Mismatched values and dates sizes

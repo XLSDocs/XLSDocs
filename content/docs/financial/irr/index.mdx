@@ -66,6 +66,48 @@ genuinely vary period to period — the same shape NPV expects.
   directly *inside* `values` — the opposite convention.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ conservative: '-7.89%', base: '2.83%', aggressive: '14.30%' }}
+  defaultValue="base"
+  label={'Live preview — =IRR({value} scenario cash flows)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 5,
+    rowsByInput: {
+      conservative: {
+        a1: 'Year', b1: 'Cash Flow',
+        a2: '0', b2: '-$50,000',
+        a3: '1', b3: '$12,000',
+        a4: '2', b4: '$14,000',
+        a5: '3', b5: '$16,000',
+      },
+      base: {
+        a1: 'Year', b1: 'Cash Flow',
+        a2: '0', b2: '-$50,000',
+        a3: '1', b3: '$15,000',
+        a4: '2', b4: '$18,000',
+        a5: '3', b5: '$20,000',
+      },
+      aggressive: {
+        a1: 'Year', b1: 'Cash Flow',
+        a2: '0', b2: '-$50,000',
+        a3: '1', b3: '$18,000',
+        a4: '2', b4: '$22,000',
+        a5: '3', b5: '$26,000',
+      },
+    },
+  }}
+/>
+
+Same $50,000 investment in every scenario — only the return amounts
+change. The conservative case doesn't even recover the investment's
+time value (a negative IRR), while the aggressive case comfortably
+beats it, which is exactly what IRR is for: turning three uneven
+future cash flows into one comparable number.
+
 ## Common errors
 
 ### #NUM! — no sign change in values

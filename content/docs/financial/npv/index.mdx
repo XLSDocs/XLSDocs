@@ -74,6 +74,46 @@ negative in some periods).
   a cost that actually happens now.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '5': '-$2,111.00', '10': '-$6,461.31', '15': '-$10,195.61' }}
+  defaultValue="10"
+  label={'Live preview — =NPV({value}%, 15000, 18000, 20000) - 50000'}
+  fieldLabel="rate %"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 4,
+    rowsByInput: {
+      '5': {
+        a1: 'Year', b1: 'Cash Flow', c1: 'Present Value',
+        a2: '1', b2: '$15,000', c2: '$14,285.71',
+        a3: '2', b3: '$18,000', c3: '$16,326.53',
+        a4: '3', b4: '$20,000', c4: '$17,276.75',
+      },
+      '10': {
+        a1: 'Year', b1: 'Cash Flow', c1: 'Present Value',
+        a2: '1', b2: '$15,000', c2: '$13,636.36',
+        a3: '2', b3: '$18,000', c3: '$14,876.03',
+        a4: '3', b4: '$20,000', c4: '$15,026.30',
+      },
+      '15': {
+        a1: 'Year', b1: 'Cash Flow', c1: 'Present Value',
+        a2: '1', b2: '$15,000', c2: '$13,043.48',
+        a3: '2', b3: '$18,000', c3: '$13,610.59',
+        a4: '3', b4: '$20,000', c4: '$13,150.32',
+      },
+    },
+  }}
+/>
+
+The Present Value column adds up to the raw NPV result — the number
+before the $50,000 investment gets subtracted. Even at a relatively
+low 5% discount rate, this project is still worth less than it costs:
+the undiscounted total ($53,000) only barely clears the $50,000
+investment, so once time value is factored in at all, it comes up
+short.
+
 ## Common errors
 
 ### Result looks too optimistic — the timing mistake
