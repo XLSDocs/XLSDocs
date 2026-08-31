@@ -75,10 +75,22 @@ or text value in the counted field is excluded from the total.
 ## Try it
 
 <TryIt
-  data={{ west: '5', east: '3', north: '2', south: '4' }}
+  data={{ west: '3', east: '2', north: '2', south: '1' }}
   defaultValue="West"
   label={'Live preview — =DCOUNT(Sales, "Amount", Criteria: Region="{value}")'}
   fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
 />
 
 ## Common errors

@@ -84,6 +84,17 @@ name plus a date).
   defaultValue="10248"
   label={'Live preview — =DGET(Sales, "Amount", Criteria: OrderID="{value}")'}
   fieldLabel="OrderID"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'OrderID', b1: 'Amount',
+      a2: '10248', b2: '$120.00',
+      a3: '10249', b3: '$85.50',
+      a4: '10250', b4: '$310.00',
+    },
+    highlightMap: { '10248': 'A2:B2', '10249': 'A3:B3', '10250': 'A4:B4' },
+  }}
 />
 
 ## Common errors
