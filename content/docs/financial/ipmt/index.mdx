@@ -88,6 +88,32 @@ the last carries the least.
   independent amounts.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '1': '$833.33', '180': '$567.81', '360': '$4.45' }}
+  defaultValue="1"
+  label={'Live preview — =IPMT(5%/12, {value}, 360, 200000)'}
+  fieldLabel="per"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 4,
+    values: {
+      a1: 'Period', b1: 'Interest', c1: 'Principal',
+      a2: '1', b2: '$833.33', c2: '$240.31',
+      a3: '180', b3: '$567.81', c3: '$505.84',
+      a4: '360', b4: '$4.45', c4: '$1,069.19',
+    },
+    highlightMap: { '1': 'A2:C2', '180': 'A3:C3', '360': 'A4:C4' },
+  }}
+/>
+
+`per` is a direct row index into the loan's amortization schedule —
+the grid highlights that exact row. Notice how little of payment 360
+is interest ($4.45) compared to payment 1 ($833.33), even though the
+total payment amount is identical every month; that shift is what a
+declining balance actually does to the interest/principal split.
+
 ## Common errors
 
 ### #NUM! — per is outside the valid range
