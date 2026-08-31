@@ -72,6 +72,15 @@ or text value in the counted field is excluded from the total.
   here?" rather than "how many records exist here at all?"
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ west: '5', east: '3', north: '2', south: '4' }}
+  defaultValue="West"
+  label={'Live preview — =DCOUNT(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+/>
+
 ## Common errors
 
 ### The count is lower than expected

@@ -77,6 +77,15 @@ exactly one match, most real DGET criteria ranges use a single row of
 AND conditions specific enough to isolate one record (an ID, or a
 name plus a date).
 
+## Try it
+
+<TryIt
+  data={{ '10248': '$120.00', '10249': '$85.50', '10250': '$310.00' }}
+  defaultValue="10248"
+  label={'Live preview — =DGET(Sales, "Amount", Criteria: OrderID="{value}")'}
+  fieldLabel="OrderID"
+/>
+
 ## Common errors
 
 ### #VALUE! — no record matches

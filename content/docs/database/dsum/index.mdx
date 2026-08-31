@@ -83,6 +83,15 @@ so expressing "Region is East OR Region is West, AND Amount > 1000"
 needs either two SUMIFS calls added together or an array formula.
 DSUM expresses it as two criteria rows.
 
+## Try it
+
+<TryIt
+  data={{ west: '$12,400', east: '$9,800', north: '$5,300', south: '$7,150' }}
+  defaultValue="West"
+  label={'Live preview — =DSUM(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+/>
+
 ## Common errors
 
 ### The result is 0, but matching rows clearly exist
