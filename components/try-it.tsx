@@ -24,7 +24,11 @@ interface TryItProps {
   grid?: {
     cols: string[];
     rowCount: number;
-    values: Record<string, string>;
+    /** Static grid content, used as-is (optionally with `highlightMap`
+     *  picking out which cells to highlight) — the common case for
+     *  functions whose argument is literally a reference (ROW, COLUMN,
+     *  OFFSET, DSUM's criteria value). Ignored when `rowsByInput` is set. */
+    values?: Record<string, string>;
     /** Maps the raw input value to the cell/range reference to highlight —
      *  for a function whose argument isn't itself a reference (OFFSET's
      *  numeric row offset, say). Plain data, not a function, since this
@@ -34,6 +38,14 @@ interface TryItProps {
      *  common case (ROW, COLUMN, ROWS, COLUMNS all take a real reference
      *  as their argument already). */
     highlightMap?: Record<string, string>;
+    /** For functions with no natural "which cell" story (PMT, SLN) but a
+     *  real "what does this actually look like" one instead — swaps the
+     *  grid's entire content per selected example (e.g. the first few
+     *  months of an amortization schedule, which differs by loan term).
+     *  Every possible input needs its own precomputed table here since,
+     *  again, this can't be a function — keyed the same way as `data`.
+     *  No highlighting in this mode; the whole table is the point. */
+    rowsByInput?: Record<string, Record<string, string>>;
   };
 }
 
@@ -77,8 +89,14 @@ export function TryIt({
             <MiniGrid
               cols={grid.cols}
               rowCount={grid.rowCount}
-              values={grid.values}
-              highlight={grid.highlightMap ? (grid.highlightMap[value.trim().toLowerCase()] ?? '') : value}
+              values={grid.rowsByInput ? (grid.rowsByInput[value.trim().toLowerCase()] ?? {}) : (grid.values ?? {})}
+              highlight={
+                grid.rowsByInput
+                  ? ''
+                  : grid.highlightMap
+                    ? (grid.highlightMap[value.trim().toLowerCase()] ?? '')
+                    : value
+              }
             />
           </div>
         )}

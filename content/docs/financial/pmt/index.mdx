@@ -92,7 +92,38 @@ matching `rate`/`nper` to the same period length.
   defaultValue="30"
   label={'Live preview — =-PMT(5%/12, {value}*12, 200000)'}
   fieldLabel="years"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 4,
+    rowsByInput: {
+      '15': {
+        a1: 'Month', b1: 'Interest', c1: 'Principal',
+        a2: '1', b2: '$833.33', c2: '$748.25',
+        a3: '2', b3: '$830.22', c3: '$751.37',
+        a4: '3', b4: '$827.08', c4: '$754.50',
+      },
+      '20': {
+        a1: 'Month', b1: 'Interest', c1: 'Principal',
+        a2: '1', b2: '$833.33', c2: '$486.58',
+        a3: '2', b3: '$831.31', c3: '$488.61',
+        a4: '3', b4: '$829.27', c4: '$490.64',
+      },
+      '30': {
+        a1: 'Month', b1: 'Interest', c1: 'Principal',
+        a2: '1', b2: '$833.33', c2: '$240.31',
+        a3: '2', b3: '$832.33', c3: '$241.31',
+        a4: '3', b4: '$831.33', c4: '$242.32',
+      },
+    },
+  }}
 />
+
+The grid shows the first 3 months of whichever term is selected —
+notice the interest portion (row-for-row) is almost identical across
+all three terms, since it only depends on the remaining balance, but
+the principal portion is dramatically smaller on the 30-year loan
+than the 15-year one. That gap is the entire reason a longer loan
+costs so much more in total interest.
 
 ## Common errors
 

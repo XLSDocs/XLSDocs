@@ -78,7 +78,33 @@ periods and taper off later.
   defaultValue="10"
   label={'Live preview — =SLN(50000, 5000, {value})'}
   fieldLabel="life"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 5,
+    rowsByInput: {
+      '5': {
+        a1: 'Year', b1: 'Book Value',
+        a2: '0', b2: '$50,000', a3: '1', b3: '$41,000',
+        a4: '2', b4: '$32,000', a5: '3', b5: '$23,000',
+      },
+      '10': {
+        a1: 'Year', b1: 'Book Value',
+        a2: '0', b2: '$50,000', a3: '1', b3: '$45,500',
+        a4: '2', b4: '$41,000', a5: '3', b5: '$36,500',
+      },
+      '20': {
+        a1: 'Year', b1: 'Book Value',
+        a2: '0', b2: '$50,000', a3: '1', b3: '$47,750',
+        a4: '2', b4: '$45,500', a5: '3', b5: '$43,250',
+      },
+    },
+  }}
 />
+
+The grid shows the asset's book value declining by the same fixed
+amount every year — the defining trait of straight-line depreciation,
+as opposed to a declining-balance method where the drop would shrink
+each year instead of staying constant.
 
 ## Common errors
 
