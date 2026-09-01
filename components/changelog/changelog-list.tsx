@@ -7,8 +7,18 @@ const TAG_STYLES: Record<ChangelogTag, string> = {
   Milestone: 'border-fd-border text-fd-muted-foreground',
 };
 
+// entry.date is a plain 'YYYY-MM-DD' string with no time-of-day meaning —
+// `new Date(date)` parses it as UTC midnight, so formatting it back out in
+// the viewer's local timezone silently shows the previous day for anyone
+// west of UTC. Forcing the format itself to UTC keeps the displayed date
+// identical to the literal string, regardless of viewer timezone.
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
 }
 
 export function ChangelogList({ entries }: { entries: ChangelogEntry[] }) {

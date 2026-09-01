@@ -12,6 +12,90 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-01',
+    title: 'A Playground page — every interactive example in one place',
+    description:
+      "A new page collects 18 of the site's best Try it examples in one browsable hub, grouped by category, each one naming the exact thing to change and what to watch happen — not just a generic \"try it live\" label.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-09-01',
+    title: 'Interactive Try it examples for every Statistical function',
+    description:
+      "RANK, PERCENTILE, MODE, STDEV, VAR, and their modern .EQ/.AVG/.INC/.EXC/.SNGL/.MULT/.S/.P variants — all 15 Statistical functions now have a live, editable example, including one that reproduces PERCENTILE.EXC's own #NUM! boundary case on demand.",
+    tags: ['Feature', 'Milestone'],
+  },
+  {
+    date: '2026-09-01',
+    title: 'Interactive Try it examples for every Info function',
+    description:
+      'ISBLANK, ISERROR, ISFORMULA, ISLOGICAL, ISNA, ISNUMBER, ISTEXT, and NA all have a live example now — including one that shows NA() breaking a SUM while a real 0 or blank cell doesn\'t.',
+    tags: ['Feature', 'Milestone'],
+  },
+  {
+    date: '2026-08-31',
+    title: 'Interactive examples complete the Financial category',
+    description:
+      'IPMT, PPMT, NPV, IRR, XNPV, and XIRR now have live Try it widgets — some showing an actual amortization row, others a full cash-flow-to-present-value breakdown — bringing all 12 Financial functions to a working, editable example.',
+    tags: ['Feature', 'Milestone'],
+  },
+  {
+    date: '2026-08-31',
+    title: 'A real amortization schedule on PMT and SLN, and matching rows on the Database functions',
+    description:
+      "PMT and SLN's Try it examples now show an actual multi-month schedule that changes with the selected loan term or asset life, and DSUM/DCOUNT/DGET highlight exactly which rows of a small dataset match the chosen criteria.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-30',
+    title: 'A sparkle icon that pre-fills Ask AI with the formula on screen',
+    description:
+      "Every Excel formula code block now has a small icon that opens Ask AI with a starter question about that exact formula already typed in, so asking about a formula doesn't mean retyping it first.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-30',
+    title: 'Try it grids for ROWS, COLUMNS, and OFFSET',
+    description:
+      "The live spreadsheet grid that debuted on ROW now covers its closest relatives too, including OFFSET's numeric row-shift mapped onto a highlighted cell in the grid.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-29',
+    title: 'A live spreadsheet grid, and clickable example buttons, on Try it widgets',
+    description:
+      "ROW's example now shows an actual mini spreadsheet with the referenced cell highlighted live, and every Try it widget across the site got clickable example buttons instead of requiring the value to be typed by hand.",
+    tags: ['Feature', 'Milestone'],
+  },
+  {
+    date: '2026-08-29',
+    title: 'The last 7 Lookup functions get an interactive example',
+    description:
+      'ROW, ROWS, COLUMN, COLUMNS, INDIRECT, LOOKUP, and OFFSET now have a Try it widget, completing all 14 Lookup functions.',
+    tags: ['Milestone'],
+  },
+  {
+    date: '2026-08-29',
+    title: 'Terms of Service, About, and Contact pages',
+    description:
+      "Three pages that didn't exist before — what xlsdocs.com is and how it stays accurate, the terms governing use of the site, and a real way to reach out with a question or bug report.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-08-29',
+    title: 'A redesigned footer, and a sticky table of contents on Terms and Privacy',
+    description:
+      "The footer's 11 links are now grouped into Product, Resources, and Company columns instead of one flat wrapping row, and Terms/Privacy both got a Clerk-style sticky \"On this page\" sidebar for jumping between sections.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-08-29',
+    title: 'This site talks to AI agents directly',
+    description:
+      'A new homepage section explains /llms.txt and /llms-full.txt — every page on the site is published as clean, structured Markdown that AI tools can fetch directly, not just HTML for humans to read.',
+    tags: ['Feature'],
+  },
+  {
     date: '2026-08-29',
     title: 'REGEXTEST, REGEXEXTRACT, and REGEXREPLACE',
     description:
