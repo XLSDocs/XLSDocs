@@ -60,6 +60,21 @@ swallowed by a "not found" fallback meant only for missing matches.
   twice, and needs no separate ISNA call.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'missing lookup': 'TRUE', 'other error': 'FALSE', 'normal number': 'FALSE' }}
+  defaultValue="missing lookup"
+  label={'Live preview — =ISNA({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+"Other error" (standing in for something like `#REF!` or `#DIV/0!`)
+comes back `FALSE` here — the opposite of what ISERROR would return
+for the same input. That gap is the entire reason ISNA exists
+alongside ISERROR.
+
 ## Common errors
 
 ### Using ISNA when IFNA would be simpler

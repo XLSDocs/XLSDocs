@@ -61,6 +61,20 @@ now does in one call, without evaluating `formula` twice.
   flag, not a substitute value.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'divide by zero': 'TRUE', 'missing lookup': 'TRUE', 'normal number': 'FALSE' }}
+  defaultValue="normal number"
+  label={'Live preview — =ISERROR({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+Both error scenarios return `TRUE` — ISERROR doesn't distinguish
+`#DIV/0!` from a missing lookup's `#N/A`, unlike ISNA, which only
+catches the second one.
+
 ## Common errors
 
 ### Using ISERROR when IFERROR would be simpler

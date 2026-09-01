@@ -60,6 +60,21 @@ though they're often treated as equivalent elsewhere in Excel.
   values that look like booleans often arrive as plain text instead.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'real boolean': 'TRUE', 'text "true"': 'FALSE', 'number 1': 'FALSE' }}
+  defaultValue="real boolean"
+  label={'Live preview — =ISLOGICAL({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+Only a genuine logical value passes — text that merely reads "TRUE"
+and the number `1` (often used to represent true/false in
+calculations) both fail, even though they're treated as equivalent
+elsewhere in Excel.
+
 ## Common errors
 
 ### Text that looks like a boolean returns FALSE

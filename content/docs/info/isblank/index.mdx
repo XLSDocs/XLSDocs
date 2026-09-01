@@ -59,6 +59,20 @@ as blank.
   instead if the goal is "does this cell display as empty."
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'empty cell': 'TRUE', 'formula returning blank': 'FALSE', 'has a value': 'FALSE' }}
+  defaultValue="empty cell"
+  label={'Live preview — =ISBLANK({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+A cell with a formula that returns "" still comes back `FALSE` —
+the exact distinction the callout above warns about. Only a cell
+that's never held a value or formula at all returns `TRUE`.
+
 ## Common errors
 
 ### Expecting TRUE for a formula that displays blank

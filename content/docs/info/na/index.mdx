@@ -53,6 +53,19 @@ references it.
   they need to tolerate a deliberate placeholder without breaking.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'na()': '#N/A', '0': '20', 'blank': '20' }}
+  defaultValue="na()"
+  label={'Live preview — =SUM(10, {value}, 10)'}
+  fieldLabel="middle cell"
+/>
+
+`NA()` breaks the whole SUM, while a real `0` or a blank cell both
+total normally — the exact propagation behavior the callout above
+describes, made visible instead of just described.
+
 ## Common errors
 
 ### A downstream SUM or AVERAGE breaks

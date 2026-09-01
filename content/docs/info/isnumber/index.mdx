@@ -60,6 +60,20 @@ contain that substring" pattern).
   number first if needed.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'a number': 'TRUE', 'text-formatted number': 'FALSE', 'plain text': 'FALSE' }}
+  defaultValue="a number"
+  label={'Live preview — =ISNUMBER({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+A text-formatted number looks identical to a real one on the sheet,
+but ISNUMBER sees the underlying stored type — it returns `FALSE`
+right alongside plain text, not `TRUE`.
+
 ## Common errors
 
 ### FALSE for a text-formatted number

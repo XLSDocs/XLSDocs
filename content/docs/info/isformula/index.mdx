@@ -58,6 +58,20 @@ accidentally overwritten with a hardcoded number.
   to any single cell.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'has a formula': 'TRUE', 'typed value': 'FALSE', 'empty cell': 'FALSE' }}
+  defaultValue="typed value"
+  label={'Live preview — =ISFORMULA({value})'}
+  fieldLabel="cell"
+  errorValue="(try one of the examples below)"
+/>
+
+Only the formula cell comes back `TRUE` — a typed-in value and an
+empty cell both read `FALSE`, since neither actually contains a
+formula for ISFORMULA to detect.
+
 ## Common errors
 
 ### #VALUE! from passing a computed value instead of a reference

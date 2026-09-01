@@ -57,6 +57,20 @@ a quick way to flag rows that need cleanup.
   number, only the display changed.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'a text value': 'TRUE', 'a number': 'FALSE', 'custom-formatted number': 'FALSE' }}
+  defaultValue="a text value"
+  label={'Live preview — =ISTEXT({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+A number custom-formatted to display like text (`"100 units"`) still
+returns `FALSE` — ISTEXT only cares about the actual stored type, not
+how the cell displays it.
+
 ## Common errors
 
 ### Confusing display formatting with actual text
