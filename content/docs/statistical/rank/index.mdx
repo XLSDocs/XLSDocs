@@ -73,6 +73,26 @@ older name for what's now formally
   rank numbers.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '95': '1', '88': '3', '72': '5' }}
+  defaultValue="95"
+  label={'Live preview — =RANK({value}, scores)'}
+  fieldLabel="number"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    values: { a1: 'Score', a2: '95', a3: '95', a4: '88', a5: '79', a6: '72' },
+    highlightMap: { '95': 'A2:A3', '88': 'A4', '72': 'A6' },
+  }}
+/>
+
+Both 95s tie for 1st, so 88 — the next distinct value — ranks 3rd,
+not 2nd. That skipped position is the "next rank accounts for the
+tie" behavior the callout above describes, made visible instead of
+just stated.
+
 ## Common errors
 
 ### #N/A — number isn't actually in ref

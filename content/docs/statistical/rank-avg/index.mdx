@@ -73,6 +73,26 @@ only shows up when values repeat.
   usually the safer choice.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '95': '1.5', '88': '3', '72': '5' }}
+  defaultValue="95"
+  label={'Live preview — =RANK.AVG({value}, scores)'}
+  fieldLabel="number"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    values: { a1: 'Score', a2: '95', a3: '95', a4: '88', a5: '79', a6: '72' },
+    highlightMap: { '95': 'A2:A3', '88': 'A4', '72': 'A6' },
+  }}
+/>
+
+Both 95s split the difference between 1st and 2nd place, landing on
+`1.5` each — the exact decimal-rank behavior the callout above
+warns about. RANK.EQ on this same data would give both a rank of 1
+instead.
+
 ## Common errors
 
 ### #N/A — number isn't actually in ref

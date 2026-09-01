@@ -67,6 +67,29 @@ only the first one encountered.
   than naturally repeating (like categories or ratings).
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'unique values': '#N/A', 'one mode': '4', 'tied modes': '3' }}
+  defaultValue="one mode"
+  label={'Live preview — =MODE({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'unique values': { a1: 'Value', a2: '1', a3: '2', a4: '3', a5: '4', a6: '5' },
+      'one mode': { a1: 'Value', a2: '4', a3: '4', a4: '7', a5: '9', a6: '12' },
+      'tied modes': { a1: 'Value', a2: '3', a3: '3', a4: '8', a5: '8', a6: '15' },
+    },
+  }}
+/>
+
+The "tied modes" dataset has two values (3 and 8) each appearing
+twice — plain MODE only reports `3`, the first one it encountered.
+[MODE.MULT](/docs/statistical/mode-mult) is the function that would
+return both.
+
 ## Common errors
 
 ### #N/A — no value repeats

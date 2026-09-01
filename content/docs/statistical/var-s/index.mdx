@@ -65,6 +65,28 @@ the more directly interpretable number for reporting.
   formulas using plain VAR don't need to be changed.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'tight cluster': '2.50', 'typical spread': '74.50', 'wide spread': '1632.50' }}
+  defaultValue="typical spread"
+  label={'Live preview — =VAR.S({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'tight cluster': { a1: 'Value', a2: '48', a3: '50', a4: '49', a5: '51', a6: '52' },
+      'typical spread': { a1: 'Value', a2: '40', a3: '55', a4: '48', a5: '62', a6: '45' },
+      'wide spread': { a1: 'Value', a2: '10', a3: '80', a4: '45', a5: '5', a6: '95' },
+    },
+  }}
+/>
+
+Same three datasets as VAR's examples, and identical results — the
+`.S` suffix documents the sample assumption in the name, without
+changing a single computed number.
+
 ## Common errors
 
 ### #DIV/0! — fewer than two numeric values

@@ -63,6 +63,29 @@ relationship, just in squared units. VAR.P replaced the older
   range, use `VAR.S` instead.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'tight cluster': '2.00', 'typical spread': '59.60', 'wide spread': '1306.00' }}
+  defaultValue="typical spread"
+  label={'Live preview — =VAR.P({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'tight cluster': { a1: 'Value', a2: '48', a3: '50', a4: '49', a5: '51', a6: '52' },
+      'typical spread': { a1: 'Value', a2: '40', a3: '55', a4: '48', a5: '62', a6: '45' },
+      'wide spread': { a1: 'Value', a2: '10', a3: '80', a4: '45', a5: '5', a6: '95' },
+    },
+  }}
+/>
+
+Same three datasets as VAR.S's examples, but every result here is
+smaller — dividing by `n` instead of `n-1` on "typical spread" gives
+`59.60` instead of `74.50`, the same population-vs-sample gap
+STDEV.P and STDEV.S show in their own squared-root units.
+
 ## Common errors
 
 ### Treating a sample as a population

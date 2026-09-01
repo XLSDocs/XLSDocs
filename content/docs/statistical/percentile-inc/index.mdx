@@ -66,6 +66,29 @@ people expect percentiles to work.
   well served by the inclusive method.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '0': '12', '0.5': '22', '1': '35' }}
+  defaultValue="0.5"
+  label={'Live preview — =PERCENTILE.INC(response times, {value})'}
+  fieldLabel="k"
+  grid={{
+    cols: ['A'],
+    rowCount: 10,
+    values: {
+      a1: 'Seconds', a2: '12', a3: '15', a4: '18', a5: '20',
+      a6: '22', a7: '25', a8: '28', a9: '30', a10: '35',
+    },
+    highlightMap: { '0': 'A2', '0.5': 'A6', '1': 'A10' },
+  }}
+/>
+
+`k=0` (the minimum) and `k=1` both work here — try `1` to see it
+land on `35`, the maximum. That's the inclusive method's whole
+appeal: unlike PERCENTILE.EXC, the endpoints are always valid,
+never a `#NUM!` error.
+
 ## Common errors
 
 ### #NUM! — k outside the 0–1 range

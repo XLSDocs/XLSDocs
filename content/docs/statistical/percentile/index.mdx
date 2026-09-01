@@ -68,6 +68,30 @@ PERCENTILE is the older name for what's now formally
   range.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '0': '12', '0.5': '22', '0.9': '31' }}
+  defaultValue="0.9"
+  label={'Live preview — =PERCENTILE(response times, {value})'}
+  fieldLabel="k"
+  grid={{
+    cols: ['A'],
+    rowCount: 10,
+    values: {
+      a1: 'Seconds', a2: '12', a3: '15', a4: '18', a5: '20',
+      a6: '22', a7: '25', a8: '28', a9: '30', a10: '35',
+    },
+    highlightMap: { '0': 'A2', '0.5': 'A6' },
+  }}
+/>
+
+`k=0` and `k=0.5` land exactly on a value in the data (the min, and
+the median), so those rows highlight directly. `k=0.9` falls between
+the last two values (30 and 35) and has to interpolate — `31` isn't
+actually in the dataset at all, which is why no row highlights for
+that one.
+
 ## Common errors
 
 ### #NUM! — k outside the 0–1 range

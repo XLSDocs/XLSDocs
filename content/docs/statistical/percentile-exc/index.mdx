@@ -70,6 +70,30 @@ anything outside that returns `#NUM!`.
   `#NUM!` on small samples.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '0.2': '15', '0.5': '22', '0.8': '30', '0.9': '#NUM!' }}
+  defaultValue="0.5"
+  label={'Live preview — =PERCENTILE.EXC(response times, {value})'}
+  fieldLabel="k"
+  errorValue="#NUM!"
+  grid={{
+    cols: ['A'],
+    rowCount: 10,
+    values: {
+      a1: 'Seconds', a2: '12', a3: '15', a4: '18', a5: '20',
+      a6: '22', a7: '25', a8: '28', a9: '30', a10: '35',
+    },
+    highlightMap: { '0.2': 'A3', '0.5': 'A6', '0.8': 'A9' },
+  }}
+/>
+
+With 9 values, valid `k` has to stay strictly between `0.1` and
+`0.9` — try `0.9` itself to see the `#NUM!` error the callout above
+describes, on the exact same dataset PERCENTILE.INC handles at every
+one of these `k` values without complaint.
+
 ## Common errors
 
 ### #NUM! — k outside the valid exclusive range

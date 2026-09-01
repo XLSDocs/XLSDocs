@@ -70,6 +70,28 @@ is the older name for what's now formally
   the data is the entire population, not a sample.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'tight cluster': '2.50', 'typical spread': '74.50', 'wide spread': '1632.50' }}
+  defaultValue="typical spread"
+  label={'Live preview — =VAR({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'tight cluster': { a1: 'Value', a2: '48', a3: '50', a4: '49', a5: '51', a6: '52' },
+      'typical spread': { a1: 'Value', a2: '40', a3: '55', a4: '48', a5: '62', a6: '45' },
+      'wide spread': { a1: 'Value', a2: '10', a3: '80', a4: '45', a5: '5', a6: '95' },
+    },
+  }}
+/>
+
+Same three datasets as STDEV's examples — and `SQRT` of each result
+here gives back STDEV's own number exactly (`SQRT(74.50) ≈ 8.63`),
+confirming the relationship the callout above describes.
+
 ## Common errors
 
 ### #DIV/0! — fewer than two numeric values

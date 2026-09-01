@@ -66,6 +66,29 @@ result, and STDEV still works in every current Excel version.
   relevant data point is included, not just a subset.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'tight cluster': '1.58', 'typical spread': '8.63', 'wide spread': '40.40' }}
+  defaultValue="typical spread"
+  label={'Live preview — =STDEV({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'tight cluster': { a1: 'Value', a2: '48', a3: '50', a4: '49', a5: '51', a6: '52' },
+      'typical spread': { a1: 'Value', a2: '40', a3: '55', a4: '48', a5: '62', a6: '45' },
+      'wide spread': { a1: 'Value', a2: '10', a3: '80', a4: '45', a5: '5', a6: '95' },
+    },
+  }}
+/>
+
+Same 5 numbers, three different arrangements — the tight cluster's
+values sit close to their own average, so STDEV comes back small;
+the wide spread's values are scattered far from their average, so
+STDEV comes back over 25 times larger on the same-size dataset.
+
 ## Common errors
 
 ### #DIV/0! — fewer than two numeric values

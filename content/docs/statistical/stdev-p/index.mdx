@@ -67,6 +67,29 @@ naming convention.
   ordered yet, future test-takers), use `STDEV.S` instead.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ 'tight cluster': '1.41', 'typical spread': '7.72', 'wide spread': '36.14' }}
+  defaultValue="typical spread"
+  label={'Live preview — =STDEV.P({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'tight cluster': { a1: 'Value', a2: '48', a3: '50', a4: '49', a5: '51', a6: '52' },
+      'typical spread': { a1: 'Value', a2: '40', a3: '55', a4: '48', a5: '62', a6: '45' },
+      'wide spread': { a1: 'Value', a2: '10', a3: '80', a4: '45', a5: '5', a6: '95' },
+    },
+  }}
+/>
+
+Same 5 numbers as STDEV.S's examples, and the same ranking of spreads
+— but every result here is slightly smaller, since STDEV.P divides
+by `n` instead of `n-1`. Try "typical spread" on both pages side by
+side: `8.63` (sample) vs `7.72` (population), on identical data.
+
 ## Common errors
 
 ### Treating a sample as a population

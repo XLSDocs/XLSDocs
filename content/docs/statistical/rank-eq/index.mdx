@@ -72,6 +72,25 @@ identical.
   all claiming the higher one.
 </Callout>
 
+## Try it
+
+<TryIt
+  data={{ '95': '1', '88': '3', '72': '5' }}
+  defaultValue="95"
+  label={'Live preview — =RANK.EQ({value}, scores)'}
+  fieldLabel="number"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    values: { a1: 'Score', a2: '95', a3: '95', a4: '88', a5: '79', a6: '72' },
+    highlightMap: { '95': 'A2:A3', '88': 'A4', '72': 'A6' },
+  }}
+/>
+
+Both 95s tie for 1st place, so 88 — the next distinct value — ranks
+3rd, not 2nd. Compare against RANK.AVG on the same data: it would
+give both 95s a rank of 1.5 instead of 1.
+
 ## Common errors
 
 ### #N/A — number isn't actually in ref
