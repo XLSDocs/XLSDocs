@@ -39,6 +39,15 @@ const marketingPages = [
     ),
   },
   {
+    id: '/playground',
+    url: '/playground',
+    title: 'Playground',
+    description: 'Every interactive Try it example on xlsdocs.com in one place.',
+    structuredData: textIndex(
+      'Playground — a curated collection of interactive Excel formula examples across Lookup, Database, Financial, Info, and Statistical functions. Change the inputs and watch the result recalculate live.',
+    ),
+  },
+  {
     id: '/tools/formula-builder',
     url: '/tools/formula-builder',
     title: 'AI Formula Builder',

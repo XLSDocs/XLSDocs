@@ -9,6 +9,7 @@ const FOOTER_COLUMNS = [
       { href: '/functions', label: 'Functions' },
       { href: '/tools/formula-builder', label: 'Formula Builder' },
       { href: '/tools/quick-fix', label: 'Quick Fix' },
+      { href: '/playground', label: 'Playground' },
       { href: '/pricing', label: 'Pricing' },
     ],
   },

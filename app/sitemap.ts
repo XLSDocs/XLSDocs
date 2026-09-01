@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: siteUrl, changeFrequency: 'weekly', priority: 1 },
     { url: `${siteUrl}/functions`, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${siteUrl}/pricing`, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${siteUrl}/playground`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/tools/formula-builder`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/tools/quick-fix`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/blog`, changeFrequency: 'weekly', priority: 0.8 },

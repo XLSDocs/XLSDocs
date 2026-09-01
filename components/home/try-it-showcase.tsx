@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { TryIt } from '@/components/try-it';
 
 export function TryItShowcase() {
@@ -21,6 +23,13 @@ export function TryItShowcase() {
             Completely free, unlimited — it's just math running in your
             browser, not an AI call.
           </p>
+          <Link
+            href="/playground"
+            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-fd-primary hover:underline"
+          >
+            See more interactive examples
+            <ArrowRight className="size-3.5" />
+          </Link>
         </div>
 
         <div>
