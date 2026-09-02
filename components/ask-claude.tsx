@@ -145,7 +145,7 @@ interface Message {
   content: string;
 }
 
-export function AskClaude({ pageTitle }: { pageTitle: string }) {
+export function AskClaude({ pageTitle, hideTrigger }: { pageTitle: string; hideTrigger?: boolean }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -223,13 +223,15 @@ export function AskClaude({ pageTitle }: { pageTitle: string }) {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border bg-fd-primary/10 border-fd-primary/20 text-fd-primary hover:bg-fd-primary/20 transition-colors"
-      >
-        <Sparkles className="w-3.5 h-3.5" />
-        Ask AI
-      </button>
+      {!hideTrigger && (
+        <button
+          onClick={() => setOpen(true)}
+          className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-md border bg-fd-primary/10 border-fd-primary/20 text-fd-primary hover:bg-fd-primary/20 transition-colors"
+        >
+          <Sparkles className="w-3.5 h-3.5" />
+          Ask AI
+        </button>
+      )}
 
       {open && (
         <div

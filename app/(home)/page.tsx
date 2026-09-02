@@ -6,6 +6,7 @@ import { AskClaudeShowcase } from '@/components/home/ask-claude-showcase';
 import { QuickFixShowcase } from '@/components/home/quick-fix-showcase';
 import { TryItShowcase } from '@/components/home/try-it-showcase';
 import { LlmsShowcase } from '@/components/home/llms-showcase';
+import { AskClaude } from '@/components/ask-claude';
 import { getFunctionCatalog } from '@/lib/source';
 import type { Metadata } from 'next';
 
@@ -32,6 +33,10 @@ export default function HomePage() {
       <AskClaudeShowcase />
       <QuickFixShowcase />
       <LlmsShowcase />
+      {/* AskClaudeShowcase above is a static mockup, not the real chat —
+          this hidden-trigger instance is what actually opens when the
+          live TryIt widget's own "Ask AI about this" button is clicked. */}
+      <AskClaude pageTitle="Excel functions" hideTrigger />
     </div>
   );
 }

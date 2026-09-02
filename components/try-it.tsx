@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { Sparkles } from 'lucide-react';
 import { MiniGrid } from './mini-grid';
+import { requestAskAIAboutSnippet } from '@/lib/ask-ai-events';
 
 interface TryItProps {
   data: Record<string, string>;
@@ -66,6 +68,16 @@ export function TryIt({
   }, [value, data, errorValue]);
 
   const found = result !== errorValue;
+
+  // resolvedLabel is always "Live preview — <formula>" by convention across
+  // every page that uses TryIt — strip that prefix so what's left is just
+  // the formula. AskClaude's shared snippet handler (see ask-claude.tsx)
+  // already prepends "Explain this formula:" to whatever snippet it's
+  // given, so this stays a plain "<formula> returns <result>" fragment
+  // rather than a full sentence — matching the same convention ExcelCode's
+  // sparkle button already uses, not a competing one.
+  const formulaPart = resolvedLabel.replace(/^Live preview\s*—\s*/, '');
+  const askAISnippet = `${formulaPart} returns ${result}`;
 
   // Cell/range references (e.g. "a5", "a1:c1") display fully uppercase,
   // matching Excel's own convention — capitalizing only the first letter
@@ -133,6 +145,14 @@ export function TryIt({
             {result}
           </span>
         </div>
+        <button
+          type="button"
+          onClick={() => requestAskAIAboutSnippet(askAISnippet)}
+          className="inline-flex w-fit items-center gap-1.5 text-xs text-fd-muted-foreground transition-colors hover:text-fd-primary"
+        >
+          <Sparkles className="size-3.5" />
+          Ask AI about this
+        </button>
       </div>
     </div>
   );
