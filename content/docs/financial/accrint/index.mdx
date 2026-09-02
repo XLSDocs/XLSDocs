@@ -1,0 +1,264 @@
+---
+title: ACCRINT
+description: Calculate the accrued interest on a bond or security that pays interest periodically, between its issue date and settlement.
+---
+
+Calculate the interest a bond has accumulated since its issue date (or
+its first payment date) up to the day it's actually traded — the
+amount a buyer owes the seller on top of the quoted price, since
+interest keeps accruing between a bond's periodic coupon payments.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Default calc_method (TRUE) accrues from issue, not first_interest', type: 'warn' },
+  { text: 'par defaults to $1,000 if omitted', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ACCRINT(issue, first_interest, settlement, rate, par, frequency, [basis], [calc_method])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ACCRINT(issue, first_interest, settlement, rate, par, frequency, [basis], [calc_method])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'issue',
+    type: 'date',
+    required: true,
+    description: "The security's issue date.",
+  },
+  {
+    name: 'first_interest',
+    type: 'date',
+    required: true,
+    description: "The security's first scheduled interest payment date.",
+  },
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — must be after issue.',
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's annual coupon rate.",
+  },
+  {
+    name: 'par',
+    type: 'number',
+    required: true,
+    description: 'The face value of the security. Defaults to $1,000 if omitted.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+  {
+    name: 'calc_method',
+    type: 'number',
+    required: false,
+    description: 'TRUE (default) accrues from issue; FALSE accrues from first_interest instead.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The interest accrued on the security between `issue` (or
+`first_interest`, depending on `calc_method`) and `settlement` — the
+amount added on top of the bond's quoted price to compensate the
+seller for interest already earned before the trade.
+
+## Description
+
+Bonds typically pay interest on fixed dates (semiannually, most
+commonly), but they can trade on any day in between. ACCRINT
+calculates the seller's share of the current coupon period — the
+interest earned since the last relevant date, which the buyer pays
+upfront and then recovers when the next full coupon arrives. For a
+settlement date that falls within the bond's very first coupon period
+(the common case, and the one demonstrated below), this reduces to a
+simple proportion: the coupon amount for that period, scaled by how
+much of the period has actually elapsed.
+
+<Callout type="warn">
+  `calc_method` changes which date ACCRINT starts counting from —
+  `TRUE` (the default) accrues from `issue`, while `FALSE` accrues
+  only from `first_interest` onward. For a security purchased during
+  its very first coupon period, this is the difference between
+  getting some accrued interest and getting none at all.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2/1/2026': '$5.00', '4/1/2026': '$15.00', '6/1/2026': '$25.00' }}
+  defaultValue="4/1/2026"
+  label={'Live preview — =ACCRINT(1/1/2026, 7/1/2026, {value}, 6%, 1000, 2)'}
+  fieldLabel="settlement"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 3,
+    rowsByInput: {
+      '2/1/2026': {
+        a1: 'Date', b1: 'Days since issue', c1: 'Accrued interest',
+        a2: '1/1/2026 (issue)', b2: '0', c2: '$0.00',
+        a3: '2/1/2026 (settlement)', b3: '30', c3: '$5.00',
+      },
+      '4/1/2026': {
+        a1: 'Date', b1: 'Days since issue', c1: 'Accrued interest',
+        a2: '1/1/2026 (issue)', b2: '0', c2: '$0.00',
+        a3: '4/1/2026 (settlement)', b3: '90', c3: '$15.00',
+      },
+      '6/1/2026': {
+        a1: 'Date', b1: 'Days since issue', c1: 'Accrued interest',
+        a2: '1/1/2026 (issue)', b2: '0', c2: '$0.00',
+        a3: '6/1/2026 (settlement)', b3: '150', c3: '$25.00',
+      },
+    },
+  }}
+/>
+
+The full semiannual coupon on this bond is $30 (6% of $1,000, split
+across 2 payments a year). Moving settlement halfway through the
+180-day period accrues half that coupon — $15 — and the accrued
+amount keeps climbing linearly with every day settlement moves later,
+right up until the next coupon actually pays.
+
+## Common errors
+
+### Settlement has crossed into a later coupon period
+
+<ExcelCode>{`ACCRINT(issue, first_interest, settlement, ...) → settlement well past first_interest`}</ExcelCode>
+
+Once `settlement` is past one or more coupon dates, ACCRINT sums a
+full coupon for every completed period plus a partial one for the
+current period — it isn't simply "days since issue divided by the
+first period's length" anymore. Excel handles this automatically;
+a hand-built version of the formula needs to account for every
+elapsed coupon period, not just the first.
+
+### Confusing calc_method's two starting points
+
+<ExcelCode>{`ACCRINT(..., calc_method=FALSE) → 0 if settlement is still within the first coupon period`}</ExcelCode>
+
+With `calc_method` set to `FALSE`, accrual only starts counting from
+`first_interest` — a settlement date before that returns `0`, which
+looks like an error but is the documented behavior for that setting.
+
+### Mismatched day count basis
+
+Comparing an ACCRINT result computed with one `basis` against a
+value computed with another (30/360 vs. actual/365, for example) on
+the same dates produces slightly different numbers — not a bug, just
+two different day-counting conventions applied to the same period.
+
+export const faqs = [
+  {
+    question: 'Why does ACCRINT exist instead of just prorating the coupon manually?',
+    answer: 'Manual proration only works cleanly for the simple case — settlement within the very first coupon period. Once a bond has paid one or more coupons already, ACCRINT sums a full coupon for each completed period plus a partial one for the current period, which gets tedious to replicate by hand.',
+  },
+  {
+    question: 'What does par actually represent here?',
+    answer: "The security's face value — the amount it pays back at maturity, and the base the coupon rate is calculated against. It defaults to $1,000 if left out, a common bond-quoting convention.",
+  },
+  {
+    question: 'TRUE vs FALSE for calc_method — which should I use?',
+    answer: "TRUE (the default) matches how accrued interest is actually settled in a real bond trade — it always includes interest from the issue date forward. FALSE is a narrower calculation, useful mainly for matching a specific pricing convention that explicitly excludes the pre-first-coupon period.",
+  },
+  {
+    question: 'Does ACCRINT work the same for a bond that has already paid several coupons?',
+    answer: "Yes, conceptually — it's still 'accrued interest since the relevant start date' — but the calculation involves summing every completed coupon period, not just prorating a single one the way the simple first-period case does.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ACCRINT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ACCRINT(DATE(2026,1,1), DATE(2026,7,1), DATE(2026,4,1), 6%, 1000, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim accruedInterest As Double
+    accruedInterest = Application.WorksheetFunction.AccrInt( _
+      DateSerial(2026, 1, 1), DateSerial(2026, 7, 1), DateSerial(2026, 4, 1), _
+      0.06, 1000, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def days_360(d1, d2):
+        # US (NASD) 30/360 day count — Excel's default basis (0), and
+        # NOT the same as (d2 - d1).days once a month doesn't have
+        # exactly 30 days. Using real calendar days here would silently
+        # disagree with Excel by a day or two per coupon period.
+        day1, day2 = d1.day, d2.day
+        if day1 == 31:
+            day1 = 30
+        if day2 == 31 and day1 == 30:
+            day2 = 30
+        return (d2.year - d1.year) * 360 + (d2.month - d1.month) * 30 + (day2 - day1)
+
+    def accrint_simple(issue, first_interest, settlement, rate, par, frequency):
+        # Simple case only — settlement within the very first coupon
+        # period. A full implementation needs to sum every completed
+        # coupon period once settlement crosses first_interest.
+        accrued_days = days_360(issue, settlement)
+        period_days = days_360(issue, first_interest)
+        return par * (rate / frequency) * (accrued_days / period_days)
+
+    accrued = accrint_simple(date(2026, 1, 1), date(2026, 7, 1), date(2026, 4, 1), 0.06, 1000, 2)
+    print(accrued)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [YIELD](/docs/financial/yield) — the annualized return a bond's
+  price implies, a different bond calculation using the same
+  settlement/maturity/rate shape.
+- [PV](/docs/financial/pv) — present value for a stream of equal
+  payments, a simpler shape than a bond's price/accrual relationship.
+- [XNPV](/docs/financial/xnpv) — present value for cash flows on
+  irregular dates, the closest non-bond-specific equivalent.

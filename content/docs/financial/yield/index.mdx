@@ -1,0 +1,235 @@
+---
+title: YIELD
+description: Calculate the annual yield to maturity of a bond that pays periodic interest, based on its current price.
+---
+
+Calculate the annualized return an investor actually earns on a
+bond, given what they paid for it — not the coupon rate printed on
+the bond, but the real return once its market price is factored in.
+The reverse question from pricing a bond off a target yield.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'pr and redemption are per $100 face value, not the actual price paid', type: 'warn' },
+  { text: 'An iterative approximation for bonds with more than one coupon period left', type: 'warn' },
+  { text: 'A bond priced exactly at par (100) always yields exactly its coupon rate', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=YIELD(settlement, maturity, rate, pr, redemption, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=YIELD(settlement, maturity, rate, pr, redemption, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires and pays its redemption value.',
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's annual coupon rate.",
+  },
+  {
+    name: 'pr',
+    type: 'number',
+    required: true,
+    description: 'The price per $100 of face value — not the actual dollar price paid.',
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 of face value — typically 100, at par.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The bond's annualized yield to maturity, as a decimal — the single
+constant discount rate that makes the present value of every
+remaining coupon payment, plus the redemption value, equal to `pr`.
+
+## Description
+
+A bond's coupon rate is fixed when it's issued, but its market price
+moves — and once the price changes, the coupon rate alone no longer
+describes the actual return a buyer gets. YIELD solves for that real
+return: with more than one coupon period remaining, there's no
+closed-form formula, so Excel approximates it iteratively (the same
+kind of Newton's-method solve [RATE](/docs/financial/rate) uses), by
+testing candidate yields until one produces the given price.
+
+<Callout type="warn">
+  `pr` and `redemption` are expressed **per $100 of face value**, a
+  standard bond-quoting convention — not the actual price paid or the
+  bond's real face value. A $1,050 price on a $1,000 bond is `pr=105`,
+  not `1050`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '95': '7.21%', '100': '6.00%', '105': '4.86%' }}
+  defaultValue="100"
+  label={'Live preview — =YIELD(1/1/2026, 1/1/2031, 6%, {value}, 100, 2)'}
+  fieldLabel="pr"
+/>
+
+Priced exactly at par (`pr=100`), this bond yields exactly its 6%
+coupon rate — no discount or premium to account for. Pay less than
+par (`95`) and the yield rises above the coupon rate; pay more
+(`105`) and it falls below — the same inverse price/yield
+relationship that drives every bond market.
+
+## Common errors
+
+### Treating pr and redemption as dollar amounts
+
+<ExcelCode>{`YIELD(settlement, maturity, 6%, 1050, 1000, 2) → wrong (1050 and 1000 aren't per-$100 values)`}</ExcelCode>
+
+Both `pr` and `redemption` need to be rescaled to a $100 face value
+first — a $1,050 price on a $1,000-par bond is `pr=105`, and
+`redemption` is almost always `100`:
+
+<ExcelCode>{`YIELD(settlement, maturity, 6%, 105, 100, 2)`}</ExcelCode>
+
+### #NUM! — the solver failed to converge, or dates are invalid
+
+`settlement` must fall before `maturity`, and — like RATE — some
+price/rate/maturity combinations converge slowly or not at all from
+the solver's default starting point. Double-check the date order
+first; a closer manual guess is the usual fix if the dates are fine.
+
+### Expecting the coupon rate and the yield to match
+
+<ExcelCode>{`YIELD(...) ≠ rate, unless pr is exactly 100`}</ExcelCode>
+
+Not an error — they're only equal when the bond is priced exactly at
+par. Any premium or discount to par pulls the yield away from the
+stated coupon rate in the opposite direction.
+
+export const faqs = [
+  {
+    question: 'Why does a bond priced above par yield less than its coupon rate?',
+    answer: "Paying more than face value for the same fixed coupon payments and redemption amount dilutes the return — the extra amount paid upfront isn't recovered, so the effective annualized return comes out lower than the coupon rate itself.",
+  },
+  {
+    question: 'What does pr=100 actually mean?',
+    answer: "The bond is priced exactly at its face value (par) — per the standard per-$100 quoting convention. A bond priced at par always yields exactly its coupon rate, since there's no premium or discount to factor into the return.",
+  },
+  {
+    question: 'YIELD vs RATE — how do they relate?',
+    answer: 'Both solve for a rate iteratively rather than directly. RATE assumes a simple loan/annuity with equal payments. YIELD is built specifically for bond pricing conventions — settlement/maturity dates, a per-$100 price, and a separate redemption value — rather than a generic payment schedule.',
+  },
+  {
+    question: 'Does YIELD account for accrued interest at settlement?',
+    answer: "Yes — pr is treated as the bond's full price including any accrued interest already built into what the buyer pays, consistent with how ACCRINT computes that same accrued amount separately.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with YIELD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=YIELD(DATE(2026,1,1), DATE(2031,1,1), 6%, 95, 100, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yieldToMaturity As Double
+    yieldToMaturity = Application.WorksheetFunction.Yield( _
+      DateSerial(2026, 1, 1), DateSerial(2031, 1, 1), 0.06, 95, 100, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from scipy.optimize import brentq
+
+    def days_360(d1, d2):
+        # US (NASD) 30/360 day count — Excel's default basis (0).
+        # (d2 - d1).days would use real calendar days instead, which
+        # can round to a different number of coupon periods.
+        day1, day2 = d1.day, d2.day
+        if day1 == 31:
+            day1 = 30
+        if day2 == 31 and day1 == 30:
+            day2 = 30
+        return (d2.year - d1.year) * 360 + (d2.month - d1.month) * 30 + (day2 - day1)
+
+    def bond_price(yield_rate, settlement, maturity, rate, redemption, frequency):
+        periods = round(days_360(settlement, maturity) / (360 / frequency))
+        coupon = 100 * rate / frequency
+        period_yield = yield_rate / frequency
+        price = sum(coupon / (1 + period_yield) ** k for k in range(1, periods + 1))
+        price += redemption / (1 + period_yield) ** periods
+        return price
+
+    settlement, maturity = date(2026, 1, 1), date(2031, 1, 1)
+    yield_to_maturity = brentq(
+        lambda y: bond_price(y, settlement, maturity, 0.06, 100, 2) - 95,
+        -0.5, 1.0,
+    )
+    print(yield_to_maturity)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ACCRINT](/docs/financial/accrint) — the interest a bond has
+  accrued since issue, a related but separate bond calculation.
+- [RATE](/docs/financial/rate) — solves for a rate too, but for a
+  simple equal-payment loan or annuity, not a bond's pricing
+  conventions.
+- [PV](/docs/financial/pv) — present value of a stream of equal
+  payments, the building block YIELD's iterative solve relies on.
