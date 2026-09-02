@@ -6,6 +6,7 @@ import { PostNav } from '@/components/blog/post-nav';
 import { PostToc } from '@/components/blog/post-toc';
 import { Faq, type FaqItem } from '@/components/faq';
 import { AskClaude } from '@/components/ask-claude';
+import { Footer } from '@/components/home/footer';
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
@@ -40,34 +41,37 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
     : null;
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <PostNav category={post.category} readTime={post.readTime} />
-      <div className="mx-auto flex max-w-5xl gap-10 px-6 py-12">
-        <article className="prose min-w-0 flex-1">
-          {faqJsonLd && (
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-            />
-          )}
-          <span className="not-prose font-mono text-xs uppercase tracking-wider text-fd-muted-foreground">
-            {formatDate(post.date)} · {post.author}
-          </span>
-          <h1>{post.title}</h1>
-          <p className="lead text-fd-muted-foreground">{post.description}</p>
-          <div className="not-prose mb-6">
-            <AskClaude pageTitle={post.title} />
-          </div>
-          <MDX components={getMDXComponents()} />
-          {faqs && faqs.length > 0 && (
-            <>
-              <h2>FAQ</h2>
-              <Faq items={faqs} />
-            </>
-          )}
-        </article>
-        <PostToc items={post.toc} />
-      </div>
+      <main className="flex-1">
+        <div className="mx-auto flex max-w-5xl gap-10 px-6 py-12">
+          <article className="prose min-w-0 flex-1">
+            {faqJsonLd && (
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+              />
+            )}
+            <span className="not-prose font-mono text-xs uppercase tracking-wider text-fd-muted-foreground">
+              {formatDate(post.date)} · {post.author}
+            </span>
+            <h1>{post.title}</h1>
+            <p className="lead text-fd-muted-foreground">{post.description}</p>
+            <div className="not-prose mb-6">
+              <AskClaude pageTitle={post.title} />
+            </div>
+            <MDX components={getMDXComponents()} />
+            {faqs && faqs.length > 0 && (
+              <>
+                <h2>FAQ</h2>
+                <Faq items={faqs} />
+              </>
+            )}
+          </article>
+          <PostToc items={post.toc} />
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }
