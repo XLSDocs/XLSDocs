@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { gitConfig } from '@/lib/shared';
 
@@ -68,8 +69,13 @@ export function Footer() {
             </p>
             <nav className="mt-3 flex flex-col gap-2 text-sm text-fd-muted-foreground">
               {column.links.map((link) => (
-                <Link key={link.href} href={link.href} className="transition-colors hover:text-fd-foreground">
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="group inline-flex w-fit items-center gap-1 transition-colors hover:text-fd-foreground"
+                >
                   {link.label}
+                  <ArrowRight className="size-3 -translate-x-1 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
                 </Link>
               ))}
             </nav>
