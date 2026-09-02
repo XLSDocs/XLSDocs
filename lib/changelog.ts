@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-02',
+    title: 'ACCRINT and YIELD',
+    description:
+      "Two bond-math functions round out Financial to 14 pages: ACCRINT calculates the interest accrued on a bond between its issue date and settlement, and YIELD solves for a bond's annualized return from its market price, coupon rate, and time to maturity.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-01',
     title: 'A Playground page — every interactive example in one place',
     description:
