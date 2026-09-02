@@ -1,0 +1,100 @@
+---
+title: "NPV vs IRR: The Two Functions That Answer Opposite Questions"
+description: NPV tells you what a series of cash flows is worth today at a rate you choose. IRR tells you the rate that would make that value exactly zero. Same cash flows, opposite unknowns — and a sign-convention trap that catches almost everyone once.
+date: "2026-09-02"
+category: Excel
+author: Dana Okafor
+readTime: 6 min read
+---
+
+Both functions take the same shape of input — an initial investment
+and a series of uneven future returns — and both are standard tools
+for deciding whether a project is worth doing. The difference is
+which piece of the math each one solves for, and it trips people up
+in a very specific way once the two get mixed together.
+
+## Same cash flows, different unknown
+
+NPV takes a discount rate you already know (a cost of capital, a
+required return) and tells you what the cash flows are worth in
+today's dollars. IRR takes the same cash flows and works backward: it
+finds the exact discount rate that would make their net present value
+equal to zero.
+
+<ExcelCode>{`=NPV(rate, 15000, 18000, 20000) - 50000
+=IRR({-50000, 15000, 18000, 20000})`}</ExcelCode>
+
+Feed IRR's result back into NPV as the rate, on the same cash flows,
+and NPV comes back to (essentially) zero — that's not a coincidence,
+it's the actual definition of what IRR is solving for. On the
+`-50000, 15000, 18000, 20000` example above, IRR returns about
+**2.83%**; plug 2.83% into NPV against the same three return values
+and the result lands within a few dollars of the $50,000 investment
+it's being compared against.
+
+## The trap: they don't agree on where the investment goes
+
+<Callout type="warn">
+  NPV expects the **initial investment left out** of the function
+  call, subtracted separately afterward:
+  `NPV(rate, futureCashFlows...) - investment`. IRR expects the
+  **exact opposite** — the investment goes *inside* the array, as its
+  first (usually negative) entry: `IRR({-investment, cashFlow1, ...})`.
+  Applying NPV's convention to IRR (or vice versa) silently produces a
+  wrong number, not an error.
+</Callout>
+
+This isn't a minor footnote — it's the single most common way both
+functions get misused, precisely because they look like they should
+work the same way. NPV assumes every value you hand it happens one
+full period in the future, so an investment made *today* (time zero)
+has to stay outside the call or it gets incorrectly discounted. IRR,
+on the other hand, needs the investment as part of the same array it's
+finding a break-even rate for — there's no "outside the call" option.
+
+## A worked comparison
+
+Same $50,000 investment, three different sets of return years, one
+number to compare them by:
+
+- Conservative returns (12,000 / 14,000 / 16,000): IRR ≈ **-7.89%**
+- Base case (15,000 / 18,000 / 20,000): IRR ≈ **2.83%**
+- Aggressive returns (18,000 / 22,000 / 26,000): IRR ≈ **14.30%**
+
+That's IRR's actual job: turning three different uneven cash-flow
+schedules into one comparable number, without needing to already know
+a discount rate to plug into NPV first.
+
+## When to reach for which
+
+Use NPV when the discount rate is already settled — a company's
+known cost of capital, or a required return that's a policy decision,
+not something the analysis is trying to discover. Use IRR when the
+question is closer to "what return does this actually generate,"
+especially when comparing several differently-sized opportunities
+that don't share one obvious discount rate to test them all against.
+
+export const faqs = [
+  {
+    question: "Why does IRR need the investment inside the array, but NPV doesn't?",
+    answer: 'They\'re historical conventions from how each function was designed, not something with a deeper logical reason — but the practical result is that copying an investment\'s handling from one function to the other produces a wrong number, since NPV discounts everything you give it (so the investment must go outside), while IRR needs a full cash-flow timeline including time zero to solve for a rate.',
+  },
+  {
+    question: "What does it mean when IRR returns a negative number?",
+    answer: "The investment doesn't recover its own time value of money — the returns, even added up, aren't enough to beat what the money could have earned elsewhere at any positive rate. It's a genuinely bad investment by this measure, not a calculation error.",
+  },
+  {
+    question: 'Can NPV and IRR ever disagree about which of two projects is better?',
+    answer: "Yes — this is a well-known real limitation, not just an Excel quirk. It usually happens when comparing very different-sized investments or very different cash-flow timing. NPV's ranking is generally considered the more reliable one financially, since IRR can be misleading for mutually exclusive projects of different scales.",
+  },
+  {
+    question: 'Is there a version of these for cash flows on irregular dates instead of even periods?',
+    answer: 'Yes — XNPV and XIRR do the same jobs as NPV and IRR, but take actual calendar dates for each cash flow instead of assuming they land on neat, evenly spaced periods.',
+  },
+];
+
+See the full reference for [NPV](/docs/financial/npv) and
+[IRR](/docs/financial/irr) for the complete argument list, common
+errors, and a live example you can edit yourself — plus
+[XNPV](/docs/financial/xnpv) and [XIRR](/docs/financial/xirr) for the
+irregular-dates versions of each.

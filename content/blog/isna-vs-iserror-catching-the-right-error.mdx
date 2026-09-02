@@ -1,0 +1,99 @@
+---
+title: "ISNA vs ISERROR: Catching the Right Error, Not Just Any Error"
+description: ISERROR catches every error type Excel has. ISNA catches exactly one — #N/A. Using the wide net when the narrow one was needed can silently hide a real formula bug behind a friendly fallback.
+date: "2026-09-02"
+category: Excel
+author: Marcus Webb
+readTime: 5 min read
+---
+
+Both functions exist to answer the same broad question — "did this
+formula produce an error?" — and both get reached for as the first
+half of a fallback pattern. The difference is how much they're
+actually willing to call an error, and it matters more than it looks
+like it should.
+
+## ISERROR catches everything
+
+<ExcelCode>{`=ISERROR(A1) → TRUE for #N/A, #VALUE!, #REF!, #DIV/0!, #NAME?, #NUM!, or #NULL!`}</ExcelCode>
+
+Any of Excel's seven error types trips ISERROR to `TRUE`. That's
+exactly what makes it dangerous to reach for by default: a genuine
+mistake somewhere else in the formula — a `#REF!` from a deleted
+column, a `#DIV/0!` from an empty denominator — gets caught by the
+same net as a simple "value not found."
+
+## ISNA catches exactly one thing
+
+<ExcelCode>{`=ISNA(A1) → TRUE only for #N/A`}</ExcelCode>
+
+`#N/A` is specifically the error lookup functions throw when nothing
+matches — VLOOKUP, XLOOKUP, MATCH. ISNA is `FALSE` for every other
+error type, on purpose. It's the narrower, more deliberate tool.
+
+<Callout type="warn">
+  Wrapping a lookup in `IFERROR` to handle a missing match also
+  silently swallows a genuine mistake elsewhere in that same formula —
+  a `#REF!` from a broken range, a `#DIV/0!` further down the chain.
+  If only "not found" should get a fallback, `IFNA`/`ISNA` is the
+  correct tool; `IFERROR`/`ISERROR` will hide real bugs along with the
+  expected case.
+</Callout>
+
+## A concrete case where they disagree
+
+<ExcelCode>{`=ISERROR(1/0)  → TRUE   (a genuine divide-by-zero mistake)
+=ISNA(1/0)     → FALSE  (it's not the #N/A error at all)
+
+=ISERROR(VLOOKUP("missing", A:B, 2, FALSE)) → TRUE
+=ISNA(VLOOKUP("missing", A:B, 2, FALSE))    → TRUE`}</ExcelCode>
+
+Both functions agree that a missing lookup is worth flagging. Only
+ISERROR agrees that a divide-by-zero is *also* worth flagging the
+same way — which is correct if the goal really is "catch anything
+that went wrong," and wrong if the goal is specifically "handle a
+missing match, but let a real mistake stay visible."
+
+## The modern shortcuts skip the IF entirely
+
+<ExcelCode>{`=IFERROR(VLOOKUP(...), "Not found")   ≈ IF(ISERROR(VLOOKUP(...)), "Not found", VLOOKUP(...))
+=IFNA(VLOOKUP(...), "Not found")     ≈ IF(ISNA(VLOOKUP(...)), "Not found", VLOOKUP(...))`}</ExcelCode>
+
+IFERROR and IFNA do the same job as pairing IF with ISERROR or ISNA,
+but evaluate the formula once instead of twice — reach for ISERROR
+or ISNA directly mainly when a plain `TRUE`/`FALSE` flag is what's
+actually needed, not a substitute value.
+
+## The rule that actually holds
+
+Default to the narrow tool. If a formula's only realistic failure
+mode is "the lookup didn't find anything," ISNA (or IFNA) says so
+without hiding anything else. Reach for ISERROR (or IFERROR) only
+when literally any error type should get the same fallback treatment
+— and even then, it's worth asking whether that's really the intent,
+or just the easier function to remember.
+
+export const faqs = [
+  {
+    question: 'Why would hiding "any error" ever be the wrong choice?',
+    answer: "Because it also hides genuine mistakes that deserve to be visible — a broken reference, a formula that's dividing by an empty cell by accident. If those get replaced by the same friendly fallback as a normal missing lookup, they can go unnoticed for a long time.",
+  },
+  {
+    question: 'Does ISNA work on values that are not the result of a lookup function?',
+    answer: 'Yes — ISNA just tests whether a value is specifically the #N/A error, regardless of where it came from. That includes NA() used deliberately as a placeholder, not just a failed VLOOKUP or MATCH.',
+  },
+  {
+    question: 'Is there ever a good reason to use ISERROR instead of ISNA?',
+    answer: "Yes, when the goal genuinely is to catch every possible error type the same way — for example, flagging any cell in a report that failed to calculate for any reason at all, rather than distinguishing why it failed.",
+  },
+  {
+    question: 'Do IFERROR and IFNA replace ISERROR and ISNA entirely?',
+    answer: "For the common 'run this, show a fallback if it errors' pattern, yes — they're simpler and only evaluate the formula once. ISERROR and ISNA are still the right choice when a plain TRUE/FALSE result is needed instead of a substitute value.",
+  },
+];
+
+See the full reference for [ISNA](/docs/info/isna) and
+[ISERROR](/docs/info/iserror) for the complete argument list, common
+errors, and a live example you can edit yourself — plus
+[IFNA](/docs/logical/ifna) and [IFERROR](/docs/logical/iferror) for
+the one-step fallback versions of each.

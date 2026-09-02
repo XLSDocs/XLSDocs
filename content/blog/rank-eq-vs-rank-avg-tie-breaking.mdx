@@ -1,0 +1,88 @@
+---
+title: "RANK.EQ vs RANK.AVG: The Tie-Breaking Difference Nobody Notices Until It Matters"
+description: Both functions agree on every rank right up until two values tie — then RANK.EQ gives them both the better position, while RANK.AVG splits the difference into a decimal.
+date: "2026-09-02"
+category: Tutorials
+author: Priya Shah
+readTime: 5 min read
+---
+
+RANK.EQ and RANK.AVG compute identical results on data with no
+duplicate values — which is exactly why the difference between them
+goes unnoticed for so long. The moment two scores tie, they stop
+agreeing, and whichever one is already in the spreadsheet quietly
+decides how that tie gets handled.
+
+## No ties, no difference
+
+<ExcelCode>{`=RANK.EQ(88, {95, 91, 88, 79, 72}) → 3
+=RANK.AVG(88, {95, 91, 88, 79, 72}) → 3`}</ExcelCode>
+
+On a list with five distinct scores, both functions rank 88 in 3rd
+place, and every other value the same way. There's genuinely no
+reason to prefer one over the other here — this is the case that
+makes them look interchangeable.
+
+## Then a tie happens
+
+<ExcelCode>{`Scores: 95, 95, 88, 79, 72
+=RANK.EQ(95, scores)  → 1
+=RANK.AVG(95, scores) → 1.5`}</ExcelCode>
+
+With two scores tied at 95, RANK.EQ gives **both** of them rank 1 —
+the standard "competition ranking" every sports league uses, where
+tied competitors share the better position and the next distinct
+value skips ahead to account for it (88 becomes rank 3, not rank 2).
+RANK.AVG instead gives both tied values **1.5**, the average of the
+two positions (1 and 2) they'd occupy if you had to pick an order.
+
+<Callout type="warn">
+  RANK.AVG can introduce a decimal into what looks like — and is
+  usually expected to be — a whole-number ranking column. If that
+  rank number feeds into something expecting an integer (a lookup by
+  position, an INDEX call), a silent `1.5` where `1` or `2` was
+  assumed can produce a subtly wrong result further downstream.
+</Callout>
+
+## Which convention is actually "right"?
+
+Neither — they're both valid, just built for different conventions.
+RANK.EQ matches how almost every visible leaderboard works: two
+runners tied for first both get a gold medal, and the next runner is
+officially third, not second. RANK.AVG matches a convention more
+common in statistics — some percentile-rank and grading calculations
+specifically want tied values to split the difference rather than
+both claim the better spot.
+
+## The legacy function always matches RANK.EQ
+
+Plain `RANK` (no suffix) predates both `.EQ` and `.AVG`, introduced
+in Excel 2010 to make the tie-handling explicit in the function name
+itself. `RANK` always computes the same result as `RANK.EQ` — never
+`RANK.AVG` — so a spreadsheet built before 2010 that already uses
+`RANK` doesn't need to change to get competition-style tie handling;
+it's already doing that.
+
+export const faqs = [
+  {
+    question: 'Do RANK, RANK.EQ, and RANK.AVG all take the same arguments?',
+    answer: 'Yes — number, ref, and an optional order (0 or omitted for descending, any nonzero value for ascending). The only difference between them is how they handle a tie.',
+  },
+  {
+    question: 'Why does RANK.EQ skip a rank number after a tie?',
+    answer: "It's following standard competition ranking: two values tied for 2nd place both get rank 2, and the next distinct value is ranked 4th, not 3rd, since two positions were already claimed by the tie.",
+  },
+  {
+    question: 'Is there a way to break ties so every rank is a unique whole number?',
+    answer: 'A common pattern combines RANK.EQ with COUNTIF: RANK.EQ(A2,$B$2:$B$10) + COUNTIF($B$2:A2,A2) - 1 nudges each tied duplicate to its own sequential rank, based on row order rather than an average.',
+  },
+  {
+    question: 'Does the order argument change how ties are handled?',
+    answer: "No — switching between descending and ascending order changes which value ranks 1st, but RANK.EQ and RANK.AVG still resolve ties the exact same way (competition-style vs. averaged) regardless of which direction is being ranked.",
+  },
+];
+
+See the full reference for [RANK](/docs/statistical/rank),
+[RANK.EQ](/docs/statistical/rank-eq), and
+[RANK.AVG](/docs/statistical/rank-avg) for the complete argument list,
+common errors, and a live example you can edit yourself.

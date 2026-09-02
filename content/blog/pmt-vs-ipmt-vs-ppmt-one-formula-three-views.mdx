@@ -1,0 +1,95 @@
+---
+title: "PMT vs IPMT vs PPMT: One Loan, Three Different Numbers"
+description: PMT gives the total payment, IPMT and PPMT split it into interest and principal — same rate, nper, and pv, three different slices of the same amortization schedule.
+date: "2026-09-02"
+category: Excel
+author: Marcus Webb
+readTime: 6 min read
+---
+
+Three functions, nearly identical argument lists, and a genuinely
+common mix-up: using PMT when a payment's principal/interest split
+is actually what's needed, or reaching for IPMT/PPMT when the total
+payment amount was the only question. They're not competing
+functions — they're three views of the exact same loan.
+
+## The same loan, sliced three ways
+
+<ExcelCode>{`=PMT(rate, nper, pv)
+=IPMT(rate, per, nper, pv)
+=PPMT(rate, per, nper, pv)`}</ExcelCode>
+
+PMT returns the **total** fixed payment for the whole loan — the
+same number every period. IPMT and PPMT split one *specific*
+payment (identified by `per`) into the portion that's interest and
+the portion that actually pays down the balance. Add IPMT and PPMT
+together for any given `per`, with identical `rate`/`nper`/`pv`, and
+the result always equals PMT exactly — they're not three independent
+calculations, just three ways of describing the same cash flow.
+
+<Callout type="warn">
+  `IPMT(rate, per, nper, pv) + PPMT(rate, per, nper, pv)` always
+  equals `PMT(rate, nper, pv)`, for any valid `per`. If a hand-built
+  amortization schedule doesn't satisfy this, the bug is in that
+  schedule, not in the functions — an easy sanity check that's worth
+  building into any spreadsheet that computes both.
+</Callout>
+
+## Why IPMT and PPMT need an extra argument
+
+PMT doesn't take a period number because it doesn't need one — the
+payment amount is constant for the life of a fixed-rate loan. IPMT
+and PPMT both take `per` because their answer genuinely changes every
+period: interest is charged on whatever balance remains, and that
+balance shrinks with every payment. `per` tells the function which
+specific payment in the loan's life to break down.
+
+## The split shifts dramatically over the loan's life
+
+On a $200,000, 5%, 30-year loan, the fixed payment is $1,073.64 every
+single month. But how much of that is interest changes enormously:
+
+| Payment | Interest | Principal |
+|---|---|---|
+| 1 | $833.33 | $240.31 |
+| 180 (halfway) | $567.81 | $505.84 |
+| 360 (last) | $4.45 | $1,069.19 |
+
+The first payment is 78% interest. The last is 99.6% principal. Both
+add up to exactly $1,073.64 — PMT never changes, but the IPMT/PPMT
+split moves almost the entire distance from one extreme to the other
+over the life of the loan.
+
+## A rule of thumb
+
+Reach for PMT alone when the only question is "what's the payment" —
+budgeting, a quick loan comparison, a mortgage calculator's headline
+number. Bring in IPMT and PPMT the moment the split itself matters:
+building a full amortization schedule, figuring out how much of this
+year's payments are tax-deductible mortgage interest, or explaining
+to someone why their loan balance barely moved after two years of
+"on-time" payments.
+
+export const faqs = [
+  {
+    question: 'Do PMT, IPMT, and PPMT need to use the same rate/nper/pv arguments?',
+    answer: 'Yes — the whole relationship (IPMT + PPMT = PMT) only holds when all three functions describe the exact same loan with identical rate, nper, and pv arguments. Mixing different values breaks the identity.',
+  },
+  {
+    question: 'Why does the interest portion shrink every period?',
+    answer: "Interest is calculated on whatever balance is still outstanding at the start of that period. Since every payment reduces the balance, the interest charge on the next payment is always a little smaller, and the principal portion grows to compensate — PMT itself never changes.",
+  },
+  {
+    question: "Can I use PPMT to build a full amortization schedule?",
+    answer: "Yes — list payment numbers 1 through nper down a column and call PPMT (and IPMT) with per set to that column, keeping rate/nper/pv locked with absolute references. Each row then shows that specific payment's principal and interest split.",
+  },
+  {
+    question: 'Is there a function that gives the total interest paid over several periods at once?',
+    answer: 'CUMIPMT (and its principal counterpart CUMPRINC) sum IPMT/PPMT across a range of periods in one call — more reliable than manually adding up individual IPMT/PPMT calls for every period in a range.',
+  },
+];
+
+See the full reference for [PMT](/docs/financial/pmt),
+[IPMT](/docs/financial/ipmt), and [PPMT](/docs/financial/ppmt) for
+the complete argument list, common errors, and a live example you can
+edit yourself.
