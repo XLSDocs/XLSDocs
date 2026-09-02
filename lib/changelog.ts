@@ -13,6 +13,27 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-02',
+    title: '"Ask AI about this" on every Try it example',
+    description:
+      "Every interactive Try it widget now has a one-click button that opens Ask AI pre-filled with the exact formula and result you were just looking at — not just the bare syntax, but what it actually returned.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-09-02',
+    title: 'A footer on every blog post',
+    description:
+      'Individual blog posts now end with the same footer every other page has, instead of stopping abruptly after the FAQ section.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-09-02',
+    title: '4 new blog posts',
+    description:
+      "PMT vs IPMT vs PPMT, NPV vs IRR, RANK.EQ vs RANK.AVG, and ISNA vs ISERROR — four \"these look alike but aren't\" articles, each tied to a category that reached full Try it coverage this week.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-09-02',
     title: 'ACCRINT and YIELD',
     description:
       "Two bond-math functions round out Financial to 14 pages: ACCRINT calculates the interest accrued on a bond between its issue date and settlement, and YIELD solves for a bond's annualized return from its market price, coupon rate, and time to maturity.",
