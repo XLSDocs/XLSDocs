@@ -13,6 +13,20 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-03',
+    title: 'Fixed Try it on YEAR, MONTH, DAY, and WEEKDAY',
+    description:
+      "These four pages' interactive examples were silently showing #N/A regardless of what you tried — a case-sensitivity bug in the shared widget that only affected pages using capitalized example values like \"January 15, 2027\". Fixed at the component level, so every page's example now works regardless of how its sample values are capitalized.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-09-03',
+    title: 'HOUR, MINUTE, SECOND, TIME, DATEVALUE, TIMEVALUE, YEARFRAC, and WEEKNUM',
+    description:
+      "Eight new Date functions closing a real gap — the site had YEAR/MONTH/DAY but no time-of-day equivalents, and no way to convert date- or time-looking text into real values. YEARFRAC also picks up the same day-count basis convention used by ACCRINT and YIELD.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-09-03',
     title: 'ABS, INT, MOD, POWER, SQRT, TRUNC, EVEN, ODD, and SIGN',
     description:
       "Nine basic Math functions that were missing entirely — found by auditing our full coverage against Microsoft's own function list. ABS and SQRT in particular are everyday-arithmetic staples; INT and TRUNC finally get their own pages explaining exactly where they disagree on negative numbers.",
