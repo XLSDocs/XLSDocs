@@ -125,5 +125,11 @@ export function getFunctionCatalog(): FunctionCategory[] {
           url: fn.url,
         })),
     }))
-    .filter((cat) => cat.functions.length > 0);
+    .filter((cat) => cat.functions.length > 0)
+    // source.getPages() order isn't guaranteed alphabetical for top-level
+    // category folders (Statistical was landing last, after Web, since it
+    // reflects filesystem/build discovery order, not category name) — sort
+    // explicitly so /functions and any other consumer of this list don't
+    // inherit that incidental ordering.
+    .sort((a, b) => a.title.localeCompare(b.title));
 }

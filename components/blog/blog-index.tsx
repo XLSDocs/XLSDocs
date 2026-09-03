@@ -90,12 +90,16 @@ export function BlogIndex({ posts, categories }: { posts: Post[]; categories: st
         )}
 
         {groups.map(([year, yearPosts]) => {
-          const [first, ...rest] = yearPosts;
+          // An explicit featured:true post wins the hero slot for its year;
+          // otherwise fall back to the newest post of that year (yearPosts
+          // is already newest-first, inherited from the sorted `posts` prop).
+          const hero = yearPosts.find((p) => p.featured) ?? yearPosts[0];
+          const rest = yearPosts.filter((p) => p !== hero);
           return (
             <section key={year} className="mb-14">
               <h2 className="mb-4 text-lg font-medium text-fd-muted-foreground">{year}</h2>
               <div className="mb-4">
-                <PostCard {...first} featured />
+                <PostCard {...hero} featured />
               </div>
               {rest.length > 0 && (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
