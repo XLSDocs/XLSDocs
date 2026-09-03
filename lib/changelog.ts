@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-03',
+    title: 'A persistent navbar on docs pages',
+    description:
+      "Functions, Blog, Formula Builder, and Pricing are now always one click away while reading a function page, instead of being tucked into a scrollable sidebar list — the same navigation every other page on the site already had.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-09-03',
     title: 'Fixed Try it on YEAR, MONTH, DAY, and WEEKDAY',
     description:
       "These four pages' interactive examples were silently showing #N/A regardless of what you tried — a case-sensitivity bug in the shared widget that only affected pages using capitalized example values like \"January 15, 2027\". Fixed at the component level, so every page's example now works regardless of how its sample values are capitalized.",
