@@ -61,11 +61,38 @@ export function TryIt({
 }: TryItProps) {
   const [value, setValue] = useState(defaultValue);
   const resolvedLabel = label.includes('{value}') ? label.replaceAll('{value}', value) : label;
+  const normalizedValue = value.trim().toLowerCase();
+
+  // Every lookup below matches on a lowercased key, but `data`/`grid.*`
+  // are hand-authored MDX props — nothing enforces that their keys are
+  // already lowercase (several pages write capitalized keys like
+  // 'January 15, 2027', matching their own defaultValue exactly). Without
+  // normalizing here too, that literal-cased key silently never matches
+  // the lowercased lookup, and the widget shows the error state
+  // unconditionally. Normalizing the data itself — not just the typed
+  // value — makes every key casing work, instead of relying on every
+  // future page remembering an undocumented lowercase-only convention.
+  const normalizeEntries = (obj: Record<string, string>) => {
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries(obj)) out[k.trim().toLowerCase()] = v;
+    return out;
+  };
+  const normalizedData = useMemo(() => normalizeEntries(data), [data]);
+  const normalizedRowsByInput = useMemo(() => {
+    if (!grid?.rowsByInput) return undefined;
+    const out: Record<string, Record<string, string>> = {};
+    for (const [k, v] of Object.entries(grid.rowsByInput)) out[k.trim().toLowerCase()] = v;
+    return out;
+  }, [grid?.rowsByInput]);
+  const normalizedHighlightMap = useMemo(
+    () => (grid?.highlightMap ? normalizeEntries(grid.highlightMap) : undefined),
+    [grid?.highlightMap],
+  );
 
   const result = useMemo(() => {
-    const match = data[value.trim().toLowerCase()];
+    const match = normalizedData[normalizedValue];
     return match ?? errorValue;
-  }, [value, data, errorValue]);
+  }, [normalizedValue, normalizedData, errorValue]);
 
   const found = result !== errorValue;
 
@@ -87,7 +114,7 @@ export function TryIt({
   const displayLabel = (key: string) =>
     isReference(key) ? key.toUpperCase() : key.charAt(0).toUpperCase() + key.slice(1);
 
-  const isTryValueActive = (key: string) => value.trim().toLowerCase() === key;
+  const isTryValueActive = (key: string) => normalizedValue === key.trim().toLowerCase();
 
   return (
     <div className="not-prose rounded-xl border bg-fd-card overflow-hidden my-4">
@@ -101,12 +128,12 @@ export function TryIt({
             <MiniGrid
               cols={grid.cols}
               rowCount={grid.rowCount}
-              values={grid.rowsByInput ? (grid.rowsByInput[value.trim().toLowerCase()] ?? {}) : (grid.values ?? {})}
+              values={normalizedRowsByInput ? (normalizedRowsByInput[normalizedValue] ?? {}) : (grid.values ?? {})}
               highlight={
-                grid.rowsByInput
+                normalizedRowsByInput
                   ? ''
-                  : grid.highlightMap
-                    ? (grid.highlightMap[value.trim().toLowerCase()] ?? '')
+                  : normalizedHighlightMap
+                    ? (normalizedHighlightMap[normalizedValue] ?? '')
                     : value
               }
             />

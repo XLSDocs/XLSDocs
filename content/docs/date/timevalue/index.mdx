@@ -1,0 +1,160 @@
+---
+title: TIMEVALUE
+description: Convert a time stored as text into a real time serial number.
+---
+
+Convert text that looks like a time — but isn't actually a time
+value yet — into the real fractional serial number Excel uses
+internally for times. The time-of-day equivalent of DATEVALUE.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Ignores any date portion in the text — time only', type: 'warn' },
+  { text: 'Returns a fraction between 0 and 1, not a whole number', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TIMEVALUE(time_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TIMEVALUE(time_text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'time_text',
+    type: 'text',
+    required: true,
+    description: 'Text that looks like a time Excel can recognize.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The time serial number corresponding to `time_text` — a fraction
+between `0` (midnight) and `0.999...` (just before the next
+midnight).
+
+## Description
+
+Just as DATEVALUE turns date-looking text into a real date, TIMEVALUE
+turns time-looking text into a real time value — a fraction
+representing how far through a 24-hour day that time falls.
+`TIMEVALUE("12:00 PM")` returns exactly `0.5`, since noon is halfway
+through the day; `TIMEVALUE("6:00 AM")` returns `0.25`, one quarter
+of the way through.
+
+<Callout type="warn">
+  If `time_text` includes a date portion as well (like
+  `"1/15/2026 2:30 PM"`), TIMEVALUE discards the date entirely and
+  returns only the time fraction. Use DATEVALUE separately on the
+  same text to recover the date portion if both parts are needed.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2:30 PM': '0.604167', '12:00 PM': '0.5', '6:00 AM': '0.25' }}
+  defaultValue="12:00 PM"
+  label={'Live preview — =TIMEVALUE("{value}")'}
+  fieldLabel="time_text"
+/>
+
+Noon lands exactly on `0.5` — halfway through the day — while 6:00 AM
+lands on `0.25`, a quarter of the way through.
+
+## Common errors
+
+### Result displays as a decimal instead of a time
+
+<ExcelCode>{`TIMEVALUE("2:30 PM") → 0.604167 (correct, just needs a time format applied)`}</ExcelCode>
+
+Not an error — apply a time number format to the cell to see it
+displayed as a clock time instead of a raw decimal fraction.
+
+### #VALUE! — text Excel can't parse as a time
+
+<ExcelCode>{`TIMEVALUE("not a time") → #VALUE!`}</ExcelCode>
+
+The text has to be in a format Excel actually recognizes as a time.
+
+### Losing the date portion of a combined date-and-time string
+
+<ExcelCode>{`TIMEVALUE("1/15/2026 2:30 PM") → 0.604167 (the time only, date is dropped)`}</ExcelCode>
+
+TIMEVALUE discards any date component entirely. Use DATEVALUE
+separately on the same text, and add the two results together, if
+both the date and time need to be preserved.
+
+export const faqs = [
+  {
+    question: 'Why is TIMEVALUE\'s result a decimal instead of a recognizable time?',
+    answer: "TIMEVALUE returns the correct underlying fraction, but display formatting is separate — apply a time number format to the cell to see it rendered as a clock time.",
+  },
+  {
+    question: 'What happens to the date if time_text includes one?',
+    answer: 'TIMEVALUE ignores it entirely, returning only the time fraction. Use DATEVALUE on the same text and add the two results together if both parts matter.',
+  },
+  {
+    question: 'What does TIMEVALUE return for exactly midnight?',
+    answer: 'TIMEVALUE("12:00 AM") returns 0 — midnight is the very start of the day\'s fraction, the same value TIME(0, 0, 0) produces.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TIMEVALUE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TIMEVALUE(Logins[TimeText])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim realTime As Date
+    realTime = TimeValue("2:30 PM")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Logins")
+    df["Time"] = pd.to_datetime(df["TimeText"]).dt.time
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DATEVALUE](/docs/date/datevalue) — the same conversion for text
+  that looks like a date instead of a time.
+- [TIME](/docs/date/time) — builds a time value from separate hour/
+  minute/second numbers, rather than parsing text.
+- [HOUR](/docs/date/hour) — a common next step after TIMEVALUE, once
+  the text has become a real time value.

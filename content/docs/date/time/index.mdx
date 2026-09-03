@@ -1,0 +1,171 @@
+---
+title: TIME
+description: Build a time value from separate hour, minute, and second numbers.
+---
+
+Build a time value from three separate numbers — hour, minute, and
+second — the time-of-day equivalent of DATE, for assembling a time
+from parts instead of a calendar date.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'An hour of 24 or more wraps around via mod 24, not an error', type: 'warn' },
+  { text: 'Always returns just a time fraction (0 to <1), never a date', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TIME(hour, minute, second)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TIME(hour, minute, second)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'hour',
+    type: 'number',
+    required: true,
+    description: 'The hour, 0 to 32767. Values of 24 or more wrap around using the remainder after dividing by 24.',
+  },
+  {
+    name: 'minute',
+    type: 'number',
+    required: true,
+    description: 'The minute, 0 to 32767. Values of 60 or more roll over into the hour.',
+  },
+  {
+    name: 'second',
+    type: 'number',
+    required: true,
+    description: 'The second, 0 to 32767. Values of 60 or more roll over into the minute.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A time serial value (a fraction between `0` and `1`, representing a
+portion of a 24-hour day) built from `hour`, `minute`, and `second`.
+
+## Description
+
+TIME combines three separate numbers into a single time value, the
+same way DATE combines year/month/day into a single date value. All
+three arguments overflow into the next unit rather than erroring —
+`TIME(0, 90, 0)` becomes `1:30 AM` (90 minutes rolls over into 1 hour
+30 minutes), and the same rollover applies to `hour` itself.
+
+<Callout type="warn">
+  An `hour` of `24` or more doesn't error or clip — it wraps around
+  using the remainder after dividing by 24. `TIME(27, 0, 0)` returns
+  the exact same result as `TIME(3, 0, 0)`: `3:00 AM`. This can
+  silently produce a "correct-looking" time from a genuinely wrong
+  hour value, like an elapsed-hours calculation that should have used
+  a different format entirely.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '14': '2:00 PM', '27': '3:00 AM', '3': '3:00 AM' }}
+  defaultValue="27"
+  label={'Live preview — =TIME({value}, 0, 0)'}
+  fieldLabel="hour"
+/>
+
+`27` and `3` both return `3:00 AM` — TIME wraps any hour of 24 or
+more back around the clock, rather than treating it as invalid.
+
+## Common errors
+
+### An hour of 24+ silently wraps instead of erroring
+
+<ExcelCode>{`TIME(27, 0, 0) → 3:00 AM (not an error, and not "27:00")`}</ExcelCode>
+
+If the goal was actually to represent more than 24 elapsed hours
+(like a duration, not a clock time), TIME is the wrong tool — a
+duration needs to stay as a plain number of hours, or use a custom
+`[h]:mm` number format that doesn't wrap at 24.
+
+### Confusing TIME's argument order
+
+<ExcelCode>{`TIME(30, 2, 0) → 6:02 AM, not 2:30 (hour=30 wraps to 6, minute=2)`}</ExcelCode>
+
+The order is always hour, minute, second — swapping hour and minute
+(an easy typo when both values happen to be small numbers) builds a
+completely different, but still validly-computed, time, with no
+error to flag the mistake.
+
+export const faqs = [
+  {
+    question: 'What happens if hour is 24 or greater?',
+    answer: 'It wraps around using the remainder after dividing by 24 — TIME(27, 0, 0) and TIME(3, 0, 0) return the identical result, 3:00 AM.',
+  },
+  {
+    question: 'Can TIME represent a duration longer than 24 hours?',
+    answer: "No — TIME always returns a value between 0 and 1 (a fraction of a single day), so any duration of 24 hours or more wraps back around the clock instead of accumulating. Represent a long duration as a plain number of hours/minutes instead, or format a date difference with a [h]:mm custom number format.",
+  },
+  {
+    question: 'Does TIME(0, 0, 0) return midnight?',
+    answer: 'Yes — TIME(0, 0, 0) returns exactly 0, which displays as 12:00 AM (midnight) with a standard time format.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TIME from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TIME(14, 30, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim meetingTime As Date
+    meetingTime = TimeSerial(14, 30, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import time
+
+    meeting_time = time(14, 30, 0)
+    print(meeting_time)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HOUR](/docs/date/hour), [MINUTE](/docs/date/minute), and
+  [SECOND](/docs/date/second) — extract the individual parts TIME
+  combines, the reverse operation.
+- [DATE](/docs/date/date) — the equivalent function for building a
+  calendar date from year/month/day, instead of a time from
+  hour/minute/second.
+- [TIMEVALUE](/docs/date/timevalue) — converts time-formatted text
+  into a time value, an alternative to building one from parts.

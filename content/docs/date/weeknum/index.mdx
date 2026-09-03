@@ -1,0 +1,169 @@
+---
+title: WEEKNUM
+description: Return the week number of the year for a given date.
+---
+
+Return which week of the year a date falls in — week 1 through
+52 or 53, depending on how the year lines up with its starting day
+of the week.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'return_type changes which day starts the week, and can shift the result', type: 'warn' },
+  { text: 'Not the same as the ISO week standard — use ISOWEEKNUM for that', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=WEEKNUM(serial_number, [return_type])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=WEEKNUM(serial_number, [return_type])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'date',
+    required: true,
+    description: 'The date to find the week number of.',
+  },
+  {
+    name: 'return_type',
+    type: 'number',
+    required: false,
+    description: 'Which day starts the week — 1 for Sunday (default), 2 for Monday, plus several other system codes.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The week number of the year containing `serial_number`, as a whole
+number. Week 1 is defined as the week containing January 1st.
+
+## Description
+
+WEEKNUM counts weeks from the start of the year, but "week 1" and
+where each week boundary falls both depend on `return_type` — with
+the default (`1`), weeks run Sunday through Saturday; with `2`,
+weeks run Monday through Sunday instead. Since week 1 is always the
+week containing January 1st regardless of how many days of that week
+actually fall in January, a date near the start of the year can land
+in a different week number depending purely on which day the week is
+defined to start on.
+
+<Callout type="warn">
+  WEEKNUM's numbering doesn't match the international ISO 8601 week
+  standard, which defines week 1 by a stricter rule (the week
+  containing the year's first Thursday). For ISO-compliant week
+  numbers, use `ISOWEEKNUM` instead — it isn't a `return_type` option
+  on WEEKNUM, but a separate function entirely.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '10', '2': '9' }}
+  defaultValue="1"
+  label={'Live preview — =WEEKNUM("March 1, 2026", {value})'}
+  fieldLabel="return_type"
+/>
+
+March 1, 2026 is a Sunday — with weeks starting on Sunday
+(`return_type=1`), that Sunday begins a new week (`10`); with weeks
+starting on Monday (`return_type=2`), that same Sunday is still
+counted as the end of the previous week (`9`).
+
+## Common errors
+
+### Results don't match a system using ISO week numbers
+
+<ExcelCode>{`WEEKNUM(date) ≠ ISOWEEKNUM(date), for many dates near a year boundary`}</ExcelCode>
+
+WEEKNUM and ISOWEEKNUM use genuinely different definitions of week 1
+— they aren't just alternate names for the same calculation. Use
+ISOWEEKNUM specifically when ISO 8601 week numbering is required.
+
+### Off-by-one results from the wrong return_type
+
+<ExcelCode>{`WEEKNUM(A2, 1) → one higher than WEEKNUM(A2, 2), for dates falling on a Sunday`}</ExcelCode>
+
+Check which day of the week the business or reporting convention
+actually starts on — mixing up `return_type` 1 and 2 is the most
+common source of a week number that's consistently one off from
+what's expected.
+
+export const faqs = [
+  {
+    question: 'What determines "week 1" for WEEKNUM?',
+    answer: "Week 1 is always the week containing January 1st, regardless of how many days of that week actually fall within January — even a single day of overlap is enough.",
+  },
+  {
+    question: 'WEEKNUM vs ISOWEEKNUM — what\'s the difference?',
+    answer: "They use different rules for defining week 1. WEEKNUM's week 1 is whichever week contains January 1st. ISOWEEKNUM follows the stricter ISO 8601 standard, where week 1 is the week containing the year's first Thursday — results can differ for dates near the year boundary.",
+  },
+  {
+    question: 'Can a year have 53 weeks under WEEKNUM?',
+    answer: 'Yes — depending on how the days align, WEEKNUM can return 53 for dates in the last few days of December.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with WEEKNUM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=WEEKNUM(Orders[Date], 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim week As Integer
+    week = Application.WorksheetFunction.WeekNum(Range("A2").Value, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Orders")
+    # ISO week number — closest pandas equivalent, NOT the same as
+    # Excel's default WEEKNUM(date, 1) rule
+    df["Week"] = pd.to_datetime(df["Date"]).dt.isocalendar().week
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [WEEKDAY](/docs/date/weekday) — returns which day of the week a
+  date falls on, rather than which week of the year.
+- [YEARFRAC](/docs/date/yearfrac) — a different way to express a
+  date's position within the year, as a fraction rather than a week
+  number.
+- [DATEDIF](/docs/date/datedif) — measures the gap between two dates
+  directly, an alternative to comparing their week numbers.

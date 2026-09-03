@@ -1,0 +1,154 @@
+---
+title: HOUR
+description: Extract the hour from a time value, as a number from 0 to 23.
+---
+
+Pull the hour out of a time value as a plain number from 0 to 23 —
+the time-of-day equivalent of YEAR, MONTH, and DAY, for splitting a
+timestamp apart instead of a calendar date.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns 0-23 (24-hour clock), never 1-12', type: 'check' },
+  { text: 'Works on the time portion of a full date-and-time value too', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=HOUR(serial_number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HOUR(serial_number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'time',
+    required: true,
+    description: 'The time to extract the hour from — a real time value, cell reference, or recognizable time text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hour as a whole number from `0` to `23`, using a 24-hour clock —
+never a 12-hour value with a separate AM/PM indicator.
+
+## Description
+
+Excel stores a time as the fractional part of a date serial number —
+`0.5` is noon, `0.75` is 6:00 PM, and so on across a full day. HOUR
+reads that fraction back out as a 24-hour-clock number. It works the
+same way whether the cell holds a pure time value or a full
+date-and-time timestamp — HOUR only ever looks at the time portion,
+ignoring any date attached to it.
+
+<Callout type="info">
+  HOUR always returns a 24-hour value — `2:30 PM` returns `14`, not
+  `2`. To display a 12-hour hour with AM/PM instead, use a custom
+  number format like `"h AM/PM"` on the cell rather than trying to
+  convert HOUR's result manually.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2:30 PM': '14', '9:15 AM': '9', '11:59 PM': '23' }}
+  defaultValue="2:30 PM"
+  label={'Live preview — =HOUR("{value}")'}
+  fieldLabel="time"
+/>
+
+`2:30 PM` returns `14`, not `2` — HOUR always speaks in 24-hour time,
+regardless of how the source time is displayed or formatted.
+
+## Common errors
+
+### Expecting a 12-hour result
+
+<ExcelCode>{`HOUR("2:30 PM") → 14 (not 2)`}</ExcelCode>
+
+HOUR is always 24-hour. If a 12-hour number is genuinely needed for
+display, use `MOD(HOUR(time) - 1, 12) + 1` to convert, or better,
+apply a 12-hour number format to the original time cell instead of
+reconstructing it from HOUR's result.
+
+### #VALUE! — text Excel doesn't recognize as a time
+
+<ExcelCode>{`HOUR("not a time") → #VALUE!`}</ExcelCode>
+
+The text needs to be something Excel can actually parse as a time —
+check the source data isn't stored as unconverted plain text.
+
+export const faqs = [
+  {
+    question: 'Does HOUR return a 12-hour or 24-hour value?',
+    answer: 'Always 24-hour, from 0 to 23. 2:30 PM returns 14, not 2 — there is no built-in AM/PM-aware version of HOUR.',
+  },
+  {
+    question: 'Does HOUR work on a full date-and-time value, or only a pure time?',
+    answer: "Both — HOUR only looks at the fractional (time) part of a serial number, so a full timestamp like a login time works exactly the same as a standalone time value.",
+  },
+  {
+    question: 'How do I convert HOUR\'s result to a 12-hour number?',
+    answer: 'MOD(HOUR(time) - 1, 12) + 1 converts 0-23 into a 1-12 range, but for display purposes a custom cell number format like "h AM/PM" is usually simpler than reconstructing the value manually.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HOUR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HOUR(Logins[Timestamp])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim loginHour As Integer
+    loginHour = Hour(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Logins")
+    df["Hour"] = pd.to_datetime(df["Timestamp"]).dt.hour
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MINUTE](/docs/date/minute) — extracts the minute instead of the
+  hour, from the same time value.
+- [SECOND](/docs/date/second) — extracts the second instead of the
+  hour.
+- [TIME](/docs/date/time) — builds a time value from separate hour,
+  minute, and second parts, the reverse of HOUR.

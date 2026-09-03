@@ -1,0 +1,151 @@
+---
+title: SECOND
+description: Extract the second from a time value, as a number from 0 to 59.
+---
+
+Pull the second out of a time value as a plain number from 0 to 59 —
+the finest-grained piece of the HOUR/MINUTE/SECOND trio for breaking
+a precise timestamp apart.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns 0-59', type: 'check' },
+  { text: 'A time entered without seconds is treated as :00', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SECOND(serial_number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SECOND(serial_number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'time',
+    required: true,
+    description: 'The time to extract the second from — a real time value, cell reference, or recognizable time text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The second as a whole number from `0` to `59`.
+
+## Description
+
+SECOND completes the HOUR/MINUTE/SECOND set — the same
+extract-a-piece pattern as YEAR/MONTH/DAY, just applied to the time
+portion of a serial number instead of the date portion. A time typed
+or displayed without an explicit seconds component (like `2:30 PM`)
+is stored with `0` seconds, so SECOND returns `0` for it rather than
+an error.
+
+<Callout type="info">
+  Excel's time precision has real floating-point limits at the
+  millisecond level, which can occasionally make SECOND return a
+  value one off from what's expected on a time computed through a
+  long chain of arithmetic. This is a general floating-point
+  representation quirk, not specific to SECOND itself — rounding the
+  underlying time value before extracting SECOND avoids it.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2:30:45 PM': '45', '9:15:00 AM': '0', '11:59:59 PM': '59' }}
+  defaultValue="2:30:45 PM"
+  label={'Live preview — =SECOND("{value}")'}
+  fieldLabel="time"
+/>
+
+## Common errors
+
+### #VALUE! — text Excel doesn't recognize as a time
+
+<ExcelCode>{`SECOND("not a time") → #VALUE!`}</ExcelCode>
+
+The text needs to be something Excel can actually parse as a time.
+
+### Off-by-one results from floating-point time arithmetic
+
+<ExcelCode>{`SECOND(A2) → 29 when 30 was expected, after several chained time calculations`}</ExcelCode>
+
+Not a bug in SECOND itself — times are stored as fractions of a day,
+and repeated arithmetic on them can accumulate tiny floating-point
+errors. Wrapping the time value in `ROUND(time * 86400, 0) / 86400`
+before extracting SECOND resolves it.
+
+export const faqs = [
+  {
+    question: 'What does SECOND return for a time with no seconds specified?',
+    answer: 'A time like 2:30 PM, with no explicit seconds component, is stored with 0 seconds — SECOND returns 0 for it, not an error.',
+  },
+  {
+    question: 'Why did SECOND return a value one off from what I expected?',
+    answer: "Times are stored as fractions of a day, and repeated arithmetic can introduce tiny floating-point rounding errors. Rounding the time value to the nearest whole second before extracting with SECOND resolves this.",
+  },
+  {
+    question: 'HOUR, MINUTE, and SECOND — how do I get the total elapsed seconds instead of just the component?',
+    answer: 'Multiply the full time value by 86400 (the number of seconds in a day) rather than combining HOUR/MINUTE/SECOND manually — this avoids reconstructing the total from its parts.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SECOND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SECOND(Logins[Timestamp])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim loginSecond As Integer
+    loginSecond = Second(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Logins")
+    df["Second"] = pd.to_datetime(df["Timestamp"]).dt.second
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HOUR](/docs/date/hour) — extracts the hour instead of the
+  second, from the same time value.
+- [MINUTE](/docs/date/minute) — extracts the minute instead of the
+  second.
+- [TIME](/docs/date/time) — builds a time value from separate hour,
+  minute, and second parts, the reverse of SECOND.

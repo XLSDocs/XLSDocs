@@ -1,0 +1,146 @@
+---
+title: MINUTE
+description: Extract the minute from a time value, as a number from 0 to 59.
+---
+
+Pull the minute out of a time value as a plain number from 0 to 59 —
+paired with HOUR and SECOND to break a timestamp apart into its
+individual pieces.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns 0-59, regardless of the hour', type: 'check' },
+  { text: 'Works on the time portion of a full date-and-time value too', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=MINUTE(serial_number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MINUTE(serial_number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'serial_number',
+    type: 'time',
+    required: true,
+    description: 'The time to extract the minute from — a real time value, cell reference, or recognizable time text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The minute as a whole number from `0` to `59`.
+
+## Description
+
+MINUTE reads the minute component straight out of a time's
+underlying serial fraction, the same way HOUR reads the hour and
+SECOND reads the second. It works identically on a pure time value
+or the time portion of a full date-and-time timestamp.
+
+<Callout type="info">
+  MINUTE only ever returns `0`–`59` — there's no rollover into the
+  hour to worry about. A time like `2:75 PM` doesn't exist as valid
+  input; Excel would already have normalized it to `3:15 PM` before
+  MINUTE ever sees it.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2:30 PM': '30', '9:15 AM': '15', '11:59 PM': '59' }}
+  defaultValue="2:30 PM"
+  label={'Live preview — =MINUTE("{value}")'}
+  fieldLabel="time"
+/>
+
+## Common errors
+
+### #VALUE! — text Excel doesn't recognize as a time
+
+<ExcelCode>{`MINUTE("not a time") → #VALUE!`}</ExcelCode>
+
+The text needs to be something Excel can actually parse as a time —
+check the source data isn't stored as unconverted plain text.
+
+### Expecting MINUTE to account for the hour
+
+<ExcelCode>{`MINUTE("2:30 PM") → 30 (just the minute — HOUR("2:30 PM") separately gives 14)`}</ExcelCode>
+
+MINUTE only reports the minute component in isolation — combine it
+with HOUR separately if a formula needs both pieces together.
+
+export const faqs = [
+  {
+    question: 'Can MINUTE return a value outside 0-59?',
+    answer: 'No — a time value is always normalized before MINUTE reads it, so the result is always a whole number from 0 to 59.',
+  },
+  {
+    question: 'Does MINUTE work on a full date-and-time value?',
+    answer: 'Yes — it only looks at the fractional (time) part of the serial number, so a full timestamp works the same as a standalone time value.',
+  },
+  {
+    question: 'How do I get the total elapsed minutes instead of just the minute component?',
+    answer: 'Multiply the time value by 1440 (the number of minutes in a day) instead of using MINUTE alone — MINUTE only ever returns the 0-59 remainder, not a running total.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MINUTE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MINUTE(Logins[Timestamp])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim loginMinute As Integer
+    loginMinute = Minute(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Logins")
+    df["Minute"] = pd.to_datetime(df["Timestamp"]).dt.minute
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HOUR](/docs/date/hour) — extracts the hour instead of the
+  minute, from the same time value.
+- [SECOND](/docs/date/second) — extracts the second instead of the
+  minute.
+- [TIME](/docs/date/time) — builds a time value from separate hour,
+  minute, and second parts, the reverse of MINUTE.

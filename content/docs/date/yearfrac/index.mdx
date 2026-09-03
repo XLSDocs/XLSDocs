@@ -1,0 +1,178 @@
+---
+title: YEARFRAC
+description: Calculate the fraction of a year between two dates.
+---
+
+Calculate what fraction of a full year lies between two dates — the
+standard way to prorate an annual amount (a salary, a premium, a
+subscription fee) across a partial year.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The day count basis (0-4) changes the result, sometimes meaningfully', type: 'warn' },
+  { text: 'Defaults to basis 0, US (NASD) 30/360', type: 'check' },
+  { text: 'Requires Excel 2007 or later (via the Analysis ToolPak in very old versions)', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=YEARFRAC(start_date, end_date, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=YEARFRAC(start_date, end_date, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The starting date.',
+  },
+  {
+    name: 'end_date',
+    type: 'date',
+    required: true,
+    description: 'The ending date.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0-4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The fraction of a year between `start_date` and `end_date`, as a
+decimal — `0.5` for exactly half a year, `1.0` for exactly one full
+year.
+
+## Description
+
+YEARFRAC answers "what portion of a year is this," which is exactly
+what's needed to prorate anything billed or earned annually — an
+employee who worked 6 months of the year earned `YEARFRAC(...)` of
+their annual salary, roughly. The `basis` argument controls exactly
+how days are counted, using the same day-count conventions as the
+bond-pricing functions ([ACCRINT](/docs/financial/accrint),
+[YIELD](/docs/financial/yield)) — 30/360 treats every month as having
+30 days, while the actual/365 basis counts real calendar days against
+a 365-day year.
+
+<Callout type="warn">
+  Changing `basis` can meaningfully change the result on the same two
+  dates — it isn't just a rounding difference. From January 1 to July
+  1, basis `0` (30/360) gives exactly `0.5`, while basis `3`
+  (actual/365) gives `0.4959`, since that particular 6-month span
+  actually spans 181 real days, not a clean 180.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'April 1, 2026': '0.25', 'July 1, 2026': '0.5', 'October 1, 2026': '0.75' }}
+  defaultValue="July 1, 2026"
+  label={'Live preview — =YEARFRAC("1/1/2026", "{value}")'}
+  fieldLabel="end_date"
+/>
+
+Each result lines up neatly with a clean quarter of the year — using
+the default 30/360 basis, three months is always exactly `0.25`,
+regardless of which three calendar months are actually involved.
+
+## Common errors
+
+### Results don't match a different system's fraction-of-year calculation
+
+<ExcelCode>{`YEARFRAC(start, end) ≠ a value computed elsewhere with actual/365 day counting`}</ExcelCode>
+
+Not a bug — check which `basis` the comparison system uses. YEARFRAC
+defaults to 30/360, which disagrees with an actual/365 calculation on
+the same two dates by a small but real amount.
+
+### Expecting a whole number instead of a fraction
+
+<ExcelCode>{`YEARFRAC("1/1/2025", "1/1/2027") → 2.0 (a whole number is a valid result, not an error)`}</ExcelCode>
+
+Not an error — a span of exactly whole years returns a clean whole
+number, since that genuinely is the correct fraction (200% of a
+year, expressed as `2.0`).
+
+export const faqs = [
+  {
+    question: 'Which basis should I use for YEARFRAC?',
+    answer: "Basis 0 (30/360, the default) is the most common choice for simple proration. Match whatever basis a comparison calculation or contract specifically calls for if the two need to agree exactly.",
+  },
+  {
+    question: 'Can YEARFRAC return a value greater than 1?',
+    answer: 'Yes — if end_date is more than a year after start_date, YEARFRAC returns a value above 1, representing more than a full year.',
+  },
+  {
+    question: 'How is YEARFRAC useful for prorating a salary or subscription?',
+    answer: 'Multiply an annual amount by YEARFRAC(start, end) to get the prorated amount for that specific date range — the standard building block for mid-year hires, cancellations, or partial billing periods.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with YEARFRAC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=YEARFRAC(Employees[StartDate], TODAY())`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim fraction As Double
+    fraction = Application.WorksheetFunction.YearFrac(startDate, Date)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def yearfrac_30_360(start, end):
+        d1 = min(start.day, 30)
+        d2 = 30 if (end.day == 31 and d1 == 30) else end.day
+        days = (end.year - start.year) * 360 + (end.month - start.month) * 30 + (d2 - d1)
+        return days / 360
+
+    print(yearfrac_30_360(date(2026, 1, 1), date(2026, 7, 1)))  # 0.5
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DATEDIF](/docs/date/datedif) — measures the gap between two dates
+  in whole years, months, or days, instead of a fractional year.
+- [ACCRINT](/docs/financial/accrint) and [YIELD](/docs/financial/yield)
+  — bond-pricing functions that use the same day-count `basis`
+  convention as YEARFRAC.
+- [EDATE](/docs/date/edate) — shifts a date by whole months, a
+  different operation than measuring the gap between two dates.

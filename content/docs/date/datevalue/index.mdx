@@ -1,0 +1,166 @@
+---
+title: DATEVALUE
+description: Convert a date stored as text into a real date serial number.
+---
+
+Convert text that looks like a date — but isn't actually a date
+value yet — into the real serial number Excel uses internally for
+dates. The standard fix for a column of "dates" imported as plain
+text that formulas like YEAR or EDATE otherwise can't touch.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Ignores any time portion in the text — date only', type: 'warn' },
+  { text: 'Returns a plain number, which usually needs a date format applied to display as a date', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DATEVALUE(date_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DATEVALUE(date_text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'date_text',
+    type: 'text',
+    required: true,
+    description: 'Text that looks like a date Excel can recognize.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The date serial number corresponding to `date_text` — the same
+number a genuine date value would have, just derived from parsing
+text instead.
+
+## Description
+
+Data imported from another system often arrives as text that merely
+*resembles* a date, rather than a real date value — a cell might
+display `"1/15/2026"` but fail every date-aware formula, because
+Excel still treats it as a string. DATEVALUE bridges that gap: it
+parses recognizable date text and returns the equivalent serial
+number, which can then be formatted to display as a date, or fed
+into YEAR, EDATE, or any other date function.
+
+<Callout type="warn">
+  DATEVALUE returns a **plain number**, not something that
+  automatically displays as a date — a cell showing `46037` instead
+  of a recognizable date just needs a date number format applied.
+  The underlying value is correct either way; only the display
+  format is missing.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1/15/2026': '46037', '7/4/2026': '46207', '12/25/2026': '46381' }}
+  defaultValue="1/15/2026"
+  label={'Live preview — =DATEVALUE("{value}")'}
+  fieldLabel="date_text"
+/>
+
+Each result is a plain serial number — the same one a genuine date
+value for that day would carry internally, just not yet formatted to
+display as a date.
+
+## Common errors
+
+### Result displays as a number instead of a date
+
+<ExcelCode>{`DATEVALUE("1/15/2026") → 46037 (correct, just needs a date format applied)`}</ExcelCode>
+
+Not an error — apply a date number format to the cell to see it
+displayed as a date instead of a raw serial number.
+
+### #VALUE! — text Excel can't parse as a date
+
+<ExcelCode>{`DATEVALUE("not a date") → #VALUE!`}</ExcelCode>
+
+The text has to be in a format Excel actually recognizes as a date —
+check regional date settings if a format that looks reasonable is
+still failing (day/month order varies by locale).
+
+### Losing the time portion of a combined date-and-time string
+
+<ExcelCode>{`DATEVALUE("1/15/2026 2:30 PM") → 46037 (the date only, time is dropped)`}</ExcelCode>
+
+DATEVALUE discards any time component entirely. Use TIMEVALUE
+separately on the same text, and add the two results together, if
+both the date and time need to be preserved.
+
+export const faqs = [
+  {
+    question: 'Why does DATEVALUE return a plain number instead of a date?',
+    answer: "DATEVALUE returns the correct underlying serial number, but display formatting is separate — apply a date number format to the cell to see it rendered as a recognizable date.",
+  },
+  {
+    question: 'What happens to the time if date_text includes one?',
+    answer: 'DATEVALUE ignores it entirely, returning only the date portion. Use TIMEVALUE on the same text and add the two results together if both parts matter.',
+  },
+  {
+    question: 'Why does DATEVALUE fail on a date that looks correctly formatted?',
+    answer: "Excel's date parsing depends on regional settings — a date written as day/month/year can fail or be misread on a system expecting month/day/year, and vice versa. Check the text against the system's actual date format expectations.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DATEVALUE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DATEVALUE(Imports[DateText])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim realDate As Date
+    realDate = DateValue("1/15/2026")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Imports")
+    df["Date"] = pd.to_datetime(df["DateText"])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TIMEVALUE](/docs/date/timevalue) — the same conversion for text
+  that looks like a time instead of a date.
+- [DATE](/docs/date/date) — builds a date from separate year/month/
+  day numbers, rather than parsing text.
+- [YEAR](/docs/date/year) — a common next step after DATEVALUE, once
+  the text has become a real date value.
