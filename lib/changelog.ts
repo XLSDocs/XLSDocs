@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-03',
+    title: 'ABS, INT, MOD, POWER, SQRT, TRUNC, EVEN, ODD, and SIGN',
+    description:
+      "Nine basic Math functions that were missing entirely — found by auditing our full coverage against Microsoft's own function list. ABS and SQRT in particular are everyday-arithmetic staples; INT and TRUNC finally get their own pages explaining exactly where they disagree on negative numbers.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-02',
     title: '"Ask AI about this" on every Try it example',
     description:
