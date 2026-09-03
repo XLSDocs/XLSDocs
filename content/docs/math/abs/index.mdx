@@ -1,0 +1,158 @@
+---
+title: ABS
+description: Return the absolute value of a number — its distance from zero, regardless of sign.
+---
+
+Return a number's distance from zero, stripping the sign entirely —
+`-8` and `8` both return `8`. The building block behind measuring a
+difference or an error margin when the direction (over vs. under)
+doesn't matter, only the size.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns zero or positive — never negative', type: 'check' },
+  { text: 'ABS(0) returns 0, not an error', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ABS(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ABS(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The real number to find the absolute value of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` with any negative sign removed. Positive numbers and zero
+are returned unchanged.
+
+## Description
+
+ABS answers "how far is this from zero," discarding whether it's
+above or below. It's most useful whenever a comparison genuinely
+shouldn't care about direction — how far off a forecast was from the
+actual result, how big a variance is regardless of whether it's over
+or under budget, or checking whether two values are "close enough"
+by comparing `ABS(a - b)` against a tolerance.
+
+<Callout type="info">
+  ABS strips the sign, but it doesn't change how a formula that
+  produces the number was computed. `ABS(actual - budget)` and
+  `ABS(budget - actual)` always return the same result, even though
+  `actual - budget` and `budget - actual` are opposite in sign —
+  useful when it genuinely doesn't matter which value was subtracted
+  from which.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-8': '8', '8': '8', '0': '0' }}
+  defaultValue="-8"
+  label={'Live preview — =ABS({value})'}
+  fieldLabel="number"
+/>
+
+Both `-8` and `8` return the same result — ABS only cares about
+distance from zero, not which side of it a number started on.
+
+## Common errors
+
+### Expecting ABS to flip a positive number negative
+
+<ExcelCode>{`ABS(8) → 8 (not -8 — ABS only ever removes a negative sign, never adds one)`}</ExcelCode>
+
+ABS is one-directional — it strips a negative sign if one exists, but
+it never makes a positive number negative. To force a value negative
+regardless of its current sign, use `-ABS(number)` instead.
+
+### Using ABS when a comparison should still care about direction
+
+<ExcelCode>{`ABS(actual - budget) → same result whether actual is over or under budget`}</ExcelCode>
+
+Not a bug, but a common design mistake — if "over budget" and "under
+budget" genuinely need different treatment, wrapping the difference
+in ABS throws that distinction away. Compare the raw difference's
+sign directly instead when direction matters.
+
+export const faqs = [
+  {
+    question: 'Does ABS work on text that looks like a number?',
+    answer: 'No — ABS expects a genuine number. Text-formatted numbers (common after a CSV import) return a #VALUE! error until converted with VALUE() first.',
+  },
+  {
+    question: 'What does ABS return for zero?',
+    answer: '0 — zero has no sign to remove, so ABS(0) simply returns 0, not an error.',
+  },
+  {
+    question: 'How do I force a number to always be negative?',
+    answer: 'Wrap it as -ABS(number) — this strips any existing sign first, then applies a negative, guaranteeing a negative result regardless of the input\'s original sign.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ABS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ABS(Forecast[Actual] - Forecast[Budget])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim variance As Double
+    variance = Abs(actualValue - budgetValue)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Forecast")
+    df["Variance"] = (df["Actual"] - df["Budget"]).abs()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SIGN](/docs/math/sign) — returns just the sign of a number
+  (-1, 0, or 1), the complement to ABS stripping it away.
+- [ROUND](/docs/math/round) — often paired with ABS when a variance
+  needs to be both sign-stripped and rounded for display.
+- [SUMPRODUCT](/docs/math/sumproduct) — commonly combined with ABS to
+  total up absolute differences across a whole range at once.

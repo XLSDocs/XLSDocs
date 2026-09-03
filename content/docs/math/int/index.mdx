@@ -1,0 +1,161 @@
+---
+title: INT
+description: Round a number down to the nearest integer, toward negative infinity.
+---
+
+Round a number down to the nearest whole number — but "down" means
+toward negative infinity, not toward zero. `INT(4.7)` gives `4`, and
+`INT(-4.7)` gives `-5`, not `-4`. That distinction is the single
+biggest source of confusion around this function.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Rounds toward negative infinity, not toward zero', type: 'warn' },
+  { text: 'For negative numbers, differs from TRUNC — INT(-4.7) is -5, TRUNC(-4.7) is -4', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=INT(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=INT(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The real number to round down to an integer.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The largest integer less than or equal to `number` — always rounding
+toward negative infinity, regardless of `number`'s own sign.
+
+## Description
+
+INT is a floor function: it always moves toward negative infinity,
+never toward zero. For a positive number this feels like ordinary
+"round down" — `INT(4.7)` is `4`. For a negative number, it keeps
+going the same direction, past zero — `INT(-4.7)` is `-5`, a smaller
+number than `-4.7` itself, not a larger one. This is precisely where
+INT and [TRUNC](/docs/math/trunc) part ways: TRUNC always moves
+toward zero instead, so `TRUNC(-4.7)` gives `-4`.
+
+<Callout type="warn">
+  INT and TRUNC agree on every positive number, which is exactly why
+  the difference goes unnoticed until a negative number shows up.
+  `INT(-4.7)` is `-5`; `TRUNC(-4.7)` is `-4` — a full integer apart,
+  from the same input.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4.7': '4', '-4.3': '-5', '-4.7': '-5' }}
+  defaultValue="-4.3"
+  label={'Live preview — =INT({value})'}
+  fieldLabel="number"
+/>
+
+`-4.3` rounds down to `-5`, not `-4` — INT keeps moving toward
+negative infinity even after crossing zero, unlike a simple "drop the
+decimal" truncation.
+
+## Common errors
+
+### Expecting INT to truncate toward zero on negative numbers
+
+<ExcelCode>{`INT(-4.7) → -5 (not -4 — INT rounds toward negative infinity, not toward zero)`}</ExcelCode>
+
+If truncating toward zero is actually what's needed (dropping the
+decimal portion without changing which side of zero the result lands
+on), use TRUNC instead:
+
+<ExcelCode>{`TRUNC(-4.7) → -4`}</ExcelCode>
+
+### Using INT to extract just the decimal portion
+
+<ExcelCode>{`number - INT(number) → the fractional part, but behaves oddly for negative numbers`}</ExcelCode>
+
+This common trick works cleanly for positive numbers, but for
+negative numbers INT's rounding-toward-negative-infinity behavior
+makes the "fractional part" come out negative-to-positive in a way
+that surprises people expecting a simple decimal remainder.
+
+export const faqs = [
+  {
+    question: 'INT vs TRUNC — what\'s the actual difference?',
+    answer: 'They agree on positive numbers. On negative numbers, INT keeps rounding toward negative infinity (INT(-4.7) = -5), while TRUNC always moves toward zero instead (TRUNC(-4.7) = -4).',
+  },
+  {
+    question: 'Does INT round to the nearest integer, like ROUND?',
+    answer: 'No — INT always rounds down (toward negative infinity), regardless of whether the decimal portion is closer to the next integer up or down. ROUND(4.7, 0) gives 5; INT(4.7) gives 4.',
+  },
+  {
+    question: 'How do I get just the decimal/fractional part of a number?',
+    answer: 'number - INT(number) works for positive numbers, but consider MOD(number, 1) instead — it handles negative numbers more predictably for this specific use.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with INT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=INT(Sales[Price])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rounded As Long
+    rounded = Int(-4.7) ' -5, VBA's Int matches the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    rounded = math.floor(-4.7)  # -5, matches Excel's INT exactly
+    print(rounded)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TRUNC](/docs/math/trunc) — removes the decimal portion toward
+  zero instead of toward negative infinity — the two only disagree
+  on negative numbers.
+- [ROUND](/docs/math/round) — rounds to the nearest value in either
+  direction, rather than always rounding down.
+- [MOD](/docs/math/mod) — uses the same floor-based logic internally
+  as INT to compute a remainder.

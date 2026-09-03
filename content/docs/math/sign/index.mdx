@@ -1,0 +1,156 @@
+---
+title: SIGN
+description: Return the sign of a number as 1, -1, or 0.
+---
+
+Return just the sign of a number, discarding its magnitude entirely
+— `1` for any positive number, `-1` for any negative number, and `0`
+for zero itself, regardless of how large or small the original value
+was.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns exactly 1, -1, or 0 — never any other value', type: 'check' },
+  { text: 'SIGN(0) returns 0, not an error', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SIGN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SIGN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to test the sign of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`1` if `number` is positive, `-1` if `number` is negative, or `0` if
+`number` is exactly zero.
+
+## Description
+
+SIGN is [ABS](/docs/math/abs)'s complement — ABS keeps the magnitude
+and drops the sign, SIGN keeps the sign and drops the magnitude.
+Multiplying the two back together always reconstructs the original
+number: `SIGN(number) * ABS(number)` equals `number` itself. SIGN is
+most useful for branching logic based on direction alone — was a
+variance positive or negative, did a value increase or decrease —
+without needing a full `IF` comparison against zero.
+
+<Callout type="info">
+  `SIGN(0)` returns `0`, not an error and not `1` — zero has no
+  positive or negative direction, so SIGN treats it as its own
+  distinct third case rather than forcing it into either bucket.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-8': '-1', '8': '1', '0': '0' }}
+  defaultValue="-8"
+  label={'Live preview — =SIGN({value})'}
+  fieldLabel="number"
+/>
+
+Three completely different magnitudes (`-8`, `8`, `0`) collapse to
+just three possible outputs — SIGN only reports direction, never
+size.
+
+## Common errors
+
+### Expecting SIGN(0) to return an error or 1
+
+<ExcelCode>{`SIGN(0) → 0 (not an error, and not defaulting to positive)`}</ExcelCode>
+
+Zero is treated as its own case, distinct from both positive and
+negative — a formula branching on SIGN's result needs to explicitly
+account for `0` as a possible outcome, not just `1` and `-1`.
+
+### Using SIGN when the actual magnitude is still needed
+
+<ExcelCode>{`SIGN(-8) → -1 (the direction only — the original -8 magnitude is gone)`}</ExcelCode>
+
+SIGN discards magnitude entirely. If both the direction and the size
+are needed, keep the original value around separately rather than
+trying to recover it from SIGN's result alone.
+
+export const faqs = [
+  {
+    question: 'What are the only possible results SIGN can return?',
+    answer: 'Exactly three: 1 for any positive number, -1 for any negative number, and 0 for zero — never any other value, regardless of how large or small the input is.',
+  },
+  {
+    question: 'How can I reconstruct the original number from SIGN and ABS?',
+    answer: 'SIGN(number) * ABS(number) always equals the original number — SIGN supplies the direction, ABS supplies the magnitude, and multiplying them back together recombines both.',
+  },
+  {
+    question: 'Is SIGN useful for comparing two values?',
+    answer: 'Yes — SIGN(a - b) gives a quick three-way comparison: 1 if a is bigger, -1 if b is bigger, and 0 if they\'re equal, without needing separate IF logic for each case.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SIGN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SIGN(Forecast[Actual] - Forecast[Budget])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim direction As Integer
+    direction = Sgn(-8) ' VBA's built-in function is named Sgn, not Sign
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def excel_sign(n):
+        return (n > 0) - (n < 0)
+
+    print(excel_sign(-8))  # -1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ABS](/docs/math/abs) — keeps the magnitude and discards the sign,
+  the exact complement of SIGN.
+- [IF](/docs/logical/if) — often replaced by SIGN for a quick
+  three-way positive/negative/zero branch.
+- [ROUND](/docs/math/round) — commonly combined with SIGN when
+  rounding a value while preserving its original direction.

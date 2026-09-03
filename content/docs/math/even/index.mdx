@@ -1,0 +1,159 @@
+---
+title: EVEN
+description: Round a number up to the nearest even integer.
+---
+
+Round a number up to the nearest even integer — always moving away
+from zero, never toward it. `EVEN(3)` gives `4`; `EVEN(-3)` gives
+`-4`, not `-2`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always rounds away from zero, not toward positive infinity', type: 'warn' },
+  { text: 'An already-even number is returned unchanged', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=EVEN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EVEN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round up to the nearest even integer.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded up to the nearest even integer, always moving away
+from zero. Returns `number` unchanged if it's already an even
+integer.
+
+## Description
+
+EVEN always rounds **away from zero**, not toward positive infinity
+— that distinction only shows up for negative numbers, but it's the
+detail that trips people up. `EVEN(3)` becomes `4` (moving up, away
+from zero), and `EVEN(-3)` becomes `-4` (also moving away from zero,
+which for a negative number means getting *more* negative, not
+closer to zero).
+
+<Callout type="info">
+  "Away from zero" and "toward positive infinity" are the same
+  direction for positive numbers, which is exactly why the
+  distinction is easy to miss. They diverge for negative numbers:
+  `EVEN(-3)` moves away from zero to `-4`, not toward positive
+  infinity to `-2`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3': '4', '-3': '-4', '2': '2' }}
+  defaultValue="3"
+  label={'Live preview — =EVEN({value})'}
+  fieldLabel="number"
+/>
+
+`-3` rounds to `-4`, not `-2` — EVEN moves away from zero in both
+directions, and `2` (already even) is returned exactly as given.
+
+## Common errors
+
+### Expecting EVEN to round negative numbers toward zero
+
+<ExcelCode>{`EVEN(-3) → -4 (not -2 — EVEN moves away from zero, not toward positive infinity)`}</ExcelCode>
+
+If a value closer to zero was expected here, remember EVEN's
+direction is always "away from zero" for both positive and negative
+inputs — it doesn't switch behavior based on sign the way some
+rounding functions do.
+
+### Assuming EVEN always changes the value
+
+<ExcelCode>{`EVEN(4) → 4 (unchanged — 4 is already even)`}</ExcelCode>
+
+Not an error — an input that's already an even integer is returned
+exactly as-is, with no rounding applied.
+
+export const faqs = [
+  {
+    question: 'Does EVEN round to the nearest even number, or always up?',
+    answer: 'Always away from zero — never toward it, and never toward the nearest even number if that happens to be in the other direction. EVEN(3) is 4, not 2, even though 2 exists as a nearby even number too.',
+  },
+  {
+    question: 'What does EVEN return for a negative number?',
+    answer: "It still moves away from zero, which for a negative number means becoming more negative. EVEN(-3) is -4, not -2 — a common point of confusion since 'up' and 'away from zero' aren't the same direction below zero.",
+  },
+  {
+    question: 'EVEN vs ODD — how do they relate?',
+    answer: 'They\'re mirror functions with the same "away from zero" rounding direction — EVEN always lands on an even integer, ODD always lands on an odd one.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EVEN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EVEN(Inventory[Count])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rounded As Double
+    rounded = Application.WorksheetFunction.Even(-3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    def excel_even(n):
+        rounded = math.ceil(abs(n) / 2) * 2
+        return rounded if n >= 0 else -rounded
+
+    print(excel_even(-3))  # -4
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ODD](/docs/math/odd) — the same away-from-zero rounding, landing
+  on an odd integer instead of an even one.
+- [ROUND](/docs/math/round) — rounds to the nearest value in either
+  direction, with no even/odd constraint.
+- [CEILING](/docs/math/ceiling) — rounds up to any arbitrary
+  multiple of significance, not just to an even number.

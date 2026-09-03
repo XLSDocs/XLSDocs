@@ -1,0 +1,157 @@
+---
+title: SQRT
+description: Return the square root of a number.
+---
+
+Return the positive square root of a number — the value that,
+multiplied by itself, gives back the original number. `SQRT(16)` is
+`4`, since `4 × 4` is `16`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A negative number returns #NUM! — no complex/imaginary results', type: 'warn' },
+  { text: 'Only returns the positive root, never the negative one', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SQRT(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SQRT(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to find the square root of. Must be zero or positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The positive square root of `number`. Returns `#NUM!` if `number` is
+negative.
+
+## Description
+
+SQRT is the common, dedicated case of a general power operation —
+`SQRT(n)` computes exactly the same thing as
+[`POWER(n, 0.5)`](/docs/math/power), just with a clearer name for the
+single most common root anyone needs. Every positive number has two
+mathematical square roots (one positive, one negative), but SQRT
+always returns only the positive one.
+
+<Callout type="warn">
+  A negative `number` returns `#NUM!` — Excel has no built-in support
+  for imaginary numbers in SQRT (there's a separate `IMSQRT` for
+  working with complex numbers specifically). Squaring a negative
+  number first, intentionally or by formula error, is the most common
+  way a negative value ends up inside SQRT unexpectedly.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '16': '4', '2': '1.41', '-4': '#NUM!' }}
+  defaultValue="16"
+  label={'Live preview — =SQRT({value})'}
+  fieldLabel="number"
+  errorValue="#NUM!"
+/>
+
+`-4` returns `#NUM!` — not a negative result, and not an imaginary
+one. SQRT simply refuses a negative input outright.
+
+## Common errors
+
+### #NUM! — negative input
+
+<ExcelCode>{`SQRT(-4) → #NUM!`}</ExcelCode>
+
+Check where the negative value is coming from — if it's the result
+of a subtraction that could go either way, `SQRT(ABS(number))` at
+least avoids the error, though it changes the math (it's no longer a
+true square root of the original signed value).
+
+### Expecting both the positive and negative root
+
+<ExcelCode>{`SQRT(16) → 4 only (not also -4, even though -4 × -4 is also 16)`}</ExcelCode>
+
+SQRT always returns just the positive root. If the negative root is
+also needed, it has to be computed separately as `-SQRT(number)`.
+
+export const faqs = [
+  {
+    question: 'Why does SQRT return #NUM! instead of an imaginary number?',
+    answer: "Excel's SQRT only works with real numbers. For genuine complex-number math involving the square root of a negative value, IMSQRT handles values in Excel's complex-number text format instead.",
+  },
+  {
+    question: 'Is SQRT(n) the same as POWER(n, 0.5)?',
+    answer: 'Yes, exactly — SQRT is a dedicated, more readable name for the single most common case of a fractional-power calculation.',
+  },
+  {
+    question: 'How do I get the negative square root too?',
+    answer: 'SQRT always returns only the positive root. Compute -SQRT(number) separately if the negative root is also needed.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SQRT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SQRT(Measurements[Area])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Sqr(16) ' VBA's built-in function is named Sqr, not Sqrt
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.sqrt(16)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [POWER](/docs/math/power) — SQRT is the special case of POWER with
+  an exponent of 0.5.
+- [ABS](/docs/math/abs) — often combined with SQRT to sidestep the
+  negative-input #NUM! error, though it changes what's actually
+  being computed.
+- [ROUND](/docs/math/round) — commonly wraps a SQRT result to a
+  clean number of decimal places.

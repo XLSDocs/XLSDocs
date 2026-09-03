@@ -1,0 +1,176 @@
+---
+title: MOD
+description: Return the remainder after dividing one number by another.
+---
+
+Return the remainder left over after dividing `number` by `divisor`
+— the classic building block behind "every Nth row," alternating
+patterns, and checking whether one number evenly divides another.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The result takes the sign of divisor, not of number', type: 'warn' },
+  { text: 'divisor of 0 returns #DIV/0!', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=MOD(number, divisor)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MOD(number, divisor)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to divide.',
+  },
+  {
+    name: 'divisor',
+    type: 'number',
+    required: true,
+    description: 'The number to divide by.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The remainder after dividing `number` by `divisor`. The result
+always has the **same sign as `divisor`**, regardless of `number`'s
+own sign.
+
+## Description
+
+MOD computes `number - divisor * INT(number / divisor)` — internally
+built on the same floor-based rounding as [INT](/docs/math/int),
+which is exactly why the result's sign follows `divisor`, not
+`number`. This is the opposite convention from many programming
+languages, where the remainder typically takes the sign of the
+dividend instead. `MOD(7, 3)` is a familiar `1`, but `MOD(-7, 3)` is
+`2` — not `-1`, which is what a language like Python's `%` on
+integers would give for the equivalent unsigned case, or what naive
+intuition expects.
+
+<Callout type="warn">
+  MOD's result always matches `divisor`'s sign, not `number`'s.
+  `MOD(-7, 3)` returns `2` (positive, matching the positive divisor);
+  `MOD(7, -3)` returns `-2` (negative, matching the negative
+  divisor). This trips up anyone assuming the remainder should follow
+  the number being divided.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '1', '-7': '2', '8': '2' }}
+  defaultValue="-7"
+  label={'Live preview — =MOD({value}, 3)'}
+  fieldLabel="number"
+/>
+
+`-7` divided by `3` returns `2`, not `-1` — the result takes the
+divisor's positive sign, even though `number` itself is negative.
+
+## Common errors
+
+### #DIV/0! — divisor is zero
+
+<ExcelCode>{`MOD(10, 0) → #DIV/0!`}</ExcelCode>
+
+There's no remainder to compute when dividing by zero — check that
+`divisor` genuinely can't be zero before relying on MOD in a formula
+that runs across a range.
+
+### Expecting the remainder to match number's sign
+
+<ExcelCode>{`MOD(-7, 3) → 2 (not -1, even though -7 is negative)`}</ExcelCode>
+
+The result takes `divisor`'s sign, not `number`'s — this is standard
+Excel behavior, not a bug. If a sign matching the dividend is
+genuinely needed, the result has to be adjusted manually.
+
+### Using MOD to test "every Nth row" and getting the offset wrong
+
+<ExcelCode>{`MOD(ROW(), 2) = 0 → TRUE on even rows, not odd`}</ExcelCode>
+
+`MOD(ROW(), 2)` is `0` on even rows and `1` on odd rows — a common
+off-by-one mistake is assuming it flags odd rows instead, or
+forgetting that row 1 itself returns `1`, not `0`.
+
+export const faqs = [
+  {
+    question: 'Why does MOD(-7, 3) return 2 instead of -1?',
+    answer: 'MOD always returns a result with the same sign as the divisor, not the number being divided. Since divisor (3) is positive, the result is positive — 2 — even though the number being divided (-7) is negative.',
+  },
+  {
+    question: 'How do I check if a number is evenly divisible by another?',
+    answer: 'MOD(number, divisor) = 0 is TRUE exactly when divisor evenly divides number — this is the standard building block behind ISEVEN-style checks and "every Nth item" formulas.',
+  },
+  {
+    question: 'How do I highlight every other row using MOD?',
+    answer: 'MOD(ROW(), 2) = 0 is TRUE on even rows; MOD(ROW(), 2) = 1 is TRUE on odd rows — a common conditional formatting formula for alternating row colors.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MOD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MOD(ROW(), 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim remainder As Long
+    remainder = -7 Mod 3 ' VBA's Mod returns -1 here — a DIFFERENT
+                         ' convention from the worksheet MOD function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def excel_mod(number, divisor):
+        # Python's % already matches Excel's sign-of-divisor convention
+        # for floats, unlike VBA's Mod operator.
+        return number - divisor * (number // divisor)
+
+    print(excel_mod(-7, 3))  # 2, matches Excel exactly
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [INT](/docs/math/int) — the floor function MOD is built on
+  internally.
+- [ROW](/docs/lookup/row) — often paired with MOD to build
+  "every Nth row" formulas.
+- [ROUND](/docs/math/round) — a different way to reshape a number,
+  rounding it instead of finding a remainder.

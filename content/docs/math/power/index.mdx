@@ -1,0 +1,163 @@
+---
+title: POWER
+description: Raise a number to a given power — the function version of the ^ exponent operator.
+---
+
+Raise `number` to the `power` given — the same calculation the `^`
+operator performs, but as a function, which makes it usable anywhere
+a formula argument is expected instead of an inline operator.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'POWER(n, p) is identical to n^p — same math, function form', type: 'check' },
+  { text: 'A fractional power computes a root — POWER(n, 0.5) is the same as SQRT(n)', type: 'check' },
+  { text: 'A negative base with a fractional power returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=POWER(number, power)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=POWER(number, power)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The base number.',
+  },
+  {
+    name: 'power',
+    type: 'number',
+    required: true,
+    description: 'The exponent to raise number to.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` raised to `power`. A negative `power` gives a reciprocal
+(`POWER(2, -1)` is `0.5`); a fractional `power` gives a root
+(`POWER(9, 0.5)` is `3`).
+
+## Description
+
+POWER and the `^` operator compute exactly the same thing —
+`POWER(2, 3)` and `2^3` both return `8`. POWER exists mainly for
+readability in a long formula, and because it can be passed directly
+as an argument to another function (like LAMBDA) where an inline
+operator sometimes reads less clearly. A fractional exponent doubles
+as a general-purpose root function: `POWER(n, 1/2)` is a square root,
+`POWER(n, 1/3)` is a cube root, and so on for any root.
+
+<Callout type="warn">
+  A **negative base with a fractional power** returns `#NUM!`, even
+  when the real-numbered root genuinely exists — `POWER(-8, 1/3)`
+  should mathematically be `-2` (the real cube root of -8), but Excel
+  returns `#NUM!` instead of computing it, since its exponent
+  algorithm doesn't handle negative bases with non-integer exponents.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3': '8', '0.5': '1.41', '-1': '0.5' }}
+  defaultValue="3"
+  label={'Live preview — =POWER(2, {value})'}
+  fieldLabel="power"
+/>
+
+The same base, three completely different shapes of result: a whole
+cube (`8`), a square root via a fractional exponent (`1.41`), and a
+reciprocal via a negative exponent (`0.5`).
+
+## Common errors
+
+### #NUM! — negative base with a fractional exponent
+
+<ExcelCode>{`POWER(-8, 1/3) → #NUM! (even though the real cube root of -8 is -2)`}</ExcelCode>
+
+Excel's POWER can't compute a fractional root of a negative base
+directly. If the real root is genuinely needed, it has to be
+computed around the sign manually — take the root of the positive
+version, then reapply the negative sign afterward.
+
+### Confusing POWER's argument order
+
+<ExcelCode>{`POWER(2, 10) → 1024 (2 to the 10th power, not 10 to the 2nd)`}</ExcelCode>
+
+`number` is the base and `power` is the exponent, in that order —
+the same order as writing `2^10` — reversing them changes the
+result completely.
+
+export const faqs = [
+  {
+    question: 'Is there any difference between POWER(n, p) and n^p?',
+    answer: 'No — they compute the exact same result. POWER exists as a function mainly for readability and for use as an argument passed into another function, where the ^ operator can be harder to read inline.',
+  },
+  {
+    question: 'How do I compute a cube root or other root with POWER?',
+    answer: 'Use a fractional exponent: POWER(n, 1/3) is the cube root of n, POWER(n, 1/4) is the fourth root, and so on. This only works directly for a non-negative n.',
+  },
+  {
+    question: 'Why does POWER return #NUM! for a negative base with a fractional exponent?',
+    answer: "Excel's exponentiation algorithm doesn't support computing real-valued fractional powers of negative numbers, even when a real answer exists (like the cube root of -8 being -2). Compute the root of the positive value and reapply the sign manually if this case comes up.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with POWER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=POWER(2, 10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = 2 ^ 10 ' VBA has no separate Power function — use the ^ operator
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = 2 ** 10
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SQRT](/docs/math/sqrt) — the special case of POWER with an
+  exponent of exactly 0.5, as its own dedicated function.
+- [ABS](/docs/math/abs) — often paired with POWER when working
+  around the negative-base-fractional-exponent limitation.
+- [ROUND](/docs/math/round) — commonly wraps a POWER result to a
+  reasonable number of decimal places for display.

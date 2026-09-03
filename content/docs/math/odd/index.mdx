@@ -1,0 +1,153 @@
+---
+title: ODD
+description: Round a number up to the nearest odd integer.
+---
+
+Round a number up to the nearest odd integer — always moving away
+from zero, never toward it. `ODD(4)` gives `5`; `ODD(-4)` gives
+`-5`, not `-3`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always rounds away from zero, not toward positive infinity', type: 'warn' },
+  { text: 'An already-odd number is returned unchanged', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ODD(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ODD(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round up to the nearest odd integer.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded up to the nearest odd integer, always moving away
+from zero. Returns `number` unchanged if it's already an odd
+integer.
+
+## Description
+
+ODD is [EVEN](/docs/math/even)'s mirror — same "away from zero"
+rounding direction, just landing on an odd integer instead of an
+even one. `ODD(4)` becomes `5`, and `ODD(-4)` becomes `-5` — moving
+further from zero in both cases, not toward positive infinity.
+
+<Callout type="info">
+  Like EVEN, "away from zero" and "toward positive infinity" only
+  look identical for positive numbers. `ODD(-4)` moves away from
+  zero to `-5`, not toward positive infinity to `-3`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4': '5', '-4': '-5', '3': '3' }}
+  defaultValue="4"
+  label={'Live preview — =ODD({value})'}
+  fieldLabel="number"
+/>
+
+`-4` rounds to `-5`, not `-3` — ODD moves away from zero regardless
+of sign, and `3` (already odd) passes through unchanged.
+
+## Common errors
+
+### Expecting ODD to round negative numbers toward zero
+
+<ExcelCode>{`ODD(-4) → -5 (not -3 — ODD moves away from zero, not toward positive infinity)`}</ExcelCode>
+
+Same direction convention as EVEN — ODD always moves further from
+zero for both positive and negative inputs.
+
+### Assuming ODD always changes the value
+
+<ExcelCode>{`ODD(5) → 5 (unchanged — 5 is already odd)`}</ExcelCode>
+
+Not an error — an input that's already an odd integer passes through
+exactly as given, with no rounding applied.
+
+export const faqs = [
+  {
+    question: 'Does ODD round to the nearest odd number, or always up?',
+    answer: 'Always away from zero — ODD(4) is 5, not 3, even though 3 is also a nearby odd number in the other direction.',
+  },
+  {
+    question: 'What does ODD return for a negative number?',
+    answer: 'It still moves away from zero, becoming more negative. ODD(-4) is -5, not -3.',
+  },
+  {
+    question: 'ODD vs EVEN — how do they relate?',
+    answer: 'Mirror functions with the same away-from-zero rounding direction — ODD always lands on an odd integer, EVEN always lands on an even one.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ODD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ODD(Inventory[Count])`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rounded As Double
+    rounded = Application.WorksheetFunction.Odd(-4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    def excel_odd(n):
+        rounded = math.floor(abs(n) / 2) * 2 + 1
+        return rounded if n >= 0 else -rounded
+
+    print(excel_odd(-4))  # -5
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [EVEN](/docs/math/even) — the same away-from-zero rounding,
+  landing on an even integer instead of an odd one.
+- [ROUND](/docs/math/round) — rounds to the nearest value in either
+  direction, with no even/odd constraint.
+- [CEILING](/docs/math/ceiling) — rounds up to any arbitrary
+  multiple of significance, not just to an odd number.
