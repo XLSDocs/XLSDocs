@@ -1,14 +1,22 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
+import { GitHubIcon } from '@/components/github-icon';
+import { NavSearchButton } from '@/components/home/nav-search-button';
+import { ThemeSwitch } from 'fumadocs-ui/layouts/shared/slots/theme-switch';
+import { gitConfig } from '@/lib/shared';
 
 // A slim, desktop-only bar sitting above fumadocs' own DocsLayout, giving
 // docs pages the same persistent site-wide links every other page has
 // (HomeNav) instead of them being tucked away as a small vertical list at
-// the top of the left sidebar. Deliberately doesn't duplicate search or
-// the theme toggle — DocsLayout's own sidebar already has both. Hidden
-// below the md breakpoint since fumadocs' own mobile header (logo + sidebar
-// drawer trigger) already covers the same ground on small screens, where
-// stacking two headers would waste scarce vertical space.
+// the top of the left sidebar. Hidden below the md breakpoint since
+// fumadocs' own mobile header (logo + sidebar drawer trigger, plus search
+// and theme toggle inside the drawer) already covers the same ground on
+// small screens, where stacking two headers would waste scarce vertical
+// space. Search and the theme toggle DO duplicate controls the sidebar
+// already has on desktop too — accepted deliberately (unlike the logo,
+// which visibly stacked right on top of itself) since a second way to
+// reach search/theme is a much softer, more common redundancy, and
+// matches the reference layout this was modeled on.
 const NAV_LINKS = [
   { href: '/functions', label: 'Functions' },
   { href: '/blog', label: 'Blog' },
@@ -33,6 +41,19 @@ export function DocsTopNav() {
           </Link>
         ))}
       </nav>
+      <div className="flex items-center gap-3">
+        <a
+          href={`https://github.com/${gitConfig.user}/${gitConfig.repo}`}
+          target="_blank"
+          rel="noreferrer noopener"
+          aria-label="xlsdocs on GitHub"
+          className="text-fd-muted-foreground transition-colors hover:text-fd-foreground"
+        >
+          <GitHubIcon className="size-4" />
+        </a>
+        <ThemeSwitch mode="light-dark" />
+        <NavSearchButton />
+      </div>
     </header>
   );
 }
