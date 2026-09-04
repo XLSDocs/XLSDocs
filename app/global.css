@@ -58,12 +58,32 @@
 }
 
 /* Now that --fd-layout-width (above) no longer caps the main grid track,
-   this is what actually keeps the reading column narrow — Fumadocs'
-   article container already has mx-auto, this just sets the number to
-   match the reference sites (~800px) instead of Fumadocs' own 900/1168px
-   defaults. */
+   this is what actually keeps the reading column narrow — sets the
+   number to match the reference sites (~800px) instead of Fumadocs' own
+   900/1168px defaults. `margin-inline: auto` centers it within the main
+   grid track, which is otherwise much wider than 808px (the whole point
+   of the --fd-layout-width override above). This used to be unnecessary
+   because the classic `docs` layout's article had its own `mx-auto`
+   baked in — the `notebook` layout's article (migrated to 2026-09-04)
+   doesn't, it only caps each child's width via `*:max-w-[900px]` with no
+   centering of its own, so without this the whole 808px column sat
+   flush left with a large empty gap before the TOC.
+
+   `width: 100%` is required alongside the auto margins, not optional —
+   #nd-page is a grid item (placed via [grid-area:main]), and CSS grid's
+   default `justify-items: stretch` (fill the grid cell) is disabled the
+   moment an item has an auto inline margin, the same way flexbox's
+   `align-items: stretch` is. Without an explicit width, the article
+   falls back to shrink-to-fit/content-based sizing instead of stretching
+   — invisible on most pages, but on mobile a non-wrapping monospace
+   formula snippet can force that content-based width past the actual
+   viewport width, overflowing and getting silently clipped by
+   #nd-docs-layout's overflow-x-clip (text truncated on the right edge,
+   confirmed via a real narrow-viewport screenshot before adding this). */
 #nd-page {
+  width: 100%;
   max-width: 808px;
+  margin-inline: auto;
 }
 
 /* Bullet lists (Related functions, etc.) use a dash instead of a dot marker */
