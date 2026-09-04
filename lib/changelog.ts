@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-03',
+    title: 'GitHub, search, and a theme toggle in the docs navbar',
+    description:
+      "The new docs navbar now carries the same GitHub link, Ctrl+K search, and light/dark toggle every other page has. Also fixed a sidebar bug: collapsing it could hide the whole thing with no visible way to bring it back — the sidebar now stays put.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-09-03',
     title: 'A persistent navbar on docs pages',
     description:
       "Functions, Blog, Formula Builder, and Pricing are now always one click away while reading a function page, instead of being tucked into a scrollable sidebar list — the same navigation every other page on the site already had.",
