@@ -7,7 +7,7 @@ export default function Layout({ children }: LayoutProps<'/docs'>) {
   return (
     <>
       <DocsTopNav />
-      <DocsLayout tree={source.getPageTree()} {...baseOptions()} sidebar={{ collapsible: false }}>
+      <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
         {children}
       </DocsLayout>
     </>
