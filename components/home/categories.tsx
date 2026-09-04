@@ -11,6 +11,8 @@ import {
   ChartColumn,
   FileCode,
   SquareFunction,
+  Database,
+  Globe,
   type LucideIcon,
 } from 'lucide-react';
 import type { FunctionCategory } from '@/lib/source';
@@ -29,6 +31,8 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   statistical: ChartColumn,
   vba: FileCode,
   'custom-functions': SquareFunction,
+  database: Database,
+  web: Globe,
 };
 
 export function Categories({ categories }: { categories: FunctionCategory[] }) {
