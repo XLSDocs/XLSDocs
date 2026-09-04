@@ -11,11 +11,11 @@ import { baseOptions } from '@/lib/layout.shared';
 // requiring any change to the underlying folder/URL structure. Modeled on
 // pbidocs' own notebook migration (same pattern, same reasoning).
 const TAB_GROUPS: { title: string; folders: string[]; landing: string }[] = [
-  { title: 'Lookup & Logical', folders: ['lookup', 'logical', 'info'], landing: '/docs/lookup' },
+  { title: 'Lookup, Logical & Info', folders: ['lookup', 'logical', 'info'], landing: '/docs/lookup' },
   { title: 'Math & Statistics', folders: ['math', 'statistical'], landing: '/docs/math' },
   { title: 'Text & Date', folders: ['text', 'date'], landing: '/docs/text' },
   { title: 'Financial & Database', folders: ['financial', 'database'], landing: '/docs/financial' },
-  { title: 'Arrays, VBA & Custom', folders: ['arrays', 'vba', 'custom-functions', 'web'], landing: '/docs/arrays' },
+  { title: 'Arrays, VBA, Custom & Web', folders: ['arrays', 'vba', 'custom-functions', 'web'], landing: '/docs/arrays' },
 ];
 
 function buildTabs(): LayoutTab[] {
