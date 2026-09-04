@@ -13,9 +13,16 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-03',
+    title: 'A proper header for the docs sidebar, and a fixed collapse button',
+    description:
+      "The sidebar now has its own \"Docs\" title and a pinned Docs Home link above the category tree, plus fixed a real bug: collapsing the sidebar could hide the whole thing with no visible way to bring it back. It now collapses to a slim icon rail that reliably expands again.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-09-03',
     title: 'GitHub, search, and a theme toggle in the docs navbar',
     description:
-      "The new docs navbar now carries the same GitHub link, Ctrl+K search, and light/dark toggle every other page has. Also fixed a sidebar bug: collapsing it could hide the whole thing with no visible way to bring it back — the sidebar now stays put.",
+      "The new docs navbar now carries the same GitHub link, Ctrl+K search, and light/dark toggle every other page has.",
     tags: ['Improvement'],
   },
   {
