@@ -309,17 +309,16 @@ html > body[data-scroll-locked] {
   display: none;
 }
 
-/* fumadocs' floating "re-expand sidebar" rail ([data-sidebar-panel], the
-   corner button that appears once the sidebar is collapsed) positions
-   itself using --fd-docs-row-3, which fumadocs computes from its own
-   built-in header rows — it has no idea DocsTopNav (an extra 48px-tall bar
-   we added above <DocsLayout>) exists. Left alone, the rail lands right
-   under DocsTopNav's sticky z-50 bar: visually and pointer-wise covered,
-   so once collapsed there was no visible way to expand the sidebar again.
-   Push it down by DocsTopNav's height on desktop, where DocsTopNav is
-   actually rendered (it's hidden below md). */
-@media (min-width: 768px) {
-  [data-sidebar-panel] {
-    top: calc(3rem + var(--spacing) * 4) !important;
-  }
+/* When the sidebar is collapsed, fumadocs' grid gives its freed-up column
+   width to whatever sits in [grid-area:header] — DocsTopNav on desktop —
+   so DocsTopNav's box grows leftward to fill it, all the way to the
+   viewport edge. That's normally fine, but fumadocs' floating "re-expand
+   sidebar" rail ([data-sidebar-panel], fixed-positioned, anchored to the
+   same edge so it can float above collapsed content) has a lower z-index
+   than DocsTopNav — once DocsTopNav's box extends over it, it wins hit
+   testing and the rail becomes unclickable, with no other way to expand
+   the sidebar again. Give the rail a higher z-index than DocsTopNav's so
+   it stays on top regardless of which grid cell currently covers it. */
+[data-sidebar-panel] {
+  z-index: 40;
 }
