@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-04',
+    title: 'A category tab bar across the top of the docs',
+    description:
+      "Lookup & Logical, Math & Statistics, Text & Date, Financial & Database, and Arrays/VBA/Custom Functions are now one click away at the top of every docs page, alongside the full category tree in the sidebar and the same Functions/Blog/Formula Builder/Pricing links every other page has.",
+    tags: ['Improvement'],
+  },
+  {
     date: '2026-09-03',
     title: 'A proper header for the docs sidebar, and a fixed collapse button',
     description:
