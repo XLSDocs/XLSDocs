@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-05',
+    title: 'GEOMEAN, HARMEAN, TRIMMEAN, FORECAST, SLOPE, INTERCEPT, CORREL, PEARSON, PERCENTRANK.INC, QUARTILE.INC, CONFIDENCE.NORM, and AGGREGATE',
+    description:
+      "Twelve Statistical and Math functions closing another audited gap — the site covered STDEV, VAR, MEDIAN, and RANK, but had nothing for the correlation/regression family (SLOPE, INTERCEPT, FORECAST, CORREL, PEARSON) or the alternate-average functions (GEOMEAN, HARMEAN, TRIMMEAN). AGGREGATE rounds it out as the one function that can run 19 different calculations with built-in error and hidden-row handling.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-04',
     title: 'A category tab bar across the top of the docs',
     description:
