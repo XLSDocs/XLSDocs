@@ -101,6 +101,29 @@
   margin-inline: auto;
 }
 
+/* Subtle vignette fading out from under the sticky docs header (search +
+   tab bar, id="nd-subnav") — matches tsqldocs' restrained take on this
+   rather than a bold branded glow (considered and rejected: the docs
+   section has stayed the quiet, functional counterpart to the homepage's
+   bolder decorative effects everywhere else this session, and content
+   starts too close to the header here for a loud glow to have room to
+   breathe). color-mix keeps it theme-adaptive without separate light/
+   dark overrides — a plain shadow-like darkening reads as depth in both
+   themes, unlike a hardcoded color would. pointer-events: none so it
+   never intercepts clicks on the tab bar or content beneath it; #nd-subnav
+   is already `position: sticky`, which is enough to anchor this
+   absolutely-positioned pseudo-element without an extra relative rule. */
+#nd-subnav::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  inset-inline: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-fd-foreground) 6%, transparent), transparent);
+  pointer-events: none;
+  z-index: 5;
+}
+
 /* Bullet lists (Related functions, etc.) use a dash instead of a dot marker */
 .prose ul > li::marker {
   content: "– ";
