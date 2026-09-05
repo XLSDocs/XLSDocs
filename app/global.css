@@ -58,16 +58,31 @@
 }
 
 /* Now that --fd-layout-width (above) no longer caps the main grid track,
-   this is what actually keeps the reading column narrow — sets the
-   number to match the reference sites (~800px) instead of Fumadocs' own
-   900/1168px defaults. `margin-inline: auto` centers it within the main
-   grid track, which is otherwise much wider than 808px (the whole point
-   of the --fd-layout-width override above). This used to be unnecessary
-   because the classic `docs` layout's article had its own `mx-auto`
-   baked in — the `notebook` layout's article (migrated to 2026-09-04)
-   doesn't, it only caps each child's width via `*:max-w-[900px]` with no
-   centering of its own, so without this the whole 808px column sat
-   flush left with a large empty gap before the TOC.
+   this is what actually keeps the reading column narrow — `margin-inline:
+   auto` centers it within the main grid track, which is otherwise much
+   wider than this max-width (the whole point of the --fd-layout-width
+   override above). This used to be unnecessary because the classic
+   `docs` layout's article had its own `mx-auto` baked in — the
+   `notebook` layout's article (migrated to 2026-09-04) doesn't, it only
+   caps each child's width via `*:max-w-[900px]` with no centering of its
+   own, so without this the whole reading column sat flush left with a
+   large empty gap before the TOC.
+
+   The max-width below is 900, but the ACTUAL rendered text column ends
+   up ~836px — #nd-page (id="nd-page", the <article> itself) is the
+   element this max-width applies to, and Tailwind's border-box default
+   means that budget includes its own horizontal padding
+   (`xl:px-8` = 64px total) inherited from notebook's own container
+   classes, not just the visible text. Comparing raw numbers against
+   sibling sites (pbidocs: 900px actual content width, no #nd-page
+   override at all, since it uses fumadocs' stock notebook default;
+   tsqldocs: ~828px) without accounting for that padding is exactly how
+   this shipped 64px narrower than intended the first time (808 here
+   rendered as 744 of actual text — confirmed too narrow next to both
+   siblings). Landing on 900 here lands the real content width at ~836,
+   between the two. If this ever needs tuning again, measure the
+   rendered text column directly (getBoundingClientRect on a child
+   paragraph, not #nd-page itself), not just this number.
 
    `width: 100%` is required alongside the auto margins, not optional —
    #nd-page is a grid item (placed via [grid-area:main]), and CSS grid's
@@ -82,7 +97,7 @@
    confirmed via a real narrow-viewport screenshot before adding this). */
 #nd-page {
   width: 100%;
-  max-width: 808px;
+  max-width: 900px;
   margin-inline: auto;
 }
 
