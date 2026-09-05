@@ -2,7 +2,7 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import { DM_Mono } from 'next/font/google';
 import Script from 'next/script';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 const dmMono = DM_Mono({
   subsets: ['latin'],
@@ -23,6 +23,20 @@ export const metadata: Metadata = {
       'msvalidate.01': 'D7B9EC9B5210AB7F934CCCC1C1B95DFF',
     },
   },
+};
+
+// Tints the mobile browser chrome (Chrome/Safari address bar, PWA title
+// bar) with the same emerald accent used everywhere else on the site
+// (--color-fd-primary in global.css) instead of leaving it at the
+// browser's own default. Two variants, matching light/dark exactly —
+// hex equivalents of the oklch() values in global.css (Tailwind's
+// emerald-600/emerald-500) since theme-color's browser support for
+// oklch() itself is inconsistent, unlike the CSS custom properties.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#059669' },
+    { media: '(prefers-color-scheme: dark)', color: '#10b981' },
+  ],
 };
 
 // next-themes' anti-flash-of-wrong-theme script (rendered inside
