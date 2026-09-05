@@ -107,11 +107,13 @@
    section has stayed the quiet, functional counterpart to the homepage's
    bolder decorative effects everywhere else this session, and content
    starts too close to the header here for a loud glow to have room to
-   breathe). color-mix keeps it theme-adaptive without separate light/
-   dark overrides — a plain shadow-like darkening reads as depth in both
-   themes, unlike a hardcoded color would. pointer-events: none so it
-   never intercepts clicks on the tab bar or content beneath it; #nd-subnav
-   is already `position: sticky`, which is enough to anchor this
+   breathe). Tinted with --color-fd-primary instead of neutral foreground
+   (was color-mix(...--color-fd-foreground...) before) at the same low
+   opacity/height as the original neutral version — same restraint, just
+   a hint of the brand's emerald rather than plain gray. color-mix keeps
+   it theme-adaptive without separate light/dark overrides. pointer-events:
+   none so it never intercepts clicks on the tab bar or content beneath it;
+   #nd-subnav is already `position: sticky`, which is enough to anchor this
    absolutely-positioned pseudo-element without an extra relative rule. */
 #nd-subnav::after {
   content: '';
@@ -119,7 +121,7 @@
   top: 100%;
   inset-inline: 0;
   height: 140px;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-fd-foreground) 6%, transparent), transparent);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--color-fd-primary) 10%, transparent), transparent);
   pointer-events: none;
   z-index: 5;
 }
