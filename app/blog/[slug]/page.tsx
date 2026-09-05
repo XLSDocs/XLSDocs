@@ -8,8 +8,23 @@ import { Faq, type FaqItem } from '@/components/faq';
 import { AskClaude } from '@/components/ask-claude';
 import { Footer } from '@/components/home/footer';
 
+// `date` is a plain 'YYYY-MM-DD' string with no time-of-day meaning —
+// `new Date(date)` parses it as UTC midnight, so formatting it back out
+// without pinning the timezone relies entirely on the server's own local
+// timezone happening to already be UTC (true on Cloudflare Workers, so
+// this "accidentally" displays correctly in production, but shows the
+// previous day in local dev/preview on any machine set to a timezone
+// west of UTC). This is a server component, so it can't cause a
+// hydration mismatch the way the same unfixed pattern did in PostCard's
+// formatDate — but pinning it explicitly here too removes the implicit
+// dependency on the runtime's timezone rather than leaving it to chance.
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
 }
 
 // FAQ answers are stored with markdown (`code`, **bold**) for on-page

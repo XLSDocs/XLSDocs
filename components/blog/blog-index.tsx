@@ -24,10 +24,18 @@ export function BlogIndex({ posts, categories }: { posts: Post[]; categories: st
     [posts, active],
   );
 
+  // getUTCFullYear(), not getFullYear() — post.date is a plain 'YYYY-MM-DD'
+  // string with no time-of-day meaning, so `new Date(post.date)` parses it
+  // as UTC midnight. getFullYear() converts to the *viewer's* local
+  // timezone first, which only differs from getUTCFullYear() for a post
+  // dated right at a year boundary (e.g. Jan 1 UTC still reads Dec 31 in
+  // any timezone west of UTC) — rare today, but this is the exact same
+  // server/client mismatch class already fixed in PostCard's formatDate,
+  // just waiting for the right post date to trigger it.
   const groups = useMemo(() => {
     const byYear = new Map<string, Post[]>();
     for (const post of filtered) {
-      const year = new Date(post.date).getFullYear().toString();
+      const year = new Date(post.date).getUTCFullYear().toString();
       byYear.set(year, [...(byYear.get(year) ?? []), post]);
     }
     return [...byYear.entries()].sort((a, b) => Number(b[0]) - Number(a[0]));
@@ -35,7 +43,7 @@ export function BlogIndex({ posts, categories }: { posts: Post[]; categories: st
 
   const topicCount = categories.length;
   const earliestYear = useMemo(
-    () => posts.reduce((min, p) => Math.min(min, new Date(p.date).getFullYear()), Infinity),
+    () => posts.reduce((min, p) => Math.min(min, new Date(p.date).getUTCFullYear()), Infinity),
     [posts],
   );
 
