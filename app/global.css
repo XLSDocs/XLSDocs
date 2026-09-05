@@ -126,39 +126,6 @@
   z-index: 5;
 }
 
-/* Fumadocs' <Callout> ships intentionally neutral — bg-fd-card (the same
-   flat card background used everywhere else) and gray text, with only
-   the icon and a thin 2px accent bar actually tinted per type. Reference
-   the user pointed at (a filled, type-colored box with matching tinted
-   text, from a well-known docs platform's tip/warning callouts) reads as
-   far more noticeable. That's the right call here specifically: unlike
-   the vignette under the docs header (kept deliberately subtle, since a
-   background flourish never needs to be "read"), a callout's entire job
-   is functional signaling — asking a reader to notice and read one
-   specific paragraph — and fumadocs' neutral default was arguably
-   under-serving that, blending into surrounding body text closely enough
-   to be easy to skim past.
-
-   Targets the accent bar's `role="none"` marker — Callout's only
-   semantic hook, and a direct child unique to this component — rather
-   than matching against Tailwind utility class names, which could shift
-   under a fumadocs update. `--callout-color` is the same CSS custom
-   property Callout already sets inline per type (info/warn/success/
-   idea/error), so this automatically stays correct for every type
-   without needing a rule per type. Text blends toward
-   --color-fd-foreground instead of using --callout-color at full
-   strength, since a highly saturated color directly as body-text color
-   risks poor contrast against its own equally-tinted background —
-   confirmed by eye in both themes across all 4 types actually in use
-   (info, warn, success, idea) before shipping. */
-.prose div:has(> div[role="none"]) {
-  background: color-mix(in srgb, var(--callout-color) 14%, var(--color-fd-background));
-  border-color: color-mix(in srgb, var(--callout-color) 30%, transparent);
-}
-.prose div:has(> div[role="none"]) .text-fd-muted-foreground {
-  color: color-mix(in srgb, var(--callout-color) 85%, var(--color-fd-foreground));
-}
-
 /* Bullet lists (Related functions, etc.) use a dash instead of a dot marker */
 .prose ul > li::marker {
   content: "– ";
