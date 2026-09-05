@@ -1,0 +1,164 @@
+---
+title: GEOMEAN
+description: The geometric mean — the right average for growth rates, ratios, and compounding percentages, where AVERAGE overstates the result.
+---
+
+Find the geometric mean of a set of positive numbers — the correct
+way to average rates of change, growth percentages, or anything that
+compounds, where a plain `AVERAGE` gives a misleadingly high answer.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Every number must be positive — zero or negative returns #NUM!', type: 'warn' },
+  { text: 'Correct way to average growth rates, returns, or ratios', type: 'check' },
+  { text: 'Always less than or equal to AVERAGE on the same data', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=GEOMEAN(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GEOMEAN(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to include. Every value must be positive.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The geometric mean — the *n*th root of the product of *n* numbers.
+
+## Description
+
+`AVERAGE` adds values and divides by the count. `GEOMEAN` multiplies
+values and takes the *n*th root instead — the correct operation for
+anything that compounds, like a series of yearly growth rates or
+investment returns, where the effect of each period multiplies onto
+the last rather than simply adding.
+
+<Callout type="warn">
+  GEOMEAN requires every value to be strictly positive. A single zero
+  or negative number — including a growth rate expressed as a raw
+  percentage like `-5` for a 5% decline instead of `0.95` as a
+  multiplier — makes the whole result `#NUM!`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.05': '1.0463', '1.1': '1.0863', '1.15': '1.1266' }}
+  defaultValue="1.05"
+  label={'Live preview — =GEOMEAN(1.02, {value}, 1.08)'}
+  fieldLabel="middle year's growth factor"
+  grid={{
+    cols: ['A'],
+    rowCount: 4,
+    values: { a1: 'Growth factor', a2: '1.02', a3: '1.05', a4: '1.08' },
+    highlightMap: { '1.05': 'A2:A4', '1.1': 'A2:A4', '1.15': 'A2:A4' },
+  }}
+/>
+
+Three years of growth — 2%, then a variable middle year, then 8% —
+averaged as multipliers. The result is the single steady annual growth
+rate that would produce the same three-year compounded outcome.
+
+## Common errors
+
+### #NUM! — a value is zero or negative
+
+<ExcelCode>{`GEOMEAN(1.05, -0.02, 1.08) → #NUM!`}</ExcelCode>
+
+Every argument must be greater than zero. A negative growth rate needs
+to be expressed as a multiplier below 1 (a 2% decline is `0.98`, not
+`-0.02`) before GEOMEAN can use it.
+
+### #DIV/0! — no numeric values supplied
+
+<ExcelCode>{`GEOMEAN(A1:A5) → #DIV/0!`}</ExcelCode>
+
+Happens when the range contains no numbers at all (all blank or
+text). GEOMEAN ignores blank cells and text within a range, but needs
+at least one numeric value to compute a result.
+
+export const faqs = [
+  {
+    question: 'Why is GEOMEAN always lower than AVERAGE?',
+    answer: 'The arithmetic mean (AVERAGE) and geometric mean are only equal when every value in the set is identical — otherwise GEOMEAN is always the smaller of the two, more so as the values spread further apart. This is a mathematical property (the AM-GM inequality), not a quirk of the data.',
+  },
+  {
+    question: 'Can I use GEOMEAN on percentages directly, like 5 for 5%?',
+    answer: "No — convert each rate to a growth multiplier first (5% growth becomes 1.05, a 5% decline becomes 0.95). GEOMEAN multiplies its arguments together, and multiplying raw percentages like 5 and 8 doesn't represent compounding growth the way 1.05 and 1.08 do.",
+  },
+  {
+    question: "What's a real-world example where GEOMEAN is the right tool?",
+    answer: "Averaging investment returns across multiple years. If a portfolio returns 10% one year and loses 10% the next, AVERAGE says the average return was 0%, but the portfolio actually lost money overall (1.10 × 0.90 = 0.99). GEOMEAN(1.10, 0.90) correctly reflects that.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GEOMEAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GEOMEAN(B2:B10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim avgGrowth As Double
+    avgGrowth = Application.WorksheetFunction.GeoMean(Range("B2:B10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import gmean
+
+    avg_growth = gmean(df["GrowthFactor"])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AVERAGE](/docs/math/average) — the standard arithmetic mean;
+  overstates results for compounding data.
+- [HARMEAN](/docs/statistical/harmean) — the harmonic mean, the right
+  average for rates like speed rather than growth multipliers.
+- [TRIMMEAN](/docs/statistical/trimmean) — an arithmetic mean that
+  excludes outliers, a different kind of "better average."

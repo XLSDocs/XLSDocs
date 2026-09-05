@@ -1,0 +1,180 @@
+---
+title: FORECAST
+description: Predict a future value along a linear trend, using known historical x/y pairs — the same calculation as FORECAST.LINEAR.
+---
+
+Predict a value along a straight-line trend fitted through existing
+data — given a new `x` (like a future date or period number), FORECAST
+returns the `y` that trend line predicts for it.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'known_ys and known_xs must be the same size', type: 'warn' },
+  { text: 'Assumes a straight-line (linear) relationship between x and y', type: 'warn' },
+  { text: 'Identical calculation to the newer FORECAST.LINEAR', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FORECAST(x, known_ys, known_xs)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FORECAST(x, known_ys, known_xs)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The data point to predict a y value for — often a future period.',
+  },
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The historical dependent values (the outcomes already observed).',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The historical independent values that correspond to known_ys, same size as known_ys.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The predicted `y` value at `x`, based on the best-fit straight line
+through `known_xs` and `known_ys`.
+
+## Description
+
+FORECAST fits a linear regression line — the same line SLOPE and
+INTERCEPT would separately calculate — through the historical points,
+then evaluates that line's equation at the new `x`. It's the single
+function that combines what SLOPE and INTERCEPT do separately: `y =
+SLOPE(known_ys, known_xs) × x + INTERCEPT(known_ys, known_xs)`.
+
+<Callout type="idea">
+  FORECAST and FORECAST.LINEAR calculate the identical result —
+  FORECAST.LINEAR was added later purely for naming symmetry with
+  FORECAST.ETS (which forecasts using seasonal patterns, not a straight
+  line). Either name works in current Excel; FORECAST is the one that
+  also works in every older version.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '6': '60', '7': '70', '8': '80' }}
+  defaultValue="6"
+  label={'Live preview — =FORECAST({value}, sales, months)'}
+  fieldLabel="x (month)"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 6,
+    values: {
+      a1: 'Month', b1: 'Sales',
+      a2: '1', b2: '10',
+      a3: '2', b3: '20',
+      a4: '3', b4: '30',
+      a5: '4', b5: '40',
+      a6: '5', b6: '50',
+    },
+    highlightMap: { '6': 'A2:B6', '7': 'A2:B6', '8': 'A2:B6' },
+  }}
+/>
+
+Five months of perfectly linear sales growth (10 units per month).
+FORECAST extends that exact trend to predict a future month — change
+`x` to any value to see the prediction continue along the same line.
+
+## Common errors
+
+### #N/A — known_ys and known_xs are different sizes
+
+<ExcelCode>{`FORECAST(6, {10,20,30}, {1,2,3,4}) → #N/A`}</ExcelCode>
+
+Every value in `known_ys` needs a corresponding value in `known_xs` at
+the same position — the two ranges must contain the same number of
+data points.
+
+### #DIV/0! — every known_x value is identical
+
+<ExcelCode>{`FORECAST(6, {10,20,30}, {1,1,1}) → #DIV/0!`}</ExcelCode>
+
+A straight line needs variation along the x-axis to have a defined
+slope. If every `known_xs` value is the same number, no line can be
+fit through them.
+
+export const faqs = [
+  {
+    question: 'FORECAST vs FORECAST.LINEAR — is there a real difference?',
+    answer: "No calculation difference at all — they're the exact same formula under two names. FORECAST.LINEAR exists for naming consistency with FORECAST.ETS, added later for seasonal forecasting. Use FORECAST if older-Excel compatibility matters.",
+  },
+  {
+    question: "Does FORECAST work for non-linear trends, like exponential growth?",
+    answer: "No — FORECAST only fits a straight line, and will produce a poor prediction if the real relationship curves. For exponential trends, GROWTH is the equivalent function; for seasonal patterns, FORECAST.ETS accounts for repeating cycles.",
+  },
+  {
+    question: 'How is this different from just using TREND?',
+    answer: 'FORECAST returns a single predicted value for one x; TREND can return predictions for multiple x values at once as a spilled array, using the same underlying linear regression.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FORECAST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FORECAST(6, B2:B6, A2:A6)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim predicted As Double
+    predicted = Application.WorksheetFunction.Forecast_Linear(6, Range("B2:B6"), Range("A2:A6"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    slope, intercept = np.polyfit(df["Month"], df["Sales"], 1)
+    predicted = slope * 6 + intercept
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SLOPE](/docs/statistical/slope) — the slope of the same regression
+  line FORECAST uses.
+- [INTERCEPT](/docs/statistical/intercept) — the y-intercept of the
+  same regression line.
+- [CORREL](/docs/statistical/correl) — how strongly `known_xs` and
+  `known_ys` are related, which indicates how trustworthy the forecast is.

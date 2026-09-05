@@ -1,0 +1,168 @@
+---
+title: PEARSON
+description: The Pearson correlation coefficient between two datasets — the identical calculation as CORREL, under its original statistical name.
+---
+
+Measure how strongly two datasets move together, from -1 to 1 — the
+same calculation as `CORREL`, named after the statistician who
+formalized it.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Identical calculation and result to CORREL', type: 'check' },
+  { text: 'Always between -1 and 1', type: 'check' },
+  { text: 'array1 and array2 must be the same size', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PEARSON(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PEARSON(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first set of values.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second set of values, same size as array1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The Pearson product-moment correlation coefficient between `array1`
+and `array2` — a number from -1 to 1, identical to what `CORREL`
+returns on the same data.
+
+## Description
+
+PEARSON and CORREL are the same formula under two names — there is no
+calculation difference, and no version of Excel treats them
+differently. `PEARSON(A1:A10, B1:B10)` and `CORREL(A1:A10, B1:B10)`
+always agree exactly.
+
+<Callout type="idea">
+  There's no functional reason to prefer PEARSON over CORREL, or vice
+  versa — pick whichever name reads more clearly in context. `CORREL`
+  is the more common choice in newer spreadsheets simply because it's
+  more self-explanatory to someone unfamiliar with the statistical
+  terminology.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '5': '1', '25': '1', '15': '1' }}
+  defaultValue="5"
+  label={'Live preview — =PEARSON(hours, sales) with the third value adjusted'}
+  fieldLabel="hour 3 value"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Ad Hours', b1: 'Sales',
+      a2: '1', b2: '5',
+      a3: '2', b3: '10',
+      a4: '4', b4: '20',
+    },
+    highlightMap: { '5': 'A2:B4', '25': 'A2:B4', '15': 'A2:B4' },
+  }}
+/>
+
+The same advertising-hours-vs-sales data as CORREL's example, since
+the two functions compute identically — this will always match
+`CORREL`'s result on the exact same inputs.
+
+## Common errors
+
+### #N/A — array1 and array2 are different sizes
+
+<ExcelCode>{`PEARSON({1,2,3}, {10,20,30,40}) → #N/A`}</ExcelCode>
+
+Both arrays need to contain the same number of data points, since
+PEARSON pairs them up position by position — the same requirement
+CORREL has.
+
+### #DIV/0! — one array has zero variance
+
+<ExcelCode>{`PEARSON({5,5,5}, {10,20,30}) → #DIV/0!`}</ExcelCode>
+
+If every value in either array is identical, there's no variation to
+correlate against.
+
+export const faqs = [
+  {
+    question: 'Should I use PEARSON or CORREL in new formulas?',
+    answer: "Either — they're permanently identical, and there's no compatibility or performance difference. CORREL is slightly more common in modern usage since the name is more self-explanatory, but existing formulas using PEARSON never need to be changed.",
+  },
+  {
+    question: "Why do both functions exist if they're identical?",
+    answer: 'PEARSON is the original name, matching the statistical term "Pearson correlation coefficient." CORREL was added later as a more approachable name for the same calculation — a naming addition, not a functional change.',
+  },
+  {
+    question: 'Does PEARSON tell me if one variable causes the other?',
+    answer: "No — like CORREL, PEARSON only measures how strongly two variables move together, not why. A high value can come from direct causation, a shared underlying cause, or coincidence.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PEARSON from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PEARSON(A2:A4, B2:B4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim r As Double
+    r = Application.WorksheetFunction.Pearson(Range("A2:A4"), Range("B2:B4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    correlation = df["AdHours"].corr(df["Sales"])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CORREL](/docs/statistical/correl) — the identical calculation
+  under its newer, more common name.
+- [SLOPE](/docs/statistical/slope) — how steep the relationship is,
+  rather than how strong it is.
+- [FORECAST](/docs/statistical/forecast) — uses the same underlying
+  linear relationship to predict new values.

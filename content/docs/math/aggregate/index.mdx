@@ -1,0 +1,203 @@
+---
+title: AGGREGATE
+description: One function that can SUM, AVERAGE, COUNT, and more, with built-in options to ignore errors and hidden rows.
+---
+
+Run one of 19 different aggregate calculations — SUM, AVERAGE, MAX,
+LARGE, PERCENTILE, and more — with built-in options to ignore errors
+and hidden/filtered rows, all through a single function.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'function_num 1–19 selects which calculation to run', type: 'warn' },
+  { text: 'options 0–7 controls what gets ignored (errors, hidden rows, nested totals)', type: 'warn' },
+  { text: 'function_num 14–19 need a k or quart value instead of a plain second range', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=AGGREGATE(function_num, options, ref1, [ref2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AGGREGATE(function_num, options, ref1, [ref2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'function_num',
+    type: 'number',
+    required: true,
+    description: 'Which calculation to run, 1–19 — see the table below.',
+  },
+  {
+    name: 'options',
+    type: 'number',
+    required: true,
+    description: 'What to ignore while calculating, 0–7 — see the table below.',
+  },
+  {
+    name: 'ref1',
+    type: 'range',
+    required: true,
+    description: 'The range to aggregate. For function_num 14–19, this is instead the first argument of that function (e.g. the array for LARGE).',
+  },
+  {
+    name: 'ref2, ...',
+    type: 'range or number',
+    required: false,
+    description: 'Additional ranges (for function_num 1–13), or the k / quart value the chosen function needs (for function_num 14–19).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The result of the chosen aggregate calculation, applied only to the
+values that survive whatever `options` excludes.
+
+## Description
+
+`function_num` picks the calculation:
+
+| Code | Function | Code | Function |
+|------|----------|------|----------|
+| 1 | AVERAGE | 11 | VAR.P |
+| 2 | COUNT | 12 | MEDIAN |
+| 3 | COUNTA | 13 | MODE.SNGL |
+| 4 | MAX | 14 | LARGE |
+| 5 | MIN | 15 | SMALL |
+| 6 | PRODUCT | 16 | PERCENTILE.INC |
+| 7 | STDEV.S | 17 | QUARTILE.INC |
+| 8 | STDEV.P | 18 | PERCENTILE.EXC |
+| 9 | SUM | 19 | QUARTILE.EXC |
+| 10 | VAR.S | | |
+
+`options` picks what to ignore:
+
+| Code | Ignores |
+|------|---------|
+| 0 | Nested SUBTOTAL/AGGREGATE results only (default) |
+| 1 | Hidden rows, plus nested SUBTOTAL/AGGREGATE results |
+| 2 | Error values, plus nested SUBTOTAL/AGGREGATE results |
+| 3 | Hidden rows and error values, plus nested results |
+| 4 | Nothing extra |
+| 5 | Hidden rows |
+| 6 | Error values |
+| 7 | Hidden rows and error values |
+
+<Callout type="warn">
+  For `function_num` 14–19, the third argument isn't another range to
+  aggregate — it's the extra value that function needs, like `k` for
+  LARGE/SMALL or `quart` for QUARTILE.INC/QUARTILE.EXC. Passing a
+  plain second range there instead (the way `function_num` 1–13
+  work) returns an error.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9': '1', '4': '1', '7': '1' }}
+  defaultValue="9"
+  label={'Live preview — =AGGREGATE({function_num}, 6, sales)'}
+  fieldLabel="function_num"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    values: {
+      a1: 'Sales',
+      a2: '10', a3: '#N/A', a4: '30', a5: '40', a6: '50',
+    },
+    highlightMap: { '9': 'A2:A6', '4': 'A2:A6', '7': 'A2:A6' },
+  }}
+/>
+
+Five sales figures, one of them an error. With `options` set to `6`
+(ignore error values), try `function_num` 9 (SUM), 4 (MAX), or 7
+(STDEV.S) to see AGGREGATE calculate straight through the `#N/A`
+without needing IFERROR anywhere.
+
+## Common errors
+
+### #VALUE! — a k/quart argument is missing for function_num 14–19
+
+<ExcelCode>{`AGGREGATE(14, 6, A2:A10) → #VALUE!`}</ExcelCode>
+
+LARGE (14) needs a `k` value as the third argument — without it,
+AGGREGATE doesn't know which largest value to return.
+
+### #REF! — function_num or options is out of range
+
+<ExcelCode>{`AGGREGATE(25, 6, A2:A10) → #REF!`}</ExcelCode>
+
+`function_num` only accepts 1–19, and `options` only accepts 0–7 —
+anything else has no corresponding calculation or behavior to run.
+
+export const faqs = [
+  {
+    question: 'AGGREGATE vs SUBTOTAL — why use AGGREGATE instead?',
+    answer: "SUBTOTAL only offers 11 calculations (doubled to 22 with its hidden-row variants) and has no built-in way to ignore errors. AGGREGATE covers all of those plus LARGE, SMALL, PERCENTILE, QUARTILE, and MODE.SNGL, and its options argument can ignore error values directly — something SUBTOTAL can't do at all.",
+  },
+  {
+    question: 'Does AGGREGATE ignore filtered rows by default?',
+    answer: "No — unlike SUBTOTAL, which always ignores filtered rows regardless of its function_num, AGGREGATE only ignores hidden rows when options is set to 1, 3, 5, or 7. With options 0, 2, 4, or 6, hidden and filtered rows are still included.",
+  },
+  {
+    question: 'Can AGGREGATE replace an IFERROR-wrapped SUM?',
+    answer: 'Often, yes — =AGGREGATE(9, 6, range) sums a range while ignoring any error values in it, in one function, instead of needing an array-entered =SUM(IFERROR(range, 0)) or a helper column.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AGGREGATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AGGREGATE(9, 6, A2:A100)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double
+    total = Application.WorksheetFunction.Aggregate(9, 6, Range("A2:A100"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    total = pd.to_numeric(df["Sales"], errors="coerce").sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUBTOTAL](/docs/math/subtotal) — a simpler predecessor covering
+  11 calculations, always ignoring filtered rows but never errors.
+- [SUM](/docs/math/sum) — the unconditional total AGGREGATE's
+  function_num 9 replicates, with optional error/hidden-row handling.
+- [LARGE](/docs/math/large) and
+  [QUARTILE.INC](/docs/statistical/quartile-inc) — two of the
+  calculations AGGREGATE can run directly via function_num 14 and 17.

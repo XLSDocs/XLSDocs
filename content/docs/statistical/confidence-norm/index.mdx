@@ -1,0 +1,175 @@
+---
+title: CONFIDENCE.NORM
+description: The margin of error for a population mean, using a normal distribution — the modern, explicit name for CONFIDENCE.
+---
+
+Calculate the margin of error for estimating a population mean from a
+sample — added to and subtracted from the sample mean, it forms a
+confidence interval, assuming a normal distribution.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'alpha is 1 minus the confidence level (0.05 for 95% confidence)', type: 'warn' },
+  { text: 'Requires knowing the population standard deviation, not just the sample’s', type: 'warn' },
+  { text: 'Identical calculation to the legacy CONFIDENCE — same result, clearer name', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CONFIDENCE.NORM(alpha, standard_dev, size)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CONFIDENCE.NORM(alpha, standard_dev, size)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The significance level, between 0 and 1 — 1 minus the confidence level (e.g. 0.05 for a 95% confidence interval).',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The known population standard deviation, assumed to be already known rather than estimated.',
+  },
+  {
+    name: 'size',
+    type: 'number',
+    required: true,
+    description: 'The sample size (an integer of at least 1).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The margin of error — a single number. The full confidence interval
+is the sample mean plus or minus this value.
+
+## Description
+
+CONFIDENCE.NORM computes exactly the same result as the older
+`CONFIDENCE` — the `.NORM` suffix was added in Excel 2010 alongside
+`CONFIDENCE.T`, which uses the Student's t-distribution instead of the
+normal distribution (better suited to small samples or an unknown
+population standard deviation). CONFIDENCE.NORM assumes the
+population standard deviation is already known — in practice, that's
+often an approximation using the sample's own standard deviation,
+which is only reliable with a reasonably large sample size.
+
+<Callout type="warn">
+  CONFIDENCE.NORM needs the population standard deviation, not the
+  sample standard deviation — if all you have is a sample, you're
+  estimating that input too, which is exactly the situation
+  CONFIDENCE.T is built to handle more accurately.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.05': '1', '0.01': '1', '0.1': '1' }}
+  defaultValue="0.05"
+  label={'Live preview — =CONFIDENCE.NORM({alpha}, 5, 40)'}
+  fieldLabel="alpha"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 3,
+    values: {
+      a1: 'Std Dev', b1: 'Sample Size',
+      a2: '5', b2: '40',
+    },
+    highlightMap: { '0.05': 'A2:B2', '0.01': 'A2:B2', '0.1': 'A2:B2' },
+  }}
+/>
+
+A standard deviation of 5 across 40 samples. Lowering `alpha` (toward
+a higher confidence level, like 0.01 for 99%) widens the margin of
+error; raising it narrows it.
+
+## Common errors
+
+### #NUM! — alpha is outside the 0–1 range, or size is less than 1
+
+<ExcelCode>{`CONFIDENCE.NORM(1.5, 5, 40) → #NUM!`}</ExcelCode>
+
+`alpha` must be a value strictly between 0 and 1, and `size` must be
+at least 1.
+
+### #VALUE! — any argument is non-numeric
+
+<ExcelCode>{`CONFIDENCE.NORM("high", 5, 40) → #VALUE!`}</ExcelCode>
+
+All three arguments need to be numbers — a text significance level
+like `"high"` can't be evaluated.
+
+export const faqs = [
+  {
+    question: 'CONFIDENCE.NORM vs CONFIDENCE — is there a difference?',
+    answer: "No — they calculate the exact same result. CONFIDENCE.NORM was introduced in Excel 2010 for naming consistency with CONFIDENCE.T. CONFIDENCE still works today and returns identical values.",
+  },
+  {
+    question: 'When should I use CONFIDENCE.T instead?',
+    answer: "Use CONFIDENCE.T when the population standard deviation isn't actually known and you're estimating it from a small sample (commonly under 30) — the t-distribution accounts for the extra uncertainty that comes with a small sample size. With a large sample, the two functions return very similar results.",
+  },
+  {
+    question: 'How do I turn this into a full confidence interval?',
+    answer: 'Calculate the sample mean with AVERAGE, then add and subtract the CONFIDENCE.NORM result: the interval runs from AVERAGE(range) - CONFIDENCE.NORM(alpha, standard_dev, size) to AVERAGE(range) + CONFIDENCE.NORM(alpha, standard_dev, size).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CONFIDENCE.NORM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CONFIDENCE.NORM(0.05, A2, B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim marginOfError As Double
+    marginOfError = Application.WorksheetFunction.Confidence_Norm(0.05, Range("A2"), Range("B2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy import stats
+    import numpy as np
+
+    margin = stats.norm.ppf(1 - 0.05 / 2) * (std_dev / np.sqrt(size))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [STDEV.S](/docs/statistical/stdev-s) — estimates the standard
+  deviation from a sample, often used as an approximation for
+  `standard_dev` here.
+- [AVERAGE](/docs/math/average) — the sample mean the margin of
+  error gets added to and subtracted from.

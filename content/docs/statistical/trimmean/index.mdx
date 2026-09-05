@@ -1,0 +1,167 @@
+---
+title: TRIMMEAN
+description: Average a dataset after excluding a percentage of the most extreme values from both ends, reducing the impact of outliers.
+---
+
+Calculate an average that ignores the most extreme values at both the
+top and bottom of a dataset — a way to reduce the influence of
+outliers without deciding by hand which data points to throw out.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: "percent is the TOTAL trimmed, split evenly between both ends", type: 'warn' },
+  { text: 'Points excluded is always rounded down to an even number', type: 'warn' },
+  { text: 'Reduces outlier influence without deleting any data', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TRIMMEAN(array, percent)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TRIMMEAN(array, percent)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array of values to average.',
+  },
+  {
+    name: 'percent',
+    type: 'number',
+    required: true,
+    description: 'The fraction of data points to exclude in total, split evenly from the top and bottom — 0.2 excludes 20% total, 10% from each end.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The arithmetic mean of `array` after excluding the specified
+percentage of the highest and lowest values.
+
+## Description
+
+TRIMMEAN sorts `array`, calculates how many data points `percent`
+represents, rounds that count *down* to the nearest even number (so it
+splits evenly between the top and bottom), removes that many points
+from each extreme, and averages what's left. With 10 data points and
+`percent` of `0.2`, that's 20% of 10 = 2 points total excluded — one
+from the top, one from the bottom — leaving 8 values to average.
+
+<Callout type="idea">
+  TRIMMEAN is a middle ground between AVERAGE (uses every value,
+  fully exposed to outliers) and MEDIAN (ignores almost everything
+  except the middle value). A small `percent` like `0.1` or `0.2`
+  keeps most of the data while still discounting a handful of extreme
+  scores — a common choice for judged competitions, where the highest
+  and lowest scores are conventionally dropped.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '5.5', '0.2': '5.5', '0.4': '5.5', '0.6': '5.5' }}
+  defaultValue="0.2"
+  label={'Live preview — =TRIMMEAN(scores, {value})'}
+  fieldLabel="percent"
+  grid={{
+    cols: ['A'],
+    rowCount: 10,
+    values: { a1: '1', a2: '2', a3: '3', a4: '4', a5: '5', a6: '6', a7: '7', a8: '8', a9: '9', a10: '10' },
+    highlightMap: { '0': 'A1:A10', '0.2': 'A2:A9', '0.4': 'A3:A8', '0.6': 'A4:A7' },
+  }}
+/>
+
+Ten sequential scores, 1 through 10. Because this dataset happens to
+be perfectly symmetric, the average stays 5.5 regardless of how much
+gets trimmed — but the *highlighted range* shrinks as `percent`
+increases, showing exactly which values TRIMMEAN is actually including
+at each setting.
+
+## Common errors
+
+### #NUM! — percent is out of range
+
+<ExcelCode>{`TRIMMEAN(A1:A10, 1.5) → #NUM!`}</ExcelCode>
+
+`percent` must be between 0 and 1. A value of `1` or greater would
+attempt to trim 100% or more of the data, leaving nothing to average.
+
+### #VALUE! — array contains no numbers
+
+<ExcelCode>{`TRIMMEAN("text", 0.2) → #VALUE!`}</ExcelCode>
+
+`array` needs to be a range or array of actual numeric values.
+
+export const faqs = [
+  {
+    question: 'Why might TRIMMEAN return the same result as AVERAGE?',
+    answer: "If the dataset has too few points for the trim count to round up to at least 2 (for example, fewer than 20 values with a small percent), TRIMMEAN excludes nothing and matches AVERAGE exactly. It can also match by coincidence on a symmetric dataset, as in the example above.",
+  },
+  {
+    question: 'How many data points does TRIMMEAN actually remove?',
+    answer: 'Multiply the count of values in array by percent, then round down to the nearest even number. For 30 values and percent of 0.2, that\'s 30 × 0.2 = 6 — rounded down to 6 already being even, so 3 from the top and 3 from the bottom.',
+  },
+  {
+    question: 'Is TRIMMEAN the same as removing outliers with a fixed threshold?',
+    answer: "No — TRIMMEAN always removes a fixed percentage of data points regardless of how extreme they actually are, while an outlier threshold (like values beyond 2 standard deviations) removes a variable number of points based on the data's actual spread.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TRIMMEAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TRIMMEAN(B2:B31, 0.2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim trimmedAvg As Double
+    trimmedAvg = Application.WorksheetFunction.TrimMean(Range("B2:B31"), 0.2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import trim_mean
+
+    trimmed_avg = trim_mean(df["Score"], proportiontocut=0.1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AVERAGE](/docs/math/average) — the plain arithmetic mean, fully
+  exposed to outliers.
+- [MEDIAN](/docs/math/median) — the middle value, effectively an
+  extreme version of trimming.
+- [GEOMEAN](/docs/statistical/geomean) — a different kind of "better
+  average," for compounding growth rates rather than outliers.

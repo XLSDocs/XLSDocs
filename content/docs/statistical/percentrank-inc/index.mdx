@@ -1,0 +1,175 @@
+---
+title: PERCENTRANK.INC
+description: The modern, explicit name for finding a value's rank as a percentage using the inclusive method.
+---
+
+Find where a value ranks within a dataset, expressed as a percentage
+from 0 to 1 — the modern, explicitly-named version of `PERCENTRANK`,
+the reverse operation of `PERCENTILE.INC`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a fraction between 0 and 1, not a whole percentage', type: 'warn' },
+  { text: 'Identical calculation to the legacy PERCENTRANK — same result, clearer name', type: 'check' },
+  { text: 'The reverse of PERCENTILE.INC', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PERCENTRANK.INC(array, x, [significance])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PERCENTRANK.INC(array, x, [significance])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array of numbers to rank x against.',
+  },
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to find the percentage rank of within array.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: false,
+    description: 'The number of significant digits in the returned percentage. Defaults to 3 if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The rank of `x` within `array`, as a fraction from `0` (the minimum)
+to `1` (the maximum), using the inclusive method.
+
+## Description
+
+PERCENTRANK.INC computes exactly the same result as the older
+`PERCENTRANK` — the `.INC` suffix was added in Excel 2010 alongside
+`PERCENTRANK.EXC`, which uses a stricter method that never returns
+exactly 0 or 1. PERCENTRANK.INC is the reverse of `PERCENTILE.INC`:
+if `PERCENTILE.INC(array, 0.75)` returns some value `v`, then
+`PERCENTRANK.INC(array, v)` returns `0.75` back.
+
+<Callout type="idea">
+  If `x` isn't found exactly in `array`, PERCENTRANK.INC interpolates
+  between the two nearest values rather than erroring — it always
+  returns *a* rank, even for values that fall between existing data
+  points.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '50': '1', '90': '1', '10': '1' }}
+  defaultValue="50"
+  label={'Live preview — =PERCENTRANK.INC(scores, {value})'}
+  fieldLabel="x (score to rank)"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: {
+      a1: 'Score',
+      a2: '10', a3: '30', a4: '50', a5: '70',
+    },
+    highlightMap: { '50': 'A2:A5', '90': 'A2:A5', '10': 'A2:A5' },
+  }}
+/>
+
+Four evenly-spaced test scores. A value of 50 sits exactly at the
+midpoint of the dataset, so PERCENTRANK.INC returns close to 0.5;
+try the dataset's minimum or maximum to see it snap to 0 or 1.
+
+## Common errors
+
+### #N/A — x falls outside the range of array
+
+<ExcelCode>{`PERCENTRANK.INC({10,30,50,70}, 100) → #N/A`}</ExcelCode>
+
+`x` must fall between the minimum and maximum values in `array` —
+PERCENTRANK.INC can't extrapolate a rank for a value outside the
+observed range.
+
+### #NUM! — significance is less than 1
+
+<ExcelCode>{`PERCENTRANK.INC({10,30,50,70}, 40, 0) → #NUM!`}</ExcelCode>
+
+`significance` controls how many digits the returned fraction is
+rounded to, and needs to be at least 1.
+
+export const faqs = [
+  {
+    question: 'PERCENTRANK.INC vs PERCENTRANK — is there a difference?',
+    answer: "No — they calculate the exact same result. PERCENTRANK.INC was introduced in Excel 2010 for naming consistency with PERCENTRANK.EXC and other .INC/.EXC function pairs. PERCENTRANK still works today and returns identical values.",
+  },
+  {
+    question: 'How is this different from RANK.EQ?',
+    answer: "RANK.EQ returns a value's position as a whole number (1st, 2nd, 3rd...), where a larger dataset naturally produces larger numbers. PERCENTRANK.INC instead returns a fraction from 0 to 1 that's comparable across datasets of any size.",
+  },
+  {
+    question: 'Why would I use significance?',
+    answer: 'Lower it (e.g. to 2 or 3) to get a rounder, more readable percentage for display, or raise it above the default of 3 when the exact interpolated position matters, such as feeding the result into another calculation.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PERCENTRANK.INC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PERCENTRANK.INC(A2:A5, 50)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pctRank As Double
+    pctRank = Application.WorksheetFunction.Percentrank_Inc(Range("A2:A5"), 50)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy import stats
+
+    pct_rank = stats.percentileofscore(df["Score"], 50) / 100
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PERCENTILE.INC](/docs/statistical/percentile-inc) — the reverse
+  operation: finds the value at a given rank instead of the rank of a
+  given value.
+- [RANK.EQ](/docs/statistical/rank-eq) — ranks a value as a whole
+  position number instead of a percentage.
+- [QUARTILE.INC](/docs/statistical/quartile-inc) — a shortcut for
+  the four most common percentile cutoffs (0%, 25%, 50%, 75%, 100%).

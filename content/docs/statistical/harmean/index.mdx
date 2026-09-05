@@ -1,0 +1,174 @@
+---
+title: HARMEAN
+description: The harmonic mean — the right average for rates like speed or price-per-unit, where AVERAGE overstates the result.
+---
+
+Find the harmonic mean of a set of positive numbers — the correct way
+to average rates such as speeds, prices per unit, or anything
+expressed as "amount per something," where a plain `AVERAGE`
+overstates the true average.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Every number must be positive — zero or negative returns #NUM!', type: 'warn' },
+  { text: 'Correct way to average rates like speed or price-per-unit', type: 'check' },
+  { text: 'Always the smallest of AVERAGE, GEOMEAN, and HARMEAN on the same data', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=HARMEAN(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HARMEAN(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to include. Every value must be positive.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The harmonic mean — the reciprocal of the average of the reciprocals
+of the supplied numbers.
+
+## Description
+
+The classic case for HARMEAN is averaging speeds over equal
+*distances*. Driving 60 mph for the first half of a trip and 30 mph
+for the second half doesn't average to 45 mph, because more *time* is
+spent at the slower speed — `HARMEAN(60, 30)` correctly returns 40,
+the true average speed for the whole trip.
+
+<Callout type="warn">
+  HARMEAN requires every value to be strictly positive, the same
+  restriction as GEOMEAN. A single zero or negative number makes the
+  whole result `#NUM!`.
+</Callout>
+
+<Callout type="idea">
+  HARMEAN is the right tool specifically when the values are rates
+  measured *per unit of something held constant* — equal distances for
+  speed, equal dollar amounts for price-per-share. If the underlying
+  quantity being averaged isn't a rate like this, AVERAGE or GEOMEAN is
+  usually the better fit.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '30': '40', '40': '46.7', '50': '53.3' }}
+  defaultValue="30"
+  label={'Live preview — =HARMEAN(60, {value})'}
+  fieldLabel="second-half speed"
+  grid={{
+    cols: ['A'],
+    rowCount: 3,
+    values: { a1: 'Speed (mph)', a2: '60', a3: '30' },
+    highlightMap: { '30': 'A2:A3', '40': 'A2:A3', '50': 'A2:A3' },
+  }}
+/>
+
+Two equal-distance legs of a trip, driven at 60 mph and a variable
+speed. HARMEAN gives the single speed that would cover the same total
+distance in the same total time — always closer to the slower speed
+than a plain average would suggest.
+
+## Common errors
+
+### #NUM! — a value is zero or negative
+
+<ExcelCode>{`HARMEAN(60, 0, 30) → #NUM!`}</ExcelCode>
+
+Every argument must be greater than zero. A speed of `0` (a full stop)
+can't be averaged this way — HARMEAN's reciprocal calculation would
+require dividing by zero.
+
+### #DIV/0! — no numeric values supplied
+
+<ExcelCode>{`HARMEAN(A1:A5) → #DIV/0!`}</ExcelCode>
+
+Happens when the range contains no numbers at all. HARMEAN ignores
+blank cells and text within a range, but needs at least one numeric
+value to compute a result.
+
+export const faqs = [
+  {
+    question: 'HARMEAN vs GEOMEAN vs AVERAGE — which is smallest?',
+    answer: 'For the same non-identical dataset, HARMEAN ≤ GEOMEAN ≤ AVERAGE, always — a mathematical property, not a data-specific coincidence. They only converge to the same value when every number in the set is identical.',
+  },
+  {
+    question: "Why doesn't averaging two speeds with AVERAGE work?",
+    answer: "AVERAGE treats the two speeds as equally weighted numbers, but if the distances are equal, the slower speed actually consumes more time — so it should count for more in the average, which is exactly what HARMEAN's reciprocal-based calculation does automatically.",
+  },
+  {
+    question: 'Does HARMEAN work if the two legs of a trip are different distances instead of equal ones?',
+    answer: "Not directly — plain HARMEAN assumes equal weight (equal distance) for each rate. For unequal distances, a weighted harmonic mean is needed instead, computed manually as total distance divided by the sum of each distance divided by its speed.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HARMEAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HARMEAN(B2:B10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim avgRate As Double
+    avgRate = Application.WorksheetFunction.HarMean(Range("B2:B10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import hmean
+
+    avg_rate = hmean(df["Speed"])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GEOMEAN](/docs/statistical/geomean) — the geometric mean, the right
+  average for compounding growth rates.
+- [AVERAGE](/docs/math/average) — the standard arithmetic mean;
+  overstates results for rate-based data like speed.
+- [TRIMMEAN](/docs/statistical/trimmean) — an arithmetic mean that
+  excludes outliers instead of correcting for rate-weighting.

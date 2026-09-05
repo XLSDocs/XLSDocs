@@ -1,0 +1,170 @@
+---
+title: CORREL
+description: The correlation coefficient between two datasets — how strongly they move together, from -1 (perfectly opposite) to 1 (perfectly together).
+---
+
+Measure how strongly two sets of numbers move together — a single
+value from -1 to 1 summarizing whether they rise and fall in sync, move
+in opposite directions, or show no consistent relationship at all.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always between -1 and 1', type: 'check' },
+  { text: 'array1 and array2 must be the same size', type: 'warn' },
+  { text: 'Identical calculation to PEARSON', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CORREL(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CORREL(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first set of values.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second set of values, same size as array1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The Pearson correlation coefficient between `array1` and `array2` — a
+number from -1 to 1.
+
+## Description
+
+A CORREL result near `1` means the two sets rise and fall together
+almost perfectly; near `-1` means they move in opposite directions
+almost perfectly (one rises as the other falls); near `0` means
+there's little to no *linear* relationship between them at all. Unlike
+SLOPE and INTERCEPT, the argument order doesn't matter — `CORREL(A,
+B)` and `CORREL(B, A)` always return the same value.
+
+<Callout type="warn">
+  CORREL only measures *linear* relationships. Two variables can have a
+  strong, perfectly predictable — but curved — relationship and still
+  return a CORREL close to `0`, because a curve isn't a straight-line
+  pattern. A low correlation rules out a linear relationship, not
+  every relationship.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '5': '1', '25': '1', '15': '1' }}
+  defaultValue="5"
+  label={'Live preview — =CORREL(hours, sales) with the third value adjusted'}
+  fieldLabel="hour 3 value"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Ad Hours', b1: 'Sales',
+      a2: '1', b2: '5',
+      a3: '2', b3: '10',
+      a4: '4', b4: '20',
+    },
+    highlightMap: { '5': 'A2:B4', '25': 'A2:B4', '15': 'A2:B4' },
+  }}
+/>
+
+Advertising hours against sales. With the values scaling together
+consistently, CORREL sits close to 1 — try setting hour 3's value far
+outside the pattern (very high or very low) to see the correlation
+weaken.
+
+## Common errors
+
+### #N/A — array1 and array2 are different sizes
+
+<ExcelCode>{`CORREL({1,2,3}, {10,20,30,40}) → #N/A`}</ExcelCode>
+
+Both arrays need to contain the same number of data points, since
+CORREL pairs them up position by position.
+
+### #DIV/0! — one array has zero variance
+
+<ExcelCode>{`CORREL({5,5,5}, {10,20,30}) → #DIV/0!`}</ExcelCode>
+
+If every value in either array is identical, there's no variation to
+correlate against — the calculation divides by a standard deviation
+of zero.
+
+export const faqs = [
+  {
+    question: 'CORREL vs PEARSON — is there a difference?',
+    answer: "No — they calculate the exact same statistic and always return identical results. PEARSON is the older name; CORREL was introduced as the more descriptive alternative. Either works in current Excel.",
+  },
+  {
+    question: 'Does a correlation of 0.9 mean one variable causes the other?',
+    answer: "No — correlation measures how strongly two variables move together, not why. A strong correlation can come from direct causation, a shared underlying cause affecting both, or pure coincidence, and CORREL can't distinguish between them.",
+  },
+  {
+    question: 'How does CORREL relate to R-squared from a regression?',
+    answer: 'R-squared is simply CORREL squared, when there\'s exactly one predictor variable — it represents the proportion of variance in one variable explained by the other, always between 0 and 1 regardless of the correlation\'s sign.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CORREL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CORREL(A2:A4, B2:B4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim r As Double
+    r = Application.WorksheetFunction.Correl(Range("A2:A4"), Range("B2:B4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    correlation = df["AdHours"].corr(df["Sales"])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PEARSON](/docs/statistical/pearson) — the identical calculation
+  under its older name.
+- [SLOPE](/docs/statistical/slope) — how steep the relationship is,
+  rather than how strong it is.
+- [FORECAST](/docs/statistical/forecast) — uses the same underlying
+  linear relationship to predict new values.

@@ -1,0 +1,172 @@
+---
+title: SLOPE
+description: The slope of the linear regression line through a set of known x/y pairs — how much y changes per unit of x.
+---
+
+Calculate the slope of the straight line that best fits a set of x/y
+data points — how much `y` changes for every one-unit increase in
+`x`, the same trend line FORECAST uses to make predictions.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'known_ys comes first, known_xs second — easy to swap by mistake', type: 'warn' },
+  { text: 'known_ys and known_xs must be the same size', type: 'warn' },
+  { text: 'Positive slope means y rises as x rises; negative means it falls', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SLOPE(known_ys, known_xs)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SLOPE(known_ys, known_xs)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The dependent values (the outcomes).',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The independent values that correspond to known_ys, same size as known_ys.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The slope of the best-fit straight line through the data — the change
+in `y` per one-unit change in `x`.
+
+## Description
+
+SLOPE finds the straight line that minimizes the total squared
+distance from every point to the line (ordinary least squares
+regression), then reports that line's steepness. A slope of `10` means
+`y` increases by 10 for every 1-unit increase in `x`; a slope of `0`
+means there's no linear relationship at all between the two.
+
+<Callout type="warn">
+  The argument order is `known_ys` first, `known_xs` second — the
+  opposite of how the pair usually gets written when plotting a chart
+  (x, then y). Swapping them by habit is one of the most common
+  mistakes with this function; it won't error, it'll just silently
+  compute the reciprocal relationship instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '10': '10', '15': '15', '5': '5' }}
+  defaultValue="10"
+  label={'Live preview — =SLOPE(sales, months) with the last month adjusted'}
+  fieldLabel="last month's sales"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 5,
+    values: {
+      a1: 'Month', b1: 'Sales',
+      a2: '1', b2: '10',
+      a3: '2', b3: '20',
+      a4: '3', b4: '30',
+      a5: '4', b5: '40',
+    },
+    highlightMap: { '10': 'A2:B5', '15': 'A2:B5', '5': 'A2:B5' },
+  }}
+/>
+
+Four months of sales data. With the fourth month steady at a
+consistent +10-per-month pace, SLOPE returns exactly 10; pulling that
+last value up or down changes how steep the best-fit line has to be to
+account for it.
+
+## Common errors
+
+### #N/A — known_ys and known_xs are different sizes
+
+<ExcelCode>{`SLOPE({10,20,30}, {1,2,3,4}) → #N/A`}</ExcelCode>
+
+Every value in `known_ys` needs a matching value in `known_xs` at the
+same position — both ranges must contain the same count of points.
+
+### #DIV/0! — every known_x value is identical
+
+<ExcelCode>{`SLOPE({10,20,30}, {1,1,1}) → #DIV/0!`}</ExcelCode>
+
+A line needs variation along the x-axis to have a defined slope. If
+every `known_xs` value is the same, SLOPE can't fit a line through
+them.
+
+export const faqs = [
+  {
+    question: "What does it mean if SLOPE returns a very small number close to 0?",
+    answer: "It means x has little to no linear effect on y — as x changes, y barely moves. Check CORREL alongside SLOPE: a slope near zero combined with a low correlation confirms there's genuinely little linear relationship, rather than the scale of the numbers just making the slope look small.",
+  },
+  {
+    question: 'How is SLOPE related to FORECAST?',
+    answer: "FORECAST's prediction is built directly from SLOPE and INTERCEPT: predicted y = SLOPE(known_ys, known_xs) × x + INTERCEPT(known_ys, known_xs). Use SLOPE and INTERCEPT directly when you need the trend line's equation itself, not just a single predicted point.",
+  },
+  {
+    question: 'Can SLOPE handle more than one x variable, like a multi-factor regression?',
+    answer: "No — SLOPE only fits a single straight line against one x variable. For a regression with multiple predictors, LINEST is the function built to handle that, returning a full set of coefficients instead of a single slope.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SLOPE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SLOPE(B2:B5, A2:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim trendSlope As Double
+    trendSlope = Application.WorksheetFunction.Slope(Range("B2:B5"), Range("A2:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    slope, intercept = np.polyfit(df["Month"], df["Sales"], 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [INTERCEPT](/docs/statistical/intercept) — the other half of the
+  same regression line's equation.
+- [FORECAST](/docs/statistical/forecast) — predicts a y value directly,
+  built from SLOPE and INTERCEPT internally.
+- [CORREL](/docs/statistical/correl) — how strong the linear
+  relationship actually is, independent of the slope's steepness.

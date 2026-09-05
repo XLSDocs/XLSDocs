@@ -1,0 +1,171 @@
+---
+title: INTERCEPT
+description: The y-intercept of the linear regression line through a set of known x/y pairs — the predicted y when x is zero.
+---
+
+Calculate the y-intercept of the straight line that best fits a set of
+x/y data points — the value the trend line predicts for `y` when `x`
+is exactly zero, the other half of the same equation SLOPE describes.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'known_ys comes first, known_xs second — same order as SLOPE', type: 'warn' },
+  { text: 'known_ys and known_xs must be the same size', type: 'warn' },
+  { text: 'Together with SLOPE, fully defines the regression line', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=INTERCEPT(known_ys, known_xs)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=INTERCEPT(known_ys, known_xs)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The dependent values (the outcomes).',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The independent values that correspond to known_ys, same size as known_ys.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The y-intercept of the best-fit straight line through the data —
+where that line crosses the y-axis.
+
+## Description
+
+Every straight line's equation is `y = slope × x + intercept`.
+INTERCEPT calculates the second half of that pair — the same
+underlying regression SLOPE calculates the first half of. On a chart,
+it's literally the point where the fitted trend line crosses the
+vertical axis, at `x = 0`.
+
+<Callout type="idea">
+  A meaningless-looking intercept (like a negative sales figure at
+  "month zero") doesn't mean the calculation is wrong — it just means
+  `x = 0` may fall well outside the range the data was ever actually
+  measured over. The intercept describes where the *line* crosses zero,
+  not a real, observed condition.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '10': '0', '15': '-10', '5': '10' }}
+  defaultValue="10"
+  label={'Live preview — =INTERCEPT(sales, months) with the first month adjusted'}
+  fieldLabel="month 1 sales"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Month', b1: 'Sales',
+      a2: '1', b2: '10',
+      a3: '2', b3: '20',
+      a4: '3', b4: '30',
+    },
+    highlightMap: { '10': 'A2:B4', '15': 'A2:B4', '5': 'A2:B4' },
+  }}
+/>
+
+With sales growing by exactly 10 each month starting from 10, the
+trend line passes through zero right at month 0 — an intercept of 0.
+Raising or lowering the first month's value shifts the whole line up
+or down without changing its slope.
+
+## Common errors
+
+### #N/A — known_ys and known_xs are different sizes
+
+<ExcelCode>{`INTERCEPT({10,20,30}, {1,2,3,4}) → #N/A`}</ExcelCode>
+
+Every value in `known_ys` needs a matching value in `known_xs` at the
+same position — both ranges must contain the same count of points.
+
+### #DIV/0! — every known_x value is identical
+
+<ExcelCode>{`INTERCEPT({10,20,30}, {1,1,1}) → #DIV/0!`}</ExcelCode>
+
+A line needs variation along the x-axis to be defined at all. If every
+`known_xs` value is the same, no single line — and therefore no single
+intercept — can be fit through them.
+
+export const faqs = [
+  {
+    question: 'Is INTERCEPT the same as the first value in known_ys?',
+    answer: "No, unless known_xs happens to start exactly at 0. INTERCEPT is where the fitted trend LINE crosses x = 0, which is usually an extrapolation beyond the actual first data point, not the first observed y value itself.",
+  },
+  {
+    question: 'How do SLOPE and INTERCEPT combine to make a prediction?',
+    answer: 'predicted y = SLOPE(known_ys, known_xs) × x + INTERCEPT(known_ys, known_xs) — the same calculation FORECAST performs in one step. Use SLOPE and INTERCEPT separately when the equation itself needs to be displayed or reused, not just a single predicted value.',
+  },
+  {
+    question: 'Can the intercept be negative even with all-positive data?',
+    answer: "Yes — if the trend has a positive slope but the earliest data points sit well above zero, extending the line backward to x = 0 can cross into negative territory, even though every actual observed y value stayed positive.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with INTERCEPT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=INTERCEPT(B2:B4, A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yIntercept As Double
+    yIntercept = Application.WorksheetFunction.Intercept(Range("B2:B4"), Range("A2:A4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    slope, intercept = np.polyfit(df["Month"], df["Sales"], 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SLOPE](/docs/statistical/slope) — the other half of the same
+  regression line's equation.
+- [FORECAST](/docs/statistical/forecast) — predicts a y value directly,
+  built from SLOPE and INTERCEPT internally.
+- [CORREL](/docs/statistical/correl) — how strong the linear
+  relationship actually is, independent of the line's position.
