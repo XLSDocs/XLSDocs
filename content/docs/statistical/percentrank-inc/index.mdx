@@ -73,7 +73,7 @@ if `PERCENTILE.INC(array, 0.75)` returns some value `v`, then
 ## Try it
 
 <TryIt
-  data={{ '50': '1', '90': '1', '10': '1' }}
+  data={{ '50': '0.667', '70': '1', '10': '0' }}
   defaultValue="50"
   label={'Live preview — =PERCENTRANK.INC(scores, {value})'}
   fieldLabel="x (score to rank)"
@@ -84,13 +84,13 @@ if `PERCENTILE.INC(array, 0.75)` returns some value `v`, then
       a1: 'Score',
       a2: '10', a3: '30', a4: '50', a5: '70',
     },
-    highlightMap: { '50': 'A2:A5', '90': 'A2:A5', '10': 'A2:A5' },
+    highlightMap: { '50': 'A2:A5', '70': 'A2:A5', '10': 'A2:A5' },
   }}
 />
 
-Four evenly-spaced test scores. A value of 50 sits exactly at the
-midpoint of the dataset, so PERCENTRANK.INC returns close to 0.5;
-try the dataset's minimum or maximum to see it snap to 0 or 1.
+Four evenly-spaced test scores. A value of 50 is the third-highest of
+four, so PERCENTRANK.INC returns 0.667 — try the dataset's minimum or
+maximum to see it snap to 0 or 1 instead.
 
 ## Common errors
 

@@ -67,7 +67,7 @@ vertical axis, at `x = 0`.
 ## Try it
 
 <TryIt
-  data={{ '10': '0', '15': '-10', '5': '10' }}
+  data={{ '10': '0', '15': '6.67', '5': '-6.67' }}
   defaultValue="10"
   label={'Live preview — =INTERCEPT(sales, months) with the first month adjusted'}
   fieldLabel="month 1 sales"
@@ -86,8 +86,9 @@ vertical axis, at `x = 0`.
 
 With sales growing by exactly 10 each month starting from 10, the
 trend line passes through zero right at month 0 — an intercept of 0.
-Raising or lowering the first month's value shifts the whole line up
-or down without changing its slope.
+Raising or lowering the first month's value doesn't just shift the
+intercept on its own — it refits the whole regression line, so the
+slope changes too (10 → 7.5 when month 1 rises to 15).
 
 ## Common errors
 

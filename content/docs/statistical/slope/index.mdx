@@ -67,8 +67,8 @@ means there's no linear relationship at all between the two.
 ## Try it
 
 <TryIt
-  data={{ '10': '10', '15': '15', '5': '5' }}
-  defaultValue="10"
+  data={{ '20': '4', '40': '10', '60': '16' }}
+  defaultValue="40"
   label={'Live preview — =SLOPE(sales, months) with the last month adjusted'}
   fieldLabel="last month's sales"
   grid={{
@@ -81,14 +81,14 @@ means there's no linear relationship at all between the two.
       a4: '3', b4: '30',
       a5: '4', b5: '40',
     },
-    highlightMap: { '10': 'A2:B5', '15': 'A2:B5', '5': 'A2:B5' },
+    highlightMap: { '20': 'A2:B5', '40': 'A2:B5', '60': 'A2:B5' },
   }}
 />
 
-Four months of sales data. With the fourth month steady at a
-consistent +10-per-month pace, SLOPE returns exactly 10; pulling that
-last value up or down changes how steep the best-fit line has to be to
-account for it.
+Four months of sales data, with the fourth month at 40 — a steady
++10-per-month pace that gives a slope of exactly 10. Try a weaker
+final month (20) or a stronger one (60) to see how much a single
+point can pull the whole trend line's slope up or down.
 
 ## Common errors
 
