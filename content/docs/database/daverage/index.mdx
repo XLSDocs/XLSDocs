@@ -1,0 +1,187 @@
+---
+title: DAVERAGE
+description: Average a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Average a numeric column across all the rows in a table that satisfy
+conditions listed in a **separate criteria range**, instead of
+conditions written directly into the formula — DSUM's averaging
+counterpart.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+  { text: 'field can be the header text or a 1-based column number', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DAVERAGE(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DAVERAGE(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to average — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The average of `field` across every record in `database` that matches
+every condition in `criteria`. Returns `#DIV/0!` if no records match.
+
+## Description
+
+DAVERAGE shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but averages a
+column instead of totaling it. It only averages records with a
+numeric value in `field`; a blank or text cell in that column is
+excluded from both the sum and the count behind the average, the same
+way DCOUNT treats non-numeric values.
+
+<Callout type="warn">
+  Unlike DSUM (which returns `0` when nothing matches), DAVERAGE
+  returns `#DIV/0!` when no record satisfies `criteria` — there's
+  nothing to divide by. Wrap it in `IFERROR` if a criteria range might
+  ever match zero records.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '$4,133.33', east: '$4,900.00', north: '$2,650.00', south: '$7,150.00' }}
+  defaultValue="West"
+  label={'Live preview — =DAVERAGE(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
+/>
+
+## Common errors
+
+### #DIV/0! — no records match criteria
+
+<ExcelCode>{`DAVERAGE(A1:D10, "Amount", F1:G2) → #DIV/0!`}</ExcelCode>
+
+DAVERAGE needs at least one matching record to average — with zero
+matches, the calculation divides by zero. Check the criteria range's
+headers and values against the database.
+
+### The average looks wrong given the visible matching rows
+
+The most common cause is a criteria header that doesn't exactly match
+a database header. DAVERAGE doesn't error on a mismatched header — it
+silently ignores that row of criteria, which can widen (or narrow)
+which records actually get averaged.
+
+### Numbers stored as text are skipped
+
+Like DSUM, DAVERAGE only includes genuine numeric values from
+`field`. A column of numbers formatted or entered as text (common
+after a CSV import) is excluded from both the sum and the count,
+which can shift the average without any visible error.
+
+export const faqs = [
+  {
+    question: 'How is DAVERAGE different from AVERAGEIFS?',
+    answer:
+      "AVERAGEIFS takes its conditions as inline arguments and always combines multiple conditions with AND. DAVERAGE reads its conditions from a separate criteria range, where same-row conditions are AND but separate-row conditions are OR — useful for OR conditions across different fields, which AVERAGEIFS can't express directly.",
+  },
+  {
+    question: 'What happens if a matching record has a blank in field?',
+    answer:
+      "It's excluded from both the total and the count used to compute the average — DAVERAGE only averages records that both match criteria AND have a numeric value in field, the same restriction DCOUNT applies when counting.",
+  },
+  {
+    question: 'Why #DIV/0! instead of 0 when nothing matches?',
+    answer:
+      'An average is a sum divided by a count — with zero matching records, that count is zero, and dividing by zero is undefined. DSUM has no such problem since summing zero records is just 0.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DAVERAGE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DAVERAGE(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim avgAmount As Double
+    avgAmount = Application.WorksheetFunction.DAverage( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DAVERAGE's job is ordinary conditional filtering + mean in pandas
+    avg = df.query('Region == "East"')['Amount'].mean()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DSUM](/docs/database/dsum) — totals a numeric field instead of
+  averaging it, using the same criteria-range mechanic.
+- [DCOUNT](/docs/database/dcount) — counts numeric values in a field,
+  the same restriction DAVERAGE applies before averaging.
+- [AVERAGEIFS](/docs/math/averageifs) — the more common modern
+  alternative for AND-only conditions written directly into the
+  formula.

@@ -1,0 +1,180 @@
+---
+title: DSTDEVP
+description: Calculate the population standard deviation of a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Calculate the population standard deviation of a numeric column,
+restricted to the rows that satisfy conditions in a **separate
+criteria range** — DVARP's square root, back in the original units.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Treats matched records as the entire population, not a sample', type: 'warn' },
+  { text: 'Works even with only 1 matching record (returns 0)', type: 'check' },
+  { text: 'Equal to the square root of DVARP on the same data', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DSTDEVP(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DSTDEVP(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to measure the standard deviation of — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population standard deviation of `field` across every record in
+`database` that matches every condition in `criteria`.
+
+## Description
+
+DSTDEVP shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but measures how
+spread out the matching values are, in the same units as the original
+data, treating the matches as a **complete population**. It's simply
+the square root of `DVARP` on the same records.
+
+<Callout type="idea">
+  Like DVARP, DSTDEVP can handle a single matching record without
+  error — the result is `0`, since a single value has no spread
+  relative to itself. DSTDEV, its sample-based counterpart, would
+  return `#DIV/0!` on the same single-record match.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '837.99', east: '1,900.00', north: '350.00', south: '0' }}
+  defaultValue="West"
+  label={'Live preview — =DSTDEVP(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
+/>
+
+South's single matching record resolves cleanly to `0` — no spread
+in a population of one. The same region errors with `#DIV/0!` under
+`DSTDEV`, which insists on at least 2 records.
+
+## Common errors
+
+### The result is smaller than DSTDEV on the same data
+
+This is expected, not a bug — DSTDEVP is built from DVARP (which
+divides by `n`), while DSTDEV is built from DVAR (which divides by
+`n - 1`), so DSTDEVP always returns a value less than or equal to
+DSTDEV's on the same matching records. The gap narrows as the number
+of matching records grows.
+
+### Confusing DSTDEVP's result with DVARP's
+
+DVARP and DSTDEVP measure the same underlying spread, but in
+different units — DVARP's result is in squared units, while
+DSTDEVP's is in the original units. They aren't interchangeable
+numbers even though they describe the same data.
+
+export const faqs = [
+  {
+    question: 'DSTDEVP vs DSTDEV — which one should I use?',
+    answer:
+      "Use DSTDEVP only when the matching records genuinely ARE the entire population, with nothing left out. Use DSTDEV whenever the matched records are a sample meant to estimate a larger, only-partially-observed population, which is the more common case.",
+  },
+  {
+    question: 'How is DSTDEVP different from STDEV.P?',
+    answer:
+      "STDEV.P takes its values as inline ranges directly. DSTDEVP instead reads which records to include from a separate criteria range against a structured database, filtering first the same way every other D-function does.",
+  },
+  {
+    question: 'Why does a single matching record return 0 instead of an error?',
+    answer: "DSTDEVP is built from DVARP, which divides by n (the full count) rather than n - 1 — so a single record just means n = 1, with no division by zero. The result is 0 because a lone value has zero deviation from its own mean.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DSTDEVP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DSTDEVP(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim popStdDev As Double
+    popStdDev = Application.WorksheetFunction.DStDevP( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DSTDEVP's job is ordinary conditional filtering + population std dev
+    pop_std = df.query('Region == "West"')['Amount'].std(ddof=0)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DVARP](/docs/database/dvarp) — the squared version of this same
+  population spread.
+- [DSTDEV](/docs/database/dstdev) — the sample version, dividing by
+  `n - 1` instead of `n`.
+- [STDEV.P](/docs/statistical/stdev-p) — the same calculation over a
+  plain range, without the criteria-range filtering.

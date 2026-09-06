@@ -1,0 +1,187 @@
+---
+title: DVAR
+description: Estimate the sample variance of a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Estimate the sample variance of a numeric column, restricted to the
+rows that satisfy conditions in a **separate criteria range** —
+DSUM's variance counterpart, treating the matched records as a
+sample of a larger population.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Treats matched records as a sample, not the full population', type: 'warn' },
+  { text: 'Needs at least 2 matching records — #DIV/0! with only 1', type: 'warn' },
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DVAR(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DVAR(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to measure the variance of — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample variance of `field` across every record in `database`
+that matches every condition in `criteria`.
+
+## Description
+
+DVAR shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but measures how
+spread out the matching values are instead of totaling them. Like
+`VAR.S`, it divides by one less than the number of matching records
+(`n - 1`), which is the correct adjustment when those records are
+treated as a *sample* representing a larger population rather than
+the entire population itself.
+
+<Callout type="warn">
+  DVAR needs **at least 2** matching records — with exactly 1 match,
+  `n - 1` is `0`, and the calculation divides by zero. Use `DVARP`
+  instead if the matching records should be treated as the entire
+  population rather than a sample (it divides by `n`, so it works
+  even with a single match).
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '1,053,333.33', east: '7,220,000', north: '245,000', south: '#DIV/0!' }}
+  defaultValue="West"
+  label={'Live preview — =DVAR(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
+/>
+
+South has only one matching record, so DVAR returns `#DIV/0!` —
+there's no spread to measure from a single value with the `n - 1`
+sample formula. Try `DVARP` on the same data to see South resolve to
+`0` instead.
+
+## Common errors
+
+### #DIV/0! — only one record matches criteria
+
+<ExcelCode>{`DVAR(A1:D10, "Amount", F1:G2) → #DIV/0!`}</ExcelCode>
+
+DVAR's sample-variance formula divides by `n - 1` matching records.
+With exactly one match, that's division by zero. Either broaden the
+criteria to include more records, or switch to `DVARP` if a single
+record legitimately represents the entire population being measured.
+
+### The result seems too large compared to the data's scale
+
+Variance is expressed in **squared** units — a field of dollar
+amounts produces a variance in squared dollars, which is why the
+number often looks disproportionately large next to the original
+values. Take the square root (or use `DSTDEV` directly) to get a
+result back in the original units.
+
+export const faqs = [
+  {
+    question: 'DVAR vs DVARP — which one should I use?',
+    answer:
+      "Use DVAR when the matching records are a sample meant to estimate a larger population's variance (the more common case in practice). Use DVARP only when the matching records ARE the entire population being measured, with nothing left out.",
+  },
+  {
+    question: 'How is DVAR different from VAR.S?',
+    answer:
+      "VAR.S takes its values as inline ranges directly. DVAR instead reads which records to include from a separate criteria range against a structured database, filtering first the same way every other D-function does.",
+  },
+  {
+    question: 'Why is the result in squared units instead of the original scale?',
+    answer: 'Variance is defined as the average of squared deviations from the mean, so its units are always the original units squared. This is precisely why standard deviation (the square root of variance) exists — DSTDEV returns a result back in the original, more interpretable scale.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DVAR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DVAR(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sampleVar As Double
+    sampleVar = Application.WorksheetFunction.DVar( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DVAR's job is ordinary conditional filtering + sample variance
+    sample_var = df.query('Region == "West"')['Amount'].var(ddof=1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DVARP](/docs/database/dvarp) — the population version, dividing by
+  `n` instead of `n - 1`.
+- [DSTDEV](/docs/database/dstdev) — the square root of this same
+  sample variance, back in the original units.
+- [VAR.S](/docs/statistical/var-s) — the same calculation over a
+  plain range, without the criteria-range filtering.

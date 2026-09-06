@@ -1,0 +1,182 @@
+---
+title: DSTDEV
+description: Estimate the sample standard deviation of a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Estimate the sample standard deviation of a numeric column, restricted
+to the rows that satisfy conditions in a **separate criteria range** —
+DVAR's square root, back in the original units.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Treats matched records as a sample, not the full population', type: 'warn' },
+  { text: 'Needs at least 2 matching records — #DIV/0! with only 1', type: 'warn' },
+  { text: 'Equal to the square root of DVAR on the same data', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DSTDEV(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DSTDEV(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to measure the standard deviation of — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample standard deviation of `field` across every record in
+`database` that matches every condition in `criteria`.
+
+## Description
+
+DSTDEV shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but measures how
+spread out the matching values are, in the same units as the original
+data. It's simply the square root of `DVAR` on the same records: a
+`DVAR` result of `1,053,333.33` (in squared dollars) becomes a DSTDEV
+result of about `1,026.32` (in plain dollars).
+
+<Callout type="warn">
+  DSTDEV needs **at least 2** matching records — the same `n - 1`
+  requirement as DVAR, since DSTDEV is just DVAR's square root. Use
+  `DSTDEVP` instead if the matching records should be treated as the
+  entire population rather than a sample.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '1,026.32', east: '2,687.01', north: '494.97', south: '#DIV/0!' }}
+  defaultValue="West"
+  label={'Live preview — =DSTDEV(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
+/>
+
+South has only one matching record, so DSTDEV returns `#DIV/0!` —
+the same underlying reason DVAR errors there. Try `DSTDEVP` on the
+same data to see South resolve to `0` instead.
+
+## Common errors
+
+### #DIV/0! — only one record matches criteria
+
+<ExcelCode>{`DSTDEV(A1:D10, "Amount", F1:G2) → #DIV/0!`}</ExcelCode>
+
+DSTDEV inherits DVAR's `n - 1` requirement — with exactly one match,
+that's division by zero before the square root is even taken. Either
+broaden the criteria to include more records, or switch to `DSTDEVP`
+if a single record legitimately represents the entire population.
+
+### Confusing DSTDEV's result with DVAR's
+
+DVAR and DSTDEV measure the same underlying spread, but in different
+units — DVAR's result is in squared units (e.g. squared dollars),
+while DSTDEV's is in the original units (plain dollars). They aren't
+interchangeable numbers even though they describe the same data.
+
+export const faqs = [
+  {
+    question: 'DSTDEV vs DSTDEVP — which one should I use?',
+    answer:
+      "Use DSTDEV when the matching records are a sample meant to estimate a larger population's spread (the more common case). Use DSTDEVP only when the matching records ARE the entire population, with nothing left out.",
+  },
+  {
+    question: 'How is DSTDEV different from STDEV.S?',
+    answer:
+      "STDEV.S takes its values as inline ranges directly. DSTDEV instead reads which records to include from a separate criteria range against a structured database, filtering first the same way every other D-function does.",
+  },
+  {
+    question: 'Why use DSTDEV instead of just taking the square root of DVAR myself?',
+    answer: "There's no calculation difference — DSTDEV(database, field, criteria) always equals SQRT(DVAR(database, field, criteria)) exactly. DSTDEV just saves writing the nested SQRT, and reads more clearly as a single named calculation.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DSTDEV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DSTDEV(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sampleStdDev As Double
+    sampleStdDev = Application.WorksheetFunction.DStDev( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DSTDEV's job is ordinary conditional filtering + sample std dev
+    sample_std = df.query('Region == "West"')['Amount'].std(ddof=1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DVAR](/docs/database/dvar) — the squared version of this same
+  sample spread.
+- [DSTDEVP](/docs/database/dstdevp) — the population version, dividing
+  by `n` instead of `n - 1`.
+- [STDEV.S](/docs/statistical/stdev-s) — the same calculation over a
+  plain range, without the criteria-range filtering.

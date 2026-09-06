@@ -1,0 +1,178 @@
+---
+title: DMAX
+description: Find the largest value in a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Find the largest value in a numeric column, restricted to the rows
+that satisfy conditions listed in a **separate criteria range** —
+DSUM's largest-value counterpart.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+  { text: 'field can be the header text or a 1-based column number', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DMAX(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DMAX(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to find the maximum of — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The largest value of `field` across every record in `database` that
+matches every condition in `criteria`. Returns `0` if no records
+match.
+
+## Description
+
+DMAX shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but returns the
+largest matching value instead of a total. Text and blank cells in
+`field` are simply ignored when comparing, the same way they're
+ignored by the plain `MAX` function.
+
+<Callout type="idea">
+  DMAX returning `0` when nothing matches can be misleading if the
+  database itself contains negative numbers — `0` might look like a
+  legitimate (if unusually low) result rather than "no matches." If
+  negative values are possible, double-check with `DCOUNT` first to
+  confirm anything actually matched.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '$5,000', east: '$6,800', north: '$3,000', south: '$7,150' }}
+  defaultValue="West"
+  label={'Live preview — =DMAX(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
+/>
+
+## Common errors
+
+### The result is 0, but matching rows clearly exist
+
+As with DSUM, the most common cause is a criteria header that doesn't
+exactly match a database header. DMAX doesn't error on a
+non-matching header — it just ignores that criteria row, which can
+silently produce 0 instead of pointing at the typo.
+
+### 0 looks like a plausible result, but nothing actually matched
+
+Since DMAX returns `0` for zero matches, this is easy to
+misinterpret when the database contains only positive values close to
+zero, or when negative values are expected. Confirm with `DCOUNT`
+that at least one record actually matched before trusting a `0`.
+
+export const faqs = [
+  {
+    question: 'How is DMAX different from MAXIFS?',
+    answer:
+      "MAXIFS takes its conditions as inline arguments and always combines multiple conditions with AND. DMAX reads its conditions from a separate criteria range, where same-row conditions are AND but separate-row conditions are OR — useful for OR conditions across different fields, which MAXIFS can't express directly.",
+  },
+  {
+    question: 'What does DMAX return if no records match?',
+    answer:
+      "0 — the same as DSUM. This can be ambiguous if the field being searched can legitimately contain negative values or zero itself, since there's no way to tell 'no matches' apart from 'the matching maximum happens to be 0' just from the result.",
+  },
+  {
+    question: 'Does DMAX consider text values in field?',
+    answer:
+      'No — like MAX, DMAX only compares numeric values and ignores text and blanks in the field being searched.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DMAX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DMAX(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim largest As Double
+    largest = Application.WorksheetFunction.DMax( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DMAX's job is ordinary conditional filtering + max in pandas
+    largest = df.query('Region == "East"')['Amount'].max()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DMIN](/docs/database/dmin) — the smallest matching value instead of
+  the largest.
+- [DSUM](/docs/database/dsum) — totals a numeric field, using the
+  same criteria-range mechanic.
+- [MAXIFS](/docs/math/maxifs) — the more common modern alternative
+  for AND-only conditions written directly into the formula.

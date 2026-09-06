@@ -1,0 +1,176 @@
+---
+title: DMIN
+description: Find the smallest value in a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Find the smallest value in a numeric column, restricted to the rows
+that satisfy conditions listed in a **separate criteria range** —
+DMAX's counterpart at the other end of the scale.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+  { text: 'field can be the header text or a 1-based column number', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DMIN(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DMIN(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to find the minimum of — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The smallest value of `field` across every record in `database` that
+matches every condition in `criteria`. Returns `0` if no records
+match.
+
+## Description
+
+DMIN shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but returns the
+smallest matching value instead of a total. Text and blank cells in
+`field` are simply ignored when comparing, the same way they're
+ignored by the plain `MIN` function.
+
+<Callout type="idea">
+  DMIN returning `0` when nothing matches can be misleading if the
+  database's values are all positive but never actually reach `0` —
+  it's easy to mistake for a genuinely low real result. If that's a
+  concern, check `DCOUNT` first to confirm anything actually matched.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '$3,000', east: '$3,000', north: '$2,300', south: '$7,150' }}
+  defaultValue="West"
+  label={'Live preview — =DMIN(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
+/>
+
+## Common errors
+
+### The result is 0, but matching rows clearly exist
+
+As with DSUM and DMAX, the most common cause is a criteria header
+that doesn't exactly match a database header. DMIN silently ignores a
+non-matching criteria row rather than erroring, which can produce a 0
+that looks like a real result.
+
+### 0 looks like a plausible result, but nothing actually matched
+
+Confirm with `DCOUNT` that at least one record actually matched
+before trusting a `0` from DMIN, especially in databases where a
+value of exactly `0` is otherwise unlikely to occur naturally.
+
+export const faqs = [
+  {
+    question: 'How is DMIN different from MINIFS?',
+    answer:
+      "MINIFS takes its conditions as inline arguments and always combines multiple conditions with AND. DMIN reads its conditions from a separate criteria range, where same-row conditions are AND but separate-row conditions are OR.",
+  },
+  {
+    question: 'What does DMIN return if no records match?',
+    answer:
+      "0 — the same as DMAX and DSUM. This is ambiguous whenever the database's real values could plausibly be at or near zero.",
+  },
+  {
+    question: 'Does DMIN consider text values in field?',
+    answer:
+      'No — like MIN, DMIN only compares numeric values and ignores text and blanks in the field being searched.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DMIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DMIN(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim smallest As Double
+    smallest = Application.WorksheetFunction.DMin( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DMIN's job is ordinary conditional filtering + min in pandas
+    smallest = df.query('Region == "East"')['Amount'].min()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DMAX](/docs/database/dmax) — the largest matching value instead of
+  the smallest.
+- [DSUM](/docs/database/dsum) — totals a numeric field, using the
+  same criteria-range mechanic.
+- [MINIFS](/docs/math/minifs) — the more common modern alternative
+  for AND-only conditions written directly into the formula.

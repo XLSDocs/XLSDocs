@@ -1,0 +1,183 @@
+---
+title: DPRODUCT
+description: Multiply the values in a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Multiply every value in a numeric column together, restricted to the
+rows that satisfy conditions in a **separate criteria range** —
+useful for chaining multipliers, like successive growth or discount
+rates, that need to compound rather than add.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+  { text: 'field can be the header text or a 1-based column number', type: 'check' },
+  { text: 'Returns 1, not 0, if no records match', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DPRODUCT(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DPRODUCT(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to multiply — either its header text in quotes (e.g. "Multiplier") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The product of every value in `field` across the records in
+`database` that match every condition in `criteria`. Returns `1` if
+no records match — the multiplicative identity, the same reason an
+empty `PRODUCT()` also returns `1`.
+
+## Description
+
+DPRODUCT shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but multiplies
+matching values together rather than adding them. It's the natural
+fit for chained multipliers: successive growth rates, discount
+factors, or conversion ratios that need to compound, not sum.
+
+<Callout type="idea">
+  DPRODUCT returns `1` for zero matches, not `0` — multiplying by 1
+  leaves a value unchanged, the same reason an empty product is
+  defined as 1 in ordinary math (just like an empty sum is defined as
+  0, which is why DSUM returns `0`).
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ a: '1.2474', b: '1.254', c: '1.15' }}
+  defaultValue="A"
+  label={'Live preview — =DPRODUCT(Growth, "Multiplier", Criteria: Store="{value}")'}
+  fieldLabel="store"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 8,
+    values: {
+      a1: 'Store', b1: 'Multiplier',
+      a2: 'A', b2: '1.05', a3: 'A', b3: '1.1', a4: 'A', b4: '1.08',
+      a5: 'B', b5: '1.2', a6: 'B', b6: '0.95', a7: 'B', b7: '1.1',
+      a8: 'C', b8: '1.15',
+    },
+    highlightMap: { a: 'A2:B4', b: 'A5:B7', c: 'A8:B8' },
+  }}
+/>
+
+Three quarterly growth multipliers per store (1.05 means "+5% that
+quarter"). DPRODUCT chains them into a single compounded growth
+factor — Store A's three quarters compound to roughly +24.7% overall,
+not the ~23% a simple sum of the percentages would suggest.
+
+## Common errors
+
+### The result is 1, but matching rows clearly exist
+
+As with DSUM's silent-0 case, the most common cause is a criteria
+header that doesn't exactly match a database header. DPRODUCT
+silently ignores a non-matching criteria row rather than erroring,
+which surfaces as an unexpected `1` (the identity result for zero
+matches) instead of pointing at the mistake.
+
+### An unexpectedly small or zero result
+
+A single `0` anywhere in the matched `field` values collapses the
+entire product to `0`, no matter how many other values were
+multiplied in. Check the matched records for a stray `0` if the
+result looks wrong.
+
+export const faqs = [
+  {
+    question: 'How is DPRODUCT different from PRODUCT?',
+    answer:
+      "PRODUCT multiplies whatever ranges or values you pass it directly. DPRODUCT instead reads which records to include from a separate criteria range against a structured database, the same mechanic every other D-function uses.",
+  },
+  {
+    question: 'Why does DPRODUCT return 1 instead of 0 for no matches?',
+    answer:
+      "1 is the multiplicative identity — multiplying anything by 1 leaves it unchanged, just as adding 0 leaves a sum unchanged. That's why DSUM (an addition) returns 0 for no matches, while DPRODUCT (a multiplication) returns 1.",
+  },
+  {
+    question: 'When would I actually need DPRODUCT over just multiplying cells directly?',
+    answer: "Whenever the values to multiply live in a table and need to be filtered first — like compounding only the growth multipliers for one store, one product line, or one date range — rather than a fixed, hand-picked set of cells.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DPRODUCT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DPRODUCT(A1:D20, "Multiplier", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim compounded As Double
+    compounded = Application.WorksheetFunction.DProduct( _
+        Range("A1:D20"), "Multiplier", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    # DPRODUCT's job is ordinary conditional filtering + a running product
+    compounded = np.prod(df.query('Store == "A"')['Multiplier'])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DSUM](/docs/database/dsum) — totals a numeric field instead of
+  multiplying it, using the same criteria-range mechanic.
+- [DCOUNT](/docs/database/dcount) — counts numeric values in a field
+  rather than combining them.
+- [DGET](/docs/database/dget) — retrieves a single field's value from
+  the one record that matches criteria.

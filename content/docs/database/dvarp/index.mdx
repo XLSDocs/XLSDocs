@@ -1,0 +1,180 @@
+---
+title: DVARP
+description: Calculate the population variance of a numeric field across the records in a database range that match a separate criteria range.
+---
+
+Calculate the population variance of a numeric column, restricted to
+the rows that satisfy conditions in a **separate criteria range** —
+DVAR's counterpart when the matching records ARE the entire
+population being measured, not a sample of a larger one.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Treats matched records as the entire population, not a sample', type: 'warn' },
+  { text: 'Works even with only 1 matching record (returns 0)', type: 'check' },
+  { text: 'criteria range needs the same column headers as the database', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DVARP(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DVARP(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: true,
+    description: 'Which column to measure the variance of — either its header text in quotes (e.g. "Amount") or its position as a 1-based column number.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population variance of `field` across every record in `database`
+that matches every condition in `criteria`.
+
+## Description
+
+DVARP shares DSUM's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but measures how
+spread out the matching values are, treating them as a **complete
+population** rather than a sample. Unlike `DVAR`, it divides by the
+full count of matching records (`n`), not `n - 1`.
+
+<Callout type="idea">
+  Because DVARP divides by `n` instead of `n - 1`, it can handle a
+  single matching record without error — the result is simply `0`
+  (a single value has no spread relative to itself). This is the main
+  practical reason to reach for DVARP over DVAR: it never produces
+  `#DIV/0!` from a small match.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '702,222.22', east: '3,610,000', north: '122,500', south: '0' }}
+  defaultValue="West"
+  label={'Live preview — =DVARP(Sales, "Amount", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount',
+      a2: 'West', b2: '5000', a3: 'West', b3: '4400', a4: 'West', b4: '3000',
+      a5: 'East', b5: '6800', a6: 'East', b6: '3000',
+      a7: 'North', b7: '2300', a8: 'North', b8: '3000',
+      a9: 'South', b9: '7150',
+    },
+    highlightMap: { west: 'A2:B4', east: 'A5:B6', north: 'A7:B8', south: 'A9:B9' },
+  }}
+/>
+
+South's single matching record resolves cleanly to `0` — no spread
+in a population of one. The same region errors with `#DIV/0!` under
+`DVAR`, which insists on at least 2 records.
+
+## Common errors
+
+### The result is much smaller than DVAR on the same data
+
+This is expected, not a bug — DVARP divides by `n` while DVAR divides
+by `n - 1`, so DVARP always returns a value less than or equal to
+DVAR's on the same matching records. The gap narrows as the number of
+matching records grows.
+
+### The result seems too large compared to the data's scale
+
+Like DVAR, variance is expressed in **squared** units. Take the
+square root (or use `DSTDEVP` directly) to get a result back in the
+original units.
+
+export const faqs = [
+  {
+    question: 'DVARP vs DVAR — which one should I use?',
+    answer:
+      "Use DVARP only when the matching records genuinely ARE the entire population being measured, with nothing left out — for instance, every employee's salary in a small, complete department. Use DVAR whenever the matched records are a sample meant to estimate a larger, only-partially-observed population, which is the more common case.",
+  },
+  {
+    question: 'How is DVARP different from VAR.P?',
+    answer:
+      "VAR.P takes its values as inline ranges directly. DVARP instead reads which records to include from a separate criteria range against a structured database, filtering first the same way every other D-function does.",
+  },
+  {
+    question: 'Why does a single matching record return 0 instead of an error?',
+    answer: "DVARP divides by n (the full count), so a single record just means n = 1 — no error, since there's no division by zero. The result is 0 because a lone value has zero deviation from its own mean.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DVARP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DVARP(A1:D20, "Amount", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim popVar As Double
+    popVar = Application.WorksheetFunction.DVarP( _
+        Range("A1:D20"), "Amount", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DVARP's job is ordinary conditional filtering + population variance
+    pop_var = df.query('Region == "West"')['Amount'].var(ddof=0)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DVAR](/docs/database/dvar) — the sample version, dividing by
+  `n - 1` instead of `n`.
+- [DSTDEVP](/docs/database/dstdevp) — the square root of this same
+  population variance, back in the original units.
+- [VAR.P](/docs/statistical/var-p) — the same calculation over a
+  plain range, without the criteria-range filtering.

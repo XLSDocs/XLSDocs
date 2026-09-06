@@ -1,0 +1,186 @@
+---
+title: DCOUNTA
+description: Count non-blank values in a field across the records in a database range that match a separate criteria range.
+---
+
+Count how many records in a table have **any non-blank value** —
+text, dates, or numbers — in a given field, restricted to rows that
+match conditions in a separate criteria range. DCOUNT's less
+restrictive counterpart.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Counts any non-blank value in field — text, dates, and numbers alike', type: 'check' },
+  { text: 'field is optional — omit it to count matching records as a whole', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DCOUNTA(database, field, criteria)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DCOUNTA(database, field, criteria)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'database',
+    type: 'range',
+    required: true,
+    description: 'The full table, including its header row. Every column needs a header.',
+  },
+  {
+    name: 'field',
+    type: 'text or number',
+    required: false,
+    description: 'Which column to count non-blank values in — header text in quotes, or a 1-based column number. If omitted, DCOUNTA counts every matching record.',
+  },
+  {
+    name: 'criteria',
+    type: 'range',
+    required: true,
+    description: 'A separate range with headers matching the database’s headers, plus one or more rows of conditions below them.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The count of records matching `criteria` that also have **any
+non-blank value** in `field`. Returns `0` if nothing matches.
+
+## Description
+
+DCOUNTA shares DCOUNT's criteria-range mechanic exactly — same-row
+conditions are AND, separate-row conditions are OR — but drops
+DCOUNT's numeric-only restriction. Any cell that isn't empty counts,
+regardless of whether it holds a number, text, or a date.
+
+<Callout type="idea">
+  Use DCOUNTA when the field being checked is naturally text (like a
+  "Reviewed by" or "Notes" column) — DCOUNT would return `0` for a
+  text-only field every time, since it only recognizes numbers.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ west: '2', east: '1', north: '0', south: '1' }}
+  defaultValue="West"
+  label={'Live preview — =DCOUNTA(Sales, "Notes", Criteria: Region="{value}")'}
+  fieldLabel="region"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 9,
+    values: {
+      a1: 'Region', b1: 'Amount', c1: 'Notes',
+      a2: 'West', b2: '5000', c2: 'Reviewed',
+      a3: 'West', b3: '4400', c3: '',
+      a4: 'West', b4: '3000', c4: 'Reviewed',
+      a5: 'East', b5: '6800', c5: '',
+      a6: 'East', b6: '3000', c6: 'Pending',
+      a7: 'North', b7: '2300', c7: '',
+      a8: 'North', b8: '3000', c8: '',
+      a9: 'South', b9: '7150', c9: 'Reviewed',
+    },
+    highlightMap: { west: 'A2:C4', east: 'A5:C6', north: 'A7:C8', south: 'A9:C9' },
+  }}
+/>
+
+North has no notes at all yet, so DCOUNTA on the Notes field returns
+0 for that region — a plain `DCOUNT` would also return 0 here, but
+for a different reason (it never recognizes text like "Reviewed" as
+countable in the first place).
+
+## Common errors
+
+### DCOUNTA counts more than expected on a numeric column
+
+If `field` is a column that's supposed to be purely numeric,
+DCOUNTA counts stray text entries too — like a typo, a placeholder
+string, or a number stored as text — that `DCOUNT` would correctly
+exclude. If the field should genuinely only ever hold numbers, DCOUNT
+is usually the better choice.
+
+### The result is 0, but matching rows clearly exist
+
+As with DCOUNT, the most common cause is a criteria header that
+doesn't exactly match a database header — DCOUNTA silently ignores a
+non-matching criteria row instead of erroring.
+
+export const faqs = [
+  {
+    question: 'How is DCOUNTA different from DCOUNT?',
+    answer:
+      "DCOUNT only counts records where field holds a number. DCOUNTA counts records where field holds anything non-blank — text, dates, or numbers — making it the right choice when the field being checked isn't necessarily numeric.",
+  },
+  {
+    question: 'How is DCOUNTA different from COUNTIFS?',
+    answer:
+      "COUNTIFS takes its conditions as inline arguments, always combined with AND. DCOUNTA reads conditions from a separate criteria range, where same-row conditions are AND and separate-row conditions are OR.",
+  },
+  {
+    question: 'What happens if I omit the field argument?',
+    answer:
+      'DCOUNTA then counts every record matching criteria, regardless of any particular column\'s contents — useful for a straightforward "how many matching rows are there?" count.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DCOUNTA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DCOUNTA(A1:D20, "Notes", F1:G2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim n As Long
+    n = Application.WorksheetFunction.DCountA( _
+        Range("A1:D20"), "Notes", Range("F1:G2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    # DCOUNTA's job is filtering + counting non-null cells regardless of type
+    matched = df.query('Region == "East"')
+    n = matched['Notes'].notna().sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DCOUNT](/docs/database/dcount) — the stricter, numeric-only
+  version of the same count.
+- [DGET](/docs/database/dget) — retrieves a single field's value from
+  the one record that matches criteria.
+- [COUNTIFS](/docs/math/countifs) — the more common modern
+  alternative for AND-only conditions written directly into the
+  formula.
