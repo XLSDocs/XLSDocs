@@ -26,7 +26,7 @@ interface PlaygroundCategory {
 
 // Curated, not exhaustive — one representative pick per Try-it "shape"
 // per category (grid highlight, schedule swap, scenario picker, error
-// demo), rather than all 52 pages that currently have a widget. See
+// demo), rather than all 134 pages that currently have a widget. See
 // each linked page's own Try it section for the full picture; this
 // page's job is to hook interest, not catalog everything.
 const CATEGORIES: PlaygroundCategory[] = [
@@ -72,6 +72,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'DGET',
         href: '/docs/database/dget#try-it',
         teaser: "Change the order ID and watch DGET pull that one row's exact amount.",
+      },
+      {
+        fn: 'DVAR',
+        href: '/docs/database/dvar#try-it',
+        teaser: 'Pick the region with just one sale and watch DVAR return #DIV/0! instead of a number.',
       },
     ],
   },
@@ -142,6 +147,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'MODE.MULT',
         href: '/docs/statistical/mode-mult#try-it',
         teaser: 'Pick the tied-modes dataset and watch MODE.MULT report both repeated values, not just the first.',
+      },
+      {
+        fn: 'SLOPE',
+        href: '/docs/statistical/slope#try-it',
+        teaser: "Push the last month's sales up to 60 and watch the slope jump from 10 to 16 — one point can swing the whole trend line.",
       },
     ],
   },
