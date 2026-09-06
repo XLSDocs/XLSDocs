@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-06',
+    title: 'All 12 Database functions — DAVERAGE, DMAX, DMIN, DCOUNTA, DPRODUCT, DVAR, DVARP, DSTDEV, and DSTDEVP',
+    description:
+      "Nine more D-functions closing out the Database category, which previously only covered DSUM, DCOUNT, and DGET. DVAR/DSTDEV vs. DVARP/DSTDEVP get a real worked example showing exactly when to use which: the same dataset that errors with #DIV/0! under the sample-based pair resolves cleanly to 0 under the population-based one.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-05',
     title: 'GEOMEAN, HARMEAN, TRIMMEAN, FORECAST, SLOPE, INTERCEPT, CORREL, PEARSON, PERCENTRANK.INC, QUARTILE.INC, CONFIDENCE.NORM, and AGGREGATE',
     description:
