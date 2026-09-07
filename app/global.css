@@ -24,6 +24,14 @@
      both were originally guessed as. */
   --fd-layout-width: 200rem;
 
+  /* Fumadocs' own light-mode default (hsl(0,0%,45.1%) = #737373) measures
+     ~4.2:1 against the card/background here — just under WCAG AA's 4.5:1
+     for body-sized text (it does clear AA for large text/UI at 3:1). Darkened
+     to #5c5c5c (~6:1) so description/FAQ/label text reads comfortably as
+     actual content, not almost-invisible. Dark mode's own override two
+     blocks down was left alone — not part of this fix. */
+  --color-fd-muted-foreground: #5c5c5c;
+
   /* emerald-600 — light-mode counterpart to the .dark block's emerald-500 accent below. Previously unset in light mode, so accent-colored UI (buttons, active nav, this file's --excel-fn) fell back to Fumadocs' near-black default. */
   --color-fd-primary: oklch(0.596 0.145 163.23);
   --color-fd-primary-foreground: #ffffff;
