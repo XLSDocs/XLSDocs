@@ -1,4 +1,5 @@
 import { getPageImageUrl, getPageMarkdownUrl, source } from '@/lib/source';
+import { FunctionNav } from '@/components/function-nav';
 import {
   DocsBody,
   DocsDescription,
@@ -40,6 +41,14 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const functionSlug = page.slugs[1];
   const categoryPage = categorySlug ? source.getPage([categorySlug]) : undefined;
   const functionPage = categorySlug && functionSlug ? source.getPage([categorySlug, functionSlug]) : undefined;
+  // Not every function page ships an examples.mdx companion — checked
+  // against the real content tree so FunctionNav's Examples tab never
+  // links to a page that doesn't exist (a live 404 otherwise).
+  const hasExamples = !!(
+    categorySlug &&
+    functionSlug &&
+    source.getPage([categorySlug, functionSlug, 'examples'])
+  );
 
   const faqs = page.data._exports?.faqs as FaqItem[] | undefined;
   const compatibility = page.data._exports?.compatibility as CompatibilityItem[] | undefined;
@@ -91,6 +100,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths
             a: createRelativeLink(source, page),
+            FunctionNav: () => <FunctionNav hasExamples={hasExamples} />,
           })}
         />
         {page.slugs.length === 2 && <QuickFixPromo />}

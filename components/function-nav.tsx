@@ -4,18 +4,32 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-const TABS = [
-  { slug: '', label: 'Overview' },
-  { slug: 'examples', label: 'Examples' },
-];
+interface FunctionNavProps {
+  /** Whether this function has a companion `examples.mdx` page. Not every
+   *  function does — several batches shipped without one — so the Examples
+   *  tab is only rendered when it actually resolves to a real page instead
+   *  of a live 404. Defaults to `true` so every existing `<FunctionNav />`
+   *  call (written with no props) keeps its current behavior; the one place
+   *  that actually passes `false` is app/docs/[[...slug]]/page.tsx's MDX
+   *  component override, computed from the real content tree via
+   *  `source.getPage`, not hand-maintained per page. */
+  hasExamples?: boolean;
+}
 
-const SUB_SLUGS = new Set(TABS.filter((tab) => tab.slug).map((tab) => tab.slug));
-
-export function FunctionNav() {
+export function FunctionNav({ hasExamples = true }: FunctionNavProps) {
   const pathname = usePathname();
+
+  const tabs = hasExamples
+    ? [
+        { slug: '', label: 'Overview' },
+        { slug: 'examples', label: 'Examples' },
+      ]
+    : [{ slug: '', label: 'Overview' }];
+  const subSlugs = new Set(tabs.filter((tab) => tab.slug).map((tab) => tab.slug));
+
   const segments = pathname.split('/').filter(Boolean);
   const last = segments[segments.length - 1];
-  const activeSlug = SUB_SLUGS.has(last) ? last : '';
+  const activeSlug = subSlugs.has(last) ? last : '';
   const base = activeSlug ? '/' + segments.slice(0, -1).join('/') : pathname;
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,12 +46,17 @@ export function FunctionNav() {
     }
   }, [activeSlug]);
 
+  // No Examples page means there's nothing to switch between — a lone
+  // "Overview" tab with an active-underline is a tab bar with no function,
+  // not a degraded version of one.
+  if (!hasExamples) return null;
+
   return (
     <div
       ref={containerRef}
       className="not-prose relative flex items-center gap-6 border-b mb-8 overflow-x-auto"
     >
-      {TABS.map((tab) => {
+      {tabs.map((tab) => {
         const href = tab.slug ? `${base}/${tab.slug}` : base;
         const isActive = tab.slug === activeSlug;
         return (
