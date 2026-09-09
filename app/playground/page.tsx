@@ -26,7 +26,7 @@ interface PlaygroundCategory {
 
 // Curated, not exhaustive — one representative pick per Try-it "shape"
 // per category (grid highlight, schedule swap, scenario picker, error
-// demo), rather than all 134 pages that currently have a widget. See
+// demo), rather than all 141 pages that currently have a widget. See
 // each linked page's own Try it section for the full picture; this
 // page's job is to hook interest, not catalog everything.
 const CATEGORIES: PlaygroundCategory[] = [
@@ -52,6 +52,21 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'INDEX',
         href: '/docs/lookup/index#try-it',
         teaser: "Push the position past the array's edge and watch INDEX return #REF! instead of a value.",
+      },
+      {
+        fn: 'ADDRESS',
+        href: '/docs/lookup/address#try-it',
+        teaser: 'Cycle through all four abs_num options and watch the same C2 reference gain and lose its $ signs.',
+      },
+    ],
+  },
+  {
+    name: 'Logical',
+    items: [
+      {
+        fn: 'XOR',
+        href: '/docs/logical/xor#try-it',
+        teaser: "Flip a third condition to TRUE and watch XOR's answer flip back to TRUE too — it's counting, not choosing.",
       },
     ],
   },
@@ -122,6 +137,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'ISLOGICAL',
         href: '/docs/info/islogical#try-it',
         teaser: 'Type the text "TRUE" and watch ISLOGICAL correctly call it FALSE — it\'s not a real boolean.',
+      },
+      {
+        fn: 'CELL',
+        href: '/docs/info/cell#try-it',
+        teaser: 'Point at the same cell but swap info_type, and watch CELL report its row, address, or contents from one formula shape.',
       },
     ],
   },
