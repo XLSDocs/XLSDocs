@@ -1,0 +1,162 @@
+---
+title: XOR
+description: Return TRUE when an odd number of the given conditions are TRUE — not the everyday "either but not both" XOR once there are more than two arguments.
+---
+
+Return `TRUE` when an **odd number** of the given conditions are
+`TRUE`, and `FALSE` when an even number are (including zero) — the
+same everyday "either but not both" logic with exactly two arguments,
+but a surprising rule once there are three or more.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'With more than 2 arguments: TRUE only when an ODD count is TRUE', type: 'warn' },
+  { text: 'Accepts up to 254 logical arguments', type: 'check' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=XOR(logical1, [logical2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=XOR(logical1, [logical2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'logical1',
+    type: 'boolean',
+    required: true,
+    description: 'The first condition or logical value to test.',
+  },
+  {
+    name: 'logical2, ...',
+    type: 'boolean',
+    required: false,
+    description: 'Up to 253 additional conditions or logical values.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if an odd number of the arguments are `TRUE`; `FALSE`
+otherwise (including when none of them are).
+
+## Description
+
+With exactly two arguments, XOR matches everyday intuition: `TRUE`
+when exactly one of the two is `TRUE`, `FALSE` when both or neither
+are. That intuition breaks down with three or more arguments — XOR
+isn't "exactly one is TRUE," it's "an **odd count** is TRUE." Three
+TRUE values among five arguments returns `TRUE`; two TRUE values
+returns `FALSE`, same as zero.
+
+<Callout type="warn">
+  XOR with more than two arguments is **not** "exactly one condition
+  is true" — that would need `COUNTIF`/`SUMPRODUCT` counting logic
+  instead. `XOR(TRUE, TRUE, TRUE)` returns `TRUE` (three is odd), even
+  though three conditions being true isn't "exactly one" by any normal
+  reading.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'one true': 'TRUE', 'two true': 'FALSE', 'three true': 'TRUE', 'none true': 'FALSE' }}
+  defaultValue="one true"
+  label={'Live preview — =XOR({value})'}
+  fieldLabel="scenario"
+/>
+
+"Three true" still returns `TRUE` — three is an odd count, the same
+result as just one condition being true, even though it doesn't match
+the everyday sense of "either... or."
+
+## Common errors
+
+### Expecting "exactly one true" with 3+ arguments
+
+<ExcelCode>{`XOR(TRUE, TRUE, TRUE) → TRUE, not FALSE`}</ExcelCode>
+
+If the real goal is "exactly one of these conditions is true," use
+`SUMPRODUCT(--(conditions)) = 1` or a `COUNTIF`-based count instead —
+XOR's odd/even rule isn't equivalent once past two arguments.
+
+### #VALUE! — a non-logical argument
+
+<ExcelCode>{`XOR("yes", TRUE) → #VALUE!`}</ExcelCode>
+
+Every argument needs to evaluate to `TRUE`/`FALSE` (or a number,
+where any nonzero number counts as `TRUE`) — plain text like `"yes"`
+isn't automatically interpreted as a logical value.
+
+export const faqs = [
+  {
+    question: 'Does XOR mean "exactly one condition is true"?',
+    answer:
+      "Only with exactly two arguments. With three or more, XOR returns TRUE whenever an ODD number of them are true — three trues, or five trues, both return TRUE, not just exactly one.",
+  },
+  {
+    question: 'How is XOR different from OR?',
+    answer:
+      "OR returns TRUE if AT LEAST ONE argument is true, regardless of how many. XOR's result flips based on whether the true count is odd or even — two true arguments make OR return TRUE but XOR return FALSE.",
+  },
+  {
+    question: 'What does XOR return with zero TRUE arguments?',
+    answer: "FALSE — zero is an even count, so XOR treats it the same as any other even number of true arguments.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with XOR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=XOR(A2>100, B2>100)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Boolean
+    result = Application.WorksheetFunction.Xor(Range("A2").Value > 100, Range("B2").Value > 100)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    conditions = [a > 100, b > 100, c > 100]
+    result = sum(conditions) % 2 == 1  # True when an odd count is True
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [OR](/docs/logical/or) — TRUE if at least one argument is true,
+  regardless of count.
+- [AND](/docs/logical/and) — TRUE only if every argument is true.
+- [NOT](/docs/logical/not) — flips a single TRUE/FALSE value, often
+  combined with XOR's result.

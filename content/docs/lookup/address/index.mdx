@@ -1,0 +1,185 @@
+---
+title: ADDRESS
+description: Build a cell reference as text from a row and column number, with control over absolute/relative style and sheet name.
+---
+
+Build a cell reference as a text string from a row number and column
+number — the reverse of what ROW/COLUMN do, useful whenever a
+reference needs to be constructed dynamically rather than typed by
+hand.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns text, not a real reference — wrap in INDIRECT to use it as one', type: 'warn' },
+  { text: 'abs_num controls the $ pattern (absolute vs relative)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ADDRESS(row_num, column_num, [abs_num], [a1], [sheet_text])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ADDRESS(row_num, column_num, [abs_num], [a1], [sheet_text])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'row_num',
+    type: 'number',
+    required: true,
+    description: 'The row number to build a reference to.',
+  },
+  {
+    name: 'column_num',
+    type: 'number',
+    required: true,
+    description: 'The column number to build a reference to (1 = A, 2 = B, and so on).',
+  },
+  {
+    name: 'abs_num',
+    type: 'number',
+    required: false,
+    description: '1 = absolute ($A$1, default), 2 = absolute row only (A$1), 3 = absolute column only ($A1), 4 = relative (A1).',
+  },
+  {
+    name: 'a1',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE (default) for A1-style references; FALSE for R1C1-style (e.g. R2C3).',
+  },
+  {
+    name: 'sheet_text',
+    type: 'text',
+    required: false,
+    description: 'A sheet name to prefix the reference with, e.g. "Sheet2".',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A text string representing the cell at `row_num`/`column_num`, in the
+`$`-pattern `abs_num` specifies.
+
+## Description
+
+ADDRESS builds a reference as plain text — it does **not** return an
+actual, usable reference the way a typed `A1` does. That text can be
+displayed, concatenated into a message, or fed into `INDIRECT` to
+turn it into a real, live reference.
+
+<Callout type="warn">
+  ADDRESS's output is just text, even though it looks exactly like a
+  real reference. `=ADDRESS(2,3)` displays `$C$2`, but
+  `=ADDRESS(2,3)+1` fails with `#VALUE!` — it isn't a reference until
+  wrapped in `INDIRECT`: `=INDIRECT(ADDRESS(2,3))`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '$C$2', '2': 'C$2', '3': '$C2', '4': 'C2' }}
+  defaultValue="1"
+  label={'Live preview — =ADDRESS(2, 3, {value})'}
+  fieldLabel="abs_num"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 2,
+    values: { a1: '', b1: '', c1: '', a2: '', b2: '', c2: 'target' },
+    highlightMap: { '1': 'C2', '2': 'C2', '3': 'C2', '4': 'C2' },
+  }}
+/>
+
+Row 2, column 3 is cell C2 in every case — only the `$` placement
+changes as `abs_num` cycles through the four styles.
+
+## Common errors
+
+### #VALUE! — treating the result as a real reference
+
+<ExcelCode>{`ADDRESS(2, 3) + 1 → #VALUE!`}</ExcelCode>
+
+ADDRESS returns text, not a reference. Wrap it in `INDIRECT` first if
+the actual cell's value is needed:
+
+<ExcelCode>{`INDIRECT(ADDRESS(2, 3)) + 1`}</ExcelCode>
+
+### #VALUE! — row_num or column_num is less than 1
+
+<ExcelCode>{`ADDRESS(0, 3) → #VALUE!`}</ExcelCode>
+
+Both arguments must be positive whole numbers — there's no row 0 or
+column 0 to reference.
+
+export const faqs = [
+  {
+    question: 'How is ADDRESS different from ROW and COLUMN?',
+    answer:
+      "ROW and COLUMN extract a number FROM an existing reference. ADDRESS does the reverse — it builds a reference (as text) FROM row and column numbers.",
+  },
+  {
+    question: 'Why does the result look like a reference but not act like one?',
+    answer:
+      "ADDRESS returns a plain text string that happens to be formatted like a reference. Excel doesn't automatically treat text as a live reference — INDIRECT is the function that performs that conversion.",
+  },
+  {
+    question: 'Can ADDRESS include a sheet name?',
+    answer: 'Yes — pass sheet_text as the fifth argument: =ADDRESS(2, 3, 1, TRUE, "Sheet2") returns "Sheet2!$C$2".',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ADDRESS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=INDIRECT(ADDRESS(2, 3))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim refText As String
+    refText = Application.WorksheetFunction.Address(2, 3)
+    Debug.Print refText ' "$C$2"
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from openpyxl.utils import get_column_letter
+
+    ref_text = f"${get_column_letter(3)}${2}"  # "$C$2"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [INDIRECT](/docs/lookup/indirect) — turns ADDRESS's text output (or
+  any reference-shaped text) into a real, usable reference.
+- [ROW](/docs/lookup/row) and [COLUMN](/docs/lookup/column) — extract
+  a number from an existing reference, the reverse operation.
+- [CELL](/docs/info/cell) — can return an existing cell's own address
+  directly, without building it from row/column numbers.

@@ -1,0 +1,156 @@
+---
+title: TRANSPOSE
+description: Flip a range or array from rows to columns, or columns to rows, spilling the result automatically.
+---
+
+Flip a range from rows to columns (or columns to rows) — a vertical
+list becomes a horizontal one, and vice versa. In modern Excel, the
+result spills automatically; in older versions, it needs to be
+array-entered into a pre-selected range of the right size.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Spills automatically in Excel 365 & 2021', type: 'check' },
+  { text: 'Pre-2021: must be array-entered (Ctrl+Shift+Enter) into a pre-sized range', type: 'warn' },
+  { text: 'A live formula — updates automatically when the source changes', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TRANSPOSE(array)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TRANSPOSE(array)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array to flip. A range with 3 rows and 2 columns becomes 2 rows and 3 columns.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`array` with its rows and columns swapped — an *m* × *n* range becomes
+*n* × *m*. Unlike Paste Special → Transpose, the result stays linked
+to the source and updates automatically when it changes.
+
+## Description
+
+TRANSPOSE is one of the oldest array functions in Excel, predating
+dynamic arrays by decades. In Excel 365 and 2021, it works like any
+other spill function — enter it in one cell and the flipped result
+spills into the cells below/right automatically. In Excel 2019 and
+earlier, there's no spilling: select a range of the exact target size
+first (if `array` is 3×2, select a 2×3 range), type the formula, then
+confirm with **Ctrl+Shift+Enter** instead of Enter.
+
+<Callout type="warn">
+  In non-spilling versions, selecting the wrong size range is the most
+  common TRANSPOSE mistake — too small and part of the result is
+  silently cut off; too large and the extra cells show `#N/A`. The
+  target range always needs exactly as many rows as `array` has
+  columns, and exactly as many columns as `array` has rows.
+</Callout>
+
+<ExcelCode>{`=TRANSPOSE(A1:C1) → a 3-cell horizontal row becomes a 3-cell vertical column`}</ExcelCode>
+
+<ExcelCode>{`=TRANSPOSE(A1:B3) → a 3-row, 2-column range becomes a 2-row, 3-column range`}</ExcelCode>
+
+## Common errors
+
+### #SPILL! — blocked spill range
+
+Cells in the direction TRANSPOSE needs to spill already contain data.
+Clear them, or move the formula somewhere with enough clear room in
+both directions.
+
+### #N/A filling part of the result (pre-2021 only)
+
+The array-entered range was sized larger than the actual transposed
+result. Reselect the exact target size — rows(`array`)'s column count
+by columns(`array`)'s row count — before re-entering with
+Ctrl+Shift+Enter.
+
+### Part of the result looks cut off (pre-2021 only)
+
+The opposite problem: the selected range was too small, so only part
+of the flipped data fit. Reselect the full correctly-sized range and
+re-enter.
+
+export const faqs = [
+  {
+    question: 'Do I still need Ctrl+Shift+Enter for TRANSPOSE?',
+    answer:
+      "Only in Excel 2019 or earlier. In Excel 365 and 2021, TRANSPOSE spills automatically like any other dynamic array function — just press Enter in a single cell.",
+  },
+  {
+    question: 'Does TRANSPOSE update if I change the source data?',
+    answer:
+      "Yes — unlike copying a range and using Paste Special → Transpose (which creates a static, disconnected copy), TRANSPOSE is a live formula that recalculates whenever array changes.",
+  },
+  {
+    question: 'Can TRANSPOSE flip a single row or column?',
+    answer: 'Yes — a single row becomes a single column and vice versa, the same rule as any other size: rows and columns simply swap.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TRANSPOSE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TRANSPOSE(A1:C3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim flipped As Variant
+    flipped = Application.WorksheetFunction.Transpose(Range("A1:C3"))
+    Range("E1:G3").Value = flipped
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1", header=None)
+    flipped = df.transpose()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HSTACK](/docs/arrays/hstack) and [VSTACK](/docs/arrays/vstack) —
+  combine ranges side by side or stacked, rather than flipping one.
+- [SORT](/docs/arrays/sort) — often combined with TRANSPOSE when data
+  needs both reordering and flipping.
+- [INDEX](/docs/lookup/index) — can pull a single flipped value
+  without transposing the whole range, when only one cell is needed.

@@ -1,0 +1,159 @@
+---
+title: TYPE
+description: Return a code identifying whether a value is a number, text, a logical value, an error, or an array.
+---
+
+Identify what kind of value a cell or formula result actually holds —
+a number, text, `TRUE`/`FALSE`, an error, or an array — returned as a
+numeric code rather than a readable word.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: '1 = number, 2 = text, 4 = logical, 16 = error, 64 = array', type: 'check' },
+  { text: 'A blank cell reference returns 1 (treated as a number)', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TYPE(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TYPE(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell, value, or formula result to identify.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A numeric code: `1` for a number, `2` for text, `4` for a logical
+value (`TRUE`/`FALSE`), `16` for an error value, or `64` for an
+array.
+
+## Description
+
+TYPE is one of the oldest ways to branch formula logic based on what
+kind of data a cell actually contains — useful when a column might
+hold a mix of numbers, text, and blanks, and a formula needs to
+behave differently depending on which. Modern alternatives
+(`ISNUMBER`, `ISTEXT`, `ISLOGICAL`) are usually more readable for a
+single check, since they return `TRUE`/`FALSE` directly instead of a
+numeric code to compare against.
+
+<Callout type="warn">
+  A reference to a genuinely **blank** cell returns `1`, the same code
+  as a real number — Excel treats an empty cell as equivalent to `0`
+  for this purpose. `TYPE` can't distinguish "this cell is blank" from
+  "this cell contains the number 0"; use `ISBLANK` for that
+  distinction instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ number: '1', text: '2', logical: '4', error: '16' }}
+  defaultValue="number"
+  label={'Live preview — =TYPE({value})'}
+  fieldLabel="value"
+/>
+
+## Common errors
+
+### Expecting TYPE to distinguish blank from zero
+
+<ExcelCode>{`TYPE(A2) → 1 (whether A2 is blank or contains 0)`}</ExcelCode>
+
+TYPE can't tell these apart — both return `1`. Use `ISBLANK(A2)` if
+the distinction between "empty" and "zero" actually matters.
+
+### Comparing against the wrong code
+
+<ExcelCode>{`IF(TYPE(A2)=1, "Text", "Number") → backwards`}</ExcelCode>
+
+`1` means number, not text — double-check the code/meaning pairing
+(1=number, 2=text, 4=logical, 16=error, 64=array) rather than
+guessing from memory.
+
+export const faqs = [
+  {
+    question: 'Should I use TYPE or ISNUMBER/ISTEXT/ISLOGICAL?',
+    answer:
+      "For a single yes/no check, ISNUMBER, ISTEXT, or ISLOGICAL are more readable — they return TRUE/FALSE directly instead of a numeric code to compare. TYPE is more useful when a formula needs to branch across several possible types at once.",
+  },
+  {
+    question: 'What does TYPE return for an empty cell?',
+    answer: "1 — the same code as a real number, since Excel treats a blank cell as equivalent to 0 in this context. Use ISBLANK if telling blank apart from zero actually matters.",
+  },
+  {
+    question: 'What does TYPE return for a spilled array formula?',
+    answer: 'Referencing the whole spill range (or an array constant like {1,2,3}) returns 64. Referencing just one cell within a spilled result returns that cell\'s own individual type instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TYPE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TYPE(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim code As Integer
+    code = Application.WorksheetFunction.Type(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def excel_type(value):
+        if isinstance(value, bool):
+            return 4
+        if isinstance(value, (int, float)):
+            return 1
+        if isinstance(value, str):
+            return 2
+        return None
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISNUMBER](/docs/info/isnumber), [ISTEXT](/docs/info/istext), and
+  [ISLOGICAL](/docs/info/islogical) — direct TRUE/FALSE checks for
+  one specific type, usually clearer than comparing a TYPE code.
+- [ISBLANK](/docs/info/isblank) — the correct way to test for a
+  genuinely empty cell, which TYPE can't distinguish from zero.
+- [CELL](/docs/info/cell) — returns other information about a cell
+  (its formatting, address, or contents), not just its data type.

@@ -1,0 +1,170 @@
+---
+title: HYPERLINK
+description: Create a clickable link to a webpage, file, or cell within the workbook, with an optional custom display text.
+---
+
+Create a clickable link — to a webpage, a file, an email address, or
+a cell elsewhere in the same workbook — that shows custom display
+text instead of the raw address underneath.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'friendly_name is what displays; link_location is where it goes', type: 'check' },
+  { text: 'Use a leading # to jump to a location in the same workbook', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=HYPERLINK(link_location, [friendly_name])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HYPERLINK(link_location, [friendly_name])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'link_location',
+    type: 'text',
+    required: true,
+    description: 'The destination — a URL, a file path, an email address (mailto:...), or a same-workbook location prefixed with #.',
+  },
+  {
+    name: 'friendly_name',
+    type: 'text',
+    required: false,
+    description: 'The text (or number) shown in the cell. Defaults to link_location itself if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A clickable cell displaying `friendly_name` (or `link_location` if
+`friendly_name` is omitted) that navigates to `link_location` when
+clicked.
+
+## Description
+
+HYPERLINK is the formula equivalent of Insert → Link — the difference
+is that it can be built dynamically from other cells, so the
+destination or display text can change based on a lookup, a
+concatenation, or any other formula logic, rather than being fixed
+when the link was manually inserted.
+
+<Callout type="warn">
+  To link to a location inside the **same workbook** (another sheet,
+  a named range, a specific cell), prefix `link_location` with `#` —
+  `"#Sheet2!A1"`, not `"Sheet2!A1"`. Without the `#`, Excel treats the
+  text as an external path and the link won't resolve correctly.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'visit site': 'Visit site', 'download report': 'Download report', 'read more': 'Read more' }}
+  defaultValue="visit site"
+  label={'Live preview — =HYPERLINK("https://example.com", "{value}")'}
+  fieldLabel="friendly_name"
+/>
+
+The link destination stays the same in all three — only the visible
+text changes, which is exactly what `friendly_name` controls.
+
+## Common errors
+
+### #VALUE! — link_location isn't text
+
+<ExcelCode>{`HYPERLINK(A2, "Click here") → #VALUE! (if A2 is a number, not text)`}</ExcelCode>
+
+`link_location` must evaluate to a text string. Wrap a numeric or
+computed value in `TEXT()` first if it needs to become part of a URL
+or path.
+
+### The link doesn't go anywhere inside the workbook
+
+Missing the leading `#` on an internal reference is the most common
+cause — `"Sheet2!A1"` is treated as an external file path, not a
+same-workbook jump. Use `"#Sheet2!A1"` instead.
+
+### Clicking does nothing at all
+
+If `link_location` points to a file path, that file needs to actually
+exist at that exact path on the machine opening the workbook —
+HYPERLINK doesn't validate the destination, it only builds the link.
+
+export const faqs = [
+  {
+    question: "What happens if I don't provide friendly_name?",
+    answer:
+      "The cell displays link_location itself as the clickable text — useful for a quick link, but usually less readable than a custom friendly_name for a real URL or file path.",
+  },
+  {
+    question: 'Can HYPERLINK create an email link?',
+    answer: 'Yes — use a mailto: link_location, like ="mailto:name@example.com". Clicking it opens the default email client with that address pre-filled.',
+  },
+  {
+    question: 'Does HYPERLINK check if the destination actually exists?',
+    answer: "No — it just builds the link. A typo'd URL or a moved file won't cause an error in the formula itself; the link will simply fail to open (or open the wrong thing) when clicked.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HYPERLINK from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HYPERLINK("https://example.com/orders/" & A2, "View order " & A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ActiveSheet.Hyperlinks.Add _
+      Anchor:=Range("B2"), _
+      Address:="https://example.com/orders/" & Range("A2").Value, _
+      TextToDisplay:="View order " & Range("A2").Value
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from openpyxl import Workbook
+
+    wb = Workbook()
+    ws = wb.active
+    ws["B2"].hyperlink = "https://example.com/orders/123"
+    ws["B2"].value = "View order 123"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ADDRESS](/docs/lookup/address) — often combined with HYPERLINK to
+  build a same-workbook jump link from a dynamically-computed cell
+  reference.
+- [INDIRECT](/docs/lookup/indirect) — also turns text into a real
+  reference, but for reading a value rather than navigating to it.
+- [CELL](/docs/info/cell) — can retrieve a workbook's own filename,
+  sometimes used alongside HYPERLINK to build a self-referencing link.

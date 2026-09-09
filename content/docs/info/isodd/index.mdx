@@ -1,0 +1,148 @@
+---
+title: ISODD
+description: Test whether a number is odd, truncating any decimal portion first.
+---
+
+Test whether a number is odd — decimal values are truncated toward
+zero first, so `3.9` and `3.1` both test as odd, the same as plain
+`3`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Decimals are truncated toward zero before checking', type: 'warn' },
+  { text: 'Negative numbers work fine (-3 is odd)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ISODD(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISODD(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to test. Non-integers are truncated toward zero first.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `number` (after truncating any decimal portion) is odd;
+`FALSE` if even.
+
+## Description
+
+ISODD truncates `number` toward zero before checking — it doesn't
+round. `3.9` truncates to `3` (odd, so `TRUE`), while `2.1` truncates
+to `2` (even, so `FALSE`), regardless of which whole number the
+decimal value is actually closer to.
+
+<Callout type="warn">
+  Truncation, not rounding — `ISODD(3.9)` returns `TRUE` because `3.9`
+  truncates to `3`, not because it rounds to a nearby odd number. This
+  matters most with values close to a whole number boundary, like
+  `2.99` (truncates to `2`, even) versus `3.01` (truncates to `3`,
+  odd).
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3': 'TRUE', '8': 'FALSE', '-3': 'TRUE', '3.9': 'TRUE' }}
+  defaultValue="3"
+  label={'Live preview — =ISODD({value})'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`ISODD("three") → #VALUE!`}</ExcelCode>
+
+`number` must be an actual number or a value that clearly converts to
+one — text like `"three"` isn't recognized, even though it reads as a
+number to a person.
+
+### Expecting rounding instead of truncation
+
+<ExcelCode>{`ISODD(2.99) → FALSE (truncates to 2, not rounded to 3)`}</ExcelCode>
+
+If the intent is to check the *rounded* value's parity, wrap in
+`ROUND` first: `ISODD(ROUND(2.99, 0))`.
+
+export const faqs = [
+  {
+    question: 'Does ISODD round or truncate decimal values?',
+    answer:
+      "It truncates toward zero, not rounds. ISODD(3.9) is TRUE because 3.9 truncates to 3, and ISODD(2.1) is FALSE because 2.1 truncates to 2 — the decimal portion is simply dropped, not rounded to the nearest whole number.",
+  },
+  {
+    question: 'Does ISODD need the Analysis ToolPak add-in?',
+    answer: "No — that requirement only applied to Excel 2003 and earlier. In every version this site covers (2016 and later), ISODD is a native built-in function.",
+  },
+  {
+    question: 'Does ISODD work with negative numbers?',
+    answer: 'Yes — -3 is odd and returns TRUE, -4 is even and returns FALSE, following the same even/odd rule as positive numbers.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISODD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ISODD(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim isOddNumber As Boolean
+    isOddNumber = Application.WorksheetFunction.IsOdd(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    is_odd = math.trunc(value) % 2 != 0
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISEVEN](/docs/info/iseven) — the exact opposite test.
+- [MOD](/docs/math/mod) — `MOD(number, 2) <> 0` is the underlying
+  arithmetic ISODD performs, exposed directly.
+- [TYPE](/docs/info/type) — identifies a value's general category
+  (number, text, etc.) rather than a number's parity.

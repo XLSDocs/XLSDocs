@@ -1,0 +1,190 @@
+---
+title: CELL
+description: Return information about a cell's location, contents, or formatting — address, row, column, data type, and more.
+---
+
+Return one specific piece of information about a cell — its address,
+row, column, contents, data type, or even formatting details like
+number format or whether it's locked — selected by a keyword rather
+than a separate function per fact.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'info_type is a specific keyword string, like "row" or "type"', type: 'warn' },
+  { text: 'Formatting-related info_types don\'t recalculate on a formatting-only change', type: 'warn' },
+  { text: '"filename" returns blank until the workbook has been saved', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CELL(info_type, [reference])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CELL(info_type, [reference])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'info_type',
+    type: 'text',
+    required: true,
+    description: 'A keyword naming which piece of information to return — see the table below.',
+  },
+  {
+    name: 'reference',
+    type: 'range',
+    required: false,
+    description: 'The cell to inspect. If omitted, applies to the last cell that was changed.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+Depends entirely on `info_type` — a number, a text string, or in a
+few cases a single-character code. See the table below for what each
+keyword returns.
+
+## Description
+
+`info_type` selects what CELL reports back:
+
+| info_type | Returns |
+|---|---|
+| `"address"` | The reference's address as text (e.g. `"$B$2"`) |
+| `"col"` | The column number |
+| `"row"` | The row number |
+| `"contents"` | The value in the upper-left cell of the reference |
+| `"type"` | `"b"` (blank), `"l"` (text/label), or `"v"` (value) |
+| `"format"` | A text code for the cell's number format |
+| `"width"` | The column width, rounded to the nearest integer |
+| `"color"` | `1` if negative values display in color, else `0` |
+| `"parentheses"` | `1` if positive/all values display with parentheses, else `0` |
+| `"prefix"` | The text alignment prefix character (`'`, `"`, `^`, `\`, or blank) |
+| `"protect"` | `1` if the cell is locked, else `0` |
+| `"filename"` | The full path and filename of the workbook (blank if unsaved) |
+
+<Callout type="warn">
+  Formatting-related `info_type`s (`"format"`, `"color"`,
+  `"parentheses"`, `"protect"`, `"width"`) don't automatically
+  recalculate when only the cell's **formatting** changes, not its
+  value — Excel doesn't treat a formatting-only edit as something
+  that needs recalculating. Press **F9** (or make any change that
+  forces recalculation) after reformatting if the CELL result looks
+  stale.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ row: '2', col: '2', type: 'l', contents: 'Apple', address: '$B$2' }}
+  defaultValue="row"
+  label={'Live preview — =CELL("{value}", B2)'}
+  fieldLabel="info_type"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 2,
+    values: { a1: '', b1: '', a2: '', b2: 'Apple' },
+    highlightMap: { row: 'B2', col: 'B2', type: 'B2', contents: 'B2', address: 'B2' },
+  }}
+/>
+
+B2 holds the text "Apple" — `"type"` returns `"l"` for label/text,
+while a cell holding a number would return `"v"` instead.
+
+## Common errors
+
+### The result doesn't update after reformatting a cell
+
+As the callout above explains, `"format"`, `"color"`, `"parentheses"`,
+`"protect"`, and `"width"` don't trigger recalculation on their own
+when only formatting changes. Force a recalculation (F9) if the
+result looks out of date.
+
+### "filename" returns blank
+
+<ExcelCode>{`CELL("filename") → "" (if the workbook has never been saved)`}</ExcelCode>
+
+A workbook that hasn't been saved yet has no path to report. Save the
+file at least once, and the full path/filename will appear.
+
+### #VALUE! — an unrecognized info_type
+
+<ExcelCode>{`CELL("adress", B2) → #VALUE! (typo — should be "address")`}</ExcelCode>
+
+`info_type` must exactly match one of the recognized keywords —
+Excel doesn't fuzzy-match or suggest corrections for a typo'd one.
+
+export const faqs = [
+  {
+    question: 'What happens if reference is omitted?',
+    answer:
+      "CELL applies info_type to the last cell that was changed anywhere in the workbook — an unusual, easy-to-misuse default. Passing reference explicitly is almost always the safer choice.",
+  },
+  {
+    question: 'How is CELL("type", ...) different from TYPE()?',
+    answer:
+      'CELL("type", ref) returns "b", "l", or "v" (blank, label, or value) — a coarser three-way split. TYPE(value) returns a numeric code distinguishing number, text, logical, error, and array separately — a finer-grained classification.',
+  },
+  {
+    question: 'Can CELL tell me if a cell is part of a merged range?',
+    answer: "Not directly — none of CELL's info_type keywords report merge status. VBA's Range.MergeCells property is the way to check that from code.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CELL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CELL("address", B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim addr As String
+    addr = Range("B2").Address ' "$B$2" — VBA's own direct equivalent
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from openpyxl import load_workbook
+
+    wb = load_workbook("workbook.xlsx")
+    cell = wb["Sheet1"]["B2"]
+    print(cell.coordinate, cell.value)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TYPE](/docs/info/type) — a finer-grained numeric type code, versus
+  CELL's coarser blank/label/value split.
+- [ADDRESS](/docs/lookup/address) — builds a cell address from row and
+  column numbers, the reverse of `CELL("address", ...)`.
+- [ROW](/docs/lookup/row) and [COLUMN](/docs/lookup/column) — dedicated
+  functions for exactly what `CELL("row", ...)` and `CELL("col", ...)`
+  return.

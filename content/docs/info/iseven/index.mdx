@@ -1,0 +1,148 @@
+---
+title: ISEVEN
+description: Test whether a number is even, truncating any decimal portion first.
+---
+
+Test whether a number is even — decimal values are truncated toward
+zero first, so `2.9` and `2.1` both test as even, the same as plain
+`2`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Decimals are truncated toward zero before checking', type: 'warn' },
+  { text: 'Negative numbers work fine (-4 is even)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ISEVEN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISEVEN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to test. Non-integers are truncated toward zero first.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `number` (after truncating any decimal portion) is even;
+`FALSE` if odd.
+
+## Description
+
+ISEVEN truncates `number` toward zero before checking — it doesn't
+round. `2.9` truncates to `2` (even, so `TRUE`), while `3.1` truncates
+to `3` (odd, so `FALSE`) even though `3.1` is closer to an even number
+than an odd one at a glance.
+
+<Callout type="warn">
+  Truncation, not rounding — `ISEVEN(2.9)` returns `TRUE` because
+  `2.9` truncates to `2`, not because it rounds to a nearby even
+  number. This matters most with values close to a whole number
+  boundary, like `1.99` (truncates to `1`, odd) versus `2.01`
+  (truncates to `2`, even).
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4': 'TRUE', '7': 'FALSE', '-4': 'TRUE', '2.9': 'TRUE' }}
+  defaultValue="4"
+  label={'Live preview — =ISEVEN({value})'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`ISEVEN("four") → #VALUE!`}</ExcelCode>
+
+`number` must be an actual number or a value that clearly converts to
+one — text like `"four"` isn't recognized, even though it reads as a
+number to a person.
+
+### Expecting rounding instead of truncation
+
+<ExcelCode>{`ISEVEN(1.99) → FALSE (truncates to 1, not rounded to 2)`}</ExcelCode>
+
+If the intent is to check the *rounded* value's parity, wrap in
+`ROUND` first: `ISEVEN(ROUND(1.99, 0))`.
+
+export const faqs = [
+  {
+    question: 'Does ISEVEN round or truncate decimal values?',
+    answer:
+      "It truncates toward zero, not rounds. ISEVEN(2.9) is TRUE because 2.9 truncates to 2, and ISEVEN(3.1) is FALSE because 3.1 truncates to 3 — the decimal portion is simply dropped, not rounded to the nearest whole number.",
+  },
+  {
+    question: 'Does ISEVEN need the Analysis ToolPak add-in?',
+    answer: "No — that requirement only applied to Excel 2003 and earlier. In every version this site covers (2016 and later), ISEVEN is a native built-in function.",
+  },
+  {
+    question: 'Does ISEVEN work with negative numbers?',
+    answer: 'Yes — -4 is even and returns TRUE, -3 is odd and returns FALSE, following the same even/odd rule as positive numbers.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISEVEN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ISEVEN(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim isEvenNumber As Boolean
+    isEvenNumber = Application.WorksheetFunction.IsEven(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    is_even = math.trunc(value) % 2 == 0
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISODD](/docs/info/isodd) — the exact opposite test.
+- [MOD](/docs/math/mod) — `MOD(number, 2) = 0` is the underlying
+  arithmetic ISEVEN performs, exposed directly.
+- [TYPE](/docs/info/type) — identifies a value's general category
+  (number, text, etc.) rather than a number's parity.

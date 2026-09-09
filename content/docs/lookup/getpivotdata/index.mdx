@@ -1,0 +1,166 @@
+---
+title: GETPIVOTDATA
+description: Pull a specific summarized value out of a PivotTable by field and item name, staying correct even if the layout changes.
+---
+
+Pull one specific summarized number out of a PivotTable by naming the
+data field and the row/column items that identify it — instead of a
+plain cell reference, which breaks the moment the PivotTable's layout
+changes.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Excel often inserts this automatically when you click a PivotTable cell', type: 'warn' },
+  { text: 'Stays correct even if the PivotTable is resorted, filtered, or refreshed', type: 'check' },
+  { text: 'Requires an existing PivotTable — not usable against plain data', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GETPIVOTDATA(data_field, pivot_table, [field1, item1, ...])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GETPIVOTDATA(data_field, pivot_table, [field1, item1, field2, item2, ...])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'data_field',
+    type: 'text',
+    required: true,
+    description: 'The name of the value field to retrieve, exactly as it appears in the PivotTable (e.g. "Sum of Sales").',
+  },
+  {
+    name: 'pivot_table',
+    type: 'range',
+    required: true,
+    description: 'A reference to any cell or range within the target PivotTable, used to identify which one.',
+  },
+  {
+    name: 'field1, item1, ...',
+    type: 'text',
+    required: false,
+    description: 'Field/item name pairs that narrow down which specific summarized cell to return (e.g. "Region", "East").',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The summarized value from `data_field` for the record matching every
+`field`/`item` pair given. Returns `#REF!` if no such combination
+exists in the current PivotTable.
+
+## Description
+
+Unlike a plain cell reference into a PivotTable (which points at a
+fixed grid position), GETPIVOTDATA identifies data by name — the
+field and the specific items being summarized. That means it keeps
+returning the right number even after the PivotTable is resorted,
+re-filtered, collapsed, or refreshed with new source data, as long as
+the named field/item combination still exists somewhere in it.
+
+<Callout type="warn">
+  Excel often inserts GETPIVOTDATA **automatically**: typing `=` in a
+  cell, then clicking a cell inside a PivotTable, produces a
+  GETPIVOTDATA formula instead of a plain reference like `C5`. This
+  surprises people expecting a normal reference. Turn it off via
+  **Excel Options → Formulas → uncheck "Use GetPivotData functions
+  for PivotTable references"** if a plain reference is what's wanted
+  instead.
+</Callout>
+
+## Common errors
+
+### #REF! — the field or item name doesn't match
+
+<ExcelCode>{`GETPIVOTDATA("Sum of Sales", A3, "Region", "Wset") → #REF!`}</ExcelCode>
+
+Field and item names must match the PivotTable's own labels exactly,
+including spelling and capitalization of the summary label itself
+(e.g. `"Sum of Sales"`, not `"Sales"`).
+
+### #REF! — the item has been filtered or collapsed out of view
+
+If a PivotTable filter currently hides the item being referenced (or
+a row group is collapsed), GETPIVOTDATA can't find it and returns
+`#REF!` even though the underlying data still technically exists.
+
+### Formula breaks after the PivotTable is deleted or moved to a new sheet
+
+`pivot_table` needs to keep pointing at a cell that's still inside the
+actual PivotTable range. Deleting the PivotTable, or moving it far
+enough that the reference no longer falls inside it, breaks the
+formula.
+
+export const faqs = [
+  {
+    question: 'Why did Excel write GETPIVOTDATA instead of a plain cell reference?',
+    answer:
+      "Excel automatically substitutes GETPIVOTDATA whenever a formula references a cell inside a PivotTable by clicking it — a deliberate feature so the formula survives resorting/refreshing, not a bug. It can be turned off in Excel Options → Formulas if a plain reference is preferred.",
+  },
+  {
+    question: 'Can GETPIVOTDATA work against a normal range, not a PivotTable?',
+    answer: "No — pivot_table must point at an actual PivotTable. For summarizing a plain range or table by criteria, SUMIFS, AVERAGEIFS, or a formula-based alternative is the right tool instead.",
+  },
+  {
+    question: 'Does GETPIVOTDATA update automatically when the source data changes?',
+    answer: 'It reflects whatever the PivotTable currently shows — so after the source data changes, refresh the PivotTable (Data → Refresh All) first, and GETPIVOTDATA picks up the new summarized value automatically.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GETPIVOTDATA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GETPIVOTDATA("Sum of Sales", $A$3, "Region", "East")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim eastSales As Double
+    eastSales = ActiveSheet.PivotTables("PivotTable1") _
+      .GetPivotData("Sum of Sales", "Region", "East")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sales")
+    east_sales = df.loc[df["Region"] == "East", "Sales"].sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMIFS](/docs/math/sumifs) — the plain-range equivalent for
+  summarizing by criteria, when a PivotTable isn't involved.
+- [INDEX](/docs/lookup/index) — a positional alternative for reading
+  a fixed cell out of a PivotTable's grid, if named lookups aren't needed.
+- [VLOOKUP](/docs/lookup/vlookup) — another way to retrieve a
+  specific value by a lookup key, outside of a PivotTable context.
