@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-09',
+    title: 'TRANSPOSE, HYPERLINK, ADDRESS, GETPIVOTDATA, XOR, TYPE, ISEVEN, ISODD, and CELL',
+    description:
+      "Nine functions across Lookup, Logical, and Info closing another audited gap — TRANSPOSE in particular was a surprising one to be missing given how common it is. XOR's Try it deliberately shows a three-TRUE scenario, since its odd-count rule only becomes visible past two arguments. CELL comes with a full info_type reference table alongside a live example.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-06',
     title: 'All 12 Database functions — DAVERAGE, DMAX, DMIN, DCOUNTA, DPRODUCT, DVAR, DVARP, DSTDEV, and DSTDEVP',
     description:
