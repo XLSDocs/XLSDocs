@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-10',
+    title: 'RAND, RANDBETWEEN, PI, COMBIN, FACT, PRODUCT, GCD, and LCM — Math is now fully covered',
+    description:
+      "The last 8 functions from our original Math gap-check, closing out the category entirely. FACT's page walks right up to Excel's own numeric ceiling (171! is the first factorial that overflows), and PRODUCT's Try it shows how compounding multipliers, not just adding them, changes the outcome.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-09',
     title: 'TRANSPOSE, HYPERLINK, ADDRESS, GETPIVOTDATA, XOR, TYPE, ISEVEN, ISODD, and CELL',
     description:
