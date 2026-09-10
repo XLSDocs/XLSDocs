@@ -26,7 +26,7 @@ interface PlaygroundCategory {
 
 // Curated, not exhaustive — one representative pick per Try-it "shape"
 // per category (grid highlight, schedule swap, scenario picker, error
-// demo), rather than all 141 pages that currently have a widget. See
+// demo), rather than all 146 pages that currently have a widget. See
 // each linked page's own Try it section for the full picture; this
 // page's job is to hook interest, not catalog everything.
 const CATEGORIES: PlaygroundCategory[] = [
@@ -67,6 +67,16 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'XOR',
         href: '/docs/logical/xor#try-it',
         teaser: "Flip a third condition to TRUE and watch XOR's answer flip back to TRUE too — it's counting, not choosing.",
+      },
+    ],
+  },
+  {
+    name: 'Math',
+    items: [
+      {
+        fn: 'FACT',
+        href: '/docs/math/fact#try-it',
+        teaser: 'Jump from 5 to 10 and watch the result rocket from 120 to 3,628,800 — factorials grow explosively fast.',
       },
     ],
   },
