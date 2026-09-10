@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-10',
+    title: 'NORM.DIST, NORM.INV, NORM.S.DIST, NORM.S.INV, STANDARDIZE, AVEDEV, DEVSQ, SKEW, SKEW.P, and KURT',
+    description:
+      "The first round of a fresh, broader Statistical audit against Microsoft's own function reference — the normal distribution family, plus the shape statistics (skewness, kurtosis) that describe how a dataset deviates from it. More rounds covering the remaining distribution and hypothesis-testing functions are on the way.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-09-10',
     title: 'DB, DDB, SYD, CUMIPMT, CUMPRINC, MIRR, EFFECT, and NOMINAL — our full function gap-check is now closed',
     description:
       "Eight Financial functions closing out the last category from our original coverage audit. DB, DDB, and SYD (three depreciation methods) share the same $50,000 asset so their schedules are directly comparable — SYD lands exactly on the $5,000 salvage value after 10 years; DDB, by design, doesn't quite get there.",
