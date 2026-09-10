@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-10',
+    title: 'DB, DDB, SYD, CUMIPMT, CUMPRINC, MIRR, EFFECT, and NOMINAL — our full function gap-check is now closed',
+    description:
+      "Eight Financial functions closing out the last category from our original coverage audit. DB, DDB, and SYD (three depreciation methods) share the same $50,000 asset so their schedules are directly comparable — SYD lands exactly on the $5,000 salvage value after 10 years; DDB, by design, doesn't quite get there.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-09-10',
     title: 'RAND, RANDBETWEEN, PI, COMBIN, FACT, PRODUCT, GCD, and LCM — Math is now fully covered',
     description:
       "The last 8 functions from our original Math gap-check, closing out the category entirely. FACT's page walks right up to Excel's own numeric ceiling (171! is the first factorial that overflows), and PRODUCT's Try it shows how compounding multipliers, not just adding them, changes the outcome.",
