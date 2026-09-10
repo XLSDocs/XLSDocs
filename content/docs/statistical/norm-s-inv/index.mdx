@@ -1,0 +1,156 @@
+---
+title: NORM.S.INV
+description: Find the z-score corresponding to a given cumulative probability under the standard normal distribution.
+---
+
+Find the z-score that corresponds to a given cumulative probability
+under the **standard** normal distribution — the exact reverse of
+`NORM.S.DIST`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The exact reverse of NORM.S.DIST — round-trips back to the same z', type: 'check' },
+  { text: 'probability must be strictly between 0 and 1', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORM.S.INV(probability)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORM.S.INV(probability)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A cumulative probability between 0 and 1 (exclusive).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The z-score `z` such that `NORM.S.DIST(z, TRUE)` equals `probability`.
+
+## Description
+
+NORM.S.INV is where the familiar critical z-values (`1.96` for 95%
+confidence, `1.6449` for 90%, `2.576` for 99%) actually come from —
+they're just `NORM.S.INV` evaluated at the corresponding two-tailed
+or one-tailed probability. It's the standard-normal counterpart to
+`NORM.INV`, which works with any mean and standard deviation.
+
+<Callout type="idea">
+  `NORM.S.INV` replaced the older `NORMSINV` in Excel 2010 — purely a
+  naming change for consistency with the other `.S.` (standard)
+  functions added that version. `NORMSINV` still works today and
+  returns identical results.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.0000', '0.9': '1.2816', '0.95': '1.6449', '0.975': '1.9600' }}
+  defaultValue="0.975"
+  label={'Live preview — =NORM.S.INV({value})'}
+  fieldLabel="probability"
+/>
+
+`NORM.S.INV(0.975)` returns `1.96` — the critical z-value behind
+every "95% confidence interval" calculation, since a 95% two-tailed
+interval leaves 2.5% in each tail, and 1 − 0.025 = 0.975.
+
+## Common errors
+
+### #NUM! — probability is 0, 1, or outside that range
+
+<ExcelCode>{`NORM.S.INV(1) → #NUM!`}</ExcelCode>
+
+`probability` must be strictly between 0 and 1 — the normal
+distribution never reaches exactly 0% or 100% cumulative probability
+at any finite z-score.
+
+### Confusing a one-tailed and two-tailed probability
+
+<ExcelCode>{`NORM.S.INV(0.95) → 1.6449, not the same z as a "95% confidence interval" (which needs 0.975)`}</ExcelCode>
+
+A 95% two-tailed confidence interval splits the remaining 5% evenly
+between both tails (2.5% each), so it needs `NORM.S.INV(0.975)`, not
+`NORM.S.INV(0.95)` — mixing these up is one of the most common
+mistakes when building a confidence interval by hand.
+
+export const faqs = [
+  {
+    question: 'Where does 1.96 come from in confidence intervals?',
+    answer:
+      "It's NORM.S.INV(0.975) — the z-score below which 97.5% of a standard normal distribution falls, which leaves exactly 2.5% in each tail for a 95% two-tailed interval.",
+  },
+  {
+    question: 'NORM.S.INV vs NORM.INV — which should I use?',
+    answer:
+      "NORM.S.INV always assumes mean 0 and standard deviation 1, returning a z-score directly. NORM.INV works with any mean and standard deviation, returning a value on that distribution's own scale instead of a z-score.",
+  },
+  {
+    question: 'Is NORM.S.INV the same as NORMSINV?',
+    answer: 'Yes, exactly — NORMSINV is the pre-2010 name for the identical calculation. NORM.S.INV is simply the more consistently-named modern version.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NORM.S.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NORM.S.INV(0.975)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim zScore As Double
+    zScore = Application.WorksheetFunction.Norm_S_Inv(0.975)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import norm
+
+    z_score = norm.ppf(0.975)  # standard normal: mean=0, sd=1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the reverse: finds
+  the cumulative probability for a given z-score.
+- [NORM.INV](/docs/statistical/norm-inv) — the general version for
+  any mean and standard deviation, not just 0 and 1.
+- [CONFIDENCE.NORM](/docs/statistical/confidence-norm) — uses this
+  same critical-z-value calculation internally to build a margin of
+  error.

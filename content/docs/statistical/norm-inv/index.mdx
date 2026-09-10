@@ -1,0 +1,161 @@
+---
+title: NORM.INV
+description: Find the value corresponding to a given cumulative probability under a normal distribution with any mean and standard deviation.
+---
+
+Find the value that corresponds to a given cumulative probability
+under a normal distribution with **any** mean and standard deviation
+— the exact reverse of `NORM.DIST`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The exact reverse of NORM.DIST — round-trips back to the same x', type: 'check' },
+  { text: 'probability must be strictly between 0 and 1', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORM.INV(probability, mean, standard_dev)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORM.INV(probability, mean, standard_dev)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A cumulative probability between 0 and 1 (exclusive).',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: "The distribution's arithmetic mean.",
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: "The distribution's standard deviation. Must be positive.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value `x` such that `NORM.DIST(x, mean, standard_dev, TRUE)`
+equals `probability`.
+
+## Description
+
+NORM.INV answers "what value corresponds to the Nth percentile?" for
+a normal distribution with a specific mean and standard deviation —
+directly in the data's own real-world units, without needing to work
+in z-scores and convert back afterward.
+
+<Callout type="idea">
+  `NORM.INV(probability, mean, standard_dev)` gives exactly the same
+  result as `mean + standard_dev × NORM.S.INV(probability)` — NORM.INV
+  just performs that conversion internally.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '100.00', '0.8413': '115.00', '0.975': '129.40' }}
+  defaultValue="0.975"
+  label={'Live preview — =NORM.INV({value}, 100, 15)'}
+  fieldLabel="probability"
+/>
+
+For IQ scores (mean 100, standard deviation 15), the 97.5th
+percentile lands at about 129.4 — roughly `mean + 1.96 × sd`, the
+same critical z-value `NORM.S.INV(0.975)` returns.
+
+## Common errors
+
+### #NUM! — probability is 0, 1, or outside that range
+
+<ExcelCode>{`NORM.INV(1, 100, 15) → #NUM!`}</ExcelCode>
+
+`probability` must be strictly between 0 and 1 — no finite value
+corresponds to exactly 0% or 100% cumulative probability.
+
+### #NUM! — standard_dev is zero or negative
+
+<ExcelCode>{`NORM.INV(0.5, 100, 0) → #NUM!`}</ExcelCode>
+
+`standard_dev` must be a positive number.
+
+export const faqs = [
+  {
+    question: 'NORM.INV vs NORM.S.INV — which should I use?',
+    answer:
+      "NORM.INV works directly with the real mean and standard deviation, returning a value in the data's own units. NORM.S.INV always assumes mean 0 and standard deviation 1, returning a z-score instead — useful when the raw units don't matter, only the standardized position.",
+  },
+  {
+    question: 'Is NORM.INV the same as NORMINV?',
+    answer: 'Yes — NORMINV is the pre-2010 name for the identical calculation. NORM.INV is simply the more consistently-named modern version, and both still work today.',
+  },
+  {
+    question: 'How is NORM.INV used in generating random normal data?',
+    answer: 'A common pattern is NORM.INV(RAND(), mean, standard_dev) — feeding a random 0-1 probability in produces a randomly-sampled value from that normal distribution.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NORM.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NORM.INV(0.975, 100, 15)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim value As Double
+    value = Application.WorksheetFunction.Norm_Inv(0.975, 100, 15)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import norm
+
+    value = norm.ppf(0.975, loc=100, scale=15)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.DIST](/docs/statistical/norm-dist) — the reverse: finds the
+  cumulative probability for a given value.
+- [NORM.S.INV](/docs/statistical/norm-s-inv) — the standard-normal
+  version, assuming mean 0 and standard deviation 1.
+- [CONFIDENCE.NORM](/docs/statistical/confidence-norm) — built from
+  this same underlying inverse-normal calculation.

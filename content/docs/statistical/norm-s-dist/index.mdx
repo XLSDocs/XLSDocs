@@ -1,0 +1,165 @@
+---
+title: NORM.S.DIST
+description: Return the standard normal distribution's cumulative probability or density at a given z-score.
+---
+
+Return a value from the **standard** normal distribution — the
+normal curve with mean `0` and standard deviation `1` — at a given
+z-score, either the cumulative probability up to that point or the
+raw density at it.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'Assumes mean = 0 and standard deviation = 1 — use NORM.DIST for other values', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORM.S.DIST(z, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORM.S.DIST(z, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'z',
+    type: 'number',
+    required: true,
+    description: 'The z-score (number of standard deviations from the mean) to evaluate.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at z).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a standard normal
+random variable is less than or equal to `z` — a value between 0 and
+1. With `cumulative` `FALSE`: the density of the standard normal
+curve at `z`.
+
+## Description
+
+NORM.S.DIST works specifically with the **standard** normal
+distribution (mean 0, standard deviation 1) — the same curve behind
+the familiar 68-95-99.7 rule (about 68% of values fall within 1
+standard deviation, 95% within 2, 99.7% within 3). For a normal
+distribution with any other mean or standard deviation, `NORM.DIST`
+is the general-purpose version.
+
+<Callout type="idea">
+  `NORM.S.DIST` replaced the older `NORMSDIST` in Excel 2010, adding
+  the `cumulative` argument — `NORMSDIST` always returns the
+  cumulative probability with no option for the density instead.
+  `NORMSDIST` still works today for backward compatibility.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-1': '0.1587', '0': '0.5000', '1': '0.8413', '1.96': '0.9750' }}
+  defaultValue="0"
+  label={'Live preview — =NORM.S.DIST({value}, TRUE)'}
+  fieldLabel="z"
+/>
+
+`z = 1.96` returns `0.9750` — meaning about 97.5% of a standard
+normal distribution falls at or below 1.96 standard deviations above
+the mean, the reason 1.96 shows up so often in 95%-confidence
+calculations.
+
+## Common errors
+
+### #VALUE! — cumulative isn't a valid logical value
+
+<ExcelCode>{`NORM.S.DIST(1, "yes") → #VALUE!`}</ExcelCode>
+
+`cumulative` must be `TRUE` or `FALSE` (or `1`/`0`) — text like
+`"yes"` isn't recognized.
+
+### Using NORM.S.DIST when the data isn't standardized
+
+<ExcelCode>{`NORM.S.DIST(115, TRUE) → treats 115 as a z-score of 115, an absurd result`}</ExcelCode>
+
+If the data has a mean other than 0 or a standard deviation other
+than 1, convert it to a z-score first with `STANDARDIZE`, or use
+`NORM.DIST` directly with the real mean and standard deviation.
+
+export const faqs = [
+  {
+    question: 'NORM.S.DIST vs NORM.DIST — which should I use?',
+    answer:
+      "NORM.S.DIST always assumes mean 0 and standard deviation 1 (a z-score input). NORM.DIST works with any mean and standard deviation directly. If the data isn't already standardized, either convert it with STANDARDIZE first or just use NORM.DIST.",
+  },
+  {
+    question: 'What does cumulative = FALSE actually give me?',
+    answer:
+      "The probability density at that exact z-score — the height of the bell curve there, not a probability. This is mostly useful for plotting the curve's shape; for probability questions ('what fraction of values fall below X'), cumulative = TRUE is almost always what's needed.",
+  },
+  {
+    question: 'Is NORM.S.DIST the same as NORMSDIST?',
+    answer: 'NORM.S.DIST(z, TRUE) returns the same result as the older NORMSDIST(z). NORMSDIST has no way to return the density (cumulative = FALSE) — that option only exists on NORM.S.DIST.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NORM.S.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NORM.S.DIST(1.96, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Norm_S_Dist(1.96, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import norm
+
+    probability = norm.cdf(1.96)  # standard normal: mean=0, sd=1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.S.INV](/docs/statistical/norm-s-inv) — the reverse: finds the
+  z-score for a given cumulative probability.
+- [NORM.DIST](/docs/statistical/norm-dist) — the general version for
+  any mean and standard deviation, not just 0 and 1.
+- [STANDARDIZE](/docs/statistical/standardize) — converts a raw value
+  into a z-score, the input NORM.S.DIST expects.

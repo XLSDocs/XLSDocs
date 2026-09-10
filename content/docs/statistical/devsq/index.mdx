@@ -1,0 +1,162 @@
+---
+title: DEVSQ
+description: Return the sum of squared deviations of a dataset from its own mean — the raw numerator behind variance.
+---
+
+Return the sum of squared deviations from the mean — the raw
+building block that variance, standard deviation, and several other
+statistics are all built from.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always ≥ 0 — squaring removes any negative sign', type: 'check' },
+  { text: 'VAR.P equals DEVSQ divided by the count', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DEVSQ(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DEVSQ(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to include.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of `(each value − mean)²` across every number supplied.
+
+## Description
+
+DEVSQ computes the exact numerator that `VAR.P` divides by `n` (and
+`VAR.S` divides by `n − 1`) to get variance — it's rarely used
+directly in everyday work, but it's the shared foundation underneath
+several other statistics, including regression's sum-of-squares
+calculations.
+
+<Callout type="idea">
+  `DEVSQ(range) / COUNT(range)` always equals `VAR.P(range)` exactly
+  — DEVSQ is simply variance before the final division step.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9': '32', '5': '14', '14': '93.875' }}
+  defaultValue="9"
+  label={'Live preview — =DEVSQ(2, 4, 4, 4, 5, 5, 7, {value})'}
+  fieldLabel="8th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 8,
+    values: { a1: '2', a2: '4', a3: '4', a4: '4', a5: '5', a6: '5', a7: '7', a8: '(varies)' },
+    highlightMap: { '9': 'A1:A8', '5': 'A1:A8', '14': 'A1:A8' },
+  }}
+/>
+
+Pushing the last value out to `14` nearly triples DEVSQ compared to
+`9` — since deviations are squared, a value far from the mean
+contributes disproportionately more than a value close to it.
+
+## Common errors
+
+### Expecting DEVSQ to behave like a "normal" average-based measure
+
+<ExcelCode>{`DEVSQ({2,4,4,4,5,5,7,14}) → 93.875, much larger than AVEDEV's 2.4375 on the same data`}</ExcelCode>
+
+DEVSQ is a **sum**, not an average, and it's built from *squared*
+distances — its scale isn't directly comparable to AVEDEV or the
+original data's own units at all.
+
+### Using DEVSQ directly as a measure of spread
+
+DEVSQ grows with both the actual spread of the data and simply how
+many values are included — more data points means a larger sum,
+even without more spread. `VAR.P` (DEVSQ divided by count) is the
+properly scaled version for comparing spread across differently-sized
+datasets.
+
+export const faqs = [
+  {
+    question: 'How is DEVSQ related to VAR.P and VAR.S?',
+    answer:
+      "DEVSQ is the numerator both are built from: VAR.P equals DEVSQ divided by the count of values (population variance), and VAR.S equals DEVSQ divided by count minus 1 (sample variance).",
+  },
+  {
+    question: 'Why would I use DEVSQ instead of just VAR.P?',
+    answer: "Directly, rarely — DEVSQ is mostly useful as a building block inside a larger formula (like certain regression or ANOVA calculations) that specifically needs the raw sum of squared deviations, not the already-divided variance.",
+  },
+  {
+    question: 'Can DEVSQ ever be negative?',
+    answer: 'No — every individual deviation is squared before summing, so the result is always zero or positive. It\'s exactly zero only when every value in the dataset is identical.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DEVSQ from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEVSQ(A2:A9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.DevSq(Range("A2:A9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    data = np.array([2, 4, 4, 4, 5, 5, 7, 14])
+    result = np.sum((data - data.mean()) ** 2)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VAR.P](/docs/statistical/var-p) and [VAR.S](/docs/statistical/var-s)
+  — variance, computed by dividing DEVSQ by the count (or count minus 1).
+- [AVEDEV](/docs/statistical/avedev) — a simpler, absolute-value-based
+  measure of spread instead of a squared one.

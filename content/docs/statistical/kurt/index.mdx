@@ -1,0 +1,177 @@
+---
+title: KURT
+description: Measure how heavy-tailed a distribution is compared to a normal distribution — how prone it is to extreme outliers.
+---
+
+Measure how heavy-tailed a distribution is compared to a normal
+distribution — a positive result means more extreme outliers than
+normal, negative means fewer (a flatter, more evenly-spread shape).
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Positive = heavier tails / more outliers than normal; negative = lighter tails', type: 'check' },
+  { text: 'A normal distribution has a KURT of exactly 0 (this is "excess" kurtosis)', type: 'warn' },
+  { text: 'Requires at least 4 data points', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=KURT(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=KURT(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to include.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The excess kurtosis of the dataset: `0` matches a normal
+distribution's tail weight, positive means heavier tails (more
+extreme values than a normal distribution would produce), negative
+means lighter tails.
+
+## Description
+
+KURT specifically measures **excess** kurtosis — it's calibrated so
+a perfectly normal distribution scores `0`, not the "raw" kurtosis
+value of `3` that some other statistical tools report. A financial
+returns series with more extreme days than a normal distribution
+would predict (a common real-world finding) shows up as a positive
+KURT, which is exactly the kind of "fatter tails than expected" risk
+that a purely normal-distribution-based model would understate.
+
+<Callout type="warn">
+  KURT needs **at least 4** data points — its formula's denominator
+  includes `(n−2)(n−3)`, which hits zero (and produces `#DIV/0!`) with
+  fewer than 4 values.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9': '0.9406', '5': '1.8286', '14': '4.8553' }}
+  defaultValue="9"
+  label={'Live preview — =KURT(2, 4, 4, 4, 5, 5, 7, {value})'}
+  fieldLabel="8th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 8,
+    values: { a1: '2', a2: '4', a3: '4', a4: '4', a5: '5', a6: '5', a7: '7', a8: '(varies)' },
+    highlightMap: { '9': 'A1:A8', '5': 'A1:A8', '14': 'A1:A8' },
+  }}
+/>
+
+Pushing the last value out to `14` — a single extreme outlier —
+pushes KURT to more than five times the `9` scenario's value,
+illustrating exactly what kurtosis is sensitive to: a small number of
+extreme values, more than the overall spread.
+
+## Common errors
+
+### #DIV/0! — fewer than 4 data points
+
+<ExcelCode>{`KURT(5, 8, 10) → #DIV/0!`}</ExcelCode>
+
+KURT's formula divides by `(n−2)(n−3)`, which is zero with only 3
+values (or fewer) — at least 4 are required.
+
+### Confusing KURT with skewness
+
+<ExcelCode>{`KURT measures tail weight/outlier-proneness, not asymmetry — that's SKEW's job`}</ExcelCode>
+
+A symmetric distribution can still have high or low kurtosis, and a
+skewed one can have kurtosis near 0 — the two describe genuinely
+different aspects of a distribution's shape.
+
+### Expecting a normal distribution to score 0 exactly on real sample data
+
+Real, finite samples drawn from a truly normal distribution will
+still show some random KURT value away from exactly 0 just from
+sampling variation — 0 is the theoretical value for a perfect,
+infinite normal distribution, not a threshold real data will hit
+precisely.
+
+export const faqs = [
+  {
+    question: 'What does a KURT of 0 mean?',
+    answer:
+      "The distribution's tails match a normal distribution's tail weight — no more or less prone to extreme outliers than would be expected from a normal curve. This is why KURT is called 'excess' kurtosis: it's measured relative to normal, not from zero in an absolute sense.",
+  },
+  {
+    question: 'What does positive KURT indicate in practice?',
+    answer: "Heavier tails than normal — more extreme values (in both directions) than a normal distribution would produce. This shows up often in financial returns data, where extreme days happen more frequently than a normal-distribution model would predict.",
+  },
+  {
+    question: 'How is KURT different from SKEW?',
+    answer: 'SKEW measures asymmetry — whether one side has a longer tail than the other. KURT measures overall tail weight/outlier-proneness, independent of whether the distribution is symmetric or skewed.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with KURT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=KURT(A2:A9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Kurt(Range("A2:A9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import kurtosis
+
+    result = kurtosis([2, 4, 4, 4, 5, 5, 7, 9], bias=False)  # excess kurtosis
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SKEW](/docs/statistical/skew) — measures asymmetry, a different
+  shape characteristic than tail weight.
+- [STDEV.S](/docs/statistical/stdev-s) — measures overall spread,
+  independent of the shape KURT and SKEW describe.
+- [DEVSQ](/docs/statistical/devsq) — a simpler squared-deviation
+  measure that KURT's formula builds on.

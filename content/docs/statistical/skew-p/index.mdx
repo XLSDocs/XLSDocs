@@ -1,0 +1,170 @@
+---
+title: SKEW.P
+description: Measure the asymmetry of a dataset's distribution around its mean, treating the data as the entire population.
+---
+
+Measure how asymmetric a dataset's distribution is around its mean —
+`SKEW`'s counterpart when the data being measured **is** the entire
+population, not a sample representing a larger one.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Positive = long tail on the high side; negative = long tail on the low side', type: 'check' },
+  { text: 'Treats the data as the full population — no minimum count requirement beyond 1', type: 'check' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SKEW.P(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SKEW.P(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to include.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A skewness value: `0` for a perfectly symmetric distribution,
+positive for a right-skewed one, negative for a left-skewed one —
+computed treating the given values as the complete population.
+
+## Description
+
+SKEW.P shares SKEW's basic idea — quantifying how lopsided a
+distribution is around its mean — but uses the population form of
+the underlying standard deviation rather than the sample form,
+producing a slightly different (generally smaller in magnitude)
+result on the same data.
+
+<Callout type="idea">
+  Use SKEW.P only when the dataset genuinely **is** the entire
+  population being described, with nothing left out — for instance,
+  every student's score in one specific, complete class. If the data
+  is a sample meant to represent a larger, only partially-observed
+  population (the far more common situation), `SKEW` is the correct
+  choice instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9': '0.6563', '5': '0.0000', '14': '1.6451' }}
+  defaultValue="9"
+  label={'Live preview — =SKEW.P(2, 4, 4, 4, 5, 5, 7, {value})'}
+  fieldLabel="8th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 8,
+    values: { a1: '2', a2: '4', a3: '4', a4: '4', a5: '5', a6: '5', a7: '7', a8: '(varies)' },
+    highlightMap: { '9': 'A1:A8', '5': 'A1:A8', '14': 'A1:A8' },
+  }}
+/>
+
+The same dataset SKEW's example uses. With the last value at `9`,
+SKEW.P returns `0.6563` — noticeably smaller than SKEW's `0.8185` on
+the identical data, since the two functions divide by different
+standard-deviation forms.
+
+## Common errors
+
+### Confusing SKEW.P's result with SKEW's
+
+<ExcelCode>{`SKEW.P({2,4,4,4,5,5,7,9}) → 0.6563, vs. SKEW of the same data → 0.8185`}</ExcelCode>
+
+These aren't meant to match — SKEW.P uses the population standard
+deviation internally, SKEW uses the sample standard deviation, so
+they diverge on the same data (more noticeably with a smaller
+dataset).
+
+### Using SKEW.P on data that's actually a sample
+
+If the values only represent part of a larger population being
+studied, `SKEW` (not SKEW.P) is the statistically appropriate choice
+— SKEW.P assumes there's nothing left unobserved.
+
+export const faqs = [
+  {
+    question: 'SKEW.P vs SKEW — which should I use?',
+    answer:
+      "Use SKEW.P only when the data genuinely is the entire population, with nothing left out. Use SKEW whenever the data is a sample meant to estimate a larger population's skewness, which is the more common real-world situation.",
+  },
+  {
+    question: 'Why does SKEW.P tend to be smaller in magnitude than SKEW?',
+    answer:
+      "SKEW.P divides by the population standard deviation, which is always smaller than (or equal to) the sample standard deviation SKEW uses — a smaller divisor in the cubed-deviation ratio produces a larger number, so SKEW's result is generally larger in magnitude for the same data.",
+  },
+  {
+    question: 'Does SKEW.P have the same minimum data-point requirement as SKEW?',
+    answer: "No — SKEW.P's formula doesn't have SKEW's (n−1)(n−2) denominator, so it doesn't share SKEW's #DIV/0! risk with very small datasets, though skewness is still not very meaningful with just a couple of values.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SKEW.P from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SKEW.P(A2:A9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Skew_P(Range("A2:A9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import skew
+
+    result = skew([2, 4, 4, 4, 5, 5, 7, 9], bias=True)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SKEW](/docs/statistical/skew) — the sample version of the same
+  measure.
+- [KURT](/docs/statistical/kurt) — measures tail heaviness, a
+  different shape characteristic than skewness.
+- [STDEV.P](/docs/statistical/stdev-p) — the population standard
+  deviation SKEW.P's formula is built on.

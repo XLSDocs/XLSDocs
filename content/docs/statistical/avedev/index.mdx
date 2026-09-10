@@ -1,0 +1,168 @@
+---
+title: AVEDEV
+description: Return the average of the absolute deviations of a dataset from its own mean — a plain-English measure of spread.
+---
+
+Return the average distance of each value from the dataset's own
+mean, ignoring direction — a simple, easy-to-explain measure of
+spread, unlike variance or standard deviation's squared-distance math.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always ≥ 0 — distances are treated as positive regardless of direction', type: 'check' },
+  { text: 'Simpler to explain than standard deviation, but used far less often in formal statistics', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=AVEDEV(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AVEDEV(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to include.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The average of the absolute value of each number's deviation from
+the mean of the whole set.
+
+## Description
+
+AVEDEV computes the mean, then averages how far each value sits from
+it — treating a value 3 below the mean the same as one 3 above it,
+since it uses absolute distance rather than squaring. This makes it
+more intuitive to explain than standard deviation, but it's used far
+less in formal statistical work because it doesn't have the same
+well-understood mathematical properties (like connecting cleanly to
+the normal distribution) that variance and standard deviation do.
+
+<Callout type="idea">
+  AVEDEV tends to run **smaller** than the standard deviation of the
+  same data, since standard deviation's squaring step disproportionately
+  weights values that are far from the mean, while AVEDEV weights every
+  distance equally.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9': '1.5', '5': '1.0', '14': '2.4375' }}
+  defaultValue="9"
+  label={'Live preview — =AVEDEV(2, 4, 4, 4, 5, 5, 7, {value})'}
+  fieldLabel="8th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 8,
+    values: { a1: '2', a2: '4', a3: '4', a4: '4', a5: '5', a6: '5', a7: '7', a8: '(varies)' },
+    highlightMap: { '9': 'A1:A8', '5': 'A1:A8', '14': 'A1:A8' },
+  }}
+/>
+
+With the last value at `9`, the mean is `5` and AVEDEV comes out to
+`1.5`. Setting it to `5` instead makes the set nearly symmetric around
+its new mean, shrinking AVEDEV to `1.0`; pushing it to `14` stretches
+the spread and AVEDEV grows to `2.4375`.
+
+## Common errors
+
+### Confusing AVEDEV with standard deviation
+
+<ExcelCode>{`AVEDEV({2,4,4,4,5,5,7,9}) → 1.5, vs. STDEV.S of the same data → 2.14`}</ExcelCode>
+
+These measure spread differently and aren't interchangeable — AVEDEV
+averages absolute distances; STDEV.S averages *squared* distances
+before taking a square root, which weights outliers more heavily.
+
+### Expecting a negative result for below-average values
+
+AVEDEV can never be negative — every individual deviation is
+converted to its absolute value before averaging, so direction
+(above or below the mean) doesn't affect the result at all.
+
+export const faqs = [
+  {
+    question: 'AVEDEV vs STDEV.S — which one should I use?',
+    answer:
+      "STDEV.S is the standard, far more widely used measure of spread in statistics, with well-established mathematical properties. AVEDEV is simpler to explain in plain language, but rarely appears in formal statistical formulas or tests.",
+  },
+  {
+    question: 'Why is AVEDEV usually smaller than the standard deviation?',
+    answer: "Standard deviation squares each deviation before averaging, which disproportionately inflates the contribution of values far from the mean. AVEDEV weights every deviation equally regardless of size, which generally produces a smaller number.",
+  },
+  {
+    question: 'Can AVEDEV be used on a range with text or blank cells?',
+    answer: 'Yes — like most statistical functions, AVEDEV ignores text and blank cells within a range, using only the numeric values.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AVEDEV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AVEDEV(A2:A9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.AveDev(Range("A2:A9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    data = np.array([2, 4, 4, 4, 5, 5, 7, 9])
+    result = np.mean(np.abs(data - data.mean()))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DEVSQ](/docs/statistical/devsq) — sums the *squared* deviations
+  instead of averaging absolute ones, the basis for variance.
+- [STDEV.S](/docs/statistical/stdev-s) — the far more commonly used
+  measure of spread, based on squared deviations.
+- [MEDIAN](/docs/math/median) — sometimes paired with AVEDEV-style
+  thinking as a robust alternative to the mean itself.

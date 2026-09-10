@@ -1,0 +1,164 @@
+---
+title: STANDARDIZE
+description: Convert a value into a z-score — how many standard deviations it sits from the mean.
+---
+
+Convert a raw value into a z-score — how many standard deviations it
+sits above or below the mean. The standard way to compare values from
+different scales on one common footing.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A positive result means above the mean; negative means below', type: 'check' },
+  { text: 'The input to NORM.S.DIST, once a value has been standardized', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=STANDARDIZE(x, mean, standard_dev)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STANDARDIZE(x, mean, standard_dev)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to convert into a z-score.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: "The distribution's arithmetic mean.",
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: "The distribution's standard deviation. Must be positive.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The z-score: `(x − mean) / standard_dev`.
+
+## Description
+
+Standardizing puts values from different scales — test scores out of
+100, a measurement in inches, a dollar amount — onto one shared,
+comparable footing: "how many standard deviations away from typical."
+A z-score of `2` always means the same thing (unusually high, two
+standard deviations above average) regardless of what's actually
+being measured, which plain raw values can't do across different
+contexts.
+
+<Callout type="idea">
+  STANDARDIZE is the building block behind `NORM.S.DIST`: converting a
+  value with `STANDARDIZE` and then feeding it into `NORM.S.DIST` gives
+  the same result as calling `NORM.DIST` directly on the original
+  value, mean, and standard deviation.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '85': '-1', '100': '0', '115': '1', '130': '2' }}
+  defaultValue="115"
+  label={'Live preview — =STANDARDIZE({value}, 100, 15)'}
+  fieldLabel="x"
+/>
+
+For IQ scores (mean 100, standard deviation 15), a score of 115 is
+exactly 1 standard deviation above average — a z-score of 1 — while
+130 is 2 standard deviations above.
+
+## Common errors
+
+### #NUM! — standard_dev is zero or negative
+
+<ExcelCode>{`STANDARDIZE(115, 100, 0) → #NUM!`}</ExcelCode>
+
+`standard_dev` must be a positive number — dividing by a zero or
+negative spread isn't meaningful.
+
+### Misreading a negative z-score as an error
+
+<ExcelCode>{`STANDARDIZE(85, 100, 15) → -1 (not an error — below-average is expected to be negative)`}</ExcelCode>
+
+A negative result is completely normal — it just means `x` falls
+below the mean, not that anything went wrong.
+
+export const faqs = [
+  {
+    question: 'What does a z-score actually tell me?',
+    answer:
+      "How many standard deviations a value sits from the mean — 0 means exactly average, positive means above average, negative means below, and the magnitude shows how unusual the value is relative to the typical spread of the data.",
+  },
+  {
+    question: 'Why standardize values instead of comparing them directly?',
+    answer:
+      "Raw values from different scales (a test score vs. a height vs. a dollar amount) can't be meaningfully compared directly. Z-scores put everything on the same standard-deviation-based scale, making cross-comparisons possible.",
+  },
+  {
+    question: 'How does STANDARDIZE relate to NORM.S.DIST?',
+    answer: 'STANDARDIZE converts a raw value into the z-score that NORM.S.DIST expects as its input — chaining them together, STANDARDIZE(x, mean, sd) then NORM.S.DIST(z, TRUE), gives the same result as calling NORM.DIST(x, mean, sd, TRUE) directly.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STANDARDIZE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STANDARDIZE(A2, 100, 15)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim zScore As Double
+    zScore = Application.WorksheetFunction.Standardize(Range("A2").Value, 100, 15)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    z_score = (value - mean) / std_dev
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — evaluates the
+  standard normal distribution at the z-score STANDARDIZE produces.
+- [NORM.DIST](/docs/statistical/norm-dist) — performs standardization
+  and distribution lookup in one step.
+- [STDEV.S](/docs/statistical/stdev-s) — a common source for the
+  standard_dev argument, estimated from a sample.

@@ -1,0 +1,174 @@
+---
+title: NORM.DIST
+description: Return the normal distribution's cumulative probability or density at a given value, for any mean and standard deviation.
+---
+
+Return a value from the normal distribution for **any** mean and
+standard deviation — either the cumulative probability up to a given
+point, or the raw density there.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'Works with any mean/standard_dev — no need to standardize first', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORM.DIST(x, mean, standard_dev, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORM.DIST(x, mean, standard_dev, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: "The distribution's arithmetic mean.",
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: "The distribution's standard deviation. Must be positive.",
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a normally-distributed
+random variable with the given `mean` and `standard_dev` is less than
+or equal to `x`. With `cumulative` `FALSE`: the density of that curve
+at `x`.
+
+## Description
+
+NORM.DIST is the general-purpose version of the normal distribution
+calculation — unlike `NORM.S.DIST`, it doesn't assume mean `0` and
+standard deviation `1`, so raw, real-scale data (test scores, heights,
+measurement errors) can be plugged in directly without converting to
+z-scores first.
+
+<Callout type="idea">
+  `NORM.DIST(x, mean, standard_dev, TRUE)` gives exactly the same
+  result as `NORM.S.DIST((x − mean) / standard_dev, TRUE)` — NORM.DIST
+  just performs that standardization internally, saving a separate
+  `STANDARDIZE` step.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '85': '0.1587', '100': '0.5000', '115': '0.8413', '130': '0.9772' }}
+  defaultValue="115"
+  label={'Live preview — =NORM.DIST({value}, 100, 15, TRUE)'}
+  fieldLabel="x"
+/>
+
+IQ scores are modeled as normal with a mean of 100 and a standard
+deviation of 15. A score of 115 (one standard deviation above the
+mean) sits at the 84th percentile — matching the familiar "68% within
+1 SD" rule, where roughly 16% falls above 115.
+
+## Common errors
+
+### #NUM! — standard_dev is zero or negative
+
+<ExcelCode>{`NORM.DIST(100, 100, 0, TRUE) → #NUM!`}</ExcelCode>
+
+`standard_dev` must be a positive number — a distribution with zero
+or negative spread isn't meaningful.
+
+### Forgetting to convert a percentage-style mean/standard_dev consistently
+
+<ExcelCode>{`NORM.DIST(1.1, 1, 0.05, TRUE) → treats 1.1 as a raw value, matching a mean of 1 and sd of 0.05`}</ExcelCode>
+
+`x`, `mean`, and `standard_dev` all need to be on the same scale (all
+raw values, or all percentages, etc.) — mixing a percentage `x` with
+a raw-number `mean` produces a meaningless result without erroring.
+
+export const faqs = [
+  {
+    question: 'NORM.DIST vs NORM.S.DIST — which should I use?',
+    answer:
+      "NORM.DIST works directly with the real mean and standard deviation of the data — no conversion needed. NORM.S.DIST always assumes mean 0 and standard deviation 1, so the data has to be standardized (converted to a z-score) first if it isn't already.",
+  },
+  {
+    question: 'Is NORM.DIST the same as NORMDIST?',
+    answer: "NORM.DIST(x, mean, sd, TRUE) returns the same result as the older NORMDIST(x, mean, sd, TRUE). NORMDIST still works today for backward compatibility, but Microsoft recommends NORM.DIST for new formulas.",
+  },
+  {
+    question: 'What does cumulative = FALSE actually give me?',
+    answer: "The probability density at x — the height of the bell curve there, not a probability. This is mostly useful for plotting the curve's shape; for 'what fraction of values fall below X' questions, cumulative = TRUE is almost always what's needed.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NORM.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NORM.DIST(115, 100, 15, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Norm_Dist(115, 100, 15, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import norm
+
+    probability = norm.cdf(115, loc=100, scale=15)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.INV](/docs/statistical/norm-inv) — the reverse: finds the
+  value for a given cumulative probability.
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the standard-normal
+  version, assuming mean 0 and standard deviation 1.
+- [STANDARDIZE](/docs/statistical/standardize) — converts a raw value
+  into the z-score NORM.DIST computes internally.

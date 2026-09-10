@@ -1,0 +1,171 @@
+---
+title: SKEW
+description: Measure the asymmetry of a dataset's distribution around its mean, treating the data as a sample.
+---
+
+Measure how asymmetric a dataset's distribution is around its mean —
+positive means a longer tail stretching above the mean, negative
+means a longer tail below it, and zero means a perfectly symmetric
+spread.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Positive = long tail on the high side; negative = long tail on the low side', type: 'check' },
+  { text: 'Treats the data as a sample — requires at least 3 values', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SKEW(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SKEW(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to include.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A skewness value: `0` for a perfectly symmetric distribution,
+positive for a right-skewed one (a longer tail above the mean),
+negative for a left-skewed one (a longer tail below it).
+
+## Description
+
+A skewed distribution has most of its values clustered on one side,
+with a longer "tail" stretching out on the other — household income
+is a classic real-world example of right skew, since most people
+earn a moderate amount while a small number earn vastly more,
+pulling the tail (and the mean itself) upward. SKEW quantifies that
+asymmetry as a single number.
+
+<Callout type="warn">
+  SKEW treats the data as a **sample** representing a larger
+  population, and needs at least 3 values to compute (its formula
+  divides by `(n−1)(n−2)`). For the population version, use `SKEW.P`
+  instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9': '0.8185', '5': '0.0000', '14': '2.0518' }}
+  defaultValue="9"
+  label={'Live preview — =SKEW(2, 4, 4, 4, 5, 5, 7, {value})'}
+  fieldLabel="8th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 8,
+    values: { a1: '2', a2: '4', a3: '4', a4: '4', a5: '5', a6: '5', a7: '7', a8: '(varies)' },
+    highlightMap: { '9': 'A1:A8', '5': 'A1:A8', '14': 'A1:A8' },
+  }}
+/>
+
+With the last value at `5`, the dataset is nearly symmetric and SKEW
+comes out essentially to `0`. Stretching that value out to `9` (mild
+right skew) or `14` (strong right skew) pulls SKEW progressively
+higher, quantifying exactly what "a long tail on the high side" looks
+like numerically.
+
+## Common errors
+
+### #DIV/0! — fewer than 3 data points
+
+<ExcelCode>{`SKEW(5, 8) → #DIV/0!`}</ExcelCode>
+
+SKEW's formula divides by `(n−1)(n−2)`, which is zero when there are
+only 1 or 2 values — at least 3 are required.
+
+### Misreading the sign of the result
+
+A **positive** SKEW means the tail stretches toward higher values
+(often with a mean pulled above the median), not that the data is
+"more skewed toward small numbers" — the sign describes the
+direction of the tail, not which side has more of the data packed
+together.
+
+export const faqs = [
+  {
+    question: 'SKEW vs SKEW.P — which should I use?',
+    answer:
+      "Use SKEW when the data is a sample meant to estimate a larger population's skewness (the more common case). Use SKEW.P only when the data IS the entire population being measured, with nothing left out.",
+  },
+  {
+    question: 'What does a skewness of exactly 0 mean?',
+    answer: "The distribution is perfectly symmetric around its mean — as much spread above the mean as below it. In practice, real data is rarely exactly 0; small positive or negative values close to 0 are considered roughly symmetric.",
+  },
+  {
+    question: 'What real-world data tends to be right-skewed?',
+    answer: 'Household income, house prices, and wait times are classic examples — most values cluster on the lower end, with a smaller number of much larger values stretching the tail (and the mean) upward.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SKEW from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SKEW(A2:A9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Skew(Range("A2:A9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import skew
+
+    result = skew([2, 4, 4, 4, 5, 5, 7, 9], bias=False)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SKEW.P](/docs/statistical/skew-p) — the population version of the
+  same measure.
+- [KURT](/docs/statistical/kurt) — measures how heavy a distribution's
+  tails are, a different shape characteristic than skewness.
+- [MEDIAN](/docs/math/median) — often compared against the mean to
+  spot skew informally (a mean well above the median suggests right
+  skew).
