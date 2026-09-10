@@ -1,0 +1,158 @@
+---
+title: GCD
+description: Find the greatest common divisor — the largest whole number that divides every given number evenly.
+---
+
+Find the greatest common divisor — the largest whole number that
+divides every given number evenly, with no remainder. `GCD(12, 18)`
+is `6`, since 6 is the largest number that divides both exactly.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Adding a number to the list can only shrink the result, never grow it', type: 'warn' },
+  { text: 'GCD of any number and 0 is that number itself', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=GCD(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GCD(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first non-negative whole number.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional non-negative whole numbers.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The largest whole number that divides every argument evenly, with no
+remainder left over.
+
+## Description
+
+GCD shows up most often when simplifying a ratio to its smallest
+whole-number form (a 12:18 ratio simplifies to 2:3, since both divide
+evenly by their GCD of 6), or figuring out the largest "batch size"
+that divides several different quantities evenly.
+
+<Callout type="warn">
+  Adding another number to the list can only shrink the GCD, never
+  grow it — each additional value adds another constraint the result
+  has to satisfy. `GCD(12, 18)` is `6`, but `GCD(12, 18, 8)` drops to
+  `2`, since `8` doesn't share the larger common factors `12` and `18`
+  have with each other.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '8': '2', '9': '3', '24': '6' }}
+  defaultValue="8"
+  label={'Live preview — =GCD(12, 18, {value})'}
+  fieldLabel="third number"
+/>
+
+`24` shares every factor `12` and `18` already have in common, so the
+GCD stays at `6`. `9` and `8` each break one of those shared factors,
+shrinking the result.
+
+## Common errors
+
+### #NUM! — a negative number
+
+<ExcelCode>{`GCD(12, -18) → #NUM!`}</ExcelCode>
+
+GCD only accepts non-negative whole numbers — a negative argument
+isn't valid.
+
+### Expecting the result to grow with more numbers
+
+<ExcelCode>{`GCD(12, 18, 8) → 2, smaller than GCD(12, 18) alone`}</ExcelCode>
+
+Each additional number can only narrow down the shared factors, so
+the GCD of a longer list is never larger than the GCD of any subset
+of it.
+
+export const faqs = [
+  {
+    question: 'What does GCD return if one of the numbers is 0?',
+    answer:
+      "The GCD of any number and 0 is that number itself — GCD(15, 0) returns 15, since every number divides 0 evenly, so 0 places no additional constraint on the result.",
+  },
+  {
+    question: 'How is GCD different from LCM?',
+    answer: "GCD finds the largest number that divides every input evenly. LCM finds the smallest number that every input divides into evenly — the opposite direction of the same divisibility relationship.",
+  },
+  {
+    question: 'What does GCD return for numbers with no common factor besides 1?',
+    answer: "1 — two numbers with no shared factors (like 8 and 9) are called coprime, and their GCD is always 1.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GCD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GCD(A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Gcd(Range("A2:A4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import gcd
+    from functools import reduce
+
+    result = reduce(gcd, [12, 18, 8])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LCM](/docs/math/lcm) — the smallest number every input divides
+  into evenly, the counterpart relationship to GCD.
+- [MOD](/docs/math/mod) — the remainder operation GCD's calculation
+  is built from internally (the Euclidean algorithm).

@@ -1,0 +1,160 @@
+---
+title: COMBIN
+description: Count how many ways a fixed number of items can be chosen from a larger group, where order doesn't matter.
+---
+
+Count how many different groups of a given size can be chosen from a
+larger set, where the **order** items are picked in doesn't matter —
+choosing A-then-B counts the same as B-then-A.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Order doesn\'t matter — {A,B} and {B,A} count as one combination', type: 'warn' },
+  { text: 'number_chosen can be 0 (always returns 1) up to number', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COMBIN(number, number_chosen)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COMBIN(number, number_chosen)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The total size of the group to choose from.',
+  },
+  {
+    name: 'number_chosen',
+    type: 'number',
+    required: true,
+    description: 'How many items to choose, from 0 up to number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of ways to choose `number_chosen` items from a group of
+`number`, ignoring order — mathematically, `number! / (number_chosen!
+× (number − number_chosen)!)`.
+
+## Description
+
+COMBIN answers "how many different 5-card hands can be dealt from a
+52-card deck?" style questions — situations where a group is being
+selected, not arranged in a sequence. If the order of selection
+matters instead (first place, second place, third place, not just
+"which three"), `PERMUT` is the function built for that instead.
+
+<Callout type="warn">
+  COMBIN counts **combinations**, not **permutations** — {'{A, B}'}
+  and {'{B, A}'} are the same combination and only counted once.
+  Choosing 2 people from a group of 3 has 3 combinations
+  (`COMBIN(3,2)`), but 6 permutations (`PERMUT(3,2)`) once order is
+  considered.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '5', '3': '10', '5': '1' }}
+  defaultValue="3"
+  label={'Live preview — =COMBIN(5, {value})'}
+  fieldLabel="number_chosen"
+/>
+
+Choosing all 5 items from a group of 5 has only one possible
+combination — the whole group itself — which is why `COMBIN(5, 5)`
+returns `1`.
+
+## Common errors
+
+### #NUM! — number_chosen is negative or greater than number
+
+<ExcelCode>{`COMBIN(5, 7) → #NUM!`}</ExcelCode>
+
+`number_chosen` can't exceed `number` — there's no way to choose 7
+items from a group of only 5.
+
+### Confusing COMBIN with PERMUT
+
+<ExcelCode>{`COMBIN(3, 2) → 3, not 6`}</ExcelCode>
+
+If the order of selection actually matters (first vs. second place,
+not just "which two"), `PERMUT` is the correct function —
+`PERMUT(3,2)` returns `6`.
+
+export const faqs = [
+  {
+    question: 'COMBIN vs PERMUT — which should I use?',
+    answer:
+      "Use COMBIN when the order of selection doesn't matter (choosing a committee, a hand of cards, a group). Use PERMUT when order does matter (1st/2nd/3rd place, a ranked sequence).",
+  },
+  {
+    question: 'What does COMBIN return when number_chosen is 0?',
+    answer: 'Always 1 — there\'s exactly one way to choose nothing at all (the empty selection), regardless of how large number is.',
+  },
+  {
+    question: 'What does COMBIN return when number_chosen equals number?',
+    answer: "Also 1 — there's only one way to choose every item in the group: take all of them.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COMBIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COMBIN(52, 5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim hands As Double
+    hands = Application.WorksheetFunction.Combin(52, 5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import comb
+
+    hands = comb(52, 5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FACT](/docs/math/fact) — computes the factorials COMBIN's formula
+  is built from directly.
+- [PRODUCT](/docs/math/product) — a general-purpose multiplication,
+  unrelated to combinations but sometimes confused with FACT/COMBIN
+  by name association.

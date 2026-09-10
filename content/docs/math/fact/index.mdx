@@ -1,0 +1,156 @@
+---
+title: FACT
+description: Return the factorial of a number — the product of every whole number from 1 up to it.
+---
+
+Return the factorial of a number — the product of every whole number
+from `1` up to it. `FACT(5)` is `5 × 4 × 3 × 2 × 1`, or `120`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'FACT(0) returns 1, by mathematical convention', type: 'warn' },
+  { text: 'Decimal input is truncated to a whole number first', type: 'warn' },
+  { text: 'Grows extremely fast — FACT(170) is close to Excel\'s numeric limit', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FACT(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FACT(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to find the factorial of. Must be zero or positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The factorial of `number` (truncated to a whole number first): `1 ×
+2 × 3 × ... × number`. Returns `1` for `0`.
+
+## Description
+
+Factorials show up anywhere counting arrangements matters — they're
+the building block behind `COMBIN` and `PERMUT`'s formulas, and grow
+so quickly that even modest inputs produce enormous results:
+`FACT(10)` is already over three million.
+
+<Callout type="warn">
+  FACT grows explosively — `FACT(20)` is already over 2.4 quintillion,
+  and `FACT(171)` overflows Excel's numeric range entirely, returning
+  `#NUM!`. There's rarely a practical reason to compute the factorial
+  of a number much larger than 20 or so directly.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '1', '5': '120', '10': '3628800' }}
+  defaultValue="5"
+  label={'Live preview — =FACT({value})'}
+  fieldLabel="number"
+/>
+
+`FACT(0)` returns `1`, not `0` — by mathematical convention, the
+factorial of zero is defined as the "empty product," the same reason
+an empty PRODUCT() also returns 1.
+
+## Common errors
+
+### #NUM! — a negative number
+
+<ExcelCode>{`FACT(-3) → #NUM!`}</ExcelCode>
+
+Factorials are only defined for zero and positive numbers — a
+negative input has no valid result.
+
+### #NUM! — the result overflows Excel's numeric range
+
+<ExcelCode>{`FACT(171) → #NUM!`}</ExcelCode>
+
+Factorials grow so quickly that `FACT(171)` and beyond exceed the
+largest number Excel can represent (roughly 1.8 × 10³⁰⁸).
+
+### Expecting a small result for a modest-looking input
+
+<ExcelCode>{`FACT(15) → 1,307,674,368,000`}</ExcelCode>
+
+Factorial growth is famously fast — even an input as small as 15
+already produces a result over a trillion.
+
+export const faqs = [
+  {
+    question: 'Why does FACT(0) return 1 instead of 0?',
+    answer:
+      'By mathematical definition, 0! = 1 — the "empty product" convention, the same reasoning behind an empty PRODUCT() also returning 1. It\'s not a special case Excel invented; it\'s the standard mathematical definition.',
+  },
+  {
+    question: 'What happens with a decimal input, like FACT(4.7)?',
+    answer: 'The decimal portion is truncated first — FACT(4.7) computes FACT(4), returning 24, not a fractional-factorial result.',
+  },
+  {
+    question: 'How is FACT related to COMBIN and PERMUT?',
+    answer: "Both are built from factorials: COMBIN(n, k) = FACT(n) / (FACT(k) × FACT(n−k)), and PERMUT(n, k) = FACT(n) / FACT(n−k). FACT is the more fundamental operation underneath both.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FACT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FACT(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Fact(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import factorial
+
+    result = factorial(5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COMBIN](/docs/math/combin) — computes combinations using
+  factorials internally.
+- [PRODUCT](/docs/math/product) — general-purpose multiplication;
+  FACT is the special case of multiplying every integer up to a
+  number.

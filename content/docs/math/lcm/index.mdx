@@ -1,0 +1,156 @@
+---
+title: LCM
+description: Find the least common multiple — the smallest whole number that every given number divides into evenly.
+---
+
+Find the least common multiple — the smallest whole number that every
+given number divides into evenly. `LCM(4, 6)` is `12`, the smallest
+number both 4 and 6 divide into with no remainder.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Adding a number to the list can only grow the result, never shrink it', type: 'warn' },
+  { text: 'LCM of any number and 1 is that number itself', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LCM(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LCM(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first non-negative whole number.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional non-negative whole numbers.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The smallest whole number that every argument divides into evenly,
+with no remainder.
+
+## Description
+
+LCM shows up most often when things need to line up on a shared
+cycle — two events repeating every 4 days and every 6 days both land
+on the same day again every `LCM(4, 6) = 12` days — or when combining
+fractions with different denominators into a common one.
+
+<Callout type="warn">
+  Adding another number to the list can only grow the LCM, never
+  shrink it — each additional value adds one more number the result
+  needs to divide into. `LCM(4, 6)` is `12`, but `LCM(4, 6, 9)` grows
+  to `36`, since `12` alone isn't divisible by `9`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '5': '60', '9': '36', '8': '24' }}
+  defaultValue="5"
+  label={'Live preview — =LCM(4, 6, {value})'}
+  fieldLabel="third number"
+/>
+
+`8` shares enough factors with `4` and `6` to keep the result smaller
+(`24`), while `5` — sharing no factors with either — forces the LCM
+all the way up to `60`.
+
+## Common errors
+
+### #NUM! — a negative number
+
+<ExcelCode>{`LCM(4, -6) → #NUM!`}</ExcelCode>
+
+LCM only accepts non-negative whole numbers — a negative argument
+isn't valid.
+
+### Expecting the result to shrink with more numbers
+
+<ExcelCode>{`LCM(4, 6, 9) → 36, larger than LCM(4, 6) alone`}</ExcelCode>
+
+Each additional number can only add another divisibility requirement,
+so the LCM of a longer list is never smaller than the LCM of any
+subset of it.
+
+export const faqs = [
+  {
+    question: 'What does LCM return if one of the numbers is 0?',
+    answer:
+      "0 — since 0 has no positive multiples other than itself, the least common multiple involving 0 is always 0.",
+  },
+  {
+    question: 'How is LCM different from GCD?',
+    answer: "LCM finds the smallest number every input divides into evenly. GCD finds the largest number that divides every input evenly — the opposite direction of the same divisibility relationship.",
+  },
+  {
+    question: 'When would I actually need LCM in a spreadsheet?',
+    answer: 'Common uses: finding when two repeating schedules or cycles next coincide, or combining fractions with different denominators into a shared one for further calculation.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LCM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LCM(A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Lcm(Range("A2:A4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import lcm
+
+    result = lcm(4, 6, 9)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GCD](/docs/math/gcd) — the largest number that divides every input
+  evenly, the counterpart relationship to LCM.
+- [MOD](/docs/math/mod) — the remainder operation both GCD and LCM's
+  calculations rely on internally.

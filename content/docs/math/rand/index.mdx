@@ -1,0 +1,132 @@
+---
+title: RAND
+description: Return a random decimal number between 0 and 1, recalculating every time the workbook does.
+---
+
+Return a random decimal number greater than or equal to `0` and less
+than `1`, with no arguments — a new value every time the workbook
+recalculates, not a one-time roll.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always 0 ≤ result < 1 — never exactly 1', type: 'check' },
+  { text: 'Volatile — generates a new value on every recalculation', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RAND()'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RAND()`}</ExcelCode>
+
+## Parameters
+
+RAND takes no arguments — the parentheses are still required, but
+always empty.
+
+## Return value
+
+A random decimal number `n` where `0 ≤ n < 1`. A new value is
+generated every time the workbook recalculates.
+
+## Description
+
+RAND is the base building block for random numbers in Excel — every
+other random-number need (a random integer in a range, a weighted
+pick, a shuffled list) is typically built by scaling or transforming
+RAND's `0`–`1` output. `RANDBETWEEN` covers the specific, very common
+case of "a random whole number between two bounds" directly.
+
+<Callout type="warn">
+  RAND is **volatile** — it recalculates on every single workbook
+  recalculation (opening the file, editing any cell, pressing F9), not
+  on a timer or only when its own inputs change (it has none). A
+  formula referencing `RAND()` will show a *different* value almost
+  every time it's viewed — it can't be used to record a fixed random
+  choice.
+</Callout>
+
+## Common errors
+
+### The value keeps changing every time I look at it
+
+This is RAND's normal, expected behavior — it recalculates on every
+recalculation, not once. To freeze a random value permanently, copy
+the cell and use **Paste Special → Values** to replace the formula
+with its current static result.
+
+### Expecting a whole number, not a decimal
+
+<ExcelCode>{`RAND() → 0.7295... (never a whole number)`}</ExcelCode>
+
+RAND always returns a decimal between 0 and 1. For a random *integer*
+within a specific range, use `RANDBETWEEN` instead, or scale RAND's
+output manually: `INT(RAND() * (max - min + 1)) + min`.
+
+export const faqs = [
+  {
+    question: 'How do I get a random whole number instead of a decimal?',
+    answer:
+      'Use RANDBETWEEN(bottom, top) directly — it\'s built specifically for a random integer within a range, and is simpler than scaling RAND\'s 0–1 output by hand.',
+  },
+  {
+    question: 'Can RAND ever return exactly 1?',
+    answer: "No — the range is inclusive of 0 but exclusive of 1, so the result is always strictly less than 1, however close it might get.",
+  },
+  {
+    question: 'How do I freeze a random value so it stops changing?',
+    answer: 'Copy the cell, then Paste Special → Values (or Ctrl+Shift+V) onto itself — this replaces the live =RAND() formula with its current static result.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RAND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RAND()`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim r As Double
+    r = Rnd() ' VBA's built-in function is named Rnd, not Rand
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import random
+
+    r = random.random()  # 0 <= r < 1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RANDBETWEEN](/docs/math/randbetween) — a random whole number
+  within a specific range, built on the same underlying randomness.
+- [SORT](/docs/arrays/sort) — often paired with RAND (via a helper
+  column) to shuffle a list into random order.

@@ -1,0 +1,136 @@
+---
+title: PI
+description: Return the value of π (pi), accurate to 15 digits, with no arguments.
+---
+
+Return the mathematical constant π (pi), accurate to 15 digits — the
+ratio of a circle's circumference to its diameter, with no arguments
+needed.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns 3.14159265358979 (15 significant digits)', type: 'check' },
+  { text: 'Not volatile — the value never changes', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PI()'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PI()`}</ExcelCode>
+
+## Parameters
+
+PI takes no arguments — the parentheses are still required, but
+always empty.
+
+## Return value
+
+`3.14159265358979`, accurate to 15 significant digits — Excel's
+floating-point precision limit.
+
+## Description
+
+PI exists so a formula involving circles, angles, or trigonometry
+never needs to hardcode a truncated approximation like `3.14` or
+`3.14159` — using `PI()` keeps the full available precision, and
+makes the formula's intent obvious to anyone reading it later.
+
+<Callout type="idea">
+  Unlike `RAND` or `NOW`, `PI()` is **not volatile** — its result
+  never changes, so it doesn't force a recalculation cost the way
+  genuinely volatile functions do. There's no downside to using it
+  freely throughout a workbook instead of typing the digits by hand.
+</Callout>
+
+<ExcelCode>{`=PI() * radius^2 → the area of a circle`}</ExcelCode>
+
+<ExcelCode>{`=2 * PI() * radius → the circumference of a circle`}</ExcelCode>
+
+<ExcelCode>{`=PI() / 180 → the conversion factor from degrees to radians (or use RADIANS() directly)`}</ExcelCode>
+
+## Common errors
+
+### Using a hardcoded approximation instead
+
+<ExcelCode>{`=3.14 * radius^2 → less precise than =PI() * radius^2`}</ExcelCode>
+
+A hand-typed `3.14` or `3.14159` is less accurate than `PI()`'s full
+15 digits, and compounds error in a formula chain that uses it
+repeatedly. There's no accuracy or performance reason to avoid
+`PI()` in favor of typing digits manually.
+
+### Forgetting the parentheses
+
+<ExcelCode>{`=PI → #NAME? (the empty parentheses are required)`}</ExcelCode>
+
+Even with no arguments, the parentheses must still be included:
+`PI()`, not `PI`.
+
+export const faqs = [
+  {
+    question: 'Is PI() slower than typing 3.14159 directly?',
+    answer: "No — PI() isn't volatile and has no meaningful performance cost. It's simply a more accurate and more readable way to reference the constant than typing an approximation by hand.",
+  },
+  {
+    question: 'How many digits of precision does PI() return?',
+    answer: '15 significant digits (3.14159265358979) — the same floating-point precision limit every number in Excel is subject to.',
+  },
+  {
+    question: 'How do I convert degrees to radians without PI()?',
+    answer: 'Use the dedicated RADIANS() function instead — RADIANS(180) returns the same result as 180 * PI() / 180, more directly.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PI from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PI() * A2^2`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim area As Double
+    area = Application.WorksheetFunction.Pi() * Range("A2").Value ^ 2
+    ' Or use VBA's own constant: WorksheetFunction.Pi vs 4 * Atn(1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    area = math.pi * radius ** 2
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [POWER](/docs/math/power) — often paired with PI() for area/volume
+  formulas that raise a dimension to a power.
+- [SQRT](/docs/math/sqrt) — another common constant-adjacent function
+  used in geometry formulas alongside PI().

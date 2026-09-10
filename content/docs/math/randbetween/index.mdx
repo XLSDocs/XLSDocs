@@ -1,0 +1,150 @@
+---
+title: RANDBETWEEN
+description: Return a random whole number between two given values, recalculating every time the workbook does.
+---
+
+Return a random whole number between two bounds, both inclusive — the
+straightforward way to get a random integer without scaling RAND's
+0–1 output by hand.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Both bottom and top are inclusive — either can be the result', type: 'check' },
+  { text: 'Volatile — generates a new value on every recalculation', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RANDBETWEEN(bottom, top)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RANDBETWEEN(bottom, top)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'bottom',
+    type: 'number',
+    required: true,
+    description: 'The smallest whole number that can be returned.',
+  },
+  {
+    name: 'top',
+    type: 'number',
+    required: true,
+    description: 'The largest whole number that can be returned. Must be greater than or equal to bottom.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A random whole number `n` where `bottom ≤ n ≤ top`. A new value is
+generated every time the workbook recalculates.
+
+## Description
+
+Unlike `RAND` (which always returns a decimal strictly less than 1),
+RANDBETWEEN returns a whole number, and both bounds are **inclusive**
+— `RANDBETWEEN(1, 6)` (simulating a die roll) can actually return `6`,
+not just values up to but excluding it.
+
+<Callout type="warn">
+  RANDBETWEEN is **volatile**, exactly like `RAND` — it recalculates
+  on every workbook recalculation, so a cell showing `=RANDBETWEEN(1,
+  100)` will show a different number almost every time it's viewed. To
+  freeze a randomly-generated value permanently, copy it and use
+  **Paste Special → Values**.
+</Callout>
+
+## Common errors
+
+### #NUM! — bottom is greater than top
+
+<ExcelCode>{`RANDBETWEEN(10, 1) → #NUM!`}</ExcelCode>
+
+`bottom` must be less than or equal to `top` — swap the arguments if
+they were entered backwards.
+
+### The result keeps changing every time I look at it
+
+This is expected — RANDBETWEEN is volatile and recalculates on every
+recalculation. Use Paste Special → Values to freeze a specific roll
+permanently.
+
+### Decimal bounds get silently truncated
+
+<ExcelCode>{`RANDBETWEEN(1.9, 5.1) → still only returns whole numbers, treating bounds as 2 and 5`}</ExcelCode>
+
+Even though decimal `bottom`/`top` values are accepted without
+erroring, RANDBETWEEN always returns a whole number — non-integer
+bounds get rounded toward the middle of the range before generating.
+
+export const faqs = [
+  {
+    question: 'Are both bottom and top inclusive?',
+    answer:
+      "Yes — RANDBETWEEN(1, 6) can return 1 or 6 themselves, not just values strictly between them. This is different from RAND(), whose upper bound of 1 is never actually reached.",
+  },
+  {
+    question: 'How do I simulate a dice roll or coin flip?',
+    answer: 'RANDBETWEEN(1, 6) simulates a six-sided die. For a coin flip, RANDBETWEEN(0, 1) or IF(RANDBETWEEN(0,1)=1, "Heads", "Tails") both work.',
+  },
+  {
+    question: 'How do I freeze a random result so it stops changing?',
+    answer: 'Copy the cell, then Paste Special → Values (or Ctrl+Shift+V) onto itself, replacing the live formula with its current static result.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RANDBETWEEN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RANDBETWEEN(1, 100)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim roll As Long
+    roll = Int((100 - 1 + 1) * Rnd + 1) ' VBA has no built-in RandBetween
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import random
+
+    roll = random.randint(1, 100)  # both bounds inclusive
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RAND](/docs/math/rand) — the underlying random decimal (0–1)
+  RANDBETWEEN's integer result is built from.
+- [ROUND](/docs/math/round) — sometimes used alongside manual RAND
+  scaling as an alternative to RANDBETWEEN.

@@ -1,0 +1,170 @@
+---
+title: PRODUCT
+description: Multiply a list of numbers, cells, or ranges together — SUM's multiplicative counterpart.
+---
+
+Multiply a list of numbers, cells, or ranges together — the
+multiplication counterpart to `SUM`, useful for chaining growth
+rates, discount factors, or any values that need to compound rather
+than add.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns 1 for an empty argument list — the multiplicative identity', type: 'warn' },
+  { text: 'Ignores text and blank cells within a range, same as SUM', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PRODUCT(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PRODUCT(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number, cell, or range to multiply.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Up to 254 additional numbers, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The product of every numeric value across all arguments. Text and
+blank cells within a range are ignored, the same way `SUM` treats
+them.
+
+## Description
+
+PRODUCT is the natural fit whenever values need to **compound**
+rather than **total** — successive growth multipliers, discount
+factors applied one after another, or unit conversions chained
+together. Multiplying cells manually with `*` works for a handful of
+values, but PRODUCT scales cleanly to an entire range without a long
+chain of `*` signs.
+
+<Callout type="warn">
+  A single `0` anywhere among the arguments collapses the entire
+  result to `0`, no matter how many other values were being
+  multiplied — the same way one `0` in a chain of manual
+  multiplication zeroes out everything downstream of it.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.08': '1.2474', '1.15': '1.32825', '1.2': '1.386' }}
+  defaultValue="1.08"
+  label={'Live preview — =PRODUCT(1.05, 1.1, {value})'}
+  fieldLabel="quarter 3 multiplier"
+  grid={{
+    cols: ['A'],
+    rowCount: 3,
+    values: { a1: 'Q1: 1.05', a2: 'Q2: 1.1', a3: 'Q3: (varies)' },
+    highlightMap: { '1.08': 'A1:A3', '1.15': 'A1:A3', '1.2': 'A1:A3' },
+  }}
+/>
+
+Three quarterly growth multipliers compounding together (1.05 means
+"+5% that quarter"). Raising the third quarter's multiplier compounds
+into a noticeably larger overall result, not just a proportional
+bump — that's the effect of multiplying instead of adding.
+
+## Common errors
+
+### An unexpectedly small or zero result
+
+<ExcelCode>{`PRODUCT(5, 10, 0, 20) → 0`}</ExcelCode>
+
+Check the arguments for a stray `0` — it collapses the whole product
+regardless of the other values.
+
+### Text values silently excluded
+
+<ExcelCode>{`PRODUCT(A2:A5) → ignores any text cells in the range instead of erroring`}</ExcelCode>
+
+Like SUM, PRODUCT quietly skips non-numeric cells within a range
+rather than raising an error — a text value expected to participate
+in the calculation (like a number stored as text) can silently drop
+out.
+
+export const faqs = [
+  {
+    question: 'What does PRODUCT return with no arguments, or all-text arguments?',
+    answer:
+      "1 — the multiplicative identity, the same reason FACT(0) also returns 1. There's nothing to multiply, so the neutral starting value is returned.",
+  },
+  {
+    question: 'How is PRODUCT different from just multiplying cells with *?',
+    answer: "For a handful of cells there's no real difference. PRODUCT becomes clearly better once a whole range is involved — PRODUCT(A2:A20) is far more maintainable than typing A2*A3*A4*...*A20 by hand.",
+  },
+  {
+    question: 'Does PRODUCT work with SUMPRODUCT-style array math?',
+    answer: 'No — PRODUCT multiplies its arguments straight through into a single number. SUMPRODUCT is a different function built for multiplying corresponding elements of parallel arrays and then summing the results.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PRODUCT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PRODUCT(A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim total As Double
+    total = Application.WorksheetFunction.Product(Range("A2:A4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    total = np.prod(df["Multiplier"])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUM](/docs/math/sum) — the additive counterpart PRODUCT mirrors.
+- [SUMPRODUCT](/docs/math/sumproduct) — multiplies corresponding
+  elements of parallel arrays, then sums the results — a different
+  operation from PRODUCT's straight-through multiplication.
+- [DPRODUCT](/docs/database/dproduct) — the same multiplication,
+  filtered by a criteria range against a structured database.
