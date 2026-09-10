@@ -26,7 +26,7 @@ interface PlaygroundCategory {
 
 // Curated, not exhaustive — one representative pick per Try-it "shape"
 // per category (grid highlight, schedule swap, scenario picker, error
-// demo), rather than all 146 pages that currently have a widget. See
+// demo), rather than all 154 pages that currently have a widget. See
 // each linked page's own Try it section for the full picture; this
 // page's job is to hook interest, not catalog everything.
 const CATEGORIES: PlaygroundCategory[] = [
@@ -127,6 +127,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'IRR',
         href: '/docs/financial/irr#try-it',
         teaser: "Switch to the aggressive scenario and watch the same $50,000 investment's return swing from negative to nearly 15%.",
+      },
+      {
+        fn: 'DDB',
+        href: '/docs/financial/ddb#try-it',
+        teaser: 'Jump to year 10 and watch the book value land at $5,368.71 — above the $5,000 salvage value, not exactly on it.',
       },
     ],
   },
