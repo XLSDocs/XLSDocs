@@ -26,7 +26,7 @@ interface PlaygroundCategory {
 
 // Curated, not exhaustive — one representative pick per Try-it "shape"
 // per category (grid highlight, schedule swap, scenario picker, error
-// demo), rather than all 154 pages that currently have a widget. See
+// demo), rather than all 164 pages that currently have a widget. See
 // each linked page's own Try it section for the full picture; this
 // page's job is to hook interest, not catalog everything.
 const CATEGORIES: PlaygroundCategory[] = [
@@ -187,6 +187,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'SLOPE',
         href: '/docs/statistical/slope#try-it',
         teaser: "Push the last month's sales up to 60 and watch the slope jump from 10 to 16 — one point can swing the whole trend line.",
+      },
+      {
+        fn: 'SKEW',
+        href: '/docs/statistical/skew#try-it',
+        teaser: 'Set the 8th value to 5 and watch skewness snap to 0 — then push it to 14 and watch a strong right tail appear.',
       },
     ],
   },
