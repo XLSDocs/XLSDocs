@@ -1,0 +1,163 @@
+---
+title: NOMINAL
+description: Convert an effective annual interest rate back into the nominal (stated) rate, given a compounding frequency.
+---
+
+Convert an effective annual interest rate back into the nominal
+(stated) rate — the exact reverse of `EFFECT`, given how often the
+rate compounds per year.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The exact reverse of EFFECT — NOMINAL(EFFECT(r, n), n) returns r again', type: 'check' },
+  { text: 'More compounding periods per year → a lower nominal rate for the same effective rate', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=NOMINAL(effect_rate, npery)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NOMINAL(effect_rate, npery)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'effect_rate',
+    type: 'number',
+    required: true,
+    description: 'The effective (real) annual interest rate.',
+  },
+  {
+    name: 'npery',
+    type: 'number',
+    required: true,
+    description: 'The number of compounding periods per year (12 for monthly, 4 for quarterly, 365 for daily, etc.).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The nominal (stated) annual interest rate: `npery × ((1 +
+effect_rate)^(1/npery) − 1)`.
+
+## Description
+
+NOMINAL answers the reverse question from EFFECT: given a real,
+effective annual rate that's actually being earned or charged, what
+stated rate would produce that result once a given compounding
+schedule is applied? This is the calculation behind converting a
+target effective return into the nominal rate to quote or search for
+on a specific product.
+
+<Callout type="idea">
+  `NOMINAL` and `EFFECT` are exact inverses of each other:
+  `NOMINAL(EFFECT(rate, npery), npery)` always returns `rate` again,
+  round-trip. For a fixed effective rate, a **higher** `npery`
+  produces a **lower** required nominal rate — the opposite direction
+  from EFFECT, where more compounding periods raise the effective
+  rate for a fixed nominal one.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '6.0000%', '4': '5.8695%', '12': '5.8411%' }}
+  defaultValue="12"
+  label={'Live preview — =NOMINAL(6%, {value})'}
+  fieldLabel="npery"
+/>
+
+To achieve the same 6% effective annual rate, less frequent
+compounding needs a *higher* stated nominal rate: annual compounding
+needs exactly 6% nominal, but monthly compounding only needs about
+5.84% nominal to reach that same 6% effective result.
+
+## Common errors
+
+### #NUM! — effect_rate or npery isn't positive
+
+<ExcelCode>{`NOMINAL(-0.06, 12) → #NUM!`}</ExcelCode>
+
+Both arguments must be greater than 0 — a negative or zero rate or
+compounding frequency isn't valid.
+
+### Confusing which rate is which
+
+<ExcelCode>{`NOMINAL(0.06, 12) → the nominal rate that PRODUCES a 6% effective rate, not 6% itself`}</ExcelCode>
+
+The first argument is the *effective* rate going in — the result is
+the (different, typically lower) nominal rate needed to reach it.
+Mixing up which rate is the input is the most common NOMINAL mistake.
+
+export const faqs = [
+  {
+    question: 'NOMINAL vs EFFECT — which direction does each one convert?',
+    answer:
+      "EFFECT converts a stated nominal rate INTO the real effective rate. NOMINAL converts an effective rate BACK INTO the nominal rate that would produce it — they're exact inverses of each other.",
+  },
+  {
+    question: 'Why does a higher npery lower the required nominal rate?',
+    answer: "Because more frequent compounding does more of the \"work\" of reaching a target effective rate on its own — so less nominal rate is needed to get there. This is the mirror image of EFFECT, where more compounding periods raise the effective rate for the same nominal one.",
+  },
+  {
+    question: 'Does NOMINAL(EFFECT(rate, n), n) always return the original rate exactly?',
+    answer: 'Yes, up to normal floating-point precision — NOMINAL and EFFECT are exact mathematical inverses of each other for the same npery.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NOMINAL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NOMINAL(0.06, 12)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim nominalRate As Double
+    nominalRate = Application.WorksheetFunction.Nominal(0.06, 12)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def nominal(effect_rate, npery):
+        return npery * ((1 + effect_rate) ** (1 / npery) - 1)
+
+    nominal_rate = nominal(0.06, 12)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [EFFECT](/docs/financial/effect) — the exact reverse conversion,
+  from nominal rate to effective rate.
+- [RATE](/docs/financial/rate) — solves for a per-period interest
+  rate from a loan or annuity's other terms, a different kind of
+  rate calculation.

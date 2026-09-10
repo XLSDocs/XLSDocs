@@ -1,0 +1,215 @@
+---
+title: DB
+description: Calculate depreciation using the fixed-declining balance method, applying a constant rate to the shrinking book value each period.
+---
+
+Calculate depreciation using the fixed-declining balance method — a
+constant rate applied to the asset's remaining book value each
+period, so the depreciation amount itself shrinks year over year
+instead of staying flat like SLN.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Applies a fixed rate to the shrinking book value, not the original cost', type: 'warn' },
+  { text: 'month lets the first year be partial (defaults to a full 12 months)', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DB(cost, salvage, life, period, [month])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DB(cost, salvage, life, period, [month])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'cost',
+    type: 'number',
+    required: true,
+    description: 'The initial cost of the asset.',
+  },
+  {
+    name: 'salvage',
+    type: 'number',
+    required: true,
+    description: "The asset's estimated value at the end of its useful life.",
+  },
+  {
+    name: 'life',
+    type: 'number',
+    required: true,
+    description: 'The number of periods over which the asset is depreciated.',
+  },
+  {
+    name: 'period',
+    type: 'number',
+    required: true,
+    description: 'Which period to calculate depreciation for, from 1 to life (or life + 1 if month is less than 12).',
+  },
+  {
+    name: 'month',
+    type: 'number',
+    required: false,
+    description: 'The number of months in the first year. Defaults to 12 (a full first year).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The depreciation expense for `period`, computed by applying a fixed
+rate (derived from `cost`, `salvage`, and `life`) to whatever book
+value remains after prior periods' depreciation.
+
+## Description
+
+DB first computes a fixed rate: `1 − (salvage / cost)^(1/life)`,
+rounded to 3 decimal places. Every period, that rate is applied to
+the asset's **current** book value (cost minus all depreciation taken
+so far), not the original cost — which is why the depreciation
+amount itself shrinks each period, front-loading more expense into
+the earlier years than SLN's flat schedule.
+
+<Callout type="warn">
+  DB's rate is rounded to **3 decimal places** before use, a
+  deliberate (if coarse) simplification baked into the function
+  itself — this means DB's schedule doesn't reduce the book value to
+  *exactly* `salvage` by the end of `life` the way the underlying math
+  would suggest, though it typically lands very close.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '$10,300.00', '5': '$4,093.73', '10': '$1,291.88' }}
+  defaultValue="1"
+  label={'Live preview — =DB(50000, 5000, 10, {value})'}
+  fieldLabel="period"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 11,
+    values: {
+      a1: 'Year', b1: 'Depreciation', c1: 'Book Value',
+      a2: '1', b2: '$10,300.00', c2: '$39,700.00',
+      a3: '2', b3: '$8,178.20', c3: '$31,521.80',
+      a4: '3', b4: '$6,493.49', c4: '$25,028.31',
+      a5: '4', b5: '$5,155.83', c5: '$19,872.48',
+      a6: '5', b6: '$4,093.73', c6: '$15,778.75',
+      a7: '6', b7: '$3,250.42', c7: '$12,528.33',
+      a8: '7', b8: '$2,580.83', c8: '$9,947.49',
+      a9: '8', b9: '$2,049.18', c9: '$7,898.31',
+      a10: '9', b10: '$1,627.05', c10: '$6,271.26',
+      a11: '10', b11: '$1,291.88', c11: '$4,979.38',
+    },
+    highlightMap: { '1': 'A2:C2', '5': 'A6:C6', '10': 'A11:C11' },
+  }}
+/>
+
+The full 10-year schedule for a $50,000 asset with a $5,000 salvage
+value — notice the depreciation amount shrinks every year (unlike
+SLN's flat $4,500/year), and the book value lands at $4,979.38 by
+year 10, close to but not exactly the $5,000 salvage value.
+
+## Common errors
+
+### #NUM! — salvage is greater than cost, or life is 0
+
+<ExcelCode>{`DB(5000, 50000, 10, 1) → #NUM!`}</ExcelCode>
+
+`salvage` must be less than `cost` for the rate calculation to make
+sense — a salvage value higher than the original cost isn't valid.
+
+### The book value doesn't land exactly on salvage after the last period
+
+This is expected, not a calculation error — DB's rate is rounded to 3
+decimal places by design, which means the schedule typically ends
+very close to, but not precisely at, `salvage`.
+
+### Using DB when DDB (double-declining balance) was intended
+
+<ExcelCode>{`DB(50000, 5000, 10, 1) → $10,300.00, not the same as DDB(50000, 5000, 10, 1) → $10,000.00`}</ExcelCode>
+
+DB and DDB are two different accelerated-depreciation methods with
+different rate calculations — they aren't interchangeable, and their
+schedules diverge more with each period.
+
+export const faqs = [
+  {
+    question: 'DB vs DDB — what\'s the actual difference?',
+    answer:
+      "DB (fixed-declining balance) derives its rate from cost, salvage, and life, rounded to 3 decimals. DDB (double-declining balance) always uses a fixed multiple (2x by default) of the straight-line rate, and doesn't factor salvage into the rate itself — only as a floor the book value won't drop below.",
+  },
+  {
+    question: 'What does the month argument actually do?',
+    answer:
+      'It lets the first period be a partial year — if an asset was put into service partway through the year, month specifies how many months of that first year to depreciate, prorating the first period\'s expense accordingly. It defaults to 12 (a full first year).',
+  },
+  {
+    question: 'Why does DB front-load more depreciation than SLN?',
+    answer: "DB applies its rate to the shrinking book value each period rather than spreading a fixed amount evenly, which produces larger depreciation charges early on — often used to better match how some assets (like vehicles or equipment) actually lose the most value when new.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DB(50000, 5000, 10, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yr1Depreciation As Double
+    yr1Depreciation = Application.WorksheetFunction.DB(50000, 5000, 10, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def db(cost, salvage, life, period, month=12):
+        rate = round(1 - (salvage / cost) ** (1 / life), 3)
+        total_dep = 0
+        for p in range(1, period + 1):
+            dep = cost * rate * month / 12 if p == 1 else (cost - total_dep) * rate
+            if p < period:
+                total_dep += dep
+        return dep
+
+    yr1_depreciation = db(50000, 5000, 10, 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DDB](/docs/financial/ddb) — a different accelerated-depreciation
+  method, using a fixed multiple of the straight-line rate instead of
+  a rate derived from salvage value.
+- [SYD](/docs/financial/syd) — sum-of-years'-digits depreciation, a
+  third accelerated method that always fully depreciates to salvage.
+- [SLN](/docs/financial/sln) — the flat, non-accelerated baseline
+  every declining-balance method is compared against.

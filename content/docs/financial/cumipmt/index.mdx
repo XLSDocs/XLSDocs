@@ -1,0 +1,196 @@
+---
+title: CUMIPMT
+description: Calculate the total interest paid across a range of loan payments, instead of adding up IPMT for each period by hand.
+---
+
+Calculate the total interest paid across a whole range of payment
+periods in one call — the reliable alternative to summing IPMT for
+every individual period by hand.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Result is negative — a cash outflow, matching PMT/IPMT\'s convention', type: 'warn' },
+  { text: 'start_period and end_period must fall between 1 and nper', type: 'warn' },
+  { text: 'Requires Excel 2007 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CUMIPMT(rate, nper, pv, start_period, end_period, type)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUMIPMT(rate, nper, pv, start_period, end_period, type)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period (not per year, unless the period is a year).',
+  },
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The present value — the loan amount received now.',
+  },
+  {
+    name: 'start_period',
+    type: 'number',
+    required: true,
+    description: 'The first period in the range to total, from 1 to nper.',
+  },
+  {
+    name: 'end_period',
+    type: 'number',
+    required: true,
+    description: 'The last period in the range to total, from start_period to nper.',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: true,
+    description: '0 for payments due at the end of each period, 1 for payments due at the start.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The total interest paid from `start_period` through `end_period`
+(inclusive), as a negative number — the sum of `IPMT` across that
+same range, computed directly instead of added up manually.
+
+## Description
+
+CUMIPMT saves building a manual `SUM` of `IPMT` calls across a range
+of periods — a common but easy-to-get-wrong pattern, since it
+requires the range to exactly match `nper` or the intended sub-range.
+A frequent real use: finding the total interest paid in a single
+calendar year (12 consecutive periods) partway through a loan, or the
+total interest over the loan's entire life (`start_period=1`,
+`end_period=nper`).
+
+<Callout type="warn">
+  Unlike `PMT`/`IPMT`/`PPMT`, CUMIPMT's `type` argument is
+  **required**, not optional — it must always be supplied (`0` or
+  `1`), even though the equivalent argument is optional everywhere
+  else in Excel's amortization functions.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '12': '-$9,932.99', '180': '-$129,023.60', '360': '-$186,511.57' }}
+  defaultValue="12"
+  label={'Live preview — =CUMIPMT(5%/12, 360, 200000, 1, {value}, 0)'}
+  fieldLabel="end_period"
+/>
+
+A 30-year, $200,000 loan at 5% — the same loan IPMT's own example
+uses. Summing interest through just the first year (period 12) totals
+about $9,933; by the end of the full loan (period 360), total
+interest paid comes to roughly $186,512 — nearly as much as the
+original loan amount itself.
+
+## Common errors
+
+### #NUM! — start_period or end_period is out of range
+
+<ExcelCode>{`CUMIPMT(5%/12, 360, 200000, 0, 12, 0) → #NUM!`}</ExcelCode>
+
+Both period arguments must fall between `1` and `nper`, and
+`start_period` can't exceed `end_period` — period `0` doesn't exist.
+
+### #NUM! — rate, nper, or pv isn't positive
+
+<ExcelCode>{`CUMIPMT(5%/12, 360, -200000, 1, 12, 0) → #NUM!`}</ExcelCode>
+
+Unlike `PMT`, CUMIPMT requires `rate`, `nper`, and `pv` to all be
+positive numbers — it doesn't use the same negative-for-outflow sign
+convention on this particular argument.
+
+### Forgetting the required type argument
+
+<ExcelCode>{`CUMIPMT(5%/12, 360, 200000, 1, 12) → #VALUE! (missing argument)`}</ExcelCode>
+
+`type` is required for CUMIPMT specifically, unlike PMT/IPMT/PPMT
+where the equivalent argument can be omitted and defaults to `0`.
+
+export const faqs = [
+  {
+    question: 'How is CUMIPMT different from just summing IPMT?',
+    answer:
+      "They compute the same total, but CUMIPMT does it in one call over a named range of periods, removing the risk of a manually-built SUM(IPMT(...), ...) accidentally covering the wrong range of periods.",
+  },
+  {
+    question: 'Why is the result negative?',
+    answer:
+      'CUMIPMT follows the same cash-flow sign convention as PMT and IPMT — interest paid out is represented as a negative number. Wrap it in ABS() for a plain positive total if the sign isn\'t needed.',
+  },
+  {
+    question: 'How do I get total interest paid over the entire loan?',
+    answer: 'Set start_period to 1 and end_period to nper — CUMIPMT(rate, nper, pv, 1, nper, type) totals interest across every payment in the loan.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUMIPMT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUMIPMT(5%/12, 360, 200000, 1, 12, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim totalInterest As Double
+    totalInterest = Application.WorksheetFunction.CumIPmt(0.05 / 12, 360, 200000, 1, 12, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    total_interest = sum(npf.ipmt(0.05/12, per, 360, 200000) for per in range(1, 13))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IPMT](/docs/financial/ipmt) — the interest portion of a single
+  specific payment, which CUMIPMT totals across a range of.
+- [CUMPRINC](/docs/financial/cumprinc) — the same idea for the
+  principal portion instead of interest.
+- [PMT](/docs/financial/pmt) — the total fixed payment CUMIPMT's
+  interest and CUMPRINC's principal add up to for any given period.

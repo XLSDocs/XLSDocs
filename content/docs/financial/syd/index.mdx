@@ -1,0 +1,198 @@
+---
+title: SYD
+description: Calculate depreciation using the sum-of-years'-digits method, a moderately accelerated schedule that fully depreciates to salvage by design.
+---
+
+Calculate depreciation using the sum-of-years'-digits method — a
+moderately accelerated schedule, front-loaded like DB and DDB but
+gentler, that always fully depreciates the asset to its salvage value
+by the end of its useful life.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always fully depreciates to exactly salvage by the last period', type: 'check' },
+  { text: 'Less aggressive front-loading than DB or DDB', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SYD(cost, salvage, life, per)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SYD(cost, salvage, life, per)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'cost',
+    type: 'number',
+    required: true,
+    description: 'The initial cost of the asset.',
+  },
+  {
+    name: 'salvage',
+    type: 'number',
+    required: true,
+    description: "The asset's estimated value at the end of its useful life.",
+  },
+  {
+    name: 'life',
+    type: 'number',
+    required: true,
+    description: 'The number of periods over which the asset is depreciated.',
+  },
+  {
+    name: 'per',
+    type: 'number',
+    required: true,
+    description: 'Which period to calculate depreciation for, from 1 to life.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The depreciation expense for `per`: `(cost − salvage) × (life − per +
+1) / (sum of 1 through life)`.
+
+## Description
+
+SYD weights each period by its position in a countdown — the "sum of
+years' digits" for a 10-year life is `1+2+...+10 = 55`, and period 1
+gets weighted `10/55` of the total depreciable amount, period 2 gets
+`9/55`, and so on down to period 10's `1/55`. This produces a
+front-loaded schedule, but one that decreases in even steps rather
+than DB/DDB's compounding percentage decline — and unlike DDB, the
+weights are guaranteed to sum to exactly 1, so the full depreciable
+amount (`cost − salvage`) is always fully allocated by the last
+period.
+
+<Callout type="idea">
+  SYD is the one accelerated method here that **always** lands
+  exactly on `salvage` after the final period, with no rounding
+  shortfall the way DB can have and no floor-related shortfall the
+  way DDB often has. If a schedule needs to fully deplete to salvage
+  precisely, SYD is the more predictable choice of the three
+  accelerated methods.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '$8,181.82', '5': '$4,909.09', '10': '$818.18' }}
+  defaultValue="1"
+  label={'Live preview — =SYD(50000, 5000, 10, {value})'}
+  fieldLabel="per"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 11,
+    values: {
+      a1: 'Year', b1: 'Depreciation', c1: 'Book Value',
+      a2: '1', b2: '$8,181.82', c2: '$41,818.18',
+      a3: '2', b3: '$7,363.64', c3: '$34,454.55',
+      a4: '3', b4: '$6,545.45', c4: '$27,909.09',
+      a5: '4', b5: '$5,727.27', c5: '$22,181.82',
+      a6: '5', b6: '$4,909.09', c6: '$17,272.73',
+      a7: '6', b7: '$4,090.91', c7: '$13,181.82',
+      a8: '7', b8: '$3,272.73', c8: '$9,909.09',
+      a9: '8', b9: '$2,454.55', c9: '$7,454.55',
+      a10: '9', b10: '$1,636.36', c10: '$5,818.18',
+      a11: '10', b11: '$818.18', c11: '$5,000.00',
+    },
+    highlightMap: { '1': 'A2:C2', '5': 'A6:C6', '10': 'A11:C11' },
+  }}
+/>
+
+The same $50,000 asset as DB and DDB's examples. Notice the book
+value lands on **exactly** $5,000.00 (the salvage value) after year
+10 — no shortfall or overshoot, unlike DDB's $5,368.71 in the same
+scenario.
+
+## Common errors
+
+### #NUM! — per is greater than life, or life is 0
+
+<ExcelCode>{`SYD(50000, 5000, 10, 11) → #NUM!`}</ExcelCode>
+
+`per` can't exceed `life` — there's no 11th period in a 10-period
+schedule.
+
+### Expecting the same front-loading intensity as DDB
+
+<ExcelCode>{`SYD(50000, 5000, 10, 1) → $8,181.82 vs. DDB(50000, 5000, 10, 1) → $10,000.00`}</ExcelCode>
+
+SYD is a gentler accelerated method than DDB — if a more aggressive
+early write-off is actually needed, DDB or DB produce a steeper
+front-loaded schedule.
+
+export const faqs = [
+  {
+    question: 'SYD vs DDB — which is more front-loaded?',
+    answer:
+      "DDB (and DB) front-load more aggressively than SYD — SYD's weights decrease in even linear steps, while DDB's decrease as a compounding percentage of a shrinking base, which produces a steeper early drop-off.",
+  },
+  {
+    question: 'Does SYD always fully depreciate to salvage?',
+    answer: "Yes — SYD's period weights are designed to sum to exactly 1 across the asset's whole life, so the entire depreciable amount (cost minus salvage) is always fully allocated by the last period, with no rounding or floor-related shortfall.",
+  },
+  {
+    question: 'Where does the name \"sum-of-years\'-digits\" come from?',
+    answer: 'From the denominator of its formula — the sum of every whole number from 1 to life (e.g. 1+2+...+10 = 55 for a 10-year life), against which each period\'s remaining-years count is weighted.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SYD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SYD(50000, 5000, 10, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yr1Depreciation As Double
+    yr1Depreciation = Application.WorksheetFunction.Syd(50000, 5000, 10, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def syd(cost, salvage, life, per):
+        return (cost - salvage) * (life - per + 1) / (life * (life + 1) / 2)
+
+    yr1_depreciation = syd(50000, 5000, 10, 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DDB](/docs/financial/ddb) — a more aggressively front-loaded
+  method that doesn't always fully reach salvage.
+- [DB](/docs/financial/db) — another declining-balance method,
+  deriving its rate from salvage value rather than a linear countdown.
+- [SLN](/docs/financial/sln) — the flat, non-accelerated baseline
+  every declining-balance method is compared against.

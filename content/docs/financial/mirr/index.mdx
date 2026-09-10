@@ -1,0 +1,188 @@
+---
+title: MIRR
+description: Calculate a return rate that accounts for different financing and reinvestment rates, fixing a real weakness in plain IRR.
+---
+
+Calculate the modified internal rate of return — like IRR, a single
+rate summarizing a series of cash flows, but one that lets financing
+costs and reinvestment returns be set separately instead of assuming
+they're both the same as the result itself.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Needs at least one negative and one positive value in values', type: 'warn' },
+  { text: 'finance_rate and reinvest_rate can be set independently', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=MIRR(values, finance_rate, reinvest_rate)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MIRR(values, finance_rate, reinvest_rate)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The series of cash flows, in order — negative for outflows, positive for inflows. Needs at least one of each.',
+  },
+  {
+    name: 'finance_rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate paid on money used for negative cash flows.',
+  },
+  {
+    name: 'reinvest_rate',
+    type: 'number',
+    required: true,
+    description: 'The rate earned by reinvesting positive cash flows as they come in.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single rate of return for `values`, computed by discounting
+outflows at `finance_rate` and compounding inflows forward at
+`reinvest_rate`, rather than assuming a single rate applies to both.
+
+## Description
+
+Plain `IRR` implicitly assumes every positive cash flow gets
+reinvested at the *same* rate as the result it's solving for —
+usually unrealistic, since money coming back from a project rarely
+gets reinvested at that project's own return rate. MIRR fixes this by
+letting financing cost and reinvestment return be specified
+separately: outflows are valued at `finance_rate` (what borrowing
+that money would cost), and inflows are grown forward at
+`reinvest_rate` (a more realistic rate for whatever they'd actually
+be reinvested in).
+
+<Callout type="warn">
+  MIRR needs **at least one negative and one positive** value in
+  `values` — a series that's all inflows or all outflows has no
+  meaningful rate of return to solve for, and returns `#DIV/0!`
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.08': '4.43%', '0.1': '5.04%', '0.15': '6.58%' }}
+  defaultValue="0.1"
+  label={'Live preview — =MIRR(cash flows, 10%, {value})'}
+  fieldLabel="reinvest_rate"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 5,
+    values: {
+      a1: 'Year', b1: 'Cash Flow',
+      a2: '0', b2: '-$50,000',
+      a3: '1', b3: '$15,000',
+      a4: '2', b4: '$18,000',
+      a5: '3', b5: '$20,000',
+    },
+    highlightMap: { '0.08': 'A2:B5', '0.1': 'A2:B5', '0.15': 'A2:B5' },
+  }}
+/>
+
+The same $50,000 investment and returns as IRR's "base" scenario
+(whose plain IRR comes out to about 2.83%). With a 10% financing rate
+and a more optimistic 15% reinvestment rate, MIRR rises to 6.58% —
+noticeably different from IRR's own answer, since MIRR isn't
+assuming the inflows compound at the project's own (much lower) rate.
+
+## Common errors
+
+### #DIV/0! — values has no negative (or no positive) numbers
+
+<ExcelCode>{`MIRR({10000, 20000, 30000}, 10%, 10%) → #DIV/0!`}</ExcelCode>
+
+Every cash flow series needs at least one outflow (negative) and one
+inflow (positive) — an all-positive or all-negative series has
+nothing to compute a rate of return from.
+
+### Confusing MIRR's result with plain IRR's
+
+<ExcelCode>{`IRR(cash flows) → 2.83%, but MIRR(cash flows, 10%, 15%) → 6.58%`}</ExcelCode>
+
+These aren't measuring the same thing, and shouldn't be expected to
+match — MIRR incorporates two additional assumptions (financing and
+reinvestment rates) that IRR folds into a single implicit rate
+instead.
+
+export const faqs = [
+  {
+    question: 'MIRR vs IRR — why do they give different answers?',
+    answer:
+      "IRR assumes cash inflows are reinvested at IRR's own result — often an unrealistic assumption, especially for a high-IRR project. MIRR lets financing cost and reinvestment return be set to more realistic, independent rates, which usually pulls the result closer to what actually happens in practice.",
+  },
+  {
+    question: 'What happens if finance_rate and reinvest_rate are the same?',
+    answer: "MIRR still differs from IRR in general, even with equal rates — the two functions use genuinely different formulas (MIRR discounts/compounds cash flows explicitly at the given rates; IRR solves for the single rate that zeroes out NPV).",
+  },
+  {
+    question: 'Which rate should reinvest_rate actually be set to?',
+    answer: 'Whatever rate the incoming cash is realistically expected to earn once reinvested — often a company\'s cost of capital, a savings/money-market rate, or another project\'s expected return, not the project\'s own IRR.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MIRR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MIRR(A2:A5, 10%, 15%)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim cashFlows(3) As Double
+    cashFlows(0) = -50000: cashFlows(1) = 15000: cashFlows(2) = 18000: cashFlows(3) = 20000
+    Dim result As Double
+    result = Application.WorksheetFunction.Mirr(cashFlows, 0.1, 0.15)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    result = npf.mirr([-50000, 15000, 18000, 20000], 0.10, 0.15)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IRR](/docs/financial/irr) — the simpler, single-rate version MIRR
+  improves on by separating financing and reinvestment assumptions.
+- [NPV](/docs/financial/npv) — values a series of cash flows at a
+  single fixed discount rate, rather than solving for a rate.
+- [XIRR](/docs/financial/xirr) — IRR's counterpart for cash flows on
+  irregular (non-evenly-spaced) dates.

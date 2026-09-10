@@ -1,0 +1,220 @@
+---
+title: DDB
+description: Calculate depreciation using the double-declining balance method — twice the straight-line rate, applied to the shrinking book value.
+---
+
+Calculate depreciation using the double-declining balance method — by
+default, twice the straight-line rate, applied to the asset's
+shrinking book value each period. The most aggressively front-loaded
+of Excel's built-in depreciation methods.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Book value never drops below salvage — depreciation stops or caps there', type: 'warn' },
+  { text: 'Often doesn\'t fully reach salvage by the end of life, unlike SYD', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DDB(cost, salvage, life, period, [factor])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DDB(cost, salvage, life, period, [factor])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'cost',
+    type: 'number',
+    required: true,
+    description: 'The initial cost of the asset.',
+  },
+  {
+    name: 'salvage',
+    type: 'number',
+    required: true,
+    description: "The asset's estimated value at the end of its useful life.",
+  },
+  {
+    name: 'life',
+    type: 'number',
+    required: true,
+    description: 'The number of periods over which the asset is depreciated.',
+  },
+  {
+    name: 'period',
+    type: 'number',
+    required: true,
+    description: 'Which period to calculate depreciation for, from 1 to life.',
+  },
+  {
+    name: 'factor',
+    type: 'number',
+    required: false,
+    description: 'The rate multiplier relative to straight-line. Defaults to 2 (double-declining).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The depreciation expense for `period`: the smaller of `book_value ×
+(factor / life)` or `book_value − salvage` — whichever keeps the
+book value from dropping below `salvage`.
+
+## Description
+
+DDB applies a fixed rate — by default, `2 / life` (double the plain
+straight-line rate) — to the asset's current book value each period,
+the same declining-balance mechanic DB uses, but with a simpler,
+salvage-independent rate. `salvage` only comes into play as a floor:
+once the book value would drop below it, DDB caps that period's
+depreciation instead of overshooting.
+
+<Callout type="warn">
+  Because `salvage` only acts as a floor, DDB's schedule often
+  **doesn't fully reach** `salvage` by the last period — the
+  book value can end up sitting above it, with some depreciable
+  amount effectively left unclaimed. Some models switch to
+  straight-line for the remaining periods once DDB's rate would fall
+  below it, to fully deplete the asset by end of life; DDB alone
+  doesn't do this automatically.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '$10,000.00', '5': '$4,096.00', '10': '$1,342.18' }}
+  defaultValue="1"
+  label={'Live preview — =DDB(50000, 5000, 10, {value})'}
+  fieldLabel="period"
+  grid={{
+    cols: ['A', 'B', 'C'],
+    rowCount: 11,
+    values: {
+      a1: 'Year', b1: 'Depreciation', c1: 'Book Value',
+      a2: '1', b2: '$10,000.00', c2: '$40,000.00',
+      a3: '2', b3: '$8,000.00', c3: '$32,000.00',
+      a4: '3', b4: '$6,400.00', c4: '$25,600.00',
+      a5: '4', b5: '$5,120.00', c5: '$20,480.00',
+      a6: '5', b6: '$4,096.00', c6: '$16,384.00',
+      a7: '6', b7: '$3,276.80', c7: '$13,107.20',
+      a8: '7', b8: '$2,621.44', c8: '$10,485.76',
+      a9: '8', b9: '$2,097.15', c9: '$8,388.61',
+      a10: '9', b10: '$1,677.72', c10: '$6,710.89',
+      a11: '10', b11: '$1,342.18', c11: '$5,368.71',
+    },
+    highlightMap: { '1': 'A2:C2', '5': 'A6:C6', '10': 'A11:C11' },
+  }}
+/>
+
+The same $50,000 asset as DB's example, for direct comparison. DDB
+front-loads even more heavily than DB (year 1: $10,000.00 vs.
+$10,300.00 — close here, but they diverge more in later years), and
+lands at a book value of $5,368.71 by year 10 — above the $5,000
+salvage floor, since the accelerated rate simply ran out of room to
+depreciate further within 10 periods.
+
+## Common errors
+
+### The asset never fully depreciates to salvage value
+
+As the callout above explains, this is DDB's normal behavior, not a
+mistake — the fixed rate can leave book value sitting above `salvage`
+at the end of `life`. Switch to straight-line for the final period(s)
+manually if fully depleting the asset by end of life is required.
+
+### #NUM! — factor or life is zero or negative
+
+<ExcelCode>{`DDB(50000, 5000, 0, 1) → #NUM!`}</ExcelCode>
+
+`life` and `factor` must both be positive numbers — a zero or
+negative value for either isn't valid.
+
+### Confusing DDB with DB
+
+<ExcelCode>{`DDB(50000, 5000, 10, 1) → $10,000.00, not the same as DB(50000, 5000, 10, 1) → $10,300.00`}</ExcelCode>
+
+DDB and DB are two distinct accelerated-depreciation methods with
+different rate formulas — not interchangeable, even though both
+produce a declining-balance-style schedule.
+
+export const faqs = [
+  {
+    question: 'DDB vs DB — what\'s the actual difference?',
+    answer:
+      "DDB always uses a fixed multiple (2x by default) of the plain straight-line rate, with salvage acting only as a floor. DB instead derives its rate directly from cost, salvage, and life, rounded to 3 decimals — a different, generally less aggressive schedule.",
+  },
+  {
+    question: 'Why might the book value not reach salvage by the last period?',
+    answer:
+      "DDB's rate is fixed and salvage-independent — it's only ever used as a floor the book value can't cross, not a target the schedule is designed to reach exactly. Depending on cost, salvage, and life, the schedule can end above salvage with room to spare.",
+  },
+  {
+    question: 'What does the factor argument change?',
+    answer: 'It scales the depreciation rate relative to straight-line — the default of 2 gives "double"-declining balance; a factor of 1.5 would give "150%-declining balance," a somewhat less aggressive schedule.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DDB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DDB(50000, 5000, 10, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yr1Depreciation As Double
+    yr1Depreciation = Application.WorksheetFunction.DDB(50000, 5000, 10, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def ddb(cost, salvage, life, period, factor=2):
+        book_value = cost
+        dep = 0
+        for p in range(1, period + 1):
+            dep = min(book_value * factor / life, book_value - salvage)
+            dep = max(dep, 0)
+            book_value -= dep
+        return dep
+
+    yr1_depreciation = ddb(50000, 5000, 10, 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DB](/docs/financial/db) — a different accelerated-depreciation
+  method, deriving its rate from salvage value instead of a fixed
+  multiplier.
+- [SYD](/docs/financial/syd) — sum-of-years'-digits depreciation,
+  which always fully depreciates to salvage by design.
+- [SLN](/docs/financial/sln) — the flat, non-accelerated baseline
+  every declining-balance method is compared against.
