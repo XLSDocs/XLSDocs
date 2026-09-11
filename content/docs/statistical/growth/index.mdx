@@ -1,0 +1,192 @@
+---
+title: GROWTH
+description: Predict one or many values along an exponential trend at once, using known historical x/y pairs.
+---
+
+Predict values along an **exponential** trend fitted through
+historical data — TREND's counterpart for data that compounds
+(percentage growth) rather than changes by a fixed amount each
+period.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Fits a curve (y = b × mˣ), not a straight line — use TREND for linear data', type: 'warn' },
+  { text: 'new_xs can be a single value or a whole array of values at once', type: 'check' },
+  { text: 'Every known_ys value must be positive', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GROWTH(known_ys, known_xs, [new_xs])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GROWTH(known_ys, known_xs, [new_xs])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The historical dependent values. Every value must be positive.',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The historical independent values that correspond to known_ys, same size as known_ys.',
+  },
+  {
+    name: 'new_xs',
+    type: 'range',
+    required: false,
+    description: 'The x value(s) to predict y for — a single value or an array. Defaults to known_xs if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The predicted `y` value(s) at `new_xs`, based on the best-fit
+exponential curve (`y = b × mˣ`) through `known_xs` and `known_ys`.
+
+## Description
+
+GROWTH is `TREND`'s counterpart for data that compounds rather than
+changes by a fixed amount each period — revenue growing by a
+consistent percentage, population growth, compound interest. It fits
+the curve `y = b × mˣ` (rather than TREND's straight line `y = mx +
+b`) by taking the logarithm of `known_ys`, fitting a straight line to
+that, then converting back.
+
+<Callout type="warn">
+  Every value in `known_ys` must be **positive** — GROWTH takes their
+  logarithm internally, and the logarithm of zero or a negative
+  number is undefined. Using GROWTH on data that includes a zero or a
+  loss (negative value) returns `#NUM!`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '5': '146.41', '6': '161.05' }}
+  defaultValue="5"
+  label={'Live preview — =GROWTH(revenue, months, {value})'}
+  fieldLabel="new_x"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 5,
+    values: {
+      a1: 'Month', b1: 'Revenue',
+      a2: '1', b2: '100.00',
+      a3: '2', b3: '110.00',
+      a4: '3', b4: '121.00',
+      a5: '4', b5: '133.10',
+    },
+    highlightMap: { '5': 'A2:B5', '6': 'A2:B5' },
+  }}
+/>
+
+Revenue growing by exactly 10% every month. GROWTH correctly
+continues that same 10% compounding pace: month 5 predicts 146.41
+(133.10 × 1.1), and month 6 predicts 161.05 — a plain linear `TREND`
+on the same data would predict smaller, understated values, since it
+would assume a fixed dollar increase instead of a fixed percentage
+one.
+
+## Common errors
+
+### #NUM! — known_ys contains a zero or negative value
+
+<ExcelCode>{`GROWTH({100, 0, 121}, {1,2,3}) → #NUM!`}</ExcelCode>
+
+GROWTH works by taking the logarithm of `known_ys` internally — a
+zero or negative value has no logarithm, so it breaks the whole
+calculation.
+
+### Using GROWTH on data that's actually linear
+
+<ExcelCode>{`GROWTH on a fixed +10-per-period series overstates later predictions compared to TREND`}</ExcelCode>
+
+If the data increases by a constant *amount* each period rather than
+a constant *percentage*, `TREND` is the correct fit — GROWTH will
+compound growth that isn't actually happening at a compounding rate.
+
+### #SPILL! — blocked spill range
+
+When `new_xs` has more than one value, GROWTH spills its results —
+clear the cells in the spill direction, or move the formula
+somewhere with room.
+
+export const faqs = [
+  {
+    question: 'GROWTH vs TREND — how do I know which fits my data?',
+    answer:
+      "If the data changes by roughly the same PERCENTAGE each period (compounding), GROWTH fits better. If it changes by roughly the same fixed AMOUNT each period, TREND fits better. Plotting the data on a chart often makes the shape obvious — a straight line suggests TREND, a curve that bends upward (or downward) suggests GROWTH.",
+  },
+  {
+    question: 'How is GROWTH related to LOGEST?',
+    answer: 'GROWTH predicts values directly. LOGEST returns the underlying exponential curve\'s own coefficients (m and b in y = b × mˣ) instead of a prediction — the same relationship LINEST has to TREND.',
+  },
+  {
+    question: 'Why does GROWTH need every known_ys value to be positive?',
+    answer: "Because fitting an exponential curve works by taking the logarithm of the y values first (to turn the curve into a straight line), fitting normally, then converting back — and the logarithm of zero or a negative number doesn't exist.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GROWTH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GROWTH(B2:B5, A2:A5, 5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim predicted As Double
+    predicted = Application.WorksheetFunction.Growth(Range("B2:B5"), Range("A2:A5"), 5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    log_y = np.log([100, 110, 121, 133.1])
+    slope, intercept = np.polyfit([1, 2, 3, 4], log_y, 1)
+    predicted = np.exp(intercept) * np.exp(slope * 5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TREND](/docs/statistical/trend) — the linear (straight-line)
+  counterpart, for data that changes by a fixed amount rather than a
+  fixed percentage.
+- [LOGEST](/docs/statistical/logest) — returns the exponential
+  curve's own coefficients directly, instead of a predicted value.
+- [FORECAST](/docs/statistical/forecast) — a single-value linear
+  prediction; use GROWTH instead when the data compounds.

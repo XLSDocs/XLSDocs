@@ -1,0 +1,173 @@
+---
+title: COVARIANCE.S
+description: Measure how two datasets vary together, treating the data as a sample of a larger population — the sample version of COVARIANCE.P.
+---
+
+Measure how two datasets vary together, treating the data as a
+**sample** meant to estimate a larger population's covariance —
+`COVARIANCE.P`'s counterpart for the far more common real-world case.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Needs at least 2 matching pairs', type: 'warn' },
+  { text: 'Always slightly larger in magnitude than COVARIANCE.P on the same data', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COVARIANCE.S(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COVARIANCE.S(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first set of values.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second set of values, same size as array1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample covariance between `array1` and `array2` — the sum of the
+product of each pair's deviations from their own means, divided by
+`n − 1`.
+
+## Description
+
+COVARIANCE.S shares COVARIANCE.P's basic idea — measuring how two
+datasets move together — but divides by `n − 1` instead of `n`, the
+same sample-vs-population adjustment `VAR.S` makes over `VAR.P`. This
+is the statistically appropriate choice whenever the data being
+analyzed is a sample representing a larger, only partially-observed
+population, which is the more common situation in practice.
+
+<Callout type="idea">
+  `COVARIANCE.S` always comes out slightly **larger in magnitude**
+  than `COVARIANCE.P` on the same data, since dividing by a smaller
+  number (`n − 1` instead of `n`) produces a bigger result — the same
+  relationship `VAR.S` has to `VAR.P`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '5': '-0.8333', '25': '15.8333', '15': '7.5000' }}
+  defaultValue="25"
+  label={'Live preview — =COVARIANCE.S(hours, sales) with the third value adjusted'}
+  fieldLabel="hour 3 value"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Ad Hours', b1: 'Sales',
+      a2: '1', b2: '5',
+      a3: '2', b3: '10',
+      a4: '4', b4: '20',
+    },
+    highlightMap: { '5': 'A2:B4', '25': 'A2:B4', '15': 'A2:B4' },
+  }}
+/>
+
+The same data as COVARIANCE.P's example. At sales of 25,
+COVARIANCE.S returns 15.8333 — noticeably larger than
+COVARIANCE.P's 10.5556 on the identical data, exactly the gap the
+`n` vs. `n − 1` divisor creates.
+
+## Common errors
+
+### #DIV/0! — fewer than 2 data points
+
+<ExcelCode>{`COVARIANCE.S({5}, {10}) → #DIV/0!`}</ExcelCode>
+
+COVARIANCE.S's formula divides by `n − 1`, which is zero with only 1
+data point — at least 2 are required.
+
+### Confusing COVARIANCE.S's result with COVARIANCE.P's
+
+<ExcelCode>{`COVARIANCE.S({1,2,4},{5,10,25}) → 15.8333, vs. COVARIANCE.P of the same data → 10.5556`}</ExcelCode>
+
+These aren't meant to match — the two functions divide by different
+denominators, so they diverge on the same data (more noticeably with
+smaller datasets).
+
+export const faqs = [
+  {
+    question: 'COVARIANCE.S vs COVARIANCE.P — which should I use?',
+    answer:
+      "Use COVARIANCE.S whenever the data is a sample meant to estimate a larger population's covariance — the more common real-world case. Use COVARIANCE.P only when the data genuinely is the entire population, with nothing left out.",
+  },
+  {
+    question: 'Is COVARIANCE.S the same as the older COVAR?',
+    answer: 'No — COVAR (the pre-2010 function) actually matches COVARIANCE.P\'s calculation (dividing by n), not COVARIANCE.S\'s. COVARIANCE.S is a genuinely new option added in Excel 2010, not just a renamed COVAR.',
+  },
+  {
+    question: 'How does COVARIANCE.S relate to CORREL?',
+    answer: 'CORREL is COVARIANCE.S (or COVARIANCE.P, either works — the ratio cancels out the n vs n-1 difference) divided by the product of both datasets\' standard deviations, normalizing it to a consistent -1 to 1 scale.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COVARIANCE.S from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COVARIANCE.S(A2:A4, B2:B4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Covariance_S(Range("A2:A4"), Range("B2:B4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    result = np.cov(ad_hours, sales, bias=False)[0, 1]  # sample covariance
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COVARIANCE.P](/docs/statistical/covariance-p) — the population
+  version of the same measure.
+- [CORREL](/docs/statistical/correl) — the scale-independent,
+  normalized version of covariance, always between -1 and 1.
+- [VAR.S](/docs/statistical/var-s) — a dataset's covariance with
+  itself, the sample variance.

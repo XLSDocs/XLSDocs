@@ -1,0 +1,178 @@
+---
+title: FORECAST.LINEAR
+description: Predict a value along a linear trend — the identical calculation as FORECAST, under its newer, more explicit name.
+---
+
+Predict a value along a linear trend fitted through known historical
+data — the identical calculation as `FORECAST`, under a newer name
+added purely for symmetry with `FORECAST.ETS`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Identical calculation and result to FORECAST', type: 'check' },
+  { text: 'Added in Excel 2016 alongside FORECAST.ETS', type: 'warn' },
+  { text: 'FORECAST still works in every version, including the newest', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FORECAST.LINEAR(x, known_ys, known_xs)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FORECAST.LINEAR(x, known_ys, known_xs)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The data point to predict a y value for — often a future period.',
+  },
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The historical dependent values (the outcomes already observed).',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The historical independent values that correspond to known_ys, same size as known_ys.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The predicted `y` value at `x`, based on the best-fit straight line
+through `known_xs` and `known_ys` — identical to what `FORECAST`
+returns on the same inputs.
+
+## Description
+
+FORECAST.LINEAR and FORECAST calculate the exact same result — there
+is no calculation difference between them, and no version of Excel
+treats them differently. FORECAST.LINEAR was introduced in Excel 2016
+purely for naming symmetry alongside `FORECAST.ETS` (which forecasts
+using seasonal patterns instead of a straight line), so the "linear"
+method would have an equally explicit name.
+
+<Callout type="idea">
+  There's no reason to prefer FORECAST.LINEAR over plain FORECAST —
+  they're permanently identical. FORECAST also has the advantage of
+  working in every Excel version this site covers, while
+  FORECAST.LINEAR requires Excel 2016 or later.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '6': '60', '7': '70', '8': '80' }}
+  defaultValue="6"
+  label={'Live preview — =FORECAST.LINEAR({value}, sales, months)'}
+  fieldLabel="x (month)"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 6,
+    values: {
+      a1: 'Month', b1: 'Sales',
+      a2: '1', b2: '10',
+      a3: '2', b3: '20',
+      a4: '3', b4: '30',
+      a5: '4', b5: '40',
+      a6: '5', b6: '50',
+    },
+    highlightMap: { '6': 'A2:B6', '7': 'A2:B6', '8': 'A2:B6' },
+  }}
+/>
+
+The identical sales trend and results as `FORECAST`'s own example —
+this will always match FORECAST exactly on the same inputs, since
+they run the same calculation.
+
+## Common errors
+
+### #N/A — known_ys and known_xs are different sizes
+
+Every value in `known_ys` needs a corresponding value in `known_xs`
+at the same position — the two ranges must contain the same number
+of data points, the same requirement FORECAST has.
+
+### Assuming FORECAST.LINEAR handles seasonality
+
+FORECAST.LINEAR only fits a straight line — for data with a
+repeating seasonal pattern, `FORECAST.ETS` is the function built to
+account for that instead.
+
+export const faqs = [
+  {
+    question: 'Should I use FORECAST or FORECAST.LINEAR in new formulas?',
+    answer:
+      "Either — they're permanently identical. FORECAST works in every version of Excel this site covers, while FORECAST.LINEAR requires 2016 or later, so FORECAST is the safer default if compatibility with older files matters.",
+  },
+  {
+    question: 'Why was FORECAST.LINEAR added if it does the same thing as FORECAST?',
+    answer: 'For naming consistency — Excel 2016 introduced FORECAST.ETS for seasonal forecasting, and FORECAST.LINEAR was added alongside it so the straight-line method had an equally explicit, descriptive name.',
+  },
+  {
+    question: 'Does FORECAST.LINEAR work for exponential or curved trends?',
+    answer: "No — like FORECAST, it only fits a straight line. GROWTH is the equivalent function for exponential (compounding) trends.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FORECAST.LINEAR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FORECAST.LINEAR(6, B2:B6, A2:A6)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim predicted As Double
+    predicted = Application.WorksheetFunction.Forecast_Linear(6, Range("B2:B6"), Range("A2:A6"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    slope, intercept = np.polyfit([1,2,3,4,5], [10,20,30,40,50], 1)
+    predicted = slope * 6 + intercept
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FORECAST](/docs/statistical/forecast) — the identical calculation
+  under its original, more broadly-compatible name.
+- [TREND](/docs/statistical/trend) — predicts multiple values at
+  once using the same underlying linear regression.
+- [GROWTH](/docs/statistical/growth) — the equivalent for an
+  exponential trend instead of a straight line.

@@ -1,0 +1,196 @@
+---
+title: LOGEST
+description: Return an exponential regression's coefficients as an array in one formula — LINEST's counterpart for curved, compounding data.
+---
+
+Return an exponential curve's own coefficients (`m` and `b` in `y = b
+× mˣ`) as a single array — `LINEST`'s counterpart for data that
+compounds rather than changes by a fixed amount each period.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns {m, b} — the growth factor first, the starting value second', type: 'warn' },
+  { text: 'Every known_ys value must be positive', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LOGEST(known_ys, known_xs, [const], [stats])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOGEST(known_ys, known_xs, [const], [stats])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The dependent values. Every value must be positive.',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: false,
+    description: 'The independent values. Defaults to {1, 2, 3, ...} if omitted.',
+  },
+  {
+    name: 'const',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE (default) to calculate b normally; FALSE to force it to 1.',
+  },
+  {
+    name: 'stats',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE for the full regression statistics table; FALSE (default) for just m and b.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `stats` `FALSE` (the default): a 2-cell array, `{m, b}`, where
+`y = b × mˣ` is the best-fit exponential curve through the data. With
+`stats` `TRUE`: a 5-row array adding standard errors, R², and more.
+
+## Description
+
+LOGEST is to `GROWTH` what `LINEST` is to `TREND` — instead of
+predicting a value, it returns the fitted exponential curve's own
+coefficients directly. `m` represents the per-period growth
+multiplier (an `m` of `1.1` means 10% growth each period), and `b`
+represents the curve's value at `x = 0`.
+
+<Callout type="warn">
+  LOGEST's two values come back **`m` first, `b` second** — easy to
+  mix up with `LINEST`'s slope-then-intercept order, since the roles
+  aren't quite equivalent: `m` here is a *multiplier* applied per
+  period, not a linear per-unit change the way LINEST's slope is.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '133.1': '{1.1000, 90.9091}', '140': '{1.1168, 88.6405}', '125': '{1.0795, 93.8083}' }}
+  defaultValue="133.1"
+  label={'Live preview — =LOGEST(revenue, months) with month 4 at {value}'}
+  fieldLabel="month 4 revenue"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 5,
+    values: {
+      a1: 'Month', b1: 'Revenue',
+      a2: '1', b2: '100.00',
+      a3: '2', b3: '110.00',
+      a4: '3', b4: '121.00',
+      a5: '4', b5: '(varies)',
+    },
+    highlightMap: { '133.1': 'A2:B5', '140': 'A2:B5', '125': 'A2:B5' },
+  }}
+/>
+
+The result shows `{m, b}` together. With month 4 at its original
+133.10 (exactly 10% above month 3), LOGEST returns `m = 1.1` — the
+10% growth factor — and `b = 90.91`, the curve's value at month `0`.
+Pushing month 4 higher or lower shifts the fitted growth rate itself,
+since it's no longer a perfectly clean 10% every period.
+
+## Common errors
+
+### #NUM! — known_ys contains a zero or negative value
+
+LOGEST takes the logarithm of `known_ys` internally, same as
+`GROWTH` — a zero or negative value has no logarithm, breaking the
+calculation.
+
+### Confusing m with a per-unit linear change
+
+<ExcelCode>{`m = 1.1 means "multiply by 1.1 each period," not "add 1.1 each period"`}</ExcelCode>
+
+LOGEST's `m` is multiplicative, unlike LINEST's slope which is
+additive — treating them the same way in a downstream formula
+produces a badly wrong projection.
+
+### Expecting a single cell instead of a spilled array
+
+LOGEST always returns a 2-cell array (or a 5-row table with `stats =
+TRUE`), even in its simplest form — make sure there's clear room for
+it to spill into.
+
+export const faqs = [
+  {
+    question: 'How do I turn LOGEST\'s output into an actual prediction?',
+    answer:
+      "Compute b × m^x for whatever x is needed — or just use GROWTH directly, which performs this exact calculation without needing to extract m and b by hand first.",
+  },
+  {
+    question: 'What does b represent here?',
+    answer: "The exponential curve's value at x = 0 — one period before the data actually starts, not literally the first observed value in known_ys.",
+  },
+  {
+    question: 'LOGEST vs GROWTH — which should I use?',
+    answer: 'Use GROWTH to get a predicted value directly. Use LOGEST when the curve\'s own coefficients are needed — for displaying the equation itself, or for further calculations that need m and b independently.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LOGEST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LOGEST(B2:B5, A2:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.LogEst(Range("B2:B5"), Range("A2:A5"))
+    Dim m As Double, b As Double
+    m = result(1, 1)
+    b = result(1, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    log_y = np.log([100, 110, 121, 133.1])
+    slope, intercept = np.polyfit([1, 2, 3, 4], log_y, 1)
+    m, b = np.exp(slope), np.exp(intercept)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GROWTH](/docs/statistical/growth) — predicts a value directly,
+  built from LOGEST's coefficients internally.
+- [LINEST](/docs/statistical/linest) — the linear-regression
+  counterpart, returning slope and intercept instead of m and b.
+- [TREND](/docs/statistical/trend) — the linear prediction function
+  LOGEST's role mirrors for exponential data.

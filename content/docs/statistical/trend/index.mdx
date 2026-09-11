@@ -1,0 +1,189 @@
+---
+title: TREND
+description: Predict one or many values along a linear trend at once, using known historical x/y pairs.
+---
+
+Predict values along a linear trend fitted through historical data —
+like `FORECAST`, but able to return predictions for **several** new
+x values in a single spilled array instead of one at a time.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'new_xs can be a single value or a whole array of values at once', type: 'check' },
+  { text: 'known_ys and known_xs must be the same size', type: 'warn' },
+  { text: 'Assumes a straight-line (linear) relationship between x and y', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TREND(known_ys, known_xs, [new_xs])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TREND(known_ys, known_xs, [new_xs])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The historical dependent values (the outcomes already observed).',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The historical independent values that correspond to known_ys, same size as known_ys.',
+  },
+  {
+    name: 'new_xs',
+    type: 'range',
+    required: false,
+    description: 'The x value(s) to predict y for — a single value or an array. Defaults to known_xs if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The predicted `y` value(s) at `new_xs`, based on the best-fit
+straight line through `known_xs` and `known_ys` — one result per
+value in `new_xs`, spilled automatically if more than one is given.
+
+## Description
+
+TREND uses the exact same linear regression as `FORECAST` — the same
+best-fit line through `known_xs`/`known_ys` — but its `new_xs`
+argument accepts a whole array, returning every prediction in one
+formula instead of needing a separate `FORECAST` call per value.
+
+<Callout type="idea">
+  `TREND(known_ys, known_xs, x)` and `FORECAST(x, known_ys,
+  known_xs)` return exactly the same value for one x — TREND is the
+  better choice specifically when several x values need predicting at
+  once, since it spills all of them from a single formula.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '6': '60', '7': '70', '8': '80' }}
+  defaultValue="6"
+  label={'Live preview — =TREND(sales, months, {value})'}
+  fieldLabel="new_x"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 6,
+    values: {
+      a1: 'Month', b1: 'Sales',
+      a2: '1', b2: '10',
+      a3: '2', b3: '20',
+      a4: '3', b4: '30',
+      a5: '4', b5: '40',
+      a6: '5', b6: '50',
+    },
+    highlightMap: { '6': 'A2:B6', '7': 'A2:B6', '8': 'A2:B6' },
+  }}
+/>
+
+The same 5-month sales trend `FORECAST`'s own example uses. A single
+`=TREND(B2:B6, A2:A6, {6,7,8})` would spill all three predictions
+(60, 70, 80) into one row at once — the button above shows each of
+those one at a time, matching what each individual cell of that
+spill would contain.
+
+## Common errors
+
+### #N/A — known_ys and known_xs are different sizes
+
+<ExcelCode>{`TREND({10,20,30}, {1,2,3,4}) → #N/A`}</ExcelCode>
+
+Every value in `known_ys` needs a matching value in `known_xs` at the
+same position — both ranges must contain the same number of data
+points.
+
+### #SPILL! — blocked spill range
+
+<ExcelCode>{`TREND(B2:B6, A2:A6, {6,7,8}) → #SPILL! if the cells to the right are occupied`}</ExcelCode>
+
+When `new_xs` has more than one value, TREND spills its results —
+clear the cells in the spill direction, or move the formula
+somewhere with room.
+
+### Expecting TREND to fit a curve, not a straight line
+
+TREND only fits a **linear** trend. If the real relationship curves
+(exponential growth, for instance), `GROWTH` is the equivalent
+function built for that shape instead.
+
+export const faqs = [
+  {
+    question: 'TREND vs FORECAST — which should I use?',
+    answer:
+      "They compute the identical linear regression. Use FORECAST for a single predicted value; use TREND when several new_x values need predicting at once, since it can spill all of them from one formula instead of repeating FORECAST for each.",
+  },
+  {
+    question: 'What does TREND return if new_xs is omitted?',
+    answer:
+      'It defaults to known_xs, returning the trend line\'s own fitted values for each original x — useful for comparing the actual historical y values against what the straight-line fit would have predicted for the same points.',
+  },
+  {
+    question: 'Can TREND handle more than one x variable (multiple regression)?',
+    answer: 'Yes — known_xs can be a range with multiple columns, one per independent variable, and TREND fits a multiple linear regression across all of them. The single-variable case shown here is the simplest, most common use.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TREND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TREND(B2:B6, A2:A6, {6,7,8})`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim predictions As Variant
+    predictions = Application.WorksheetFunction.Trend(Range("B2:B6"), Range("A2:A6"), Array(6, 7, 8))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    slope, intercept = np.polyfit([1,2,3,4,5], [10,20,30,40,50], 1)
+    predictions = [slope * x + intercept for x in [6, 7, 8]]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FORECAST](/docs/statistical/forecast) — the single-value version
+  of this same linear regression.
+- [GROWTH](/docs/statistical/growth) — the equivalent function for an
+  exponential (curved) trend instead of a straight line.
+- [LINEST](/docs/statistical/linest) — returns the trend line's own
+  slope and intercept directly, instead of a predicted value.

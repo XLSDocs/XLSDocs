@@ -1,0 +1,175 @@
+---
+title: RSQ
+description: Return the R-squared value of a linear regression — the proportion of variance in one variable explained by the other.
+---
+
+Return the R-squared value of a linear regression between two
+datasets — the proportion of variance in one variable that's
+explained by the other, from `0` (no linear relationship) to `1`
+(perfect fit).
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always between 0 and 1 — never negative', type: 'check' },
+  { text: 'Equal to CORREL squared', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RSQ(known_ys, known_xs)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RSQ(known_ys, known_xs)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The dependent values.',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The independent values, same size as known_ys.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The square of the Pearson correlation coefficient between
+`known_ys` and `known_xs` — a value from `0` to `1`.
+
+## Description
+
+RSQ answers "how much of the variation in y is explained by x?" — an
+RSQ of `0.90` means 90% of the variation in `known_ys` can be
+accounted for by its linear relationship with `known_xs`, leaving
+10% unexplained (noise, or factors outside the model). It's simply
+`CORREL` squared, which is also why RSQ is always positive even when
+the underlying relationship is negative (a strong negative
+correlation still means a strong, high-RSQ fit).
+
+<Callout type="idea">
+  Squaring a correlation always removes its sign, which is exactly
+  why RSQ can't tell you whether the relationship is positive or
+  negative — only how *strong* the linear fit is. Check `CORREL` or
+  `SLOPE` directly if the direction of the relationship matters.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '5': '0.0357', '25': '0.9918', '15': '0.9643' }}
+  defaultValue="25"
+  label={'Live preview — =RSQ(sales, hours) with the third value adjusted'}
+  fieldLabel="hour 3 value"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Ad Hours', b1: 'Sales',
+      a2: '1', b2: '5',
+      a3: '2', b3: '10',
+      a4: '4', b4: '20',
+    },
+    highlightMap: { '5': 'A2:B4', '25': 'A2:B4', '15': 'A2:B4' },
+  }}
+/>
+
+The same advertising-hours-vs-sales data as CORREL's own example. At
+sales of 25, RSQ comes out to 0.9918 — about 99% of the variation in
+sales is explained by ad hours in this scenario. Dropping the third
+value to 5 (a weak, near-random pattern) collapses RSQ to just 0.0357.
+
+## Common errors
+
+### #DIV/0! — known_xs or known_ys has no variance
+
+<ExcelCode>{`RSQ({5,5,5}, {1,2,3}) → #DIV/0!`}</ExcelCode>
+
+If every value in either range is identical, there's no variation to
+explain a relationship with.
+
+### Expecting RSQ to reveal the direction of the relationship
+
+<ExcelCode>{`RSQ always ≥ 0, even for a strong NEGATIVE correlation`}</ExcelCode>
+
+RSQ can't distinguish a strong positive relationship from a strong
+negative one — both square to a similarly high value. Check `CORREL`
+or `SLOPE` for the sign.
+
+export const faqs = [
+  {
+    question: 'Is RSQ the same as R² from a regression summary?',
+    answer:
+      "Yes, exactly — for a simple one-variable linear regression, RSQ is the same R² value reported by regression software or LINEST's extended statistics.",
+  },
+  {
+    question: 'What counts as a \"good\" RSQ value?',
+    answer: "It depends heavily on context — in controlled physical measurements, an RSQ below 0.95 might signal a problem, while in social science or business data, an RSQ of 0.3-0.5 can be considered a genuinely useful relationship. There's no universal cutoff.",
+  },
+  {
+    question: 'How is RSQ related to CORREL?',
+    answer: 'RSQ(known_ys, known_xs) always equals CORREL(known_ys, known_xs) squared — the two functions describe the same underlying linear relationship, just on different scales (RSQ from 0 to 1, CORREL from -1 to 1).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RSQ from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RSQ(B2:B4, A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rSquared As Double
+    rSquared = Application.WorksheetFunction.RSq(Range("B2:B4"), Range("A2:A4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    r = np.corrcoef(ad_hours, sales)[0, 1]
+    r_squared = r ** 2
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CORREL](/docs/statistical/correl) — the correlation coefficient
+  RSQ is the square of.
+- [SLOPE](/docs/statistical/slope) — the steepness of the same
+  regression line, independent of how well it fits.
+- [STEYX](/docs/statistical/steyx) — measures the typical prediction
+  error in the same regression's own units.

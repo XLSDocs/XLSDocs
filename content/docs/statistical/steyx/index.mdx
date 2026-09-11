@@ -1,0 +1,178 @@
+---
+title: STEYX
+description: Return the standard error of the predicted y value in a linear regression — how far off a typical prediction tends to be.
+---
+
+Return the standard error of the predicted y value in a linear
+regression — a measure of how far off a typical prediction from the
+regression line tends to be, in the same units as `y` itself.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'A value of 0 means every point sits exactly on the regression line', type: 'check' },
+  { text: 'Expressed in the same units as known_ys, unlike RSQ', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=STEYX(known_ys, known_xs)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STEYX(known_ys, known_xs)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The dependent values.',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: true,
+    description: 'The independent values, same size as known_ys.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The standard error of the estimate — roughly, the typical size of
+the gap between each actual `y` value and what the regression line
+predicted for it.
+
+## Description
+
+Where `RSQ` describes fit as a unitless proportion (0 to 1), STEYX
+describes it in the data's own real-world units — a STEYX of `500`
+on dollar data means predictions typically miss by around $500,
+directly comparable to the scale of the numbers being predicted. This
+makes STEYX often more immediately useful for judging whether a
+regression's accuracy is actually good enough for a specific
+practical purpose.
+
+<Callout type="idea">
+  A STEYX of exactly `0` means every single point sits precisely on
+  the regression line — no scatter at all. Any real-world dataset with
+  genuine noise will show some nonzero STEYX; the question is only
+  whether that typical error is small enough to be useful.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '40': '0.0000', '35': '1.9365', '60': '7.7460' }}
+  defaultValue="40"
+  label={'Live preview — =STEYX(sales, months) with the last month adjusted'}
+  fieldLabel="month 4 sales"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Month', b1: 'Sales',
+      a2: '1', b2: '10',
+      a3: '2', b3: '20',
+      a4: '3', b4: '30',
+    },
+    highlightMap: { '40': 'A2:B4', '35': 'A2:B4', '60': 'A2:B4' },
+  }}
+/>
+
+With month 4 at exactly 40 (perfectly continuing the +10/month
+pattern), every point sits exactly on the line and STEYX is `0`.
+Pulling that value away from the pattern — to 35 or 60 — introduces
+real scatter, and STEYX grows to measure it.
+
+## Common errors
+
+### #DIV/0! — fewer than 3 data points
+
+<ExcelCode>{`STEYX({10,20}, {1,2}) → #DIV/0!`}</ExcelCode>
+
+STEYX's formula divides by `n − 2`, which is zero with only 2 data
+points — at least 3 are required.
+
+### Confusing STEYX with RSQ
+
+STEYX and RSQ both describe regression fit, but on different scales
+— STEYX is in `y`'s own units (useful for "how far off, in real
+terms"), while RSQ is a unitless 0-to-1 proportion (useful for "how
+much of the variation is explained"). They aren't interchangeable
+numbers.
+
+export const faqs = [
+  {
+    question: 'STEYX vs RSQ — which one should I look at?',
+    answer:
+      "They answer different questions. RSQ says what proportion of variance is explained (0 to 1, unitless). STEYX says how big a typical prediction error is, in the data's own real units — often the more directly actionable number for deciding if a forecast is precise enough.",
+  },
+  {
+    question: 'Why does STEYX need at least 3 data points?',
+    answer: "Its formula divides by n − 2 (the regression's residual degrees of freedom, after estimating both a slope and an intercept from the data) — with only 2 points, that's zero, and any 2-point line fits perfectly anyway, leaving nothing to measure error from.",
+  },
+  {
+    question: 'Can STEYX be used to build a prediction interval around a FORECAST result?',
+    answer: 'Yes — STEYX is the basis for a rough prediction interval: FORECAST(x, ...) ± roughly 2 × STEYX gives an approximate 95% range for where a new observation might actually fall, for a large enough sample.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STEYX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STEYX(B2:B4, A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim stdError As Double
+    stdError = Application.WorksheetFunction.StEyx(Range("B2:B4"), Range("A2:A4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    x, y = np.array([1, 2, 3]), np.array([10, 20, 30])
+    slope, intercept = np.polyfit(x, y, 1)
+    residuals = y - (slope * x + intercept)
+    steyx = np.sqrt(np.sum(residuals ** 2) / (len(x) - 2))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RSQ](/docs/statistical/rsq) — the unitless (0-1) version of
+  regression fit quality, versus STEYX's real-units version.
+- [FORECAST](/docs/statistical/forecast) — a predicted value that
+  STEYX can be used to build an approximate error margin around.
+- [SLOPE](/docs/statistical/slope) and
+  [INTERCEPT](/docs/statistical/intercept) — the regression line
+  STEYX measures the scatter around.

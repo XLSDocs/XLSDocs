@@ -1,0 +1,178 @@
+---
+title: COVARIANCE.P
+description: Measure how two datasets vary together, treating the data as the entire population — the un-normalized building block behind CORREL.
+---
+
+Measure how two datasets vary together — positive means they tend to
+rise and fall together, negative means one tends to fall as the
+other rises — treating the data as the complete population being
+measured.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Sign matters (direction); magnitude alone doesn\'t tell you strength', type: 'warn' },
+  { text: 'Use CORREL instead when comparing strength across different datasets', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COVARIANCE.P(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COVARIANCE.P(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first set of values.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second set of values, same size as array1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population covariance between `array1` and `array2` — the
+average of the product of each pair's deviations from their own
+means.
+
+## Description
+
+Covariance is the raw building block `CORREL` is normalized from —
+positive covariance means the two datasets tend to move in the same
+direction, negative means they tend to move in opposite directions,
+and the magnitude depends on the scale of the original data (unlike
+CORREL, which is always between -1 and 1 regardless of scale).
+
+<Callout type="warn">
+  Covariance's magnitude **can't be compared across different
+  datasets** the way CORREL's can — a covariance of `1000` might
+  represent a very strong relationship for small numbers or a weak
+  one for large numbers, since it's not normalized. Use `CORREL` when
+  the goal is judging or comparing the *strength* of a relationship,
+  not just its calculation.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '5': '-0.5556', '25': '10.5556', '15': '5.0000' }}
+  defaultValue="25"
+  label={'Live preview — =COVARIANCE.P(hours, sales) with the third value adjusted'}
+  fieldLabel="hour 3 value"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Ad Hours', b1: 'Sales',
+      a2: '1', b2: '5',
+      a3: '2', b3: '10',
+      a4: '4', b4: '20',
+    },
+    highlightMap: { '5': 'A2:B4', '25': 'A2:B4', '15': 'A2:B4' },
+  }}
+/>
+
+The same advertising-hours-vs-sales data as CORREL's own example.
+Notice the sign flips to negative when sales drops to 5 — hours and
+sales are moving in *opposite* directions in that scenario, the same
+directional story CORREL's negative result tells for the identical
+input.
+
+## Common errors
+
+### Comparing covariance magnitudes across different units
+
+<ExcelCode>{`COVARIANCE.P in dollars vs. COVARIANCE.P in thousands of dollars → wildly different magnitudes for the same underlying relationship`}</ExcelCode>
+
+Covariance scales with the units of the original data — converting
+one dataset from dollars to thousands of dollars changes the
+covariance by a factor of 1000, even though the actual relationship
+hasn't changed at all. CORREL is scale-independent and doesn't have
+this problem.
+
+### Using COVARIANCE.P when the data is actually a sample
+
+If `array1`/`array2` represent a sample meant to estimate a larger
+population, `COVARIANCE.S` (dividing by `n − 1` instead of `n`) is
+the statistically appropriate choice instead.
+
+export const faqs = [
+  {
+    question: 'COVARIANCE.P vs COVARIANCE.S — which should I use?',
+    answer:
+      "Use COVARIANCE.P only when the data genuinely is the entire population being measured. Use COVARIANCE.S whenever the data is a sample meant to estimate a larger population's covariance, which is the more common real-world situation.",
+  },
+  {
+    question: 'Why use CORREL instead of covariance directly?',
+    answer:
+      "CORREL normalizes covariance by both variables' standard deviations, producing a value always between -1 and 1 that can be meaningfully compared across completely different datasets. Raw covariance's magnitude depends on the original data's scale, so a bigger number doesn't necessarily mean a stronger relationship.",
+  },
+  {
+    question: 'What does a covariance of exactly 0 mean?',
+    answer: 'No linear relationship between the two datasets — as one goes up, the other shows no consistent tendency to go up or down in response. Like CORREL, a covariance of 0 only rules out a LINEAR relationship, not every possible relationship.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COVARIANCE.P from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COVARIANCE.P(A2:A4, B2:B4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Covariance_P(Range("A2:A4"), Range("B2:B4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    result = np.cov(ad_hours, sales, bias=True)[0, 1]  # population covariance
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COVARIANCE.S](/docs/statistical/covariance-s) — the sample
+  version of the same measure.
+- [CORREL](/docs/statistical/correl) — the scale-independent,
+  normalized version of covariance, always between -1 and 1.
+- [VAR.P](/docs/statistical/var-p) — a dataset's covariance with
+  itself, the population variance.

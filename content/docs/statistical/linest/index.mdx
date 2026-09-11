@@ -1,0 +1,200 @@
+---
+title: LINEST
+description: Return a linear regression's slope and intercept as an array in one formula, with optional extended regression statistics.
+---
+
+Return a linear regression line's slope and intercept together as a
+single array — the same numbers `SLOPE` and `INTERCEPT` calculate
+separately, in one formula, with the option to pull the full set of
+regression statistics alongside them.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns {slope, intercept} — slope first, intercept second', type: 'warn' },
+  { text: 'stats = TRUE adds standard errors, R², F-statistic, and more', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LINEST(known_ys, known_xs, [const], [stats])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LINEST(known_ys, known_xs, [const], [stats])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'known_ys',
+    type: 'range',
+    required: true,
+    description: 'The dependent values (the outcomes).',
+  },
+  {
+    name: 'known_xs',
+    type: 'range',
+    required: false,
+    description: 'The independent values. Defaults to {1, 2, 3, ...} if omitted.',
+  },
+  {
+    name: 'const',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE (default) to calculate the intercept normally; FALSE to force it to 0.',
+  },
+  {
+    name: 'stats',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE for the full regression statistics table; FALSE (default) for just slope and intercept.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `stats` `FALSE` (the default) and one independent variable: a
+2-cell array, `{slope, intercept}`. With `stats` `TRUE`: a 5-row
+array adding standard errors, R², the F-statistic, and more beneath
+those two values.
+
+## Description
+
+LINEST is the single-formula alternative to calling `SLOPE` and
+`INTERCEPT` separately — both values come back from one array
+formula, in the fixed order `{slope, intercept}`. Its real power
+shows up with multiple regression (several independent variables in
+`known_xs`), where SLOPE/INTERCEPT can't help at all — LINEST returns
+one slope coefficient per variable, still followed by a single
+intercept.
+
+<Callout type="warn">
+  LINEST's two values come back **slope first, intercept second** —
+  the opposite order from how the equation `y = mx + b` is usually
+  written out. Reading them in the wrong order is a common way to
+  silently swap a slope and an intercept in a downstream formula.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '10': '{10, 0}', '15': '{7.5, 6.67}', '5': '{12.5, -6.67}' }}
+  defaultValue="10"
+  label={'Live preview — =LINEST(sales, months) with month 1 at {value}'}
+  fieldLabel="month 1 sales"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Month', b1: 'Sales',
+      a2: '1', b2: '(varies)',
+      a3: '2', b3: '20',
+      a4: '3', b4: '30',
+    },
+    highlightMap: { '10': 'A2:B4', '15': 'A2:B4', '5': 'A2:B4' },
+  }}
+/>
+
+The result shows `{slope, intercept}` together. With month 1 at its
+original 10, LINEST spills `{10, 0}` — the same values `SLOPE` and
+`INTERCEPT` compute separately for this exact data. Raising month 1
+to 15 or lowering it to 5 changes *both* numbers at once, since
+they're two views of the same single regression line.
+
+## Common errors
+
+### Reading slope and intercept in the wrong order
+
+<ExcelCode>{`=INDEX(LINEST(B2:B4,A2:A4),1,1) → the SLOPE, not the intercept`}</ExcelCode>
+
+The first value in LINEST's array is always the slope; the second is
+the intercept. Pulling the wrong position with `INDEX` silently
+swaps them without any error.
+
+### #N/A — known_ys and known_xs are different sizes
+
+`known_ys` and `known_xs` (when supplied) must contain the same
+number of data points.
+
+### Expecting a single cell instead of a spilled array
+
+<ExcelCode>{`LINEST(B2:B4, A2:A4) → spills across 2 cells, not just 1`}</ExcelCode>
+
+LINEST always returns an array, even in its simplest form — make
+sure there's a clear cell to its right (or below, with `stats =
+TRUE`) for it to spill into.
+
+export const faqs = [
+  {
+    question: 'LINEST vs calling SLOPE and INTERCEPT separately — why use LINEST?',
+    answer:
+      "For simple one-variable regression, either approach works fine. LINEST becomes necessary for multiple regression (more than one independent variable), which SLOPE and INTERCEPT can't handle at all — LINEST returns one slope per variable plus a single intercept, all from one formula.",
+  },
+  {
+    question: 'What does stats = TRUE add?',
+    answer:
+      "A full 5-row regression statistics table: standard errors for each coefficient, R² and the standard error of y, the F-statistic and its degrees of freedom, and the regression and residual sums of squares — everything needed to assess how good the fit actually is, not just what the line's equation is.",
+  },
+  {
+    question: 'How is LINEST related to LOGEST?',
+    answer: 'LOGEST is the identical idea applied to an exponential curve fit instead of a linear one — same array-of-coefficients structure, same slope-then-intercept-equivalent ordering, just for GROWTH-style data instead of TREND-style data.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LINEST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LINEST(B2:B4, A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.LinEst(Range("B2:B4"), Range("A2:A4"))
+    Dim regSlope As Double, regIntercept As Double
+    regSlope = result(1, 1)
+    regIntercept = result(1, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    slope, intercept = np.polyfit([1, 2, 3], [10, 20, 30], 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SLOPE](/docs/statistical/slope) and
+  [INTERCEPT](/docs/statistical/intercept) — the same two values,
+  calculated separately instead of as one array.
+- [TREND](/docs/statistical/trend) — uses this same regression to
+  predict values directly, rather than returning the line's coefficients.
+- [LOGEST](/docs/statistical/logest) — the equivalent for an
+  exponential curve fit instead of a linear one.
