@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-11',
+    title: 'TREND, GROWTH, LINEST, LOGEST, RSQ, STEYX, COVARIANCE.P, COVARIANCE.S, and FORECAST.LINEAR',
+    description:
+      "Round 2 of the Statistical audit — the regression and forecasting family. TREND and GROWTH predict several values at once instead of one at a time; LINEST and LOGEST return a regression's own coefficients directly; RSQ and STEYX describe how good a fit actually is.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-10',
     title: 'NORM.DIST, NORM.INV, NORM.S.DIST, NORM.S.INV, STANDARDIZE, AVEDEV, DEVSQ, SKEW, SKEW.P, and KURT',
     description:
