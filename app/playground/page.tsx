@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, FlaskConical } from 'lucide-react';
+import { FlaskConical } from 'lucide-react';
 import { HomeNav } from '@/components/home/nav';
 import { Footer } from '@/components/home/footer';
+import { PlaygroundBrowser, type PlaygroundCategory } from '@/components/playground-browser';
 
 export const metadata: Metadata = {
   title: 'Playground',
@@ -13,22 +14,15 @@ export const metadata: Metadata = {
   },
 };
 
-interface PlaygroundItem {
-  fn: string;
-  href: string;
-  teaser: string;
-}
-
-interface PlaygroundCategory {
-  name: string;
-  items: PlaygroundItem[];
-}
-
 // Curated, not exhaustive — one representative pick per Try-it "shape"
 // per category (grid highlight, schedule swap, scenario picker, error
 // demo), rather than all 164 pages that currently have a widget. See
 // each linked page's own Try it section for the full picture; this
-// page's job is to hook interest, not catalog everything.
+// page's job is to hook interest, not catalog everything. The list only
+// ever grows (a new pick alongside almost every content batch), so it's
+// presented through PlaygroundBrowser's search + category filter rather
+// than a flat scroll — that's what keeps a bigger list from needing a
+// cap or a pruning pass as more categories and picks get added over time.
 const CATEGORIES: PlaygroundCategory[] = [
   {
     name: 'Lookup',
@@ -218,29 +212,8 @@ export default function PlaygroundPage() {
             right on the page, no Excel and no upload required.
           </p>
 
-          <div className="mt-14 flex flex-col gap-14">
-            {CATEGORIES.map((category) => (
-              <section key={category.name}>
-                <h2 className="text-xl font-medium">{category.name}</h2>
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {category.items.map((item) => (
-                    <Link
-                      key={item.fn}
-                      href={item.href}
-                      className="group flex flex-col gap-2 rounded-xl border border-fd-border bg-fd-card p-4 transition-colors hover:border-fd-primary/40"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-mono text-sm font-medium text-fd-primary">
-                          {item.fn}()
-                        </span>
-                        <ArrowRight className="size-4 shrink-0 text-fd-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-fd-primary" />
-                      </div>
-                      <p className="text-sm text-fd-muted-foreground">{item.teaser}</p>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            ))}
+          <div className="mt-14">
+            <PlaygroundBrowser categories={CATEGORIES} />
           </div>
 
           <p className="mt-16 text-sm text-fd-muted-foreground">
