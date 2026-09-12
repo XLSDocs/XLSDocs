@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-12',
+    title: 'QUARTILE.EXC, PERCENTRANK.EXC, CONFIDENCE.T, PERMUT, PERMUTATIONA, FREQUENCY, and all 7 "A" variants',
+    description:
+      "Round 3 of the Statistical audit. FREQUENCY spills a histogram's bin counts from one formula; AVERAGEA, MAXA, MINA, VARA, VARPA, STDEVA, and STDEVPA all count text as 0 and TRUE/FALSE as 1/0 instead of ignoring them like their plain counterparts do.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-11',
     title: 'TREND, GROWTH, LINEST, LOGEST, RSQ, STEYX, COVARIANCE.P, COVARIANCE.S, and FORECAST.LINEAR',
     description:
