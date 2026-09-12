@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 // Curated, not exhaustive — one representative pick per Try-it "shape"
 // per category (grid highlight, schedule swap, scenario picker, error
-// demo), rather than all 173 pages that currently have a widget. See
+// demo), rather than all 186 pages that currently have a widget. See
 // each linked page's own Try it section for the full picture; this
 // page's job is to hook interest, not catalog everything. The list only
 // ever grows (a new pick alongside almost every content batch), so it's
@@ -191,6 +191,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         fn: 'GROWTH',
         href: '/docs/statistical/growth#try-it',
         teaser: 'Ask for month 6 and watch GROWTH keep compounding the same 10% every period, not just adding a fixed amount.',
+      },
+      {
+        fn: 'MINA',
+        href: '/docs/statistical/mina#try-it',
+        teaser: '"Pass" sits in an all-positive list and watch MINA report 0 as the minimum — MIN would ignore it entirely.',
       },
     ],
   },
