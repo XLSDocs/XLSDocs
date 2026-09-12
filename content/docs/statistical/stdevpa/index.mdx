@@ -1,0 +1,170 @@
+---
+title: STDEVPA
+description: Calculate population standard deviation across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like STDEV.P does.
+---
+
+Calculate the population standard deviation across a list of values
+— but unlike `STDEV.P`, text counts as `0` and `TRUE`/`FALSE` count
+as `1`/`0` instead of being skipped entirely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Text counts as 0, TRUE counts as 1, FALSE counts as 0 — none are skipped', type: 'warn' },
+  { text: 'Equal to the square root of VARPA on the same data', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=STDEVPA(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STDEVPA(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The first value, cell, or range to include.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 254 additional values, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population standard deviation across everything included, where
+text counts as `0` and `TRUE`/`FALSE` count as `1`/`0` — unlike
+`STDEV.P`, which ignores text and logical values entirely.
+
+## Description
+
+STDEVPA is `VARPA`'s square root — it measures spread in the same
+units as the original data, treating the values as a **complete
+population** rather than a sample, while still applying the same
+text-as-`0`, logical-as-`1`/`0` treatment.
+
+<Callout type="idea">
+  STDEVPA always comes out **smaller than or equal to** `STDEVA` on
+  the same data, since it's built from VARPA (dividing by `n`) rather
+  than VARA (dividing by `n − 1`) — the same relationship `STDEV.P`
+  has to `STDEV.S`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '3.7417', '15': '5.5353', '-3': '4.6904' }}
+  defaultValue="7"
+  label={'Live preview — =STDEVPA("Pass", 8, 9, TRUE, {value})'}
+  fieldLabel="5th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: { a1: '"Pass"', a2: '8', a3: '9', a4: 'TRUE', a5: '(varies)' },
+    highlightMap: { '7': 'A1:A5', '15': 'A1:A5', '-3': 'A1:A5' },
+  }}
+/>
+
+With the 5th value at `7`, STDEVPA returns `3.7417` — smaller than
+`STDEVA`'s `4.1833` on the identical data, the square-root version of
+the same `n` vs. `n − 1` gap that separates `VARPA` from `VARA`.
+
+## Common errors
+
+### Confusing STDEVPA's result with STDEVA's
+
+<ExcelCode>{`STDEVPA("Pass",8,9,TRUE,7) → 3.7417, vs. STDEVA of the same range → 4.1833`}</ExcelCode>
+
+These aren't meant to match — the two functions are built from
+differently-divided variances, so they diverge on the same data.
+
+### Using STDEVPA when the data is actually a sample
+
+If the values represent a sample meant to estimate a larger
+population, `STDEVA` is the statistically appropriate choice instead.
+
+export const faqs = [
+  {
+    question: 'STDEVPA vs STDEVA — which should I use?',
+    answer:
+      "Use STDEVPA only when the data genuinely is the entire population, with nothing left out. Use STDEVA whenever the data is a sample meant to estimate a larger population, which is the more common real-world case.",
+  },
+  {
+    question: 'STDEVPA vs STDEV.P — which should I use?',
+    answer:
+      "Use STDEV.P for a normal numeric population — it correctly ignores stray text and logical values. Use STDEVPA only when TRUE/FALSE should genuinely count as 1/0, which is uncommon.",
+  },
+  {
+    question: 'Is STDEVPA just the square root of VARPA?',
+    answer: 'Yes, exactly — STDEVPA(values) always equals SQRT(VARPA(values)), the same relationship STDEV.P has to VAR.P.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STDEVPA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STDEVPA(A1:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.StDevPA(Range("A1:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    def to_a_value(v):
+        if isinstance(v, bool): return 1 if v else 0
+        if isinstance(v, (int, float)): return v
+        if v is None: return None
+        return 0
+
+    values = [v for v in (to_a_value(v) for v in ["Pass", 8, 9, True, 7]) if v is not None]
+    result = np.std(values, ddof=0)  # population standard deviation
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VARPA](/docs/statistical/varpa) — the squared version of this
+  same population spread.
+- [STDEVA](/docs/statistical/stdeva) — the sample version, dividing
+  by `n − 1` instead of `n`.
+- [STDEV.P](/docs/statistical/stdev-p) — the far more commonly used
+  version that ignores text and logical values entirely.

@@ -1,0 +1,173 @@
+---
+title: STDEVA
+description: Estimate sample standard deviation across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like STDEV.S does.
+---
+
+Estimate the sample standard deviation across a list of values — but
+unlike `STDEV.S`, text counts as `0` and `TRUE`/`FALSE` count as
+`1`/`0` instead of being skipped entirely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Text counts as 0, TRUE counts as 1, FALSE counts as 0 — none are skipped', type: 'warn' },
+  { text: 'Equal to the square root of VARA on the same data', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=STDEVA(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STDEVA(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The first value, cell, or range to include.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 254 additional values, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample standard deviation across everything included, where text
+counts as `0` and `TRUE`/`FALSE` count as `1`/`0` — unlike `STDEV.S`,
+which ignores text and logical values entirely.
+
+## Description
+
+STDEVA is `VARA`'s square root — it measures spread in the same
+units as the original data, rather than squared units, while still
+applying the same text-as-`0`, logical-as-`1`/`0` treatment. Mixing
+genuine numbers with text or logical values usually inflates STDEVA
+compared to STDEV.S on the identical range, for the same reason it
+inflates VARA.
+
+<Callout type="warn">
+  Like VARA, a text entry mixed into an otherwise tightly-clustered
+  positive numeric range can noticeably inflate STDEVA compared to
+  `STDEV.S` — check whether that inflation reflects real spread in
+  the data or just an unintended stray text value.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '4.1833', '15': '6.1887', '-3': '5.2440' }}
+  defaultValue="7"
+  label={'Live preview — =STDEVA("Pass", 8, 9, TRUE, {value})'}
+  fieldLabel="5th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: { a1: '"Pass"', a2: '8', a3: '9', a4: 'TRUE', a5: '(varies)' },
+    highlightMap: { '7': 'A1:A5', '15': 'A1:A5', '-3': 'A1:A5' },
+  }}
+/>
+
+With the 5th value at `7`, STDEVA returns `4.1833` — the square root
+of `VARA`'s `17.5` on the identical data. Pushing the 5th value
+farther from the rest of the set (to `15` or `-3`) grows the spread,
+and STDEVA along with it.
+
+## Common errors
+
+### #DIV/0! — fewer than 2 non-blank values
+
+STDEVA's formula (like VARA's) divides by `n − 1`, which is zero
+with only 1 non-blank value.
+
+### The result is much larger than STDEV.S on the same range
+
+Check for a text entry — it counts as `0` in STDEVA, which can
+noticeably raise the calculated spread if the rest of the range's
+real numbers are clustered elsewhere. `STDEV.S` would exclude that
+same text entry entirely.
+
+export const faqs = [
+  {
+    question: 'STDEVA vs STDEV.S — which should I use?',
+    answer:
+      "Use STDEV.S for a normal numeric sample — it correctly ignores stray text and logical values. Use STDEVA only when TRUE/FALSE should genuinely count as 1/0, which is uncommon.",
+  },
+  {
+    question: 'STDEVA vs STDEVPA — which should I use?',
+    answer:
+      'STDEVA treats the data as a sample (built from VARA, dividing by n − 1). STDEVPA treats it as the entire population (built from VARPA, dividing by n). The choice follows the same sample-vs-population logic as STDEV.S vs STDEV.P.',
+  },
+  {
+    question: 'Is STDEVA just the square root of VARA?',
+    answer: 'Yes, exactly — STDEVA(values) always equals SQRT(VARA(values)). STDEVA just saves writing the nested SQRT and reads more clearly as a single named calculation.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STDEVA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STDEVA(A1:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.StDevA(Range("A1:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    def to_a_value(v):
+        if isinstance(v, bool): return 1 if v else 0
+        if isinstance(v, (int, float)): return v
+        if v is None: return None
+        return 0
+
+    values = [v for v in (to_a_value(v) for v in ["Pass", 8, 9, True, 7]) if v is not None]
+    result = np.std(values, ddof=1)  # sample standard deviation
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VARA](/docs/statistical/vara) — the squared version of this same
+  sample spread.
+- [STDEVPA](/docs/statistical/stdevpa) — the population version,
+  dividing by `n` instead of `n − 1`.
+- [STDEV.S](/docs/statistical/stdev-s) — the far more commonly used
+  version that ignores text and logical values entirely.

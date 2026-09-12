@@ -1,0 +1,170 @@
+---
+title: QUARTILE.EXC
+description: Find a quartile using the exclusive method, which never returns the dataset's own minimum or maximum.
+---
+
+Find the 25th, 50th, or 75th percentile of a dataset using the
+**exclusive** method — stricter than `QUARTILE.INC`, and unable to
+return the dataset's own minimum or maximum at all.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'quart only accepts 1, 2, or 3 — not 0 or 4', type: 'warn' },
+  { text: 'Never returns the dataset\'s actual minimum or maximum value', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=QUARTILE.EXC(array, quart)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=QUARTILE.EXC(array, quart)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array of numbers to find a quartile within.',
+  },
+  {
+    name: 'quart',
+    type: 'number',
+    required: true,
+    description: 'Which quartile to return: 1 (25th percentile), 2 (median), or 3 (75th percentile).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value at the requested quartile of `array`, using the exclusive
+method — always strictly between the dataset's minimum and maximum.
+
+## Description
+
+QUARTILE.EXC treats `array` as a sample drawn from a larger
+population, and deliberately excludes the endpoints from its
+calculation — unlike `QUARTILE.INC`, it has no `quart = 0` or `quart
+= 4` option at all, since those would require extrapolating exactly
+to the sample's own min/max rather than estimating a population
+quartile.
+
+<Callout type="warn">
+  QUARTILE.EXC only accepts `quart` values of `1`, `2`, or `3` — there
+  is no exclusive-method equivalent of "quartile 0" or "quartile 4".
+  Passing `0` or `4` (both valid for `QUARTILE.INC`) returns `#NUM!`
+  here.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '12.5', '2': '25', '3': '37.5' }}
+  defaultValue="1"
+  label={'Live preview — =QUARTILE.EXC(scores, {quart})'}
+  fieldLabel="quart"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: {
+      a1: 'Score',
+      a2: '10', a3: '20', a4: '30', a5: '40',
+    },
+    highlightMap: { '1': 'A2:A5', '2': 'A2:A5', '3': 'A2:A5' },
+  }}
+/>
+
+The same four scores `QUARTILE.INC`'s example uses. QUARTILE.EXC's
+first quartile comes out to 12.5, noticeably different from
+QUARTILE.INC's 17.5 on the identical data — the exclusive method's
+different interpolation rule.
+
+## Common errors
+
+### #NUM! — quart is 0 or 4
+
+<ExcelCode>{`QUARTILE.EXC({10,20,30,40}, 0) → #NUM!`}</ExcelCode>
+
+QUARTILE.EXC only accepts `1`, `2`, or `3`. Use `QUARTILE.INC` if the
+dataset's actual minimum or maximum is what's needed.
+
+### #NUM! — array is too small for the requested quartile
+
+A very small `array` can push the exclusive method's calculation
+outside the valid range even for `quart` values of 1-3 — the
+exclusive method needs slightly more data to work with than the
+inclusive method does.
+
+export const faqs = [
+  {
+    question: 'QUARTILE.EXC vs QUARTILE.INC — which should I use?',
+    answer:
+      "QUARTILE.INC (the more commonly used of the two) always returns the dataset's actual minimum and maximum at quart=0 and quart=4. QUARTILE.EXC never does — it treats the data as a sample and estimates population quartiles that fall strictly inside the observed range.",
+  },
+  {
+    question: 'Why doesn\'t QUARTILE.EXC have a quart=0 or quart=4 option?',
+    answer: "Because the exclusive method is built around estimating a POPULATION quartile from a sample, and the population's true minimum/maximum generally isn't the same as the sample's own smallest and largest observed values — so there's no meaningful 'quartile 0' or 'quartile 4' to return.",
+  },
+  {
+    question: 'How different are QUARTILE.EXC and QUARTILE.INC results in practice?',
+    answer: 'They converge as the dataset grows larger, but can differ noticeably on small datasets — always check which one a formula or dataset was built around rather than assuming they\'re interchangeable.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with QUARTILE.EXC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=QUARTILE.EXC(A2:A5, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim q1 As Double
+    q1 = Application.WorksheetFunction.Quartile_Exc(Range("A2:A5"), 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    q1 = np.percentile([10, 20, 30, 40], 25, method='weibull')
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [QUARTILE.INC](/docs/statistical/quartile-inc) — the more commonly
+  used inclusive method, which does return the dataset's own
+  minimum and maximum.
+- [PERCENTRANK.EXC](/docs/statistical/percentrank-exc) — the
+  matching exclusive-method rank function.
+- [PERCENTILE.EXC](/docs/statistical/percentile-exc) — the general
+  form QUARTILE.EXC is a fixed-step shortcut for.

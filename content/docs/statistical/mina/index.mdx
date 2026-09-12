@@ -1,0 +1,177 @@
+---
+title: MINA
+description: Find the smallest value in a list, counting text as 0 and FALSE as 0 instead of ignoring them like MIN does.
+---
+
+Find the smallest value in a list — but unlike plain `MIN`, text
+counts as `0` and `FALSE` counts as `0` instead of being skipped
+entirely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Text counts as 0, TRUE counts as 1, FALSE counts as 0 — none are skipped', type: 'warn' },
+  { text: 'A stray text entry can become the minimum if every real number is positive', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=MINA(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MINA(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The first value, cell, or range to include.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 254 additional values, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The smallest value across everything included, where text counts as
+`0` and `TRUE`/`FALSE` count as `1`/`0` — unlike `MIN`, which ignores
+text and logical values entirely.
+
+## Description
+
+Because text and `FALSE` both count as `0` in MINA, a stray text
+entry or logical value in an otherwise all-positive range often
+becomes the new minimum — something MIN would never report, since it
+skips both entirely. This is the opposite risk from MAXA: rather than
+rarely mattering, MINA's text-as-`0` rule frequently changes the
+result whenever every genuine number in the range happens to be
+positive.
+
+<Callout type="warn">
+  A single stray text entry (a label, a typo, a placeholder like
+  `"N/A"`) in an all-positive numeric range silently becomes MINA's
+  result — `0` — which can look like a plausible-but-wrong answer
+  rather than an obvious error.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '0', '15': '0', '-3': '-3' }}
+  defaultValue="7"
+  label={'Live preview — =MINA("Pass", 8, 9, TRUE, {value})'}
+  fieldLabel="5th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: { a1: '"Pass"', a2: '8', a3: '9', a4: 'TRUE', a5: '(varies)' },
+    highlightMap: { '7': 'A1:A5', '15': 'A1:A5', '-3': 'A1:A5' },
+  }}
+/>
+
+With the 5th value at `7` or `15`, MINA still returns `0` — from
+`"Pass"`, not from any genuine number, since every real value here is
+positive. Only when the 5th value actually drops below `0` (to `-3`)
+does a real number become the new minimum.
+
+## Common errors
+
+### The minimum is unexpectedly 0
+
+Check the range for a stray text entry — it counts as `0` in MINA,
+which becomes the reported minimum whenever every actual number in
+the range is positive. If text should be excluded entirely instead,
+`MIN` is the correct function.
+
+### Expecting MINA and MIN to always match
+
+<ExcelCode>{`MINA(5, 10, "N/A") → 0, vs. MIN(5, 10, "N/A") → 5`}</ExcelCode>
+
+These diverge as soon as any text or `FALSE` value is present in an
+all-positive range — check which function was actually intended
+before trusting a suspiciously round `0`.
+
+export const faqs = [
+  {
+    question: 'MINA vs MIN — which should I use?',
+    answer:
+      "Use MIN for a normal numeric range — it correctly ignores stray text and logical values. Use MINA only when FALSE should genuinely compete as the minimum, which is uncommon; otherwise MINA's text-as-0 behavior is more often a source of silent errors than useful data.",
+  },
+  {
+    question: 'Why does a stray text entry break MINA so often?',
+    answer: "Because text always counts as 0, and 0 is smaller than most real, positive data. MIN would correctly skip that same text entry, which is why MIN is usually the safer default for genuinely numeric data.",
+  },
+  {
+    question: 'Does MINA count blank cells?',
+    answer: 'No — blank cells are still ignored entirely, the same as in MIN. Only non-blank text and logical values get the special 0/1 treatment.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MINA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MINA(A1:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.MinA(Range("A1:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def to_mina_value(v):
+        if isinstance(v, bool):
+            return 1 if v else 0
+        if isinstance(v, (int, float)):
+            return v
+        if v is None:
+            return None
+        return 0
+
+    values = [v for v in (to_mina_value(v) for v in ["Pass", 8, 9, True, -3]) if v is not None]
+    result = min(values)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MIN](/docs/math/min) — the far more commonly used version that
+  ignores text and logical values entirely.
+- [MAXA](/docs/statistical/maxa) — the same text/logical-inclusive
+  treatment, for the largest value instead.
+- [AVERAGEA](/docs/statistical/averagea) — the same treatment
+  applied to an average instead of a minimum.

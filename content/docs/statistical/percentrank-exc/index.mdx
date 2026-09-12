@@ -1,0 +1,180 @@
+---
+title: PERCENTRANK.EXC
+description: Find a value's rank as a percentage using the exclusive method, which never returns exactly 0 or 1.
+---
+
+Find where a value ranks within a dataset, expressed as a percentage
+— the **exclusive** method, which never returns exactly `0` or `1`
+even for the dataset's own minimum or maximum.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Never returns exactly 0 or 1, even for the min/max value', type: 'warn' },
+  { text: 'Uses n + 1 in its formula, instead of INC\'s n - 1', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PERCENTRANK.EXC(array, x, [significance])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PERCENTRANK.EXC(array, x, [significance])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array of numbers to rank x against.',
+  },
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to find the percentage rank of within array.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: false,
+    description: 'The number of significant digits in the returned percentage. Defaults to 3 if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The rank of `x` within `array`, as a fraction strictly between `0`
+and `1` — using the exclusive method.
+
+## Description
+
+PERCENTRANK.EXC shares `PERCENTRANK.INC`'s basic idea, but treats
+`array` as a sample of a larger population rather than the complete
+set — dividing by `n + 1` instead of `n − 1`. The practical
+consequence: even the dataset's own smallest value gets a rank
+slightly above `0`, and the largest gets a rank slightly below `1`,
+since the exclusive method assumes there's always more extreme data
+somewhere outside the observed sample.
+
+<Callout type="warn">
+  PERCENTRANK.EXC can't evaluate `x` at exactly the dataset's minimum
+  or maximum the same way `PERCENTRANK.INC` can — it still returns a
+  value for them (close to, but never exactly, `0` or `1`), but `x`
+  values *outside* the observed min/max still return `#N/A`, same as
+  the inclusive version.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '10': '0.2', '30': '0.4', '50': '0.6', '70': '0.8' }}
+  defaultValue="50"
+  label={'Live preview — =PERCENTRANK.EXC(scores, {value})'}
+  fieldLabel="x (score to rank)"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: {
+      a1: 'Score',
+      a2: '10', a3: '30', a4: '50', a5: '70',
+    },
+    highlightMap: { '10': 'A2:A5', '30': 'A2:A5', '50': 'A2:A5', '70': 'A2:A5' },
+  }}
+/>
+
+The same four evenly-spaced scores `PERCENTRANK.INC`'s example uses.
+Even the dataset's own minimum (10) returns `0.2`, not `0` — and the
+maximum (70) returns `0.8`, not `1` — the defining trait of the
+exclusive method.
+
+## Common errors
+
+### #N/A — x falls outside the range of array
+
+<ExcelCode>{`PERCENTRANK.EXC({10,30,50,70}, 100) → #N/A`}</ExcelCode>
+
+Same restriction as `PERCENTRANK.INC` — `x` must fall within the
+observed minimum and maximum of `array`.
+
+### Expecting the minimum or maximum to return exactly 0 or 1
+
+<ExcelCode>{`PERCENTRANK.EXC({10,30,50,70}, 10) → 0.2, not 0`}</ExcelCode>
+
+This is expected exclusive-method behavior, not an error — use
+`PERCENTRANK.INC` if the dataset's own min/max should map to exactly
+`0`/`1`.
+
+export const faqs = [
+  {
+    question: 'PERCENTRANK.EXC vs PERCENTRANK.INC — which should I use?',
+    answer:
+      "PERCENTRANK.INC (the more commonly used of the two) maps the dataset's own minimum and maximum to exactly 0 and 1. PERCENTRANK.EXC treats the data as a sample and never quite reaches 0 or 1, since it assumes the true population extends a bit further in both directions.",
+  },
+  {
+    question: 'Why does the minimum value get a rank above 0?',
+    answer: "Because the exclusive method divides by n + 1 instead of n − 1, deliberately leaving room on both ends for values beyond what was actually observed in the sample — the same reasoning QUARTILE.EXC uses to avoid ever returning the sample's exact minimum or maximum.",
+  },
+  {
+    question: 'Do PERCENTRANK.EXC and PERCENTRANK.INC converge for large datasets?',
+    answer: 'Yes — the gap between them shrinks as the sample size grows, since n+1 and n-1 become nearly indistinguishable for a large n. The difference matters most for small datasets, like the 4-value example here.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PERCENTRANK.EXC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PERCENTRANK.EXC(A2:A5, 50)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pctRank As Double
+    pctRank = Application.WorksheetFunction.Percentrank_Exc(Range("A2:A5"), 50)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    scores = sorted([10, 30, 50, 70])
+    n = len(scores)
+    rank = scores.index(50) + 1
+    pct_rank = rank / (n + 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PERCENTRANK.INC](/docs/statistical/percentrank-inc) — the more
+  commonly used inclusive method, which does map the min/max to
+  exactly 0 and 1.
+- [QUARTILE.EXC](/docs/statistical/quartile-exc) — the matching
+  exclusive-method quartile function.
+- [RANK.EQ](/docs/statistical/rank-eq) — ranks a value as a whole
+  position number instead of a percentage.

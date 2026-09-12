@@ -1,0 +1,173 @@
+---
+title: VARPA
+description: Calculate population variance across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like VAR.P does.
+---
+
+Calculate the population variance across a list of values — but
+unlike `VAR.P`, text counts as `0` and `TRUE`/`FALSE` count as
+`1`/`0` instead of being skipped entirely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Text counts as 0, TRUE counts as 1, FALSE counts as 0 — none are skipped', type: 'warn' },
+  { text: 'Treats the data as the entire population, dividing by n', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VARPA(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VARPA(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The first value, cell, or range to include.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 254 additional values, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population variance across everything included, where text
+counts as `0` and `TRUE`/`FALSE` count as `1`/`0` — unlike `VAR.P`,
+which ignores text and logical values entirely.
+
+## Description
+
+VARPA shares `VAR.P`'s population-variance formula (dividing by the
+full count `n`), but folds text and logical values into the
+calculation as `0`/`1`/`0` instead of excluding them. It's the
+population counterpart to `VARA`, appropriate only when the values
+being measured genuinely are the entire population, with nothing
+left out.
+
+<Callout type="idea">
+  VARPA always comes out **smaller** than `VARA` on the same data,
+  since dividing by `n` instead of `n − 1` produces a smaller result
+  — the same relationship `VAR.P` has to `VAR.S`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '14', '15': '30.64', '-3': '22' }}
+  defaultValue="7"
+  label={'Live preview — =VARPA("Pass", 8, 9, TRUE, {value})'}
+  fieldLabel="5th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: { a1: '"Pass"', a2: '8', a3: '9', a4: 'TRUE', a5: '(varies)' },
+    highlightMap: { '7': 'A1:A5', '15': 'A1:A5', '-3': 'A1:A5' },
+  }}
+/>
+
+With the 5th value at `7`, VARPA returns `14` — smaller than `VARA`'s
+`17.5` on the identical data, exactly the gap the `n` vs. `n − 1`
+divisor creates.
+
+## Common errors
+
+### Confusing VARPA's result with VARA's
+
+<ExcelCode>{`VARPA("Pass",8,9,TRUE,7) → 14, vs. VARA of the same range → 17.5`}</ExcelCode>
+
+These aren't meant to match — the two functions divide by different
+denominators, so they diverge on the same data (more noticeably with
+smaller datasets).
+
+### Using VARPA when the data is actually a sample
+
+If the values represent a sample meant to estimate a larger
+population, `VARA` (dividing by `n − 1`) is the statistically
+appropriate choice instead.
+
+export const faqs = [
+  {
+    question: 'VARPA vs VARA — which should I use?',
+    answer:
+      "Use VARPA only when the data genuinely is the entire population being measured, with nothing left out. Use VARA whenever the data is a sample meant to estimate a larger population, which is the more common real-world case.",
+  },
+  {
+    question: 'VARPA vs VAR.P — which should I use?',
+    answer:
+      "Use VAR.P for a normal numeric population — it correctly ignores stray text and logical values. Use VARPA only when TRUE/FALSE should genuinely count as 1/0 in the calculation, which is uncommon.",
+  },
+  {
+    question: 'How is VARPA related to STDEVPA?',
+    answer: 'STDEVPA is simply the square root of VARPA — the same relationship STDEV.P has to VAR.P, just with the text/logical-inclusive treatment applied to both.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VARPA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VARPA(A1:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.VarPA(Range("A1:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    def to_a_value(v):
+        if isinstance(v, bool): return 1 if v else 0
+        if isinstance(v, (int, float)): return v
+        if v is None: return None
+        return 0
+
+    values = [v for v in (to_a_value(v) for v in ["Pass", 8, 9, True, 7]) if v is not None]
+    result = np.var(values, ddof=0)  # population variance
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VARA](/docs/statistical/vara) — the sample version of the same
+  text/logical-inclusive treatment.
+- [VAR.P](/docs/statistical/var-p) — the far more commonly used
+  version that ignores text and logical values entirely.
+- [STDEVPA](/docs/statistical/stdevpa) — the square root of this
+  same population variance, back in the original units.

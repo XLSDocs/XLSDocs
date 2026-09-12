@@ -1,0 +1,160 @@
+---
+title: PERMUT
+description: Count how many ways a fixed number of items can be arranged in order from a larger group — COMBIN's order-sensitive counterpart.
+---
+
+Count how many different **ordered** arrangements are possible when
+choosing a fixed number of items from a larger group — `COMBIN`'s
+counterpart when the order of selection actually matters.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Order matters — {A,B} and {B,A} count as two separate permutations', type: 'warn' },
+  { text: 'Always ≥ COMBIN on the same inputs', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PERMUT(number, number_chosen)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PERMUT(number, number_chosen)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The total size of the group to choose from.',
+  },
+  {
+    name: 'number_chosen',
+    type: 'number',
+    required: true,
+    description: 'How many items to choose and arrange in order, from 0 up to number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of ways to choose and arrange `number_chosen` items from a
+group of `number`, where order matters — mathematically, `number! /
+(number − number_chosen)!`.
+
+## Description
+
+PERMUT answers "how many different ways can 1st, 2nd, and 3rd place
+be awarded from a field of 5 runners?" style questions — situations
+where both *which* items are chosen and the *order* they come in
+matter. If order doesn't matter (just "which 3 runners," not their
+finishing order), `COMBIN` is the function built for that instead.
+
+<Callout type="warn">
+  PERMUT counts **permutations**, not **combinations** — choosing 2
+  items from a group of 3 has 3 combinations (`COMBIN(3,2)`) but 6
+  permutations (`PERMUT(3,2)`), since {'{A, B}'} and {'{B, A}'} count
+  as two separate outcomes here.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2': '20', '3': '60', '5': '120' }}
+  defaultValue="3"
+  label={'Live preview — =PERMUT(5, {value})'}
+  fieldLabel="number_chosen"
+/>
+
+Arranging all 5 items in order has 120 possible sequences —
+`PERMUT(5, 5)` equals `FACT(5)`, since every item has to be placed
+somewhere and none are left out.
+
+## Common errors
+
+### #NUM! — number_chosen is negative or greater than number
+
+<ExcelCode>{`PERMUT(5, 7) → #NUM!`}</ExcelCode>
+
+`number_chosen` can't exceed `number` — there's no way to arrange 7
+items when only 5 exist.
+
+### Confusing PERMUT with COMBIN
+
+<ExcelCode>{`PERMUT(3, 2) → 6, not 3`}</ExcelCode>
+
+If the order of selection doesn't actually matter (just "which
+items," not their sequence), `COMBIN` is the correct function —
+`COMBIN(3,2)` returns `3`.
+
+export const faqs = [
+  {
+    question: 'PERMUT vs COMBIN — which should I use?',
+    answer:
+      "Use PERMUT when the order of selection matters (1st/2nd/3rd place, a ranked sequence, a PIN code). Use COMBIN when it doesn't (choosing a committee, a hand of cards, a group where membership alone matters).",
+  },
+  {
+    question: 'What does PERMUT return when number_chosen equals number?',
+    answer: "The factorial of number — PERMUT(n, n) always equals FACT(n), since arranging every single item in the group in order is exactly what a factorial counts.",
+  },
+  {
+    question: 'What does PERMUT return when number_chosen is 0?',
+    answer: '1 — there\'s exactly one way to arrange nothing at all (the empty arrangement), regardless of how large number is, the same reasoning behind COMBIN(n, 0) also returning 1.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PERMUT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PERMUT(10, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim arrangements As Double
+    arrangements = Application.WorksheetFunction.Permut(10, 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import perm
+
+    arrangements = perm(10, 3)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COMBIN](/docs/math/combin) — the order-independent counterpart,
+  counting groups instead of arrangements.
+- [PERMUTATIONA](/docs/statistical/permutationa) — the same idea, but
+  allowing an item to be chosen more than once.
+- [FACT](/docs/math/fact) — computes the factorials PERMUT's formula
+  is built from directly.

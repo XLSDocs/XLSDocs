@@ -1,0 +1,175 @@
+---
+title: VARA
+description: Estimate sample variance across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like VAR.S does.
+---
+
+Estimate the sample variance across a list of values — but unlike
+`VAR.S`, text counts as `0` and `TRUE`/`FALSE` count as `1`/`0`
+instead of being skipped entirely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Text counts as 0, TRUE counts as 1, FALSE counts as 0 — none are skipped', type: 'warn' },
+  { text: 'Treats the data as a sample, dividing by n - 1', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=VARA(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VARA(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The first value, cell, or range to include.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 254 additional values, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sample variance across everything included, where text counts as
+`0` and `TRUE`/`FALSE` count as `1`/`0` — unlike `VAR.S`, which
+ignores text and logical values entirely.
+
+## Description
+
+VARA shares `VAR.S`'s sample-variance formula (dividing by `n − 1`),
+but folds text and logical values into the calculation as `0`/`1`/`0`
+instead of excluding them — both from the average it measures spread
+around, and from the count of values contributing to that spread.
+Mixing genuine numbers with text or logicals usually inflates VARA's
+result compared to VAR.S on the identical range, since those
+substituted values often sit far from the real data's own spread.
+
+<Callout type="warn">
+  Adding a text entry to an otherwise tightly-clustered positive
+  numeric range can dramatically inflate VARA compared to VAR.S,
+  since the text's substituted `0` often sits far outside where the
+  real values cluster — check whether that inflation is actually
+  intended before trusting a surprisingly large VARA result.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '17.5', '15': '38.3', '-3': '27.5' }}
+  defaultValue="7"
+  label={'Live preview — =VARA("Pass", 8, 9, TRUE, {value})'}
+  fieldLabel="5th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: { a1: '"Pass"', a2: '8', a3: '9', a4: 'TRUE', a5: '(varies)' },
+    highlightMap: { '7': 'A1:A5', '15': 'A1:A5', '-3': 'A1:A5' },
+  }}
+/>
+
+With the 5th value at `7`, VARA returns `17.5`. Pushing it to `15` (a
+value farther from the rest of the set) grows VARA to `38.3` — more
+spread among the treated values, more variance.
+
+## Common errors
+
+### #DIV/0! — fewer than 2 non-blank values
+
+VARA's formula divides by `n − 1`, which is zero with only 1
+non-blank value (blank cells don't count toward `n`, but text and
+logical values do).
+
+### The result is much larger than VAR.S on the same range
+
+Check for a text entry — VARA folds it in as `0`, which can pull the
+calculated spread up substantially if the rest of the range's real
+numbers are clustered elsewhere. `VAR.S` would exclude that same text
+entry entirely.
+
+export const faqs = [
+  {
+    question: 'VARA vs VAR.S — which should I use?',
+    answer:
+      "Use VAR.S for a normal numeric sample — it correctly ignores stray text and logical values. Use VARA only when TRUE/FALSE should genuinely count as 1/0 in the variance calculation, which is uncommon.",
+  },
+  {
+    question: 'VARA vs VARPA — which should I use?',
+    answer:
+      'VARA treats the data as a sample (dividing by n − 1). VARPA treats it as the entire population (dividing by n). The choice between them follows the same sample-vs-population logic as VAR.S vs VAR.P — VARA/VARPA just add the text/logical-inclusive treatment on top.',
+  },
+  {
+    question: 'Does VARA count blank cells?',
+    answer: 'No — blank cells are still excluded from both the calculation and the count, the same as in VAR.S. Only non-blank text and logical values get the special 0/1 treatment.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VARA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VARA(A1:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.VarA(Range("A1:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    def to_a_value(v):
+        if isinstance(v, bool): return 1 if v else 0
+        if isinstance(v, (int, float)): return v
+        if v is None: return None
+        return 0
+
+    values = [v for v in (to_a_value(v) for v in ["Pass", 8, 9, True, 7]) if v is not None]
+    result = np.var(values, ddof=1)  # sample variance
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VAR.S](/docs/statistical/var-s) — the far more commonly used
+  version that ignores text and logical values entirely.
+- [VARPA](/docs/statistical/varpa) — the population version of the
+  same text/logical-inclusive treatment.
+- [STDEVA](/docs/statistical/stdeva) — the square root of this same
+  sample variance, back in the original units.

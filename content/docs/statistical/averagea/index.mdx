@@ -1,0 +1,179 @@
+---
+title: AVERAGEA
+description: Average a list of values, counting text as 0 and TRUE/FALSE as 1/0 instead of ignoring them like AVERAGE does.
+---
+
+Average a list of values — but unlike plain `AVERAGE`, text counts as
+`0` and logical values count as `1` (`TRUE`) or `0` (`FALSE`) instead
+of being skipped entirely.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Text counts as 0, TRUE counts as 1, FALSE counts as 0 — none are skipped', type: 'warn' },
+  { text: 'Blank cells are still ignored, unlike text/logical values', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=AVERAGEA(value1, [value2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AVERAGEA(value1, [value2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value1',
+    type: 'any',
+    required: true,
+    description: 'The first value, cell, or range to include.',
+  },
+  {
+    name: 'value2, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 254 additional values, cells, or ranges to include.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The average across every included value, where text counts as `0`
+and `TRUE`/`FALSE` count as `1`/`0` — unlike `AVERAGE`, which skips
+text and logical values entirely rather than counting them as
+anything.
+
+## Description
+
+Plain `AVERAGE` ignores any cell that isn't a genuine number — a
+text entry or a `TRUE`/`FALSE` doesn't affect the average at all,
+and doesn't count toward the denominator either. AVERAGEA treats
+every non-blank cell as participating: text becomes `0`, `TRUE`
+becomes `1`, `FALSE` becomes `0`, and all of them count toward the
+average's denominator, which usually pulls the result down compared
+to AVERAGE on the identical range.
+
+<Callout type="warn">
+  AVERAGEA counting text as `0` means a stray label, comment, or
+  typo'd entry in a numeric column can silently drag the average
+  down — often the opposite of what's actually wanted. AVERAGE is
+  usually the safer default unless logical values specifically need
+  to count as 1/0.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '5', '15': '6.6', '-3': '3' }}
+  defaultValue="7"
+  label={'Live preview — =AVERAGEA("Pass", 8, 9, TRUE, {value})'}
+  fieldLabel="5th value"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: { a1: '"Pass"', a2: '8', a3: '9', a4: 'TRUE', a5: '(varies)' },
+    highlightMap: { '7': 'A1:A5', '15': 'A1:A5', '-3': 'A1:A5' },
+  }}
+/>
+
+`"Pass"` counts as `0` and `TRUE` counts as `1`. With the 5th value
+at `7`, AVERAGEA returns `(0 + 8 + 9 + 1 + 7) / 5 = 5`. Plain
+`AVERAGE` on the same range would ignore both non-numeric entries
+entirely and return `(8 + 9 + 7) / 3 ≈ 8` — a very different result.
+
+## Common errors
+
+### The average is much lower than expected
+
+Check the range for stray text entries — every one of them counts as
+`0` in AVERAGEA, silently pulling the average down. If those cells
+should be excluded entirely instead, `AVERAGE` is the correct
+function.
+
+### Confusing AVERAGEA's result with AVERAGE's
+
+<ExcelCode>{`AVERAGEA({"Pass",8,9,TRUE,7}) → 5, vs. AVERAGE of the same range (ignoring "Pass" and TRUE) → 8`}</ExcelCode>
+
+These treat non-numeric values completely differently and aren't
+interchangeable on a range that contains any.
+
+export const faqs = [
+  {
+    question: 'AVERAGEA vs AVERAGE — which should I use?',
+    answer:
+      "Use AVERAGE for a normal numeric range — it correctly ignores stray text and logical values. Use AVERAGEA only when TRUE/FALSE values are meant to genuinely count as 1/0 in the average, which is a specific, less common need.",
+  },
+  {
+    question: 'Does AVERAGEA count blank cells?',
+    answer: "No — blank cells are still ignored entirely, the same as in AVERAGE. Only non-blank text and logical values get the special 0/1 treatment.",
+  },
+  {
+    question: 'What happens if a cell contains a number stored as text, like \"8\"?',
+    answer: 'It\'s still treated as text and counted as 0, not as the number 8 — AVERAGEA doesn\'t attempt to convert text that merely looks numeric.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AVERAGEA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AVERAGEA(A1:A5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.AverageA(Range("A1:A5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def to_averagea_value(v):
+        if isinstance(v, bool):
+            return 1 if v else 0
+        if isinstance(v, (int, float)):
+            return v
+        if v is None:
+            return None  # blank, excluded
+        return 0  # text
+
+    values = [to_averagea_value(v) for v in ["Pass", 8, 9, True, 7]]
+    result = sum(v for v in values if v is not None) / len([v for v in values if v is not None])
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AVERAGE](/docs/math/average) — the far more commonly used version
+  that ignores text and logical values entirely.
+- [MAXA](/docs/statistical/maxa) and [MINA](/docs/statistical/mina)
+  — the same text/logical-inclusive treatment, for largest and
+  smallest values instead of an average.
+- [STDEVA](/docs/statistical/stdeva) — the same treatment applied to
+  sample standard deviation.

@@ -1,0 +1,185 @@
+---
+title: FREQUENCY
+description: Count how many values fall into each of several bins — the formula behind a histogram, spilling every bin's count at once.
+---
+
+Count how many values from a dataset fall into each of several
+ranges ("bins") — the calculation behind a histogram, returning every
+bin's count at once as a spilled array.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns one more count than there are bin boundaries — an "everything above" bin', type: 'warn' },
+  { text: 'Each value is counted in exactly one bin — no double-counting', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FREQUENCY(data_array, bins_array)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FREQUENCY(data_array, bins_array)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'data_array',
+    type: 'range',
+    required: true,
+    description: 'The values to count and sort into bins.',
+  },
+  {
+    name: 'bins_array',
+    type: 'range',
+    required: true,
+    description: 'The upper boundary of each bin, in ascending order.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+An array of counts, one longer than `bins_array` — each element is
+the number of `data_array` values falling into that bin, with the
+final element counting everything above the last boundary.
+
+## Description
+
+Given bin boundaries like `{59, 69, 79, 89}`, FREQUENCY produces 5
+counts: values `≤ 59`, values `60–69`, values `70–79`, values
+`80–89`, and values `> 89` — always one more bin than there are
+boundaries, since the boundaries only define where each bin *ends*,
+leaving an open-ended final bin for everything above the last one.
+
+<Callout type="warn">
+  FREQUENCY always spills **one more value** than the number of bin
+  boundaries supplied — a 4-boundary `bins_array` produces 5 counts,
+  not 4. Selecting too few cells for the array (in older, pre-spill
+  Excel versions entered with Ctrl+Shift+Enter) silently cuts off that
+  last "everything above" bin.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '<=59': '1', '60-69': '2', '70-79': '4', '80-89': '3', '>89': '4' }}
+  defaultValue="70-79"
+  label={'Live preview — =FREQUENCY(scores, {59;69;79;89}) → the {value} bin'}
+  fieldLabel="bin"
+  grid={{
+    cols: ['A'],
+    rowCount: 14,
+    values: {
+      a1: '55', a2: '62', a3: '68', a4: '71', a5: '73', a6: '76',
+      a7: '78', a8: '81', a9: '84', a10: '87', a11: '90', a12: '93',
+      a13: '96', a14: '98',
+    },
+    highlightMap: {
+      '<=59': 'A1:A14', '60-69': 'A1:A14', '70-79': 'A1:A14',
+      '80-89': 'A1:A14', '>89': 'A1:A14',
+    },
+  }}
+/>
+
+14 test scores sorted into 5 bins by the boundaries 59/69/79/89. All
+five counts (1, 2, 4, 3, 4) spill from a single formula and add up to
+14 — every score counted in exactly one bin.
+
+## Common errors
+
+### The last bin's count looks missing
+
+<ExcelCode>{`FREQUENCY(scores, {59;69;79;89}) → spills 5 values, not 4`}</ExcelCode>
+
+If only as many cells as there are boundaries were selected (a common
+habit carried over from other array formulas), the final
+"everything above the last boundary" count gets cut off. Select — or
+let it spill into — one more cell than the number of boundaries.
+
+### Counts don't add up to the total number of values
+
+Double-check that `bins_array` is sorted in ascending order — an
+out-of-order `bins_array` produces miscounted, overlapping-looking
+bins rather than an error.
+
+### #N/A from a legacy array-entry mistake
+
+In pre-365/2021 Excel, FREQUENCY must be entered with
+**Ctrl+Shift+Enter** into a pre-selected range of the correct size —
+entering it as a normal formula returns only the first bin's count
+instead of the full array.
+
+export const faqs = [
+  {
+    question: 'Why does FREQUENCY return one more value than there are bins?',
+    answer:
+      "Because the bin boundaries only mark where each bin ends — there's always an implicit final bin for everything above the last boundary, which needs its own count too.",
+  },
+  {
+    question: 'Do the counts always add up to the total number of data points?',
+    answer: 'Yes, as long as bins_array is sorted ascending and every data_array value is a plain number — every value falls into exactly one bin, with nothing double-counted or skipped.',
+  },
+  {
+    question: 'Can FREQUENCY handle text or blank cells in data_array?',
+    answer: "It ignores them — FREQUENCY only counts genuine numeric values, the same way most statistical functions treat text and blanks in a range.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FREQUENCY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FREQUENCY(A1:A14, {59;69;79;89})`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim counts As Variant
+    counts = Application.WorksheetFunction.Frequency(Range("A1:A14"), Array(59, 69, 79, 89))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    scores = [55,62,68,71,73,76,78,81,84,87,90,93,96,98]
+    bins = [-np.inf, 59, 69, 79, 89, np.inf]
+    counts, _ = np.histogram(scores, bins=bins)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUNTIFS](/docs/math/countifs) — can replicate a single bin's
+  count with an explicit range condition, useful when bins need
+  labels rather than just boundary numbers.
+- [LARGE](/docs/math/large) and [SMALL](/docs/math/small) — find
+  specific ranked values, rather than counting how many fall in a range.
+- [QUARTILE.INC](/docs/statistical/quartile-inc) — divides a dataset
+  into four equal-count groups, a fixed alternative to FREQUENCY's
+  custom bin boundaries.

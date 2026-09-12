@@ -1,0 +1,160 @@
+---
+title: PERMUTATIONA
+description: Count how many ordered arrangements are possible when items can be chosen more than once — PERMUT's counterpart allowing repetition.
+---
+
+Count how many ordered arrangements are possible when items **can be
+chosen more than once** — `PERMUT`'s counterpart for situations like
+PIN codes or dice rolls, where repetition is allowed.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Allows repeats — unlike PERMUT, the same item can be chosen more than once', type: 'warn' },
+  { text: 'Always ≥ PERMUT on the same inputs', type: 'check' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PERMUTATIONA(number, number_chosen)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PERMUTATIONA(number, number_chosen)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The total size of the group to choose from.',
+  },
+  {
+    name: 'number_chosen',
+    type: 'number',
+    required: true,
+    description: 'How many items to choose and arrange in order, with repetition allowed.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of ordered arrangements of `number_chosen` items drawn
+from a group of `number`, allowing repeats — mathematically,
+`number ^ number_chosen`.
+
+## Description
+
+PERMUTATIONA answers "how many different 4-digit PIN codes are
+possible?" style questions — situations where order matters *and*
+the same item can be picked again (each digit 0-9 can repeat across
+all 4 positions). `PERMUT` assumes each item can only be used once;
+PERMUTATIONA drops that restriction entirely, which is why its
+formula is a simple power (`numberⁿ`) rather than a ratio of
+factorials.
+
+<Callout type="idea">
+  PERMUTATIONA's formula is exactly `number ^ number_chosen` — the
+  same calculation `POWER(number, number_chosen)` performs directly.
+  It's really just a domain-specific name for exponentiation, framed
+  around counting repeated-choice arrangements.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2': '25', '3': '125' }}
+  defaultValue="2"
+  label={'Live preview — =PERMUTATIONA(5, {value})'}
+  fieldLabel="number_chosen"
+/>
+
+A 4-digit PIN code drawn from 10 possible digits (0-9), with repeats
+allowed at every position, would be `PERMUTATIONA(10, 4) = 10,000` —
+every possible 4-digit combination from 0000 to 9999.
+
+## Common errors
+
+### #NUM! — number or number_chosen is negative
+
+<ExcelCode>{`PERMUTATIONA(-5, 2) → #NUM!`}</ExcelCode>
+
+Both arguments must be zero or positive — a negative group size or
+selection count isn't valid.
+
+### Confusing PERMUTATIONA with PERMUT
+
+<ExcelCode>{`PERMUTATIONA(5, 2) → 25, not the same as PERMUT(5, 2) → 20`}</ExcelCode>
+
+PERMUTATIONA allows repeats; PERMUT doesn't. Use PERMUT if each item
+can only be selected once (like awarding 1st/2nd/3rd place to
+different people).
+
+export const faqs = [
+  {
+    question: 'PERMUTATIONA vs PERMUT — which should I use?',
+    answer:
+      "Use PERMUTATIONA when the same item can be chosen more than once (PIN codes, dice rolls, passwords with repeatable characters). Use PERMUT when each item can only be used once (awarding distinct places, drawing cards without replacement).",
+  },
+  {
+    question: 'Is PERMUTATIONA just POWER in disguise?',
+    answer: "Functionally, yes — PERMUTATIONA(number, number_chosen) always equals POWER(number, number_chosen) exactly. PERMUTATIONA exists as a more descriptively-named option for this specific counting scenario.",
+  },
+  {
+    question: 'What does PERMUTATIONA return when number_chosen is 0?',
+    answer: '1 — anything raised to the power of 0 is 1, matching the same "one way to choose nothing" logic PERMUT and COMBIN both follow at 0.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PERMUTATIONA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PERMUTATIONA(10, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim arrangements As Double
+    arrangements = Application.WorksheetFunction.PermutationA(10, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    arrangements = 10 ** 4
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PERMUT](/docs/statistical/permut) — the counterpart without
+  repetition, where each item can only be chosen once.
+- [POWER](/docs/math/power) — the identical calculation PERMUTATIONA
+  performs internally.
+- [COMBIN](/docs/math/combin) — the order-independent counterpart,
+  counting groups instead of arrangements.

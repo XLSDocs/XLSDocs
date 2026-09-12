@@ -1,0 +1,185 @@
+---
+title: CONFIDENCE.T
+description: The margin of error for a population mean using the Student's t-distribution — better suited to small samples than CONFIDENCE.NORM.
+---
+
+Calculate the margin of error for estimating a population mean from a
+sample, using the Student's t-distribution — better suited than
+`CONFIDENCE.NORM` when the sample is small or the population standard
+deviation isn't actually known.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'alpha is 1 minus the confidence level (0.05 for 95% confidence)', type: 'warn' },
+  { text: 'Always ≥ CONFIDENCE.NORM\'s result on the same inputs', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CONFIDENCE.T(alpha, standard_dev, size)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CONFIDENCE.T(alpha, standard_dev, size)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The significance level, between 0 and 1 — 1 minus the confidence level (e.g. 0.05 for a 95% confidence interval).',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The sample standard deviation.',
+  },
+  {
+    name: 'size',
+    type: 'number',
+    required: true,
+    description: 'The sample size (an integer of at least 2).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The margin of error, based on the Student's t-distribution with `size
+− 1` degrees of freedom. The full confidence interval is the sample
+mean plus or minus this value.
+
+## Description
+
+CONFIDENCE.T uses the Student's t-distribution instead of the normal
+distribution `CONFIDENCE.NORM` relies on — the t-distribution has
+fatter tails, which correctly accounts for the extra uncertainty that
+comes from estimating the population standard deviation from a
+limited sample rather than knowing it outright. As sample size grows
+large, the t-distribution converges toward the normal distribution,
+and CONFIDENCE.T's result converges toward CONFIDENCE.NORM's.
+
+<Callout type="idea">
+  CONFIDENCE.T's result is always **greater than or equal to**
+  CONFIDENCE.NORM's on the same inputs — the t-distribution's fatter
+  tails produce a wider (more conservative) margin of error,
+  especially noticeable with a small sample size. The gap between
+  them shrinks as `size` grows.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.05': '1.5991', '0.01': '2.1408', '0.1': '1.3320' }}
+  defaultValue="0.05"
+  label={'Live preview — =CONFIDENCE.T({alpha}, 5, 40)'}
+  fieldLabel="alpha"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 3,
+    values: {
+      a1: 'Std Dev', b1: 'Sample Size',
+      a2: '5', b2: '40',
+    },
+    highlightMap: { '0.05': 'A2:B2', '0.01': 'A2:B2', '0.1': 'A2:B2' },
+  }}
+/>
+
+The same standard deviation and sample size as `CONFIDENCE.NORM`'s
+example. At `alpha = 0.05`, CONFIDENCE.T returns 1.5991 — noticeably
+wider than CONFIDENCE.NORM's 1.55 on the identical inputs, the extra
+margin the t-distribution adds for a sample of this size.
+
+## Common errors
+
+### #NUM! — alpha is outside the 0–1 range, or size is less than 2
+
+<ExcelCode>{`CONFIDENCE.T(0.05, 5, 1) → #NUM!`}</ExcelCode>
+
+`alpha` must be strictly between 0 and 1, and `size` must be at
+least 2 — the t-distribution's degrees of freedom (`size − 1`) can't
+be zero.
+
+### Expecting an identical result to CONFIDENCE.NORM
+
+<ExcelCode>{`CONFIDENCE.T(0.05, 5, 40) → 1.5991, not the same as CONFIDENCE.NORM(0.05, 5, 40) → 1.55`}</ExcelCode>
+
+These use different underlying distributions and aren't meant to
+match — the gap narrows as `size` increases but never fully
+disappears for finite samples.
+
+export const faqs = [
+  {
+    question: 'CONFIDENCE.T vs CONFIDENCE.NORM — which should I use?',
+    answer:
+      "Use CONFIDENCE.T when the population standard deviation isn't actually known and is being estimated from a sample — especially a small one (commonly under 30). Use CONFIDENCE.NORM only when the true population standard deviation is genuinely known outright, which is less common in practice.",
+  },
+  {
+    question: 'Why does CONFIDENCE.T give a wider margin of error?',
+    answer:
+      "The t-distribution has fatter tails than the normal distribution, which accounts for the extra uncertainty introduced by estimating the standard deviation from a limited sample instead of knowing the true population value. That extra uncertainty widens the margin of error.",
+  },
+  {
+    question: 'Does the gap between CONFIDENCE.T and CONFIDENCE.NORM matter for large samples?',
+    answer: 'Less and less — the t-distribution converges toward the normal distribution as degrees of freedom (size − 1) grow, so for a sample size in the hundreds or more, the two functions return very similar results.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CONFIDENCE.T from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CONFIDENCE.T(0.05, A2, B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim marginOfError As Double
+    marginOfError = Application.WorksheetFunction.Confidence_T(0.05, Range("A2"), Range("B2"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy import stats
+    import numpy as np
+
+    alpha, std_dev, size = 0.05, 5, 40
+    margin = stats.t.ppf(1 - alpha/2, size - 1) * (std_dev / np.sqrt(size))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CONFIDENCE.NORM](/docs/statistical/confidence-norm) — the
+  normal-distribution version, appropriate when the population
+  standard deviation is genuinely known.
+- [STDEV.S](/docs/statistical/stdev-s) — estimates the standard
+  deviation from a sample, the usual source for `standard_dev` here.
+- [AVERAGE](/docs/math/average) — the sample mean the margin of
+  error gets added to and subtracted from.
