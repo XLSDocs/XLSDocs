@@ -89,7 +89,7 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
           {filtered.map((cat) => (
             <section key={cat.slug} id={cat.slug} className="mb-12 scroll-mt-24">
               <h2 className="mb-4 text-lg font-medium">{cat.title}</h2>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {cat.functions.map((fn) => (
                   <Link
                     key={fn.slug}
