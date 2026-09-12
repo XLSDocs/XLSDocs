@@ -1,0 +1,91 @@
+---
+title: "VAR.S vs VAR.P: The Question Excel Won't Ask You First"
+description: Both functions measure spread from the exact same data, but they answer a different question about it — and Excel has no way to know which one you actually meant.
+date: "2026-09-12"
+category: Tutorials
+readTime: 5 min read
+---
+
+Type the same five numbers into `VAR.S` and `VAR.P`, and you'll get
+two different answers — not because one of them is wrong, but because
+they're built to answer two genuinely different questions about the
+same data, and nothing about typing the numbers in tells Excel which
+question you meant to ask.
+
+## The same data, two different results
+
+<ExcelCode>{`Values: 40, 55, 48, 62, 45
+=VAR.S(values) → 74.5
+=VAR.P(values) → 59.6`}</ExcelCode>
+
+Both functions compute the same underlying idea — how spread out the
+values are from their average — but they divide by a different
+number to get there. `VAR.S` divides by `n − 1` (4, here); `VAR.P`
+divides by the full count `n` (5). That single divisor is the entire
+difference, and it's never trivial: `VAR.S` is always the larger of
+the two on identical data.
+
+## The actual question, not the formula
+
+<Callout type="warn">
+  The choice isn't about which formula "looks more correct" — it's
+  about what the five values in your sheet actually represent. Are
+  they **everything** you're measuring (VAR.P), or are they a
+  **sample** standing in for a larger group you didn't fully measure
+  (VAR.S)?
+</Callout>
+
+Five students' test scores, when those five students are the entire
+class: use `VAR.P` — there's no larger population being estimated,
+these numbers are the whole story. Five students' scores, pulled as a
+sample to estimate how an entire school district performs: use
+`VAR.S` — the extra division by `n − 1` corrects for the fact that a
+small sample tends to understate the true spread of whatever larger
+group it's drawn from.
+
+## Why the correction exists at all
+
+A sample's own variance, if you just divided by `n` like the
+population formula does, is a slightly biased (too-small) estimate of
+the real population variance it's meant to represent — smaller
+samples are more likely to miss the true extremes sitting further out
+in the full population. Dividing by `n − 1` instead of `n` inflates
+the result just enough to correct for that bias on average. It's not
+an arbitrary tweak; it's the mathematically derived fix for a real,
+provable underestimation.
+
+## It gets more confusing before it gets simpler
+
+Excel actually ships **four** variance functions, not two — `VARA`
+and `VARPA` apply the identical sample/population distinction, but
+also count text as `0` and `TRUE`/`FALSE` as `1`/`0` instead of
+ignoring them the way `VAR.S`/`VAR.P` do. Unless a column genuinely
+mixes real numbers with logical values on purpose, `VAR.S` and
+`VAR.P` are almost always the right pair to reach for — the "A"
+versions solve a narrower, less common problem.
+
+export const faqs = [
+  {
+    question: "Is there ever a case where VAR.S and VAR.P return the same result?",
+    answer: "Only in the limit — as the sample size grows very large, dividing by n − 1 versus n makes less and less difference. For small samples (under 30 or so), the gap is usually large enough to matter.",
+  },
+  {
+    question: "What's the older, pre-2010 name for these functions?",
+    answer: 'VAR (matching VAR.S) and VARP (matching VAR.P). Both still work today for backward compatibility, but Microsoft recommends the dotted names for new formulas.',
+  },
+  {
+    question: 'How do these relate to STDEV.S and STDEV.P?',
+    answer: 'STDEV.S is the square root of VAR.S, and STDEV.P is the square root of VAR.P — the same sample-vs-population choice, just expressed in the data\'s original units instead of squared ones.',
+  },
+  {
+    question: 'What happens if I use VAR.S on data that\'s actually the full population?',
+    answer: "You'll get a slightly inflated number — not wrong in the sense of an error, but describing a hypothetical larger population that doesn't actually exist in this case. If the data really is everything, VAR.P is the statistically honest choice.",
+  },
+];
+
+See the full reference for [VAR.S](/docs/statistical/var-s) and
+[VAR.P](/docs/statistical/var-p) for the complete argument list,
+common errors, and a live example you can edit yourself — plus
+[VARA](/docs/statistical/vara) and
+[VARPA](/docs/statistical/varpa) for the text/logical-inclusive
+versions of each.

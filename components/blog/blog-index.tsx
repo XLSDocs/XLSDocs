@@ -10,7 +10,7 @@ interface Post {
   description: string;
   date: string;
   category: string;
-  author: string;
+  author?: string;
   readTime: string;
   featured?: boolean;
 }

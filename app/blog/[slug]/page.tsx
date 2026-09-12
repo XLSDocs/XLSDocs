@@ -68,7 +68,8 @@ export default async function BlogPostPage(props: PageProps<'/blog/[slug]'>) {
               />
             )}
             <span className="not-prose font-mono text-xs uppercase tracking-wider text-fd-muted-foreground">
-              {formatDate(post.date)} · {post.author}
+              {formatDate(post.date)}
+              {post.author ? ` · ${post.author}` : ''}
             </span>
             <h1>{post.title}</h1>
             <p className="lead text-fd-muted-foreground">{post.description}</p>

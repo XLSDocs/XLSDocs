@@ -1,0 +1,81 @@
+---
+title: "PERMUT vs COMBIN: The One Question That Decides Which You Need"
+description: Choosing 3 people from a group of 5 has two different right answers, depending on whether you're picking a committee or awarding 1st, 2nd, and 3rd place.
+date: "2026-09-12"
+category: Tutorials
+readTime: 4 min read
+---
+
+Both functions answer "how many ways can I choose a few items from a
+bigger group?" — and both take the exact same two arguments in the
+exact same order. The only thing that decides which one is correct is
+a question neither function asks you directly: does the *order* of
+the choices matter?
+
+## Same inputs, different answers
+
+<ExcelCode>{`=COMBIN(5, 3) → 10
+=PERMUT(5, 3) → 60`}</ExcelCode>
+
+Choosing 3 people from a group of 5 has exactly 10 possible
+*groups* — that's `COMBIN`. But if those 3 spots are 1st, 2nd, and
+3rd place instead of an unordered group, there are 60 possible
+*orderings* of who ends up where — that's `PERMUT`. Same 5 people,
+same 3 spots, six times as many outcomes, purely because order
+suddenly counts.
+
+## The test that actually decides it
+
+<Callout type="idea">
+  Ask one question: if you picked the same 3 people but in a
+  different order, would that count as a **different** outcome? If
+  yes, it's `PERMUT`. If the group is the group regardless of who was
+  picked first, it's `COMBIN`.
+</Callout>
+
+A 3-person committee: Alex, Blake, and Casey are the committee
+whether Alex was picked first or last — one outcome, `COMBIN`. A
+race's podium: Alex-1st/Blake-2nd/Casey-3rd is a completely different
+result from Blake-1st/Alex-2nd/Casey-3rd, even though it's the same
+three people — six distinct outcomes for the same trio, `PERMUT`.
+
+## Where the 6x actually comes from
+
+`PERMUT`'s answer is always `COMBIN`'s answer multiplied by the
+number of ways to arrange whatever was chosen — for 3 items, that's
+`3! = 6`, which is exactly the ratio between 60 and 10 above. Every
+group `COMBIN` counts once, `PERMUT` counts once for each of the
+`3!` orders that group could be arranged in.
+
+## The one with repeats allowed
+
+There's a third function worth knowing about once the first two click:
+`PERMUTATIONA`, which allows the *same* item to be picked more than
+once — a 4-digit PIN code, where digit `7` can appear in more than one
+position, is `PERMUTATIONA(10, 4) = 10,000`, not `PERMUT(10, 4)`
+(which would assume each digit gets used at most once).
+
+export const faqs = [
+  {
+    question: "Is COMBIN always smaller than PERMUT on the same inputs?",
+    answer: "Yes, whenever number_chosen is 2 or more — PERMUT always equals COMBIN times a factorial that's at least 2. They're only equal when number_chosen is 0 or 1, since there's nothing to reorder in either of those cases.",
+  },
+  {
+    question: 'How do I remember which one is which?',
+    answer: '"PERMUT" and "position" both start with P — permutations care about position/order. Combinations (COMBIN) don\'t care about the arrangement, just the membership.',
+  },
+  {
+    question: 'Do PERMUT and COMBIN take the same arguments?',
+    answer: 'Yes — both take (number, number_chosen), in the same order, which is exactly why it\'s so easy to grab the wrong one out of habit.',
+  },
+  {
+    question: 'What real-world Excel scenarios use PERMUT instead of COMBIN?',
+    answer: "Counting possible finishing orders in a race or tournament bracket, possible password/PIN arrangements without repeats, or any seating-chart or scheduling problem where WHO goes in WHICH specific slot matters, not just who's included.",
+  },
+];
+
+See the full reference for [PERMUT](/docs/statistical/permut) and
+[COMBIN](/docs/math/combin) for the complete argument list, common
+errors, and a live example you can edit yourself — plus
+[PERMUTATIONA](/docs/statistical/permutationa) for the
+repeats-allowed version.

@@ -16,7 +16,10 @@ const blogSchema = z.object({
   description: z.string(),
   date: z.string(),
   category: z.enum(blogCategories),
-  author: z.string(),
+  // No longer required — new posts skip the byline entirely rather than
+  // carry a made-up name. Existing posts keep whichever name they already
+  // shipped with.
+  author: z.string().optional(),
   readTime: z.string(),
   featured: z.boolean().optional(),
 });

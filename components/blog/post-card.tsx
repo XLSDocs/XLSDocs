@@ -6,7 +6,9 @@ interface PostCardProps {
   description: string;
   date: string;
   category: string;
-  author: string;
+  // Optional going forward — new posts don't carry a byline. Older posts
+  // keep whichever name they already shipped with; nothing needs backfilling.
+  author?: string;
   readTime: string;
   featured?: boolean;
 }
@@ -54,8 +56,12 @@ export function PostCard({ slug, title, description, date, category, author, rea
         </p>
       </div>
       <div className="flex items-center gap-2 font-mono text-xs text-fd-muted-foreground">
-        <span>{author}</span>
-        <span>·</span>
+        {author && (
+          <>
+            <span>{author}</span>
+            <span>·</span>
+          </>
+        )}
         <span>{readTime}</span>
         <span>·</span>
         <span>{formatDate(date)}</span>
