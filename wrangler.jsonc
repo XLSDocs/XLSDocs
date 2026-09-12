@@ -5,6 +5,7 @@
   "workers_dev": true,
   "compatibility_date": "2026-08-03",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "limits": { "cpu_ms": 50000 },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",
