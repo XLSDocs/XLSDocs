@@ -1,0 +1,188 @@
+---
+title: Z.TEST
+description: The one-tailed probability that a sample mean this far from a hypothesized value happened by chance.
+---
+
+Test whether a sample's mean is significantly different from a
+hypothesized value `x`, when the population standard deviation is
+known — returns a one-tailed probability, not a raw z-score.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a one-tailed probability, not the z-score itself', type: 'warn' },
+  { text: 'A smaller result means a bigger, less likely-by-chance difference from x', type: 'check' },
+  { text: 'Omitting sigma estimates it from the array\'s own sample standard deviation', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=Z.TEST(array, x, [sigma])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=Z.TEST(array, x, [sigma])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The sample of data being tested against the hypothesized value.',
+  },
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The hypothesized population mean to test the sample against.',
+  },
+  {
+    name: 'sigma',
+    type: 'number',
+    required: false,
+    description: 'The known population standard deviation. If omitted, the sample standard deviation of array is used instead.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A probability between 0 and 1 — the one-tailed likelihood of
+observing a sample mean at least this far above `x` by chance alone,
+if the true population mean actually equals `x`.
+
+## Description
+
+Z.TEST computes `z = (mean(array) − x) / (sigma / SQRT(n))`, then
+returns `1 − NORM.S.DIST(z, TRUE)` — the area under the standard
+normal curve to the right of that z-score. A result close to 0 means
+the sample mean sits far enough above `x` that it's unlikely to have
+happened by chance; a result close to 1 means the sample mean is at
+or below `x`, giving no evidence the true mean exceeds it.
+
+<Callout type="warn">
+  Z.TEST is built for a **one-tailed, "is the mean greater than x"**
+  question. For a two-tailed test (mean is different from `x`, in
+  either direction), double the smaller of Z.TEST's result and `1 −`
+  its result: `=2 * MIN(Z.TEST(array, x, sigma), 1 - Z.TEST(array, x, sigma))`.
+  Also note Excel's own docs describe Z.TEST as most useful with
+  `sigma` supplied — with a small sample, estimating both the mean and
+  standard deviation from the same data makes `T.TEST` the more
+  standard choice.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '85': '0.0100', '90': '0.4644', '92': '0.7896' }}
+  defaultValue="90"
+  label={'Live preview — =Z.TEST(scores, {x}, 5)'}
+  fieldLabel="x"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    values: {
+      a1: 'Score', a2: '95', a3: '88', a4: '91', a5: '87', a6: '90',
+    },
+    highlightMap: { '85': 'A2:A6', '90': 'A2:A6', '92': 'A2:A6' },
+  }}
+/>
+
+Five test scores (mean 90.2) tested against a known population
+standard deviation of 5. Against a hypothesized mean of 85, Z.TEST
+returns 0.0100 — strong evidence the sample mean is really above 85.
+Against 90 (almost exactly the sample mean), it returns 0.4644 — no
+real evidence either way. Against 92 (above the sample mean), it
+returns 0.7896, since the sample gives no support for a mean that
+high.
+
+## Common errors
+
+### #N/A — array contains no numeric values
+
+<ExcelCode>{`Z.TEST(A1:A5, 90) → #N/A when A1:A5 has no numbers`}</ExcelCode>
+
+`array` needs at least one numeric value to compute a mean and
+standard deviation from.
+
+### Misreading the result as a two-tailed p-value
+
+<ExcelCode>{`Z.TEST(array, x, sigma) → one-tailed only, not directly comparable to a two-tailed T.TEST result`}</ExcelCode>
+
+Z.TEST's raw output answers "is the mean greater than x," not "is the
+mean different from x." Double the smaller tail (see the callout
+above) before comparing it to a two-tailed significance threshold like
+0.05.
+
+export const faqs = [
+  {
+    question: 'Z.TEST vs T.TEST — which should I use?',
+    answer: 'Z.TEST when the population standard deviation is genuinely known and supplied as sigma. T.TEST when it isn\'t — which is most real-world cases — since T.TEST accounts for the extra uncertainty of estimating standard deviation from the sample itself.',
+  },
+  {
+    question: 'What does it mean if Z.TEST returns a value close to 0.5?',
+    answer: 'The sample mean is essentially equal to the hypothesized value x, so there\'s no evidence in either direction that the true mean is higher than x.',
+  },
+  {
+    question: 'How do I get a two-tailed result from Z.TEST?',
+    answer: 'Double whichever is smaller: Z.TEST\'s own result, or 1 minus it. In a formula: =2 * MIN(Z.TEST(array, x, sigma), 1 - Z.TEST(array, x, sigma)).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with Z.TEST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=Z.TEST(A2:A6, 90, 5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pValue As Double
+    pValue = Application.WorksheetFunction.Z_Test(Range("A2:A6"), 90, 5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy import stats
+    import numpy as np
+
+    scores = np.array([95, 88, 91, 87, 90])
+    x, sigma = 90, 5
+    z = (scores.mean() - x) / (sigma / np.sqrt(len(scores)))
+    p_one_tailed = 1 - stats.norm.cdf(z)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.TEST](/docs/statistical/t-test) — the more common choice when the
+  population standard deviation isn't actually known.
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the standard normal
+  distribution Z.TEST's z-score is evaluated against.
+- [CONFIDENCE.NORM](/docs/statistical/confidence-norm) — a related
+  normal-distribution calculation, for a margin of error instead of a
+  hypothesis test.

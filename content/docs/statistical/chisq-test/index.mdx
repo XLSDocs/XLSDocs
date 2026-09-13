@@ -1,0 +1,190 @@
+---
+title: CHISQ.TEST
+description: The probability that observed category counts differ this much from expected counts by chance.
+---
+
+Test whether a set of observed counts across categories differs
+significantly from a set of expected counts — the standard
+goodness-of-fit test for categorical data.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'actual_range and expected_range must be the same size and shape', type: 'warn' },
+  { text: 'A small result (typically < 0.05) means the observed counts likely don\'t match the expected pattern', type: 'check' },
+  { text: 'Also known outside Excel as the chi-square goodness-of-fit test', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHISQ.TEST(actual_range, expected_range)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHISQ.TEST(actual_range, expected_range)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'actual_range',
+    type: 'range',
+    required: true,
+    description: 'The observed counts for each category.',
+  },
+  {
+    name: 'expected_range',
+    type: 'range',
+    required: true,
+    description: 'The expected counts for each category, based on the hypothesis being tested — must match actual_range in size and shape.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A probability between 0 and 1 — the likelihood of seeing a deviation
+between observed and expected counts at least this large by chance
+alone, if the expected counts are actually correct. Smaller values
+are stronger evidence the real distribution doesn't match what was
+expected.
+
+## Description
+
+CHISQ.TEST computes a chi-square statistic by summing
+`(actual − expected)² / expected` across every category, then
+evaluates it against the chi-square distribution with
+`(number of categories − 1)` degrees of freedom (one fewer degree of
+freedom per row, if the data spans multiple rows and columns). A
+result close to 0 means the observed counts diverge sharply from what
+was expected; a result close to 1 means the observed counts line up
+almost exactly with the expectation.
+
+<Callout type="idea">
+  Excel doesn't have a separate function to compute the raw chi-square
+  statistic itself before converting it to a probability — CHISQ.TEST
+  does both steps at once. To get the raw statistic on its own (for
+  comparing against a critical-value table, for example), use
+  `=SUMPRODUCT((actual_range - expected_range)^2 / expected_range)`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ close: '0.8521', moderate: '0.0087', 'strongly skewed': '0.0009' }}
+  defaultValue="moderate"
+  label={'Live preview — =CHISQ.TEST({scenario} counts, expected)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    rowsByInput: {
+      close: {
+        a1: 'Actual', b1: 'Expected',
+        a2: '36', b2: '33.33', a3: '32', b3: '33.33', a4: '32', b4: '33.33',
+      },
+      moderate: {
+        a1: 'Actual', b1: 'Expected',
+        a2: '45', b2: '33.33', a3: '35', b3: '33.33', a4: '20', b4: '33.33',
+      },
+      'strongly skewed': {
+        a1: 'Actual', b1: 'Expected',
+        a2: '50', b2: '33.33', a3: '30', b3: '33.33', a4: '20', b4: '33.33',
+      },
+    },
+  }}
+/>
+
+100 observations across 3 categories, tested against an even
+33.33/33.33/33.33 expectation each time. When the actual counts are
+close to the expectation, CHISQ.TEST returns 0.8521 — no evidence of
+a real difference. As the actual counts drift further from an even
+split, the result drops to 0.0087 and then 0.0009 — increasingly
+strong evidence the true distribution isn't actually even across the
+three categories.
+
+## Common errors
+
+### #N/A — actual_range and expected_range are different sizes
+
+<ExcelCode>{`CHISQ.TEST(A2:A4, B2:B5) → #N/A`}</ExcelCode>
+
+Every category in `actual_range` needs a matching expected value in
+`expected_range` — the two ranges must be the same size and shape.
+
+### #DIV/0! — an expected value is zero
+
+<ExcelCode>{`CHISQ.TEST(A2:A4, B2:B4) → #DIV/0! when any value in B2:B4 is 0`}</ExcelCode>
+
+Each term in the chi-square statistic divides by the expected count
+for that category, so no expected value can be zero.
+
+export const faqs = [
+  {
+    question: 'What does a low CHISQ.TEST result mean?',
+    answer: 'A low result (commonly below 0.05) is evidence that the observed counts don\'t match the expected distribution — the difference is unlikely to be explained by chance alone.',
+  },
+  {
+    question: 'Where do the expected counts come from?',
+    answer: 'They come from whatever hypothesis is being tested — often an even split across categories, but just as commonly a theoretical distribution, a prior year\'s proportions, or a null hypothesis of no association between two variables in a contingency table.',
+  },
+  {
+    question: 'Can CHISQ.TEST work on a two-dimensional table, not just one row?',
+    answer: 'Yes — actual_range and expected_range can each span multiple rows and columns (a contingency table), as long as their shapes match exactly.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHISQ.TEST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHISQ.TEST(A2:A4, B2:B4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pValue As Double
+    pValue = Application.WorksheetFunction.ChiSq_Test(Range("A2:A4"), Range("B2:B4"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy import stats
+    import numpy as np
+
+    actual = np.array([45, 35, 20])
+    expected = np.array([33.33, 33.33, 33.33])
+    chi2 = np.sum((actual - expected) ** 2 / expected)
+    p_value = 1 - stats.chi2.cdf(chi2, len(actual) - 1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.TEST](/docs/statistical/t-test) — the equivalent hypothesis test
+  for comparing means instead of category counts.
+- [F.TEST](/docs/statistical/f-test) — the equivalent hypothesis test
+  for comparing variances.
+- [COUNTIF](/docs/math/countif) — one common way to build the
+  actual_range counts from raw category data.

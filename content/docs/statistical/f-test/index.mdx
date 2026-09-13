@@ -1,0 +1,189 @@
+---
+title: F.TEST
+description: The two-tailed probability that two samples' variances differ this much by chance.
+---
+
+Test whether two samples likely come from populations with the same
+variance — the standard way to check whether it's reasonable to
+assume equal spread before running a two-sample T.TEST.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always two-tailed — there\'s no tails argument', type: 'warn' },
+  { text: 'A small result (typically < 0.05) means the variances likely differ', type: 'check' },
+  { text: 'Order of array1/array2 doesn\'t change the result', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=F.TEST(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=F.TEST(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first sample of data — at least 2 numeric values.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second sample of data — at least 2 numeric values.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A two-tailed probability between 0 and 1 — the likelihood of seeing a
+ratio of variances at least this extreme by chance alone, if the two
+populations actually share the same variance. Smaller values are
+stronger evidence the variances genuinely differ.
+
+## Description
+
+F.TEST divides `array1`'s sample variance by `array2`'s to get an
+F-statistic, then evaluates it against the F-distribution with
+`(n1 − 1, n2 − 1)` degrees of freedom. Because the result is always
+two-tailed and F.TEST always reports "how extreme is this ratio,"
+swapping `array1` and `array2` inverts the F-statistic but returns the
+exact same probability.
+
+<Callout type="idea">
+  F.TEST is most often used as a **pre-check before T.TEST** — its
+  result helps decide whether `T.TEST`'s `type` argument should be 2
+  (equal variance assumed) or 3 (Welch's unequal-variance version). A
+  small F.TEST result argues for type 3.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ similar: '0.7888', wide: '0.0111', tight: '0.0062' }}
+  defaultValue="similar"
+  label={'Live preview — =F.TEST(typical, {comparison})'}
+  fieldLabel="comparison"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 6,
+    rowsByInput: {
+      similar: {
+        a1: 'Typical', b1: 'Similar',
+        a2: '40', b2: '38', a3: '55', b3: '52', a4: '48', b4: '46', a5: '62', b5: '58', a6: '45', b6: '51',
+      },
+      wide: {
+        a1: 'Typical', b1: 'Wide',
+        a2: '40', b2: '10', a3: '55', b3: '80', a4: '48', b4: '45', a5: '62', b5: '5', a6: '45', b6: '95',
+      },
+      tight: {
+        a1: 'Typical', b1: 'Tight',
+        a2: '40', b2: '48', a3: '55', b3: '50', a4: '48', b4: '49', a5: '62', b5: '51', a6: '45', b6: '52',
+      },
+    },
+  }}
+/>
+
+The same "typical spread" group of 5 values (variance 74.5), compared
+against three differently-spread groups. Against a similarly-spread
+group (variance 56), F.TEST returns 0.7888 — no evidence of a real
+difference. Against a much more widely-spread group (variance 1632.5)
+or a much tighter one (variance 2.5), it returns 0.0111 and 0.0062 —
+both below the common 0.05 threshold, correctly flagging that the
+variances really do differ, regardless of which direction.
+
+## Common errors
+
+### #DIV/0! — array2's variance is zero
+
+<ExcelCode>{`F.TEST(A2:A6, B2:B6) → #DIV/0! when every value in B2:B6 is identical`}</ExcelCode>
+
+A variance of zero can't appear in the denominator of the F-statistic
+— `array2` needs at least some spread in its values.
+
+### #N/A — fewer than 2 numeric values in either array
+
+<ExcelCode>{`F.TEST(A1, B2:B6) → #N/A`}</ExcelCode>
+
+Sample variance is undefined with fewer than 2 numbers — both arrays
+need at least 2 numeric values each.
+
+export const faqs = [
+  {
+    question: 'Does the order of array1 and array2 matter for F.TEST?',
+    answer: 'No — F.TEST is a two-tailed test, so swapping array1 and array2 inverts the underlying F-statistic but returns the identical probability either way.',
+  },
+  {
+    question: 'What is F.TEST usually used for?',
+    answer: 'Most commonly as a pre-check before running T.TEST on two independent samples — a small F.TEST result suggests using T.TEST\'s type 3 (unequal variance, Welch\'s test) instead of type 2 (equal variance).',
+  },
+  {
+    question: 'What counts as a significant F.TEST result?',
+    answer: 'As with most hypothesis tests, a result below 0.05 is the most common threshold for concluding the two variances are genuinely different, rather than differing just by sampling chance.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with F.TEST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=F.TEST(A2:A6, B2:B6)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pValue As Double
+    pValue = Application.WorksheetFunction.F_Test(Range("A2:A6"), Range("B2:B6"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy import stats
+    import numpy as np
+
+    group1 = np.array([40, 55, 48, 62, 45])
+    group2 = np.array([10, 80, 45, 5, 95])
+    f_stat = group1.var(ddof=1) / group2.var(ddof=1)
+    p_value = 2 * min(
+        stats.f.cdf(f_stat, len(group1) - 1, len(group2) - 1),
+        1 - stats.f.cdf(f_stat, len(group1) - 1, len(group2) - 1),
+    )
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.TEST](/docs/statistical/t-test) — the mean-comparison test that
+  F.TEST's result often helps configure.
+- [VAR.S](/docs/statistical/var-s) — the sample variance calculation
+  F.TEST compares between the two arrays.
+- [CHISQ.TEST](/docs/statistical/chisq-test) — a different hypothesis
+  test, for observed vs. expected category counts.

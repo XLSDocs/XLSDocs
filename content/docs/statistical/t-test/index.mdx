@@ -1,0 +1,203 @@
+---
+title: T.TEST
+description: The probability that two samples' means differ this much by chance, using the Student's t-distribution.
+---
+
+Test whether two samples likely come from populations with the same
+mean, using the Student's t-distribution — the standard hypothesis
+test when the population standard deviation isn't known.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'type chooses paired (1), equal-variance (2), or unequal-variance (3)', type: 'warn' },
+  { text: 'A small result (typically < 0.05) suggests the means really differ', type: 'check' },
+  { text: 'array1 and array2 must be the same size when type is 1 (paired)', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=T.TEST(array1, array2, tails, type)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=T.TEST(array1, array2, tails, type)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first sample of data.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second sample of data.',
+  },
+  {
+    name: 'tails',
+    type: 'number',
+    required: true,
+    description: '1 for a one-tailed test, 2 for a two-tailed test.',
+  },
+  {
+    name: 'type',
+    type: 'number',
+    required: true,
+    description: '1 = paired, 2 = two-sample equal variance (homoscedastic), 3 = two-sample unequal variance (heteroscedastic, Welch\'s test).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A probability between 0 and 1 — the likelihood of seeing a difference
+between the two samples' means at least this large by chance alone,
+if their true population means are actually equal. Smaller values are
+stronger evidence the means genuinely differ.
+
+## Description
+
+T.TEST computes a t-statistic from the two samples — how it's
+calculated depends entirely on `type`: **paired** (1) looks at the
+mean and spread of the differences between matched pairs (before/after
+measurements on the same subjects); **equal variance** (2) pools both
+samples' variances into one shared estimate, appropriate when the two
+groups are reasonably assumed to have similar spread; **unequal
+variance** (3), Welch's t-test, doesn't assume equal spread and adjusts
+the degrees of freedom accordingly — the safer default when in doubt.
+The t-statistic is then converted to a probability using the
+t-distribution with the appropriate degrees of freedom, doubled if
+`tails` is 2.
+
+<Callout type="warn">
+  Picking the wrong `type` on the same data can noticeably change the
+  result. Paired only makes sense when each row in `array1` is
+  genuinely matched to the same row in `array2` (the same subject,
+  measured twice) — running the same two independent groups through
+  `type = 1` treats unrelated numbers as if they were paired and
+  produces a meaningless answer.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '0.1916', '2': '0.0761', '3': '0.0781' }}
+  defaultValue="2"
+  label={'Live preview — =T.TEST(group1, group2, 2, {type})'}
+  fieldLabel="type"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 6,
+    values: {
+      a1: 'Group 1', b1: 'Group 2',
+      a2: '85', b2: '78',
+      a3: '88', b3: '82',
+      a4: '92', b4: '75',
+      a5: '79', b5: '88',
+      a6: '95', b6: '80',
+    },
+    highlightMap: { '1': 'A2:B6', '2': 'A2:B6', '3': 'A2:B6' },
+  }}
+/>
+
+The same two groups of 5 values, tested three different ways with
+`tails = 2`. Treated as paired (`type = 1`), the differences are noisy
+relative to their spread and T.TEST returns 0.1916 — no significant
+difference. Treated as two independent samples with equal variance
+(`type = 2`), it returns 0.0761; with unequal variance assumed
+(`type = 3`, Welch's test), a very similar 0.0781 — both closer to
+(but still above) the common 0.05 significance threshold, since the
+independent-samples framing better fits data that was never actually
+paired.
+
+## Common errors
+
+### #N/A — array1 and array2 are different sizes with type = 1
+
+<ExcelCode>{`T.TEST(A2:A6, B2:B4, 2, 1) → #N/A`}</ExcelCode>
+
+A paired test requires each value in `array1` to correspond to one in
+`array2` — the two ranges must contain the same number of values.
+
+### #NUM! — tails is not 1 or 2
+
+<ExcelCode>{`T.TEST(array1, array2, 3, 2) → #NUM!`}</ExcelCode>
+
+`tails` only accepts 1 (one-tailed) or 2 (two-tailed); any other
+value is invalid.
+
+export const faqs = [
+  {
+    question: 'Which type should I use for T.TEST?',
+    answer: 'Use type 1 (paired) only when each row genuinely represents the same subject measured twice. For two independent groups, use type 3 (unequal variance / Welch\'s test) as the safer default unless you have good reason to assume both groups have the same underlying variance, in which case type 2 is slightly more powerful.',
+  },
+  {
+    question: 'What counts as a significant result from T.TEST?',
+    answer: 'There\'s no universal cutoff, but a result below 0.05 is the most common threshold researchers use to call a difference "statistically significant" — meaning there\'s less than a 5% chance the observed difference happened purely by chance.',
+  },
+  {
+    question: 'T.TEST vs Z.TEST — which should I use?',
+    answer: 'T.TEST almost always, since it doesn\'t require knowing the population standard deviation in advance — it estimates it from the samples themselves. Z.TEST is only appropriate when the true population standard deviation is genuinely known.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with T.TEST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=T.TEST(A2:A6, B2:B6, 2, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pValue As Double
+    pValue = Application.WorksheetFunction.T_Test(Range("A2:A6"), Range("B2:B6"), 2, 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy import stats
+    import numpy as np
+
+    group1 = np.array([85, 88, 92, 79, 95])
+    group2 = np.array([78, 82, 75, 88, 80])
+    t_stat, p_value = stats.ttest_ind(group1, group2, equal_var=False)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [Z.TEST](/docs/statistical/z-test) — the equivalent test for when
+  the population standard deviation is actually known.
+- [F.TEST](/docs/statistical/f-test) — tests whether two samples'
+  variances differ, which can help decide between T.TEST's type 2
+  and type 3.
+- [CHISQ.TEST](/docs/statistical/chisq-test) — a different hypothesis
+  test, for whether observed category counts match expected
+  proportions.
