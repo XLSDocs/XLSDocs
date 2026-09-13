@@ -2,6 +2,7 @@ import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 import { DM_Mono } from 'next/font/google';
 import Script from 'next/script';
+import NextTopLoader from 'nextjs-toploader';
 import type { Metadata, Viewport } from 'next';
 
 const dmMono = DM_Mono({
@@ -68,6 +69,19 @@ export default function Layout({ children }: LayoutProps<'/'>) {
         <script id="name-shim" dangerouslySetInnerHTML={{ __html: nameShim }} />
       </head>
       <body className="flex flex-col min-h-screen font-sans">
+        {/* GitHub-style thin progress bar during navigation — color reads
+            the same --color-fd-primary custom property every other brand
+            accent uses, so it stays correct in both themes automatically
+            without a separate dark-mode color to keep in sync. No spinner,
+            matching GitHub's own bar (just the line, no icon). z-40 is the
+            highest sticky element on the page (the navbar); the default
+            z-1600 clears it with room to spare. */}
+        <NextTopLoader
+          color="var(--color-fd-primary)"
+          height={2}
+          showSpinner={false}
+          shadow="0 0 10px var(--color-fd-primary), 0 0 5px var(--color-fd-primary)"
+        />
         <RootProvider>{children}</RootProvider>
         <Script
           type="module"
