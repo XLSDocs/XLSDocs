@@ -197,6 +197,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         href: '/docs/statistical/mina#try-it',
         teaser: '"Pass" sits in an all-positive list and watch MINA report 0 as the minimum — MIN would ignore it entirely.',
       },
+      {
+        fn: 'CHISQ.TEST',
+        href: '/docs/statistical/chisq-test#try-it',
+        teaser: 'Skew the same 100 observations further from an even split and watch the p-value collapse from 0.85 to 0.0009.',
+      },
     ],
   },
 ];

@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-13',
+    title: 'T.TEST, Z.TEST, F.TEST, and CHISQ.TEST',
+    description:
+      "Round 4 of the Statistical audit — the core hypothesis-testing functions. T.TEST's type argument picks between paired, equal-variance, and unequal-variance (Welch's) comparisons on the same two samples; F.TEST checks whether that variance assumption is reasonable in the first place; CHISQ.TEST tests observed counts against an expected distribution.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-12',
     title: 'QUARTILE.EXC, PERCENTRANK.EXC, CONFIDENCE.T, PERMUT, PERMUTATIONA, FREQUENCY, and all 7 "A" variants',
     description:
