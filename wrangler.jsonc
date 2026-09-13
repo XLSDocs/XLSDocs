@@ -24,6 +24,10 @@
     {
       "binding": "FEEDBACK",
       "id": "925daacb91134dfa9c6835a256e52e08"
+    },
+    {
+      "binding": "NEXT_INC_CACHE_KV",
+      "id": "a2cca9814afd42e78db8b5c9ea871ad9"
     }
   ],
   "routes": [
