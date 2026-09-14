@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-14',
+    title: 'T.DIST, T.DIST.RT, T.DIST.2T, T.INV, and T.INV.2T',
+    description:
+      "Round 5 of the Statistical audit — the T-distribution family. All five pages follow the same t-statistic (12 degrees of freedom) across left-tailed, right-tailed, and two-tailed variants and their inverses, so it's easy to see exactly how T.DIST.2T's 0.0687 is just double T.DIST.RT's 0.0343 on the identical input.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-13',
     title: 'T.TEST, Z.TEST, F.TEST, and CHISQ.TEST',
     description:

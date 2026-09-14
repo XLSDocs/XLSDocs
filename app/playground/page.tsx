@@ -202,6 +202,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         href: '/docs/statistical/chisq-test#try-it',
         teaser: 'Skew the same 100 observations further from an even split and watch the p-value collapse from 0.85 to 0.0009.',
       },
+      {
+        fn: 'T.INV.2T',
+        href: '/docs/statistical/t-inv-2t#try-it',
+        teaser: 'Tighten from a 95% to a 99% confidence level and watch the critical value jump from 2.18 to 3.05.',
+      },
     ],
   },
 ];
