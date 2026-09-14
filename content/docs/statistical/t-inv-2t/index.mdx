@@ -1,0 +1,167 @@
+---
+title: T.INV.2T
+description: The t-value for a given two-tailed probability — the reverse of T.DIST.2T, and Excel's standard critical-value lookup.
+---
+
+Find the t-value that corresponds to a given two-tailed probability —
+the reverse of `T.DIST.2T`, and the most direct way to look up a
+critical value for a two-sided confidence interval or hypothesis
+test.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'probability is the total split across BOTH tails (0.05 for a 95% confidence level)', type: 'warn' },
+  { text: 'Always returns a positive value — represents a distance from 0', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=T.INV.2T(probability, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=T.INV.2T(probability, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive — the total two-tailed probability (split evenly across both tails) to find the corresponding t-value for.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically sample size minus 1 (or minus 2 for a two-sample test).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The positive t-value `x` such that `T.DIST.2T(x, deg_freedom)` equals
+`probability` — the critical value a t-statistic's absolute value
+needs to reach or exceed for the result to be significant at that
+level.
+
+## Description
+
+T.INV.2T is Excel's most direct route to the number printed in a
+t-table: pass it a significance level like `0.05` and it returns the
+critical value directly, without needing to convert to a one-tailed
+equivalent first the way plain `T.INV` requires
+(`T.INV(1 - 0.05/2, df)`). This is also the exact value
+`CONFIDENCE.T` multiplies by the standard error internally to build a
+margin of error.
+
+<Callout type="idea">
+  `T.INV.2T(probability, df)` and `T.INV(1 - probability/2, df)`
+  always return the same result — T.INV.2T just saves the `1 -
+  probability/2` step, and its output is guaranteed non-negative since
+  it represents a distance from zero rather than a signed position on
+  the curve.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.1': '1.7823', '0.05': '2.1788', '0.01': '3.0545' }}
+  defaultValue="0.05"
+  label={'Live preview — =T.INV.2T({probability}, 12)'}
+  fieldLabel="probability"
+/>
+
+With 12 degrees of freedom (the same sample-of-13 scenario used
+across this round's other pages), a two-tailed 95% confidence level
+(`probability = 0.05`) needs a t-statistic of at least 2.1788 in
+either direction to be significant — noticeably larger than
+`T.INV(0.95, 12)`'s 1.7823, since a two-tailed test spreads the same
+5% risk across both ends of the curve instead of concentrating it on
+one side.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`T.INV.2T(0, 12) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1.
+
+### Passing a one-tailed alpha instead of the total two-tailed probability
+
+<ExcelCode>{`T.INV.2T(0.05, 12) → 2.1788, the two-tailed critical value for a 5% total risk`}</ExcelCode>
+
+`probability` here is the combined risk across both tails, not the
+risk in one tail alone — for a 95% two-tailed confidence level, pass
+`0.05` directly (not `0.025`); T.INV.2T already splits it in half
+internally.
+
+export const faqs = [
+  {
+    question: 'T.INV.2T vs T.INV — which should I use?',
+    answer: "T.INV.2T for the common case of a two-sided confidence interval or hypothesis test — pass it the total significance level (0.05 for 95% confidence) directly. T.INV only when the test genuinely has one direction, or when a one-tailed critical value is specifically what's needed.",
+  },
+  {
+    question: 'Why is T.INV.2T\'s result always positive?',
+    answer: "Because it represents a distance from zero — the critical value a t-statistic's absolute value needs to clear — rather than a signed position on the curve. Compare it against ABS() of your actual t-statistic, not the raw signed value.",
+  },
+  {
+    question: 'How does T.INV.2T relate to CONFIDENCE.T?',
+    answer: "CONFIDENCE.T computes T.INV.2T(alpha, size - 1) internally, then multiplies it by the standard error (standard_dev / SQRT(size)) to get the full margin of error in one step. T.INV.2T is the critical-value building block on its own.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with T.INV.2T from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=T.INV.2T(0.05, 12)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim criticalValue As Double
+    criticalValue = Application.WorksheetFunction.T_Inv_2T(0.05, 12)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import t
+
+    critical_value = t.ppf(1 - 0.05 / 2, df=12)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.DIST.2T](/docs/statistical/t-dist-2t) — the reverse: finds the
+  two-tailed probability for a given t-value.
+- [T.INV](/docs/statistical/t-inv) — the one-tailed version.
+- [CONFIDENCE.T](/docs/statistical/confidence-t) — uses this same
+  critical value internally to build a full margin of error.

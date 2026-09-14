@@ -1,0 +1,165 @@
+---
+title: T.INV
+description: The t-value for a given left-tailed probability — the reverse of T.DIST.
+---
+
+Find the t-value that corresponds to a given left-tailed probability
+— the reverse of `T.DIST`, most often used to find a critical value
+for a one-tailed test or a confidence interval.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'probability is left-tailed — 0.95 finds the value with 95% of the area to its left', type: 'warn' },
+  { text: 'Returns a negative t-value when probability is below 0.5', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=T.INV(probability, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=T.INV(probability, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive — the left-tailed area to find the corresponding t-value for.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically sample size minus 1 (or minus 2 for a two-sample test).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The t-value `x` such that `T.DIST(x, deg_freedom, TRUE)` equals
+`probability` — the point with exactly that much area under the
+t-distribution curve to its left.
+
+## Description
+
+T.INV is most commonly used to find a **critical value** — the
+cutoff a t-statistic needs to clear for a result to count as
+significant at a chosen confidence level. Because it's left-tailed,
+`probability = 0.95` finds the value with 95% of the distribution to
+its left, which is the standard one-tailed 95% critical value; for a
+two-tailed 95% confidence level (splitting 5% between both tails),
+use `T.INV(0.975, df)` or, more directly, `T.INV.2T(0.05, df)`.
+
+<Callout type="idea">
+  T.INV and `T.DIST` are exact inverses of each other:
+  `T.INV(T.DIST(x, df, TRUE), df)` returns `x` back, for any valid `x`
+  and `df`. This makes T.INV useful for building a confidence interval
+  by hand — pairing it with a sample mean and standard error, the same
+  role `CONFIDENCE.T` plays in one step.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.9': '1.3562', '0.95': '1.7823', '0.975': '2.1788', '0.99': '2.6810' }}
+  defaultValue="0.95"
+  label={'Live preview — =T.INV({probability}, 12)'}
+  fieldLabel="probability"
+/>
+
+With 12 degrees of freedom (the same sample-of-13 scenario used
+across this round's other pages), `T.INV(0.95, 12)` returns 1.7823 —
+a t-statistic would need to clear that value to have only a 5% chance
+of occurring by chance in a one-tailed test. Moving to a stricter 99%
+threshold requires a noticeably larger t-value: 2.6810.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`T.INV(1, 12) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1 — the exact
+boundaries are undefined for an unbounded distribution.
+
+### Using T.INV where T.INV.2T is actually needed
+
+<ExcelCode>{`T.INV(0.95, 12) → 1.7823, not the same as T.INV.2T(0.05, 12) → 2.1788`}</ExcelCode>
+
+T.INV(0.95, df) finds the one-tailed 95% critical value. A two-tailed
+95% confidence level needs `T.INV(0.975, df)` or `T.INV.2T(0.05, df)`
+— using plain `T.INV(0.95, df)` for a two-tailed interval understates
+how wide it should be.
+
+export const faqs = [
+  {
+    question: 'T.INV vs T.INV.2T — which should I use?',
+    answer: "T.INV for a one-tailed critical value, at exactly the probability given. T.INV.2T for the more common two-tailed case — pass it the total probability split across both tails (0.05 for a 95% confidence level), rather than computing T.INV(1 - alpha/2, df) yourself.",
+  },
+  {
+    question: 'Why does T.INV sometimes return a negative number?',
+    answer: "Because the t-distribution is centered at 0, any probability below 0.5 corresponds to a point on the left side of the curve — T.INV(0.1, df), for example, returns a negative t-value, since only 10% of the area lies that far to the left.",
+  },
+  {
+    question: 'How is T.INV related to CONFIDENCE.T?',
+    answer: 'CONFIDENCE.T computes a full margin of error in one step, internally calling something equivalent to T.INV.2T on the confidence level and multiplying by the standard error. T.INV is the lower-level building block for constructing that calculation (or a one-tailed critical value) by hand.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with T.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=T.INV(0.95, 12)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim criticalValue As Double
+    criticalValue = Application.WorksheetFunction.T_Inv(0.95, 12)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import t
+
+    critical_value = t.ppf(0.95, df=12)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.DIST](/docs/statistical/t-dist) — the reverse: finds the
+  left-tailed probability for a given t-value.
+- [T.INV.2T](/docs/statistical/t-inv-2t) — the two-tailed version,
+  usually the more natural fit for a confidence interval.
+- [CONFIDENCE.T](/docs/statistical/confidence-t) — computes a full
+  margin of error in one step, using this same underlying inverse.

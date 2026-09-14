@@ -1,0 +1,162 @@
+---
+title: T.DIST.2T
+description: The two-tailed Student's t-distribution — the probability a t-statistic is this extreme in either direction.
+---
+
+Return the two-tailed probability of the Student's t-distribution —
+the combined area under both tails beyond `x` and `-x`, the p-value
+shape most significance tests actually compare against a threshold.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'x must be non-negative — it represents a distance from 0, not a direction', type: 'warn' },
+  { text: 'Equivalent to 2 * T.DIST.RT(x, deg_freedom)', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=T.DIST.2T(x, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=T.DIST.2T(x, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The t-value to evaluate — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically sample size minus 1 (or minus 2 for a two-sample test).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The probability that a t-distributed random variable with
+`deg_freedom` degrees of freedom is at least as extreme as `x`, in
+either direction — the combined area under both tails beyond `x` and
+`-x`.
+
+## Description
+
+T.DIST.2T answers "how likely is a result this far from zero, in
+either direction" — exactly the question a typical two-sided
+hypothesis test asks. Because the t-distribution is symmetric around
+0, this is always exactly double the right tail alone:
+`T.DIST.2T(x, df) = 2 * T.DIST.RT(x, df)`. This is also the same
+value `T.TEST` returns internally when its `tails` argument is 2.
+
+<Callout type="warn">
+  `x` must be **non-negative** — T.DIST.2T treats it as a distance
+  from zero, not a signed value. Passing a negative `x` returns
+  `#NUM!`; use `ABS()` on a raw t-statistic first if it might be
+  negative, e.g. `=T.DIST.2T(ABS(t_stat), df)`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.5': '0.1595', '2': '0.0687', '2.5': '0.0279', '3': '0.0111' }}
+  defaultValue="2"
+  label={'Live preview — =T.DIST.2T({t}, 12)'}
+  fieldLabel="t"
+/>
+
+The same t-statistic from a 13-observation sample (12 degrees of
+freedom) used on `T.DIST`'s and `T.DIST.RT`'s pages. At `t = 2`,
+T.DIST.2T returns 0.0687 — exactly double T.DIST.RT's 0.0343 on the
+identical input, since both tails are equally likely by symmetry.
+Neither `t = 1.5` (0.1595) nor `t = 2` clears the common 0.05
+significance threshold; `t = 2.5` (0.0279) does.
+
+## Common errors
+
+### #NUM! — x is negative
+
+<ExcelCode>{`T.DIST.2T(-2, 12) → #NUM!`}</ExcelCode>
+
+`x` represents a distance from zero, not a signed t-statistic — wrap
+a possibly-negative value in `ABS()` before passing it in.
+
+### #NUM! — deg_freedom is less than 1
+
+<ExcelCode>{`T.DIST.2T(2, 0) → #NUM!`}</ExcelCode>
+
+`deg_freedom` must be at least 1.
+
+export const faqs = [
+  {
+    question: 'Why does T.DIST.2T reject negative x?',
+    answer: 'Because x represents a distance from zero (how extreme the t-statistic is), not a direction — the function already accounts for both tails internally. Wrap a raw, possibly-negative t-statistic in ABS() before passing it in.',
+  },
+  {
+    question: 'Is T.DIST.2T the same as T.TEST with tails = 2?',
+    answer: 'T.DIST.2T converts a t-statistic you already have into a two-tailed probability. T.TEST computes the t-statistic itself from two data arrays and then does exactly this conversion internally when tails is 2 — same underlying math, different starting point.',
+  },
+  {
+    question: 'Should I use T.DIST.2T or T.DIST.RT for my hypothesis test?',
+    answer: 'T.DIST.2T for most real-world tests, which ask whether something is different in either direction. T.DIST.RT only when the hypothesis has an explicit direction built in, like testing whether a value is specifically greater than expected.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with T.DIST.2T from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=T.DIST.2T(2, 12)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pValue As Double
+    pValue = Application.WorksheetFunction.T_Dist_2T(2, 12)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import t
+
+    p_value = 2 * (1 - t.cdf(2, df=12))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.DIST.RT](/docs/statistical/t-dist-rt) — the one-tailed version,
+  exactly half of T.DIST.2T's result.
+- [T.INV.2T](/docs/statistical/t-inv-2t) — the reverse: finds the
+  t-value for a given two-tailed probability.
+- [T.TEST](/docs/statistical/t-test) — computes the t-statistic this
+  function converts to a probability, directly from two data samples.

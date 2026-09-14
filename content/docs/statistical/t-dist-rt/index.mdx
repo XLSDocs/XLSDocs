@@ -1,0 +1,160 @@
+---
+title: T.DIST.RT
+description: The right-tailed Student's t-distribution — the probability a t-statistic exceeds a given value.
+---
+
+Return the right-tailed probability of the Student's t-distribution —
+the area under the curve to the right of a given t-value, the shape
+most one-tailed hypothesis tests actually need.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Right-tailed only — negative x still returns a probability above 0.5', type: 'warn' },
+  { text: 'Equivalent to 1 - T.DIST(x, deg_freedom, TRUE)', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=T.DIST.RT(x, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=T.DIST.RT(x, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The t-value to evaluate the distribution at.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically sample size minus 1 (or minus 2 for a two-sample test).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The probability that a t-distributed random variable with
+`deg_freedom` degrees of freedom is greater than or equal to `x` — the
+area under the curve to the right of `x`.
+
+## Description
+
+T.DIST.RT is the mirror image of `T.DIST`'s cumulative result:
+`T.DIST.RT(x, df)` always equals `1 - T.DIST(x, df, TRUE)`. It's the
+natural choice for a one-tailed "is the true value greater than this"
+question — the same role `T.DIST` plays on the left side.
+
+<Callout type="idea">
+  T.DIST.RT doesn't take a `cumulative` argument — unlike `T.DIST`, it
+  only ever returns a probability, never a density. There's no
+  "right-tailed density" concept, since density doesn't have a
+  direction.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.5': '0.0797', '2': '0.0343', '2.5': '0.0140', '3': '0.0055' }}
+  defaultValue="2"
+  label={'Live preview — =T.DIST.RT({t}, 12)'}
+  fieldLabel="t"
+/>
+
+The same t-statistic from a 13-observation sample (12 degrees of
+freedom) used on `T.DIST`'s page. At `t = 2`, T.DIST.RT returns
+0.0343 — only 3.43% of the distribution's area lies to the right of
+2, which is exactly `1 - 0.9657` from T.DIST's left-tailed result on
+the identical input.
+
+## Common errors
+
+### #NUM! — deg_freedom is less than 1
+
+<ExcelCode>{`T.DIST.RT(2, 0) → #NUM!`}</ExcelCode>
+
+`deg_freedom` must be at least 1.
+
+### Using T.DIST.RT when the test is actually two-tailed
+
+<ExcelCode>{`T.DIST.RT(2, 12) → 0.0343, not the same as the two-tailed 0.0687`}</ExcelCode>
+
+A one-tailed result is only appropriate when the hypothesis being
+tested has a direction ("is the mean greater than X," not just
+"different from X"). For a non-directional test, use `T.DIST.2T`
+instead — it's exactly double this result.
+
+export const faqs = [
+  {
+    question: 'Why doesn\'t T.DIST.RT have a cumulative argument like T.DIST?',
+    answer: 'Because T.DIST.RT only ever returns a probability, never a density — "right-tailed density" isn\'t a meaningful concept since density has no direction. T.DIST needs the argument because it can return either a probability or a density.',
+  },
+  {
+    question: 'When should I use T.DIST.RT instead of T.DIST.2T?',
+    answer: 'Only when the hypothesis genuinely has a direction — for example, testing whether a new process is faster, not just different. Most real-world significance tests are two-tailed (testing for any difference, in either direction), which calls for T.DIST.2T.',
+  },
+  {
+    question: 'Does T.DIST.RT work the same as the legacy TDIST function?',
+    answer: 'For a one-tailed request, yes — TDIST(x, df, 1) matches T.DIST.RT(x, df). TDIST\'s tails argument also supported a two-tailed mode that T.DIST.RT doesn\'t have; use T.DIST.2T for that case instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with T.DIST.RT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=T.DIST.RT(2, 12)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.T_Dist_RT(2, 12)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import t
+
+    probability = 1 - t.cdf(2, df=12)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.DIST](/docs/statistical/t-dist) — the left-tailed version of the
+  same distribution.
+- [T.DIST.2T](/docs/statistical/t-dist-2t) — the two-tailed version,
+  usually what a hypothesis test actually needs.
+- [T.INV.2T](/docs/statistical/t-inv-2t) — the reverse: finds the
+  t-value for a given two-tailed probability.

@@ -1,0 +1,171 @@
+---
+title: T.DIST
+description: The left-tailed Student's t-distribution — cumulative probability or density at a given t-value.
+---
+
+Return a value from the Student's t-distribution — either the
+left-tailed cumulative probability up to a given t-value, or the raw
+density there.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'Left-tailed — use T.DIST.RT for the right tail, T.DIST.2T for both', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=T.DIST(x, deg_freedom, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=T.DIST(x, deg_freedom, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The t-value to evaluate the distribution at.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically sample size minus 1 (or minus 2 for a two-sample test).',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a t-distributed random
+variable with `deg_freedom` degrees of freedom is less than or equal
+to `x` — the area under the curve to the left of `x`. With
+`cumulative` `FALSE`: the density of that curve at `x`.
+
+## Description
+
+T.DIST is the direct way to turn a t-statistic (the kind `T.TEST`
+computes internally) into a left-tailed probability. The
+t-distribution looks like the standard normal curve but with fatter
+tails — the smaller `deg_freedom` is, the fatter those tails are, and
+the more T.DIST's result differs from what `NORM.S.DIST` would give
+on the same input. As `deg_freedom` grows large, the two converge.
+
+<Callout type="warn">
+  T.DIST is **left-tailed**, unlike the legacy `TDIST` function, which
+  was always right-tailed (and two-tailed only) — porting an old
+  `TDIST` formula to T.DIST isn't a drop-in swap. For a right-tailed
+  result, use `T.DIST.RT`; for the classic two-tailed p-value a
+  hypothesis test usually needs, use `T.DIST.2T`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.5': '0.9203', '2': '0.9657', '2.5': '0.9860', '3': '0.9945' }}
+  defaultValue="2"
+  label={'Live preview — =T.DIST({t}, 12, TRUE)'}
+  fieldLabel="t"
+/>
+
+A t-statistic computed from a sample of 13 observations (12 degrees
+of freedom). At `t = 2`, T.DIST returns 0.9657 — 96.57% of the
+distribution's area sits to the left of 2. As `t` climbs toward 3,
+the result creeps closer to 1, since fewer and fewer outcomes lie
+further left.
+
+## Common errors
+
+### #NUM! — deg_freedom is less than 1
+
+<ExcelCode>{`T.DIST(2, 0, TRUE) → #NUM!`}</ExcelCode>
+
+`deg_freedom` must be at least 1 — a t-distribution needs at least one
+degree of freedom to be defined.
+
+### Expecting a two-tailed result from T.DIST directly
+
+<ExcelCode>{`T.DIST(2, 12, TRUE) → 0.9657, not a p-value ready to compare against 0.05`}</ExcelCode>
+
+T.DIST's raw result is the left tail only. For the two-tailed p-value
+a typical hypothesis test compares against a 0.05 threshold, use
+`T.DIST.2T` instead, or compute `2 * MIN(T.DIST(x, df, TRUE), 1 -
+T.DIST(x, df, TRUE))`.
+
+export const faqs = [
+  {
+    question: 'T.DIST vs T.DIST.RT vs T.DIST.2T — which should I use?',
+    answer: 'T.DIST for a left-tailed probability (P(T ≤ x)). T.DIST.RT for a right-tailed probability (P(T ≥ x)) — the more common choice for a one-tailed hypothesis test. T.DIST.2T for the two-tailed probability most significance tests actually compare against a threshold like 0.05.',
+  },
+  {
+    question: 'Is T.DIST the same as the legacy TDIST function?',
+    answer: 'No — TDIST was always right-tailed (or two-tailed, depending on its tails argument) and never left-tailed. T.DIST is left-tailed only; use T.DIST.RT or T.DIST.2T to match TDIST\'s old behavior.',
+  },
+  {
+    question: 'How is T.DIST related to T.TEST?',
+    answer: 'T.TEST computes a t-statistic from two samples internally and then converts it to a probability using exactly this distribution. T.DIST lets you do that conversion yourself on a t-statistic from any source, not just T.TEST\'s own arrays.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with T.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=T.DIST(2, 12, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.T_Dist(2, 12, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import t
+
+    probability = t.cdf(2, df=12)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.DIST.RT](/docs/statistical/t-dist-rt) — the right-tailed version
+  of the same distribution.
+- [T.DIST.2T](/docs/statistical/t-dist-2t) — the two-tailed version,
+  usually what a hypothesis test actually needs.
+- [T.INV](/docs/statistical/t-inv) — the reverse: finds the t-value
+  for a given left-tailed probability.
