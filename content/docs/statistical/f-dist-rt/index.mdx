@@ -1,0 +1,168 @@
+---
+title: F.DIST.RT
+description: The right-tailed F-distribution — the shape F.TEST's underlying variance-ratio statistic actually points in.
+---
+
+Return the right-tailed probability of the F-distribution — the area
+under the curve to the right of a given F-value.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'The standard shape for one-tailed variance comparisons and ANOVA', type: 'check' },
+  { text: 'Equivalent to 1 - F.DIST(x, deg_freedom1, deg_freedom2, TRUE)', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=F.DIST.RT(x, deg_freedom1, deg_freedom2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=F.DIST.RT(x, deg_freedom1, deg_freedom2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The F-value to evaluate — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom1',
+    type: 'number',
+    required: true,
+    description: 'The numerator degrees of freedom.',
+  },
+  {
+    name: 'deg_freedom2',
+    type: 'number',
+    required: true,
+    description: 'The denominator degrees of freedom.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The probability that an F-distributed random variable with
+`deg_freedom1` and `deg_freedom2` degrees of freedom is greater than
+or equal to `x` — the area under the curve to the right of `x`.
+
+## Description
+
+F.DIST.RT is the mirror image of `F.DIST`'s cumulative result:
+`F.DIST.RT(x, df1, df2)` always equals
+`1 - F.DIST(x, df1, df2, TRUE)`. It's the standard shape for a
+one-tailed variance-ratio question — the underlying calculation
+behind an ANOVA F-test's p-value, where a large ratio of between-group
+to within-group variance is the evidence a real effect exists.
+
+<Callout type="idea">
+  `F.TEST`'s own two-tailed result is built from this same right
+  tail: `F.TEST(array1, array2)` equals `2 * MIN(F.DIST.RT(F, df1,
+  df2), 1 - F.DIST.RT(F, df1, df2))`, where `F` is the ratio of the
+  two arrays' sample variances.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.6906', '1': '0.4323', '2': '0.1780', '3.71': '0.0499' }}
+  defaultValue="1"
+  label={'Live preview — =F.DIST.RT({x}, 3, 10)'}
+  fieldLabel="x"
+/>
+
+The same variance-ratio statistic (3 and 10 degrees of freedom) used
+on `F.DIST`'s page. At `x = 3.71`, F.DIST.RT returns almost exactly
+0.0499 — the standard 5% significance threshold for this pair of
+degrees of freedom, and `1 - 0.9501` from F.DIST's left-tailed result
+on the identical input.
+
+## Common errors
+
+### #NUM! — x is negative, or either deg_freedom is less than 1
+
+<ExcelCode>{`F.DIST.RT(-1, 3, 10) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative, and both degrees-of-freedom arguments must
+be at least 1.
+
+### Forgetting F.DIST.RT's result depends on argument order
+
+<ExcelCode>{`F.DIST.RT(1, 3, 10) → 0.4323, not the same as F.DIST.RT(1, 10, 3) → 0.5677`}</ExcelCode>
+
+Swapping `deg_freedom1` and `deg_freedom2` changes the answer here,
+unlike F.TEST's own two-tailed result — match the order to whichever
+sample's variance was actually used as the numerator when the
+F-statistic was computed.
+
+export const faqs = [
+  {
+    question: 'How does F.DIST.RT relate to an ANOVA F-test?',
+    answer: 'ANOVA computes an F-statistic (between-group variance divided by within-group variance) and reports a p-value from the right tail of the F-distribution — exactly what F.DIST.RT calculates. Excel\'s own ANOVA tool reports this p-value directly, computed internally the same way.',
+  },
+  {
+    question: 'F.DIST.RT vs F.DIST — which should I use?',
+    answer: 'F.DIST.RT for the right-tailed probability most one-tailed variance tests and ANOVA p-values need. F.DIST for the left-tailed probability or the density curve itself.',
+  },
+  {
+    question: 'Is F.DIST.RT the same as the legacy FDIST function?',
+    answer: 'Yes — FDIST(x, df1, df2) and F.DIST.RT(x, df1, df2) return identical results. FDIST still works for backward compatibility, but Microsoft recommends F.DIST.RT for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with F.DIST.RT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=F.DIST.RT(3.71, 3, 10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pValue As Double
+    pValue = Application.WorksheetFunction.F_Dist_RT(3.71, 3, 10)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import f
+
+    p_value = 1 - f.cdf(3.71, dfn=3, dfd=10)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [F.DIST](/docs/statistical/f-dist) — the left-tailed version of the
+  same distribution.
+- [F.INV.RT](/docs/statistical/f-inv-rt) — the reverse: finds the
+  F-value for a given right-tailed probability.
+- [F.TEST](/docs/statistical/f-test) — builds its two-tailed result
+  from this same right tail.

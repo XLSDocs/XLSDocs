@@ -1,0 +1,180 @@
+---
+title: F.DIST
+description: The left-tailed F-distribution — cumulative probability or density at a given F-value.
+---
+
+Return a value from the F-distribution — either the left-tailed
+cumulative probability up to a given F-value, or the raw density
+there.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'Left-tailed — use F.DIST.RT for the right tail, which F.TEST uses internally', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=F.DIST(x, deg_freedom1, deg_freedom2, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=F.DIST(x, deg_freedom1, deg_freedom2, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The F-value to evaluate the distribution at — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom1',
+    type: 'number',
+    required: true,
+    description: 'The numerator degrees of freedom.',
+  },
+  {
+    name: 'deg_freedom2',
+    type: 'number',
+    required: true,
+    description: 'The denominator degrees of freedom.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that an F-distributed
+random variable with `deg_freedom1` and `deg_freedom2` degrees of
+freedom is less than or equal to `x`. With `cumulative` `FALSE`: the
+density of that curve at `x`.
+
+## Description
+
+F.DIST is the direct way to turn an F-statistic (the kind `F.TEST`
+computes internally as a ratio of two variances) into a left-tailed
+probability. Unlike the symmetric normal or t-distributions, the
+F-distribution only takes non-negative values, and its exact shape
+depends on **both** degrees-of-freedom parameters — swapping
+`deg_freedom1` and `deg_freedom2` changes the curve, unlike F.TEST's
+own result, which stays the same either way.
+
+<Callout type="warn">
+  F.DIST is **left-tailed**, but `F.TEST` reports a two-tailed result
+  built from the right tail. Use `F.DIST.RT`, not plain F.DIST, if the
+  goal is reproducing the direction F.TEST's underlying statistic
+  actually points in.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.3094', '1': '0.5677', '2': '0.8220', '3.71': '0.9501' }}
+  defaultValue="1"
+  label={'Live preview — =F.DIST({x}, 3, 10, TRUE)'}
+  fieldLabel="x"
+/>
+
+A variance-ratio statistic tested with 3 and 10 degrees of freedom.
+At `x = 1` (equal variances), F.DIST returns 0.5677 — noticeably
+above 0.5 because the F-distribution isn't symmetric, unlike the
+normal or t-distributions. At `x = 3.71`, the standard 95%
+critical value for this pair of degrees of freedom, F.DIST returns
+almost exactly 0.9501.
+
+## Common errors
+
+### #NUM! — x is negative, or either deg_freedom is less than 1
+
+<ExcelCode>{`F.DIST(-1, 3, 10, TRUE) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative, and both degrees-of-freedom arguments must
+be at least 1.
+
+### Swapping deg_freedom1 and deg_freedom2 by mistake
+
+<ExcelCode>{`F.DIST(1, 3, 10, TRUE) → 0.5677, not the same as F.DIST(1, 10, 3, TRUE) → 0.4323`}</ExcelCode>
+
+Unlike `F.TEST` (which returns the same two-tailed answer regardless
+of argument order), F.DIST's result genuinely depends on which
+degrees of freedom is the numerator and which is the denominator —
+double-check they're in the right order for what `x` was actually
+computed from.
+
+export const faqs = [
+  {
+    question: 'F.DIST vs F.DIST.RT — which should I use?',
+    answer: 'F.DIST for a left-tailed probability (P(X ≤ x)) or the density curve. F.DIST.RT for a right-tailed probability (P(X ≥ x)) — the shape most F-test critical values and p-values are actually built around.',
+  },
+  {
+    question: 'Why does F.DIST(1, df1, df2, TRUE) not equal 0.5?',
+    answer: "Because the F-distribution isn't symmetric — unlike the normal or t-distribution, its median generally isn't 1 even though its numerator and denominator variances are equal on average. The distribution is right-skewed, more so at low degrees of freedom.",
+  },
+  {
+    question: 'Is F.DIST the same as the legacy FDIST function?',
+    answer: 'No — FDIST was always right-tailed. F.DIST is left-tailed only; use F.DIST.RT to match FDIST\'s old behavior.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with F.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=F.DIST(3.71, 3, 10, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.F_Dist(3.71, 3, 10, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import f
+
+    probability = f.cdf(3.71, dfn=3, dfd=10)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [F.DIST.RT](/docs/statistical/f-dist-rt) — the right-tailed
+  version.
+- [F.INV](/docs/statistical/f-inv) — the reverse: finds the F-value
+  for a given left-tailed probability.
+- [F.TEST](/docs/statistical/f-test) — computes an F-statistic from
+  two samples' variances, then converts it to a probability using this
+  same distribution.

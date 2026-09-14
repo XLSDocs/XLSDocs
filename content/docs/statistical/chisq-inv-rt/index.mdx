@@ -1,0 +1,163 @@
+---
+title: CHISQ.INV.RT
+description: The chi-square value for a given right-tailed probability — Excel's standard chi-square critical-value lookup.
+---
+
+Find the chi-square value that corresponds to a given right-tailed
+probability — the reverse of `CHISQ.DIST.RT`, and the most direct way
+to look up a chi-square critical value using the same convention
+`CHISQ.TEST` reports as a p-value.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'probability is right-tailed — matches CHISQ.TEST\'s p-value convention directly', type: 'check' },
+  { text: 'Equivalent to CHISQ.INV(1 - probability, deg_freedom)', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHISQ.INV.RT(probability, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHISQ.INV.RT(probability, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive — the right-tailed area to find the corresponding chi-square value for.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically the number of categories minus 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The chi-square value `x` such that `CHISQ.DIST.RT(x, deg_freedom)`
+equals `probability` — the critical value a chi-square statistic
+needs to reach or exceed to be significant at that level.
+
+## Description
+
+CHISQ.INV.RT takes a significance level like `0.05` and returns the
+critical value directly, using the same right-tailed convention
+`CHISQ.TEST` reports as a p-value — no need to convert to
+`1 - probability` first the way plain `CHISQ.INV` requires. This is
+the function most textbook chi-square tables are actually built
+around.
+
+<Callout type="idea">
+  `CHISQ.INV.RT(probability, df)` and `CHISQ.INV(1 - probability, df)`
+  always return the same result — CHISQ.INV.RT just saves the
+  `1 - probability` step, and matches the direction CHISQ.TEST already
+  reports its p-value in.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '3.3567', '0.1': '7.7794', '0.05': '9.4877', '0.01': '13.2767' }}
+  defaultValue="0.05"
+  label={'Live preview — =CHISQ.INV.RT({probability}, 4)'}
+  fieldLabel="probability"
+/>
+
+With 4 degrees of freedom (the same 5-category scenario used across
+this round's other pages), a chi-square statistic needs to reach at
+least 9.4877 to produce a p-value of 0.05 or smaller —
+`CHISQ.INV.RT(0.05, 4)` returns exactly that value, identical to
+`CHISQ.INV(0.95, 4)` on `CHISQ.INV`'s own page.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`CHISQ.INV.RT(0, 4) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1.
+
+### Confusing this with CHISQ.INV's left-tailed convention
+
+<ExcelCode>{`CHISQ.INV.RT(0.05, 4) → 9.4877, the same value as CHISQ.INV(0.95, 4)`}</ExcelCode>
+
+Both functions can produce the identical critical value — the
+difference is only which probability convention gets passed in.
+CHISQ.INV.RT matches CHISQ.TEST's own p-value direction, so it's
+usually the more natural fit when the significance level is already
+known as a small number like 0.05.
+
+export const faqs = [
+  {
+    question: 'Why does CHISQ.INV.RT match CHISQ.TEST\'s convention better than CHISQ.INV?',
+    answer: 'Because CHISQ.TEST reports a right-tailed p-value (a small p-value means a significant difference). CHISQ.INV.RT takes a right-tailed probability directly, so a significance level like 0.05 can be passed in without converting it first — CHISQ.INV would need 1 - 0.05 = 0.95 instead.',
+  },
+  {
+    question: 'Is CHISQ.INV.RT the same as the legacy CHIINV function?',
+    answer: 'Yes — CHIINV(probability, df) and CHISQ.INV.RT(probability, df) return identical results. CHIINV still works for backward compatibility, but Microsoft recommends CHISQ.INV.RT for new formulas.',
+  },
+  {
+    question: 'How do I check if a CHISQ.TEST result is significant using CHISQ.INV.RT?',
+    answer: 'Compute the raw chi-square statistic (SUMPRODUCT((actual - expected)^2 / expected)), then compare it against CHISQ.INV.RT(0.05, df) — if the statistic exceeds that critical value, the result is significant at the 5% level, matching what CHISQ.TEST\'s own p-value would show.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHISQ.INV.RT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHISQ.INV.RT(0.05, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim criticalValue As Double
+    criticalValue = Application.WorksheetFunction.ChiSq_Inv_RT(0.05, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import chi2
+
+    critical_value = chi2.ppf(1 - 0.05, df=4)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt) — the reverse:
+  finds the right-tailed probability for a given chi-square value.
+- [CHISQ.INV](/docs/statistical/chisq-inv) — the left-tailed version.
+- [CHISQ.TEST](/docs/statistical/chisq-test) — reports the same
+  right-tailed probability this function inverts.

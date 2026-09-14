@@ -1,0 +1,168 @@
+---
+title: F.INV.RT
+description: The F-value for a given right-tailed probability — Excel's standard F-distribution critical-value lookup.
+---
+
+Find the F-value that corresponds to a given right-tailed probability
+— the reverse of `F.DIST.RT`, and the most direct way to look up an
+F critical value using the same convention most F-tables and ANOVA
+results are built around.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'probability is right-tailed — matches F.TEST\'s and ANOVA\'s p-value convention directly', type: 'check' },
+  { text: 'Equivalent to F.INV(1 - probability, deg_freedom1, deg_freedom2)', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=F.INV.RT(probability, deg_freedom1, deg_freedom2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=F.INV.RT(probability, deg_freedom1, deg_freedom2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive — the right-tailed area to find the corresponding F-value for.',
+  },
+  {
+    name: 'deg_freedom1',
+    type: 'number',
+    required: true,
+    description: 'The numerator degrees of freedom.',
+  },
+  {
+    name: 'deg_freedom2',
+    type: 'number',
+    required: true,
+    description: 'The denominator degrees of freedom.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The F-value `x` such that `F.DIST.RT(x, deg_freedom1, deg_freedom2)`
+equals `probability` — the critical value an F-statistic needs to
+reach or exceed to be significant at that level.
+
+## Description
+
+F.INV.RT takes a significance level like `0.05` and returns the
+critical value directly, using the same right-tailed convention most
+printed F-tables (and Excel's own ANOVA output) are built around — no
+need to convert to `1 - probability` first the way plain `F.INV`
+requires.
+
+<Callout type="idea">
+  `F.INV.RT(probability, df1, df2)` and `F.INV(1 - probability, df1,
+  df2)` always return the same result — F.INV.RT just saves the
+  `1 - probability` step, and matches the direction most F-test
+  critical-value tables are already printed in.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.8451', '0.1': '2.7277', '0.05': '3.7083', '0.01': '6.5523' }}
+  defaultValue="0.05"
+  label={'Live preview — =F.INV.RT({probability}, 3, 10)'}
+  fieldLabel="probability"
+/>
+
+With 3 and 10 degrees of freedom (the same scenario used across this
+round's other F pages), an F-statistic needs to reach at least
+3.7083 to be significant at the 5% level — `F.INV.RT(0.05, 3, 10)`
+returns exactly that value, identical to `F.INV(0.95, 3, 10)` on
+`F.INV`'s own page.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`F.INV.RT(0, 3, 10) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1.
+
+### Forgetting deg_freedom order still matters here
+
+<ExcelCode>{`F.INV.RT(0.05, 3, 10) → 3.7083, not the same as F.INV.RT(0.05, 10, 3) → 8.7855`}</ExcelCode>
+
+Even though F.TEST's own two-tailed result doesn't care about
+argument order, F.INV.RT's critical value does — make sure
+`deg_freedom1` and `deg_freedom2` match whichever sample's variance
+was actually the numerator when the underlying F-statistic was
+computed.
+
+export const faqs = [
+  {
+    question: 'Why does F.INV.RT match F-tables and ANOVA output better than F.INV?',
+    answer: "Because printed F-tables and Excel's own ANOVA tool report a right-tailed significance level (a small p-value means a significant result). F.INV.RT takes that same right-tailed probability directly, so a threshold like 0.05 can be passed in without converting it first.",
+  },
+  {
+    question: 'How do I find the F critical value for a 95% confidence ANOVA test?',
+    answer: 'Use F.INV.RT(0.05, df1, df2) — this returns the same critical value a printed F-table would show for a 5% significance level with those degrees of freedom.',
+  },
+  {
+    question: 'Is F.INV.RT the same as the legacy FINV function?',
+    answer: 'Yes — FINV(probability, df1, df2) and F.INV.RT(probability, df1, df2) return identical results. FINV still works for backward compatibility, but Microsoft recommends F.INV.RT for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with F.INV.RT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=F.INV.RT(0.05, 3, 10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim criticalValue As Double
+    criticalValue = Application.WorksheetFunction.F_Inv_RT(0.05, 3, 10)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import f
+
+    critical_value = f.ppf(1 - 0.05, dfn=3, dfd=10)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [F.DIST.RT](/docs/statistical/f-dist-rt) — the reverse: finds the
+  right-tailed probability for a given F-value.
+- [F.INV](/docs/statistical/f-inv) — the left-tailed version.
+- [F.TEST](/docs/statistical/f-test) — reports a two-tailed result
+  built from this same right-tailed convention.

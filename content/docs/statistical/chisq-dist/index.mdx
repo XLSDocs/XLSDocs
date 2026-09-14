@@ -1,0 +1,171 @@
+---
+title: CHISQ.DIST
+description: The left-tailed chi-square distribution — cumulative probability or density at a given chi-square value.
+---
+
+Return a value from the chi-square distribution — either the
+left-tailed cumulative probability up to a given value, or the raw
+density there.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'Left-tailed — use CHISQ.DIST.RT for the right tail, which CHISQ.TEST uses internally', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHISQ.DIST(x, deg_freedom, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHISQ.DIST(x, deg_freedom, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The chi-square value to evaluate the distribution at — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically the number of categories minus 1.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a chi-square-distributed
+random variable with `deg_freedom` degrees of freedom is less than or
+equal to `x`. With `cumulative` `FALSE`: the density of that curve
+at `x`.
+
+## Description
+
+CHISQ.DIST is the direct way to turn a chi-square statistic (the kind
+`CHISQ.TEST` computes internally from observed-vs-expected counts)
+into a left-tailed probability. Unlike the symmetric normal or
+t-distributions, the chi-square distribution only takes non-negative
+values and is right-skewed — more so at low degrees of freedom, and
+increasingly bell-shaped as `deg_freedom` grows.
+
+<Callout type="warn">
+  CHISQ.DIST is **left-tailed**, but `CHISQ.TEST` itself works off the
+  **right** tail — a large chi-square statistic (evidence the
+  observed and expected counts really differ) corresponds to a
+  *small* right-tail probability. Use `CHISQ.DIST.RT`, not plain
+  CHISQ.DIST, to reproduce the p-value shape CHISQ.TEST returns.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2': '0.2642', '5': '0.7127', '9.488': '0.9500', '13': '0.9887' }}
+  defaultValue="9.488"
+  label={'Live preview — =CHISQ.DIST({x}, 4, TRUE)'}
+  fieldLabel="x"
+/>
+
+A chi-square statistic tested against 4 degrees of freedom (5
+categories). At `x = 9.488` — the standard critical value for a 95%
+confidence level at this degree of freedom — CHISQ.DIST returns
+exactly 0.9500: 95% of the distribution's area sits to the left of
+that point.
+
+## Common errors
+
+### #NUM! — x is negative, or deg_freedom is less than 1
+
+<ExcelCode>{`CHISQ.DIST(-2, 4, TRUE) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative and `deg_freedom` must be at least 1 — the
+chi-square distribution is only defined for non-negative values.
+
+### Expecting CHISQ.DIST to match CHISQ.TEST's p-value directly
+
+<ExcelCode>{`CHISQ.DIST(9.488, 4, TRUE) → 0.9500, not the 0.05 p-value CHISQ.TEST would report on the same statistic`}</ExcelCode>
+
+CHISQ.TEST reports a right-tailed probability — the chance of a
+statistic *at least this large*. Use `1 - CHISQ.DIST(x, df, TRUE)`,
+or more directly `CHISQ.DIST.RT(x, df)`, to match it.
+
+export const faqs = [
+  {
+    question: 'CHISQ.DIST vs CHISQ.DIST.RT — which should I use?',
+    answer: 'CHISQ.DIST for a left-tailed probability (P(X ≤ x)) or for the density curve itself. CHISQ.DIST.RT for the right-tailed probability (P(X ≥ x)) that CHISQ.TEST and most chi-square hypothesis tests actually report as a p-value.',
+  },
+  {
+    question: 'Why is the chi-square distribution never negative?',
+    answer: 'Because a chi-square statistic is built from squared differences (like (observed − expected)² / expected in CHISQ.TEST) — squares can\'t be negative, so neither can their sum.',
+  },
+  {
+    question: 'Is CHISQ.DIST the same as the legacy CHIDIST function?',
+    answer: 'No — CHIDIST was always right-tailed. CHISQ.DIST is left-tailed only; use CHISQ.DIST.RT to match CHIDIST\'s old behavior.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHISQ.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHISQ.DIST(9.488, 4, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.ChiSq_Dist(9.488, 4, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import chi2
+
+    probability = chi2.cdf(9.488, df=4)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt) — the right-tailed
+  version, matching CHISQ.TEST's p-value shape.
+- [CHISQ.INV](/docs/statistical/chisq-inv) — the reverse: finds the
+  chi-square value for a given left-tailed probability.
+- [CHISQ.TEST](/docs/statistical/chisq-test) — computes a chi-square
+  statistic from observed and expected counts, then converts it to a
+  probability using this same distribution.

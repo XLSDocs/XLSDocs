@@ -1,0 +1,166 @@
+---
+title: CHISQ.DIST.RT
+description: The right-tailed chi-square distribution — the p-value shape CHISQ.TEST reports internally.
+---
+
+Return the right-tailed probability of the chi-square distribution —
+the area under the curve to the right of a given value, matching the
+p-value `CHISQ.TEST` reports internally.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'This is the p-value shape most chi-square hypothesis tests actually use', type: 'check' },
+  { text: 'Equivalent to 1 - CHISQ.DIST(x, deg_freedom, TRUE)', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHISQ.DIST.RT(x, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHISQ.DIST.RT(x, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The chi-square value to evaluate — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically the number of categories minus 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The probability that a chi-square-distributed random variable with
+`deg_freedom` degrees of freedom is greater than or equal to `x` —
+the area under the curve to the right of `x`.
+
+## Description
+
+CHISQ.DIST.RT is the mirror image of `CHISQ.DIST`'s cumulative
+result: `CHISQ.DIST.RT(x, df)` always equals
+`1 - CHISQ.DIST(x, df, TRUE)`. Because a large chi-square statistic
+means the observed data diverges sharply from what was expected, the
+right tail — "how likely is a statistic at least this extreme" — is
+the direction that actually matters for a goodness-of-fit test, which
+is exactly what `CHISQ.TEST` returns.
+
+<Callout type="idea">
+  Given raw observed and expected counts, `CHISQ.TEST(actual_range,
+  expected_range)` and `CHISQ.DIST.RT(SUMPRODUCT((actual_range -
+  expected_range)^2 / expected_range), degrees_of_freedom)` return the
+  same result — CHISQ.TEST just computes the statistic and looks it
+  up in one step instead of two.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2': '0.7358', '5': '0.2873', '9.488': '0.0500', '13': '0.0113' }}
+  defaultValue="9.488"
+  label={'Live preview — =CHISQ.DIST.RT({x}, 4)'}
+  fieldLabel="x"
+/>
+
+The same chi-square statistic against 4 degrees of freedom used on
+`CHISQ.DIST`'s page. At `x = 9.488`, CHISQ.DIST.RT returns exactly
+0.0500 — the standard 5% significance threshold at this degree of
+freedom, and exactly `1 - 0.9500` from CHISQ.DIST's left-tailed
+result on the identical input.
+
+## Common errors
+
+### #NUM! — x is negative, or deg_freedom is less than 1
+
+<ExcelCode>{`CHISQ.DIST.RT(2, 0) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative and `deg_freedom` must be at least 1.
+
+### Confusing this with CHISQ.DIST's left tail
+
+<ExcelCode>{`CHISQ.DIST.RT(9.488, 4) → 0.0500, not the same as CHISQ.DIST(9.488, 4, TRUE) → 0.9500`}</ExcelCode>
+
+These are complementary, not interchangeable — a small
+CHISQ.DIST.RT result is evidence of a real difference (the usual
+goal of a goodness-of-fit test), while a small CHISQ.DIST result
+would mean the observed statistic is unusually *close* to the
+expected pattern.
+
+export const faqs = [
+  {
+    question: 'Why does CHISQ.TEST use the right tail, not the left?',
+    answer: 'Because a large chi-square statistic is the evidence that observed and expected counts really differ — the question a goodness-of-fit test asks is "how likely is a statistic this large or larger," which is exactly the right tail.',
+  },
+  {
+    question: 'Is CHISQ.DIST.RT the same as the legacy CHIDIST function?',
+    answer: 'Yes — CHIDIST(x, df) and CHISQ.DIST.RT(x, df) return identical results. CHIDIST still works for backward compatibility, but Microsoft recommends CHISQ.DIST.RT for new formulas.',
+  },
+  {
+    question: 'Can I reproduce CHISQ.TEST\'s result using CHISQ.DIST.RT?',
+    answer: 'Yes — compute the chi-square statistic yourself with SUMPRODUCT((actual - expected)^2 / expected), then pass it to CHISQ.DIST.RT along with the right degrees of freedom. This gives the identical result CHISQ.TEST would return directly.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHISQ.DIST.RT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHISQ.DIST.RT(9.488, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pValue As Double
+    pValue = Application.WorksheetFunction.ChiSq_Dist_RT(9.488, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import chi2
+
+    p_value = 1 - chi2.cdf(9.488, df=4)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHISQ.DIST](/docs/statistical/chisq-dist) — the left-tailed version
+  of the same distribution.
+- [CHISQ.INV.RT](/docs/statistical/chisq-inv-rt) — the reverse: finds
+  the chi-square value for a given right-tailed probability.
+- [CHISQ.TEST](/docs/statistical/chisq-test) — returns exactly this
+  shape of probability, computed from observed and expected counts
+  directly.

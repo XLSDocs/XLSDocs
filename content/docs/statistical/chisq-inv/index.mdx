@@ -1,0 +1,163 @@
+---
+title: CHISQ.INV
+description: The chi-square value for a given left-tailed probability — the reverse of CHISQ.DIST.
+---
+
+Find the chi-square value that corresponds to a given left-tailed
+probability — the reverse of `CHISQ.DIST`, most often used to look up
+a critical value for a goodness-of-fit or independence test.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'probability is left-tailed — 0.95 finds the value with 95% of the area to its left', type: 'warn' },
+  { text: 'For CHISQ.TEST\'s right-tailed convention, use CHISQ.INV.RT instead', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHISQ.INV(probability, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHISQ.INV(probability, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive — the left-tailed area to find the corresponding chi-square value for.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically the number of categories minus 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The chi-square value `x` such that `CHISQ.DIST(x, deg_freedom, TRUE)`
+equals `probability` — the point with exactly that much area under
+the chi-square curve to its left.
+
+## Description
+
+CHISQ.INV finds a **left-tailed** critical value. Because a
+goodness-of-fit test like `CHISQ.TEST` conventionally works off the
+right tail (a large statistic is evidence of a real difference),
+looking up the standard "95% confidence" critical value from a
+chi-square table actually means passing `0.95` here — the value with
+95% of the area to its left is the same value that has only 5% of the
+area to its right, which is the usual significance threshold.
+
+<Callout type="idea">
+  CHISQ.INV and `CHISQ.DIST` are exact inverses:
+  `CHISQ.INV(CHISQ.DIST(x, df, TRUE), df)` returns `x` back, for any
+  valid `x` and `df`. And `CHISQ.INV(p, df)` always equals
+  `CHISQ.INV.RT(1 - p, df)` — the same critical value, looked up from
+  either tail's convention.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '3.3567', '0.9': '7.7794', '0.95': '9.4877', '0.99': '13.2767' }}
+  defaultValue="0.95"
+  label={'Live preview — =CHISQ.INV({probability}, 4)'}
+  fieldLabel="probability"
+/>
+
+With 4 degrees of freedom (the same 5-category scenario used across
+this round's other pages), `CHISQ.INV(0.95, 4)` returns 9.4877 — the
+familiar chi-square critical value for a 95% confidence level at this
+degree of freedom, matching standard statistics tables.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`CHISQ.INV(1, 4) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1.
+
+### Passing CHISQ.TEST's own p-value directly
+
+<ExcelCode>{`CHISQ.INV(0.05, 4) → 0.7107, not the 9.4877 critical value a CHISQ.TEST p-value of 0.05 corresponds to`}</ExcelCode>
+
+CHISQ.INV is left-tailed, but a chi-square p-value from CHISQ.TEST is
+right-tailed. To find the critical value matching a 0.05 significance
+threshold, pass `0.95` to CHISQ.INV (or `0.05` directly to
+`CHISQ.INV.RT`) — not the p-value itself.
+
+export const faqs = [
+  {
+    question: 'CHISQ.INV vs CHISQ.INV.RT — which should I use?',
+    answer: 'CHISQ.INV.RT is usually the more natural fit for a goodness-of-fit test, since it takes the same right-tailed significance level (like 0.05) that CHISQ.TEST reports as a p-value. CHISQ.INV takes the complementary left-tailed probability (0.95 for the same threshold) instead — same result, different convention.',
+  },
+  {
+    question: 'How do I find the critical value for a chi-square test at 95% confidence?',
+    answer: 'Use CHISQ.INV(0.95, df) or the equivalent CHISQ.INV.RT(0.05, df) — both return the same value, the standard critical value a chi-square statistic needs to exceed to be significant at that level.',
+  },
+  {
+    question: 'Is CHISQ.INV the same as the legacy CHIINV function?',
+    answer: 'No — CHIINV was always right-tailed, matching what CHISQ.INV.RT does today. CHISQ.INV is left-tailed only.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHISQ.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CHISQ.INV(0.95, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim criticalValue As Double
+    criticalValue = Application.WorksheetFunction.ChiSq_Inv(0.95, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import chi2
+
+    critical_value = chi2.ppf(0.95, df=4)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHISQ.DIST](/docs/statistical/chisq-dist) — the reverse: finds the
+  left-tailed probability for a given chi-square value.
+- [CHISQ.INV.RT](/docs/statistical/chisq-inv-rt) — the right-tailed
+  version, matching CHISQ.TEST's own convention directly.
+- [CHISQ.TEST](/docs/statistical/chisq-test) — the goodness-of-fit
+  test whose critical value this function can look up.
