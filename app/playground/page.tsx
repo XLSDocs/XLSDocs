@@ -212,6 +212,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         href: '/docs/statistical/f-inv-rt#try-it',
         teaser: 'Drop the significance level from 0.10 to 0.01 and watch the F critical value climb from 2.73 all the way to 6.55.',
       },
+      {
+        fn: 'HYPGEOM.DIST',
+        href: '/docs/statistical/hypgeom-dist#try-it',
+        teaser: 'Draw from a 20-item pool with 6 winners and watch the odds of 2-or-fewer winning picks jump to 87% — no card ever goes back in the deck.',
+      },
     ],
   },
 ];
