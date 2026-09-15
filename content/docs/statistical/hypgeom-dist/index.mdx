@@ -1,0 +1,186 @@
+---
+title: HYPGEOM.DIST
+description: The hypergeometric distribution — probability of a given number of successes when sampling without replacement.
+---
+
+Return the probability of a given number of successes when drawing a
+fixed-size sample **without replacement** from a finite population —
+the distribution `BINOM.DIST` would give the wrong answer for, since
+each draw changes the odds for the next.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives P(X ≤ sample_s); FALSE gives the exact P(X = sample_s)', type: 'warn' },
+  { text: 'Use this instead of BINOM.DIST whenever sampling is without replacement', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=HYPGEOM.DIST(sample_s, number_sample, population_s, number_pop, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HYPGEOM.DIST(sample_s, number_sample, population_s, number_pop, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'sample_s',
+    type: 'number',
+    required: true,
+    description: 'The number of successes to evaluate within the sample.',
+  },
+  {
+    name: 'number_sample',
+    type: 'number',
+    required: true,
+    description: 'The size of the sample drawn.',
+  },
+  {
+    name: 'population_s',
+    type: 'number',
+    required: true,
+    description: 'The total number of successes in the full population.',
+  },
+  {
+    name: 'number_pop',
+    type: 'number',
+    required: true,
+    description: 'The size of the full population.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative probability of sample_s or fewer successes; FALSE for the exact probability of precisely sample_s successes.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability of `sample_s` or fewer
+successes appearing in the sample. With `cumulative` `FALSE`: the
+probability of exactly `sample_s` successes.
+
+## Description
+
+HYPGEOM.DIST is the right tool whenever a sample is drawn from a
+finite population without putting items back — a hand of cards, a
+batch of parts pulled for inspection, a raffle. Because each draw
+permanently removes one item, the probability of success on the next
+draw keeps shifting, which is exactly the assumption `BINOM.DIST`
+requires to stay fixed.
+
+<Callout type="idea">
+  When `number_pop` is very large relative to `number_sample`,
+  removing a few items barely moves the odds — HYPGEOM.DIST and
+  BINOM.DIST (with `probability_s = population_s / number_pop`)
+  converge to nearly the same answer in that case. The two
+  distributions only diverge meaningfully when the sample is a
+  sizeable fraction of the population.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.1291', '1': '0.5165', '2': '0.8687', '3': '0.9861' }}
+  defaultValue="2"
+  label={'Live preview — =HYPGEOM.DIST({sample_s}, 5, 6, 20, TRUE)'}
+  fieldLabel="sample_s"
+/>
+
+A population of 20 items with 6 successes overall (think 6 winning
+tickets out of 20 raffle entries), sampling 5 without replacement.
+The chance of drawing 2 or fewer successes is 0.8687, while getting
+none at all still has a real 12.91% chance.
+
+## Common errors
+
+### #NUM! — sample_s exceeds what's possible given the other arguments
+
+<ExcelCode>{`HYPGEOM.DIST(6, 5, 6, 20, TRUE) → #NUM!, since a 5-item sample can't contain 6 successes`}</ExcelCode>
+
+`sample_s` can't exceed `number_sample`, `population_s`, or what's
+mathematically reachable given how many failures exist in the
+population — Excel returns `#NUM!` for any combination that isn't
+actually possible.
+
+### Using HYPGEOM.DIST when sampling actually has replacement
+
+<ExcelCode>{`HYPGEOM.DIST(2, 5, 6, 20, TRUE) → assumes each of the 20 items can only be drawn once`}</ExcelCode>
+
+If items are put back before the next draw (sampling with
+replacement), each draw's odds stay constant and `BINOM.DIST` is the
+correct distribution instead.
+
+export const faqs = [
+  {
+    question: 'HYPGEOM.DIST vs BINOM.DIST — which should I use?',
+    answer: 'HYPGEOM.DIST whenever sampling is without replacement from a finite, known population — each draw changes the odds for the next. BINOM.DIST whenever each trial is independent with a fixed, unchanging success probability, such as sampling with replacement or an effectively infinite population.',
+  },
+  {
+    question: 'What happens if number_pop is huge compared to number_sample?',
+    answer: 'The hypergeometric and binomial distributions converge — removing a handful of items from a huge population barely shifts the remaining odds, so HYPGEOM.DIST and the equivalent BINOM.DIST call give nearly identical results in that case.',
+  },
+  {
+    question: 'Is HYPGEOM.DIST the same as the legacy HYPGEOMDIST function?',
+    answer: 'The core calculation is the same, but the legacy HYPGEOMDIST has no cumulative argument — it only returns the exact probability, equivalent to HYPGEOM.DIST(..., FALSE). HYPGEOM.DIST adds the cumulative option.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HYPGEOM.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HYPGEOM.DIST(2, 5, 6, 20, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Hypgeom_Dist(2, 5, 6, 20, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import hypergeom
+
+    probability = hypergeom.cdf(2, M=20, n=6, N=5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.DIST](/docs/statistical/binom-dist) — the equivalent
+  distribution for sampling with replacement (or effectively
+  unlimited population size).
+- [POISSON.DIST](/docs/statistical/poisson-dist) — models an
+  unbounded count of independent events, rather than draws from a
+  fixed population.
+- [PERMUT](/docs/statistical/permut) — counts orderings, related to
+  the combinatorics HYPGEOM.DIST's probability formula is built from.

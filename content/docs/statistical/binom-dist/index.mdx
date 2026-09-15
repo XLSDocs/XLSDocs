@@ -1,0 +1,179 @@
+---
+title: BINOM.DIST
+description: The binomial distribution — probability of exactly (or up to) a given number of successes across a fixed number of trials.
+---
+
+Return the probability of a given number of successes across a fixed
+number of independent trials, each with the same success probability
+— either the exact chance of that many successes, or the cumulative
+chance of that many **or fewer**.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives P(X ≤ number_s); FALSE gives the exact P(X = number_s)', type: 'warn' },
+  { text: 'Every trial must be independent with the same success probability', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BINOM.DIST(number_s, trials, probability_s, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BINOM.DIST(number_s, trials, probability_s, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number_s',
+    type: 'number',
+    required: true,
+    description: 'The number of successes to evaluate — an integer from 0 to trials.',
+  },
+  {
+    name: 'trials',
+    type: 'number',
+    required: true,
+    description: 'The total number of independent trials.',
+  },
+  {
+    name: 'probability_s',
+    type: 'number',
+    required: true,
+    description: 'The probability of success on each individual trial.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative probability of number_s or fewer successes; FALSE for the exact probability of precisely number_s successes.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability of getting `number_s` **or
+fewer** successes across `trials` independent attempts. With
+`cumulative` `FALSE`: the probability of getting **exactly**
+`number_s` successes.
+
+## Description
+
+BINOM.DIST models the classic "how many successes in N tries" question
+— coin flips, defective parts in a batch, conversions out of a
+fixed number of visitors — as long as every trial is truly
+independent and shares the same success probability. The exact
+(`cumulative = FALSE`) result comes from the binomial probability
+formula: `C(trials, number_s) × probability_s^number_s ×
+(1 − probability_s)^(trials − number_s)`, where `C(trials,
+number_s)` is the number of ways to choose which trials succeed.
+
+<Callout type="idea">
+  Summing every exact probability from 0 successes up to `number_s`
+  gives the same result as `BINOM.DIST(number_s, trials,
+  probability_s, TRUE)` directly — cumulative mode just does that sum
+  internally rather than requiring one call per outcome.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3': '0.1071', '6': '0.6080', '8': '0.8867', '10': '0.9829' }}
+  defaultValue="6"
+  label={'Live preview — =BINOM.DIST({number_s}, 20, 0.3, TRUE)'}
+  fieldLabel="number_s"
+/>
+
+20 independent trials, each with a 30% success probability. The
+chance of getting 6 or fewer successes is 0.6080 — just over half —
+while the chance of 10 or fewer climbs to 0.9829, since 10 successes
+out of 20 is well above the expected average of 6.
+
+## Common errors
+
+### #NUM! — number_s, trials, or probability_s is out of range
+
+<ExcelCode>{`BINOM.DIST(25, 20, 0.3, TRUE) → #NUM!`}</ExcelCode>
+
+`number_s` must be between 0 and `trials`, and `probability_s` must
+be between 0 and 1.
+
+### Forgetting BINOM.DIST assumes independence
+
+<ExcelCode>{`BINOM.DIST(3, 10, 0.3, TRUE) → assumes each of the 10 trials is unaffected by the others`}</ExcelCode>
+
+If drawing without replacement from a finite population (so each
+draw changes the odds for the next), the binomial distribution
+doesn't apply — use `HYPGEOM.DIST` instead.
+
+export const faqs = [
+  {
+    question: 'BINOM.DIST vs BINOM.DIST.RANGE — which should I use?',
+    answer: 'BINOM.DIST for "at most N successes" (cumulative) or "exactly N successes" (non-cumulative). BINOM.DIST.RANGE for "between N1 and N2 successes" directly, without subtracting two BINOM.DIST calls yourself.',
+  },
+  {
+    question: 'What counts as "success" in BINOM.DIST?',
+    answer: 'Whatever outcome is being counted — it doesn\'t need to be a positive outcome in the everyday sense. A coin landing heads, a part being defective, and a visitor converting are all equally valid "successes" as long as every trial shares the same probability and is independent of the others.',
+  },
+  {
+    question: 'Is BINOM.DIST the same as the legacy BINOMDIST function?',
+    answer: 'Yes — BINOMDIST(number_s, trials, probability_s, cumulative) and BINOM.DIST return identical results. BINOMDIST still works for backward compatibility, but Microsoft recommends BINOM.DIST for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BINOM.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BINOM.DIST(6, 20, 0.3, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Binom_Dist(6, 20, 0.3, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import binom
+
+    probability = binom.cdf(6, n=20, p=0.3)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.DIST.RANGE](/docs/statistical/binom-dist-range) — the
+  probability of successes falling within a range, in one call.
+- [BINOM.INV](/docs/statistical/binom-inv) — the reverse: finds the
+  smallest number of successes reaching a given cumulative
+  probability.
+- [HYPGEOM.DIST](/docs/statistical/hypgeom-dist) — the equivalent
+  distribution for sampling without replacement from a finite
+  population.

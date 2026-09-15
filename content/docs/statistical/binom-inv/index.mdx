@@ -1,0 +1,171 @@
+---
+title: BINOM.INV
+description: The smallest number of successes reaching a given cumulative probability — the reverse of BINOM.DIST.
+---
+
+Find the smallest number of successes at which the cumulative
+binomial probability first reaches or exceeds a given threshold — the
+reverse of `BINOM.DIST`'s cumulative mode.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns the smallest integer number_s where BINOM.DIST(number_s, ..., TRUE) ≥ alpha', type: 'warn' },
+  { text: 'Always returns a whole number of successes, never interpolated', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BINOM.INV(trials, probability_s, alpha)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BINOM.INV(trials, probability_s, alpha)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'trials',
+    type: 'number',
+    required: true,
+    description: 'The total number of independent trials.',
+  },
+  {
+    name: 'probability_s',
+    type: 'number',
+    required: true,
+    description: 'The probability of success on each individual trial.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The target cumulative probability, between 0 and 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The smallest integer `number_s` such that `BINOM.DIST(number_s,
+trials, probability_s, TRUE)` is greater than or equal to `alpha`.
+
+## Description
+
+Because the binomial distribution only takes whole-number outcomes,
+its cumulative probability jumps in discrete steps rather than rising
+smoothly — so BINOM.INV can't just invert a continuous curve the way
+`NORM.INV` or `T.INV` do. Instead it walks up through 0, 1, 2, ...
+successes, accumulating probability at each step, and stops at the
+first value whose cumulative probability clears `alpha`.
+
+<Callout type="warn">
+  Because of that step pattern, BINOM.INV's result can look
+  "over-satisfied" — the cumulative probability at the returned value
+  is usually a little **above** `alpha`, not exactly equal to it,
+  since no exact match may land precisely on the requested threshold.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '6', '0.8': '8', '0.9': '9', '0.95': '9' }}
+  defaultValue="0.9"
+  label={'Live preview — =BINOM.INV(20, 0.3, {alpha})'}
+  fieldLabel="alpha"
+/>
+
+The same 20-trial, 30%-success scenario used across this round's
+binomial pages. `BINOM.INV(20, 0.3, 0.9)` returns 9 — the smallest
+number of successes whose cumulative probability reaches at least
+90%. Notice `alpha = 0.9` and `alpha = 0.95` both return 9: no exact
+number of successes lands with cumulative probability between those
+two thresholds, so both round up to the same answer.
+
+## Common errors
+
+### #NUM! — alpha is outside the 0–1 range
+
+<ExcelCode>{`BINOM.INV(20, 0.3, 1.5) → #NUM!`}</ExcelCode>
+
+`alpha` must be between 0 and 1.
+
+### Expecting BINOM.INV(trials, p, BINOM.DIST(k, trials, p, TRUE)) to always return k
+
+<ExcelCode>{`BINOM.INV(20, 0.3, BINOM.DIST(6, 20, 0.3, TRUE)) → 6 (matches), but nearby alpha values can round up to the same k`}</ExcelCode>
+
+Because multiple `alpha` values can map to the same returned
+`number_s` (the step-function behavior described above), BINOM.INV
+and BINOM.DIST aren't smooth inverses of each other the way a
+continuous distribution's pair would be — only feeding back an
+`alpha` that exactly equals a real cumulative-probability value is
+guaranteed to round-trip.
+
+export const faqs = [
+  {
+    question: 'Why doesn\'t BINOM.INV give an exact match to alpha?',
+    answer: "Because the binomial distribution's outcomes are discrete whole numbers, its cumulative probability only takes on a finite set of specific values — BINOM.INV returns the smallest number of successes whose cumulative probability is at least alpha, which is usually a little higher than alpha itself, not an exact match.",
+  },
+  {
+    question: 'What is BINOM.INV typically used for?',
+    answer: 'Finding a threshold — like the minimum number of successful outcomes needed to be reasonably confident (say, 95%) that a result isn\'t due to chance, or setting a quality-control acceptance number for a batch inspection plan.',
+  },
+  {
+    question: 'Is BINOM.INV the same as the legacy CRITBINOM function?',
+    answer: 'Yes — CRITBINOM(trials, probability_s, alpha) and BINOM.INV return identical results. CRITBINOM still works for backward compatibility, but Microsoft recommends BINOM.INV for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BINOM.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BINOM.INV(20, 0.3, 0.9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim minSuccesses As Long
+    minSuccesses = Application.WorksheetFunction.Binom_Inv(20, 0.3, 0.9)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import binom
+
+    min_successes = binom.ppf(0.9, n=20, p=0.3)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.DIST](/docs/statistical/binom-dist) — the reverse: finds the
+  cumulative probability for a given number of successes.
+- [BINOM.DIST.RANGE](/docs/statistical/binom-dist-range) — the
+  probability of successes falling within a range.
+- [NEGBINOM.DIST](/docs/statistical/negbinom-dist) — a related
+  distribution, for the number of failures before a fixed number of
+  successes.

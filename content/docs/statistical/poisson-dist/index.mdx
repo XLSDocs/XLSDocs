@@ -1,0 +1,173 @@
+---
+title: POISSON.DIST
+description: The probability of a given number of events occurring in a fixed interval, given a known average rate.
+---
+
+Return the probability of a given number of events occurring within a
+fixed interval of time or space, given a known long-run average rate
+— call volume in an hour, defects per meter of cable, customer
+arrivals in a day.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives P(X ≤ x); FALSE gives the exact P(X = x)', type: 'warn' },
+  { text: 'mean is the average number of events per interval — can be any positive number, not just a whole number', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=POISSON.DIST(x, mean, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=POISSON.DIST(x, mean, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The number of events to evaluate — a non-negative integer.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: 'The expected (average) number of events per interval — must be positive.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative probability of x or fewer events; FALSE for the exact probability of precisely x events.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability of `x` or fewer events
+occurring. With `cumulative` `FALSE`: the probability of exactly `x`
+events occurring.
+
+## Description
+
+POISSON.DIST models events that happen independently and at a
+constant average rate, with no natural upper limit on how many could
+occur — unlike the binomial distribution's fixed number of trials.
+`mean` (often written `λ`, lambda) can be any positive number, even
+though `x` itself must always be a whole count of events.
+
+<Callout type="idea">
+  The Poisson distribution is often used as an approximation to the
+  binomial distribution when `trials` is large and `probability_s` is
+  small — `mean = trials × probability_s` in that case. This is why
+  rare-event counts (typos per page, defects per batch) are so often
+  modeled with Poisson even though the underlying process is really a
+  huge number of low-probability binomial trials.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.0183', '2': '0.2381', '4': '0.6288', '8': '0.9786' }}
+  defaultValue="4"
+  label={'Live preview — =POISSON.DIST({x}, 4, TRUE)'}
+  fieldLabel="x"
+/>
+
+A support queue that averages 4 calls per hour. The chance of getting
+4 or fewer calls in a given hour is 0.6288, while the chance of 0
+calls at all is just 0.0183 — a genuinely rare, though not
+impossible, outcome at this rate.
+
+## Common errors
+
+### #NUM! — x or mean is negative
+
+<ExcelCode>{`POISSON.DIST(-1, 4, TRUE) → #NUM!`}</ExcelCode>
+
+`x` must be a non-negative integer, and `mean` must be a positive
+number.
+
+### Using POISSON.DIST when events aren't actually independent
+
+<ExcelCode>{`POISSON.DIST(10, 4, TRUE) → assumes each event's timing is unaffected by the others`}</ExcelCode>
+
+If one event happening makes another more or less likely soon after
+(support calls spiking right after an outage, for example), the
+Poisson assumption of independent events at a constant rate breaks
+down and the result won't reflect the true probability.
+
+export const faqs = [
+  {
+    question: 'What does mean actually represent in POISSON.DIST?',
+    answer: 'The average number of events expected in one interval — the same interval x is being measured over. If mean = 4 calls per hour, x should also be counted in calls per hour, not calls per minute or per day.',
+  },
+  {
+    question: 'Can mean be a decimal, like 2.5?',
+    answer: "Yes — mean represents a long-run average rate, which is very often not a whole number (2.5 calls per hour, on average). x itself must still be a whole count of actual events, since you can't observe half an event.",
+  },
+  {
+    question: 'Is POISSON.DIST the same as the legacy POISSON function?',
+    answer: 'Yes — POISSON(x, mean, cumulative) and POISSON.DIST return identical results. POISSON still works for backward compatibility, but Microsoft recommends POISSON.DIST for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with POISSON.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=POISSON.DIST(4, 4, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Poisson_Dist(4, 4, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import poisson
+
+    probability = poisson.cdf(4, mu=4)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.DIST](/docs/statistical/binom-dist) — the fixed-trials
+  distribution the Poisson distribution approximates in the
+  large-trials, small-probability limit.
+- [NEGBINOM.DIST](/docs/statistical/negbinom-dist) — a related
+  discrete distribution, for counting failures before a target number
+  of successes.
+- [HYPGEOM.DIST](/docs/statistical/hypgeom-dist) — the equivalent
+  distribution for sampling without replacement from a finite
+  population, rather than an unbounded count of independent events.

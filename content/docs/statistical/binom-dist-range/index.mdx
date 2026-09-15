@@ -1,0 +1,175 @@
+---
+title: BINOM.DIST.RANGE
+description: The probability of a range of successes across a fixed number of binomial trials, in one call.
+---
+
+Return the probability that the number of successes across a fixed
+number of independent trials falls within a given range — without
+subtracting two separate `BINOM.DIST` calls to get there.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Omitting number_s2 gives the probability of exactly number_s1 successes', type: 'warn' },
+  { text: 'Equivalent to BINOM.DIST(number_s2, ..., TRUE) − BINOM.DIST(number_s1 − 1, ..., TRUE)', type: 'check' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BINOM.DIST.RANGE(trials, probability_s, number_s1, [number_s2])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BINOM.DIST.RANGE(trials, probability_s, number_s1, [number_s2])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'trials',
+    type: 'number',
+    required: true,
+    description: 'The total number of independent trials.',
+  },
+  {
+    name: 'probability_s',
+    type: 'number',
+    required: true,
+    description: 'The probability of success on each individual trial.',
+  },
+  {
+    name: 'number_s1',
+    type: 'number',
+    required: true,
+    description: 'The lower bound on the number of successes to include.',
+  },
+  {
+    name: 'number_s2',
+    type: 'number',
+    required: false,
+    description: 'The upper bound on the number of successes to include. If omitted, only number_s1 successes (exactly) is evaluated.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The probability that the number of successes falls between
+`number_s1` and `number_s2`, inclusive — or, if `number_s2` is
+omitted, the probability of exactly `number_s1` successes.
+
+## Description
+
+BINOM.DIST.RANGE saves the extra subtraction step a range question
+would otherwise need with plain `BINOM.DIST`: instead of computing
+`BINOM.DIST(number_s2, trials, probability_s, TRUE) −
+BINOM.DIST(number_s1 − 1, trials, probability_s, TRUE)`, one call
+does both cumulative lookups internally and returns the difference
+directly.
+
+<Callout type="idea">
+  Notice the **argument order is different** from every other
+  distribution function in this family: `trials` and `probability_s`
+  come first here, with the success-count arguments last — the
+  opposite of `BINOM.DIST`'s `number_s, trials, probability_s`
+  ordering. Easy to transpose by habit when switching between the two.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4': '0.1304', '6': '0.5009', '8': '0.7796', '10': '0.8758' }}
+  defaultValue="6"
+  label={'Live preview — =BINOM.DIST.RANGE(20, 0.3, 4, {number_s2})'}
+  fieldLabel="number_s2"
+/>
+
+The same 20-trial, 30%-success scenario used on `BINOM.DIST`'s page,
+now asking for a range starting at 4 successes. Widening the upper
+bound from 4 (a single exact value) to 10 raises the probability from
+0.1304 to 0.8758 — most of the distribution's likely outcomes fall
+somewhere in that 4-to-10 window.
+
+## Common errors
+
+### #NUM! — number_s1 is greater than number_s2
+
+<ExcelCode>{`BINOM.DIST.RANGE(20, 0.3, 10, 4) → #NUM!`}</ExcelCode>
+
+`number_s1` must be less than or equal to `number_s2` when both are
+supplied.
+
+### Mixing up the argument order with BINOM.DIST
+
+<ExcelCode>{`BINOM.DIST.RANGE(0.3, 20, 4, 8) → #NUM!, since probability_s can't be 20`}</ExcelCode>
+
+BINOM.DIST.RANGE puts `trials` before `probability_s`, the reverse
+of `BINOM.DIST`'s `number_s, trials, probability_s` order — a common
+copy-paste mistake between the two.
+
+export const faqs = [
+  {
+    question: 'How is BINOM.DIST.RANGE different from BINOM.DIST?',
+    answer: 'BINOM.DIST.RANGE directly answers "what\'s the probability of between N1 and N2 successes," computing both cumulative lookups and subtracting them internally. BINOM.DIST only gives "at most N" or "exactly N" per call — a range question needs two calls and a manual subtraction.',
+  },
+  {
+    question: 'What happens if I omit number_s2?',
+    answer: 'BINOM.DIST.RANGE treats it as asking for exactly number_s1 successes — the same result as BINOM.DIST(number_s1, trials, probability_s, FALSE).',
+  },
+  {
+    question: 'Why is the argument order different from other distribution functions?',
+    answer: "BINOM.DIST.RANGE was added later (Excel 2013) specifically for range queries, and Microsoft chose to put trials and probability_s first since they don't change between number_s1 and number_s2 — but it does mean the order doesn't match BINOM.DIST's, so it's worth double-checking when switching between the two.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BINOM.DIST.RANGE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BINOM.DIST.RANGE(20, 0.3, 4, 10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Binom_Dist_Range(20, 0.3, 4, 10)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import binom
+
+    probability = binom.cdf(10, n=20, p=0.3) - binom.cdf(4 - 1, n=20, p=0.3)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.DIST](/docs/statistical/binom-dist) — the single-value
+  version, for "at most N" or "exactly N" successes.
+- [BINOM.INV](/docs/statistical/binom-inv) — finds the smallest
+  number of successes reaching a given cumulative probability.
+- [HYPGEOM.DIST](/docs/statistical/hypgeom-dist) — the equivalent
+  distribution for sampling without replacement.

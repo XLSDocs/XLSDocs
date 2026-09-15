@@ -1,0 +1,177 @@
+---
+title: NEGBINOM.DIST
+description: The negative binomial distribution — probability of a given number of failures before a fixed number of successes.
+---
+
+Return the probability of a given number of failures occurring before
+a fixed target number of successes is reached — the "how many misses
+before N hits" counterpart to the binomial distribution's "how many
+hits in N tries."
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives P(X ≤ number_f); FALSE gives the exact P(X = number_f)', type: 'warn' },
+  { text: 'number_f counts failures, not total trials', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NEGBINOM.DIST(number_f, number_s, probability_s, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NEGBINOM.DIST(number_f, number_s, probability_s, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number_f',
+    type: 'number',
+    required: true,
+    description: 'The number of failures to evaluate.',
+  },
+  {
+    name: 'number_s',
+    type: 'number',
+    required: true,
+    description: 'The target (fixed) number of successes required.',
+  },
+  {
+    name: 'probability_s',
+    type: 'number',
+    required: true,
+    description: 'The probability of success on each individual trial.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative probability of number_f or fewer failures; FALSE for the exact probability of precisely number_f failures.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability of `number_f` or fewer
+failures occurring before the `number_s`-th success. With
+`cumulative` `FALSE`: the probability of exactly `number_f` failures
+before that success.
+
+## Description
+
+NEGBINOM.DIST flips the usual binomial question around: instead of
+fixing the number of trials and asking how many succeed, it fixes the
+**target number of successes** and asks how many failures happen
+along the way before that target is reached. The special case
+`number_s = 1` (stop at the first success) is the geometric
+distribution — how many failures before the very first success.
+
+<Callout type="idea">
+  The final trial in any NEGBINOM.DIST scenario is always a success —
+  by definition, the sequence stops the moment the `number_s`-th
+  success occurs. This is the key structural difference from
+  `BINOM.DIST`, where the total number of trials is fixed in advance
+  and any of them could be the last.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.1250', '2': '0.5000', '4': '0.7734', '6': '0.9102' }}
+  defaultValue="2"
+  label={'Live preview — =NEGBINOM.DIST({number_f}, 3, 0.5, TRUE)'}
+  fieldLabel="number_f"
+/>
+
+A process with a 50% success rate, stopping once 3 successes have
+been reached. The chance of hitting exactly 2 or fewer failures along
+the way is exactly 0.5000, while allowing up to 6 failures raises
+that to 0.9102 — nearly certain by that point.
+
+## Common errors
+
+### #NUM! — number_f or number_s is negative, or probability_s is out of range
+
+<ExcelCode>{`NEGBINOM.DIST(-1, 3, 0.5, TRUE) → #NUM!`}</ExcelCode>
+
+`number_f` and `number_s` must both be non-negative, and
+`probability_s` must be between 0 and 1.
+
+### Confusing number_f with total trials
+
+<ExcelCode>{`NEGBINOM.DIST(2, 3, 0.5, TRUE) → counts 2 failures plus 3 successes, 5 trials total, not 2 trials`}</ExcelCode>
+
+`number_f` is the failure count on its own — the actual number of
+trials run is `number_f + number_s`, since every trial is either one
+of the counted failures or one of the required successes.
+
+export const faqs = [
+  {
+    question: 'NEGBINOM.DIST vs BINOM.DIST — which should I use?',
+    answer: 'BINOM.DIST when the number of trials is fixed in advance and successes are counted. NEGBINOM.DIST when the target number of successes is fixed instead, and the question is how many failures happen before reaching it — trials keep running until that target is hit.',
+  },
+  {
+    question: 'What is the geometric distribution, and how does it relate to NEGBINOM.DIST?',
+    answer: 'The geometric distribution is the special case of NEGBINOM.DIST where number_s = 1 — the number of failures before the very first success. Excel doesn\'t have a separate GEOM.DIST function; use NEGBINOM.DIST with number_s set to 1 instead.',
+  },
+  {
+    question: 'Is NEGBINOM.DIST the same as the legacy NEGBINOMDIST function?',
+    answer: 'The core calculation is the same, but the legacy NEGBINOMDIST has no cumulative argument — it only returns the exact probability, equivalent to NEGBINOM.DIST(..., FALSE). NEGBINOM.DIST adds the cumulative option.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with NEGBINOM.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=NEGBINOM.DIST(2, 3, 0.5, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.NegBinom_Dist(2, 3, 0.5, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import nbinom
+
+    probability = nbinom.cdf(2, n=3, p=0.5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.DIST](/docs/statistical/binom-dist) — the fixed-trials
+  counterpart, counting successes instead of failures.
+- [POISSON.DIST](/docs/statistical/poisson-dist) — another discrete
+  distribution for counting events, used for an unbounded rate rather
+  than a fixed success target.
+- [HYPGEOM.DIST](/docs/statistical/hypgeom-dist) — the equivalent
+  distribution for sampling without replacement.
