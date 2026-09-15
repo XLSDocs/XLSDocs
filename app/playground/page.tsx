@@ -217,6 +217,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         href: '/docs/statistical/hypgeom-dist#try-it',
         teaser: 'Draw from a 20-item pool with 6 winners and watch the odds of 2-or-fewer winning picks jump to 87% — no card ever goes back in the deck.',
       },
+      {
+        fn: 'GAMMA',
+        href: '/docs/statistical/gamma#try-it',
+        teaser: 'Drop to x = 0.5 and watch the gamma function land exactly on the square root of pi — a smooth extension of the factorial, not just an interpolation.',
+      },
     ],
   },
 ];

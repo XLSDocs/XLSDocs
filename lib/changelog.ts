@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-15',
+    title: 'BETA.DIST, BETA.INV, GAMMA, GAMMA.DIST, GAMMA.INV, GAMMALN, GAMMALN.PRECISE, GAUSS, LOGNORM.DIST, LOGNORM.INV, WEIBULL.DIST, EXPON.DIST, FISHER, FISHERINV, PHI, and PROB',
+    description:
+      "Round 8 of the Statistical audit — 16 functions, the largest batch yet, covering the continuous distributions and the gamma-function building blocks underneath them. GAMMA.DIST models claim sizes and waiting times, BETA.DIST models a probability itself as an uncertain quantity, WEIBULL.DIST is the standard reliability-engineering model, and FISHER/FISHERINV let a correlation coefficient be tested and averaged with ordinary normal statistics.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-09-15',
     title: 'BINOM.DIST, BINOM.DIST.RANGE, BINOM.INV, POISSON.DIST, HYPGEOM.DIST, and NEGBINOM.DIST',
     description:
       "Round 7 of the Statistical audit — the discrete distributions. BINOM.DIST counts successes across a fixed number of trials, POISSON.DIST counts events at a known average rate with no upper limit, HYPGEOM.DIST handles sampling without replacement (where BINOM.DIST would give the wrong answer), and NEGBINOM.DIST flips the question around to count failures before a target number of successes.",
