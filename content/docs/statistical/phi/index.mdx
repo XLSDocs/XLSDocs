@@ -1,0 +1,158 @@
+---
+title: PHI
+description: The standard normal density function — the bell curve's height at a given z-score.
+---
+
+Return the value of the standard normal density function at a given
+point — the height of the familiar bell curve, not a cumulative
+probability.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Equivalent to NORM.S.DIST(x, FALSE) — the density, not the cumulative probability', type: 'warn' },
+  { text: 'PHI(0) always returns the curve\'s peak height, 1/SQRT(2×PI())', type: 'check' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PHI(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PHI(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The z-score (a value on the standard normal scale, mean 0 and standard deviation 1) to evaluate the density at.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The height of the standard normal curve at `x`.
+
+## Description
+
+PHI is a shorthand for exactly what `NORM.S.DIST(x, FALSE)` already
+computes — the standard normal probability *density*, not a
+cumulative probability. Its own name comes directly from the
+mathematical convention of writing the standard normal density
+function as the Greek letter φ (phi), reserving the capital Φ for the
+cumulative version. Because it's a density rather than a probability,
+PHI's output can exceed 1 (its maximum, at `x = 0`, is about 0.3989)
+and represents the curve's height, not the chance of any particular
+outcome.
+
+<Callout type="idea">
+  PHI exists purely as a shorter, more mathematically conventional way
+  to write `NORM.S.DIST(x, FALSE)` — the two are otherwise completely
+  interchangeable, always returning identical results for the same
+  input.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.3989', '1': '0.2420', '1.5': '0.1295', '2.5': '0.0175' }}
+  defaultValue="1"
+  label={'Live preview — =PHI({x})'}
+  fieldLabel="x"
+/>
+
+`PHI(0)` returns 0.3989 — the bell curve's peak height, right at its
+center. As `x` moves further from 0, the curve's height drops off
+quickly: by `x = 2.5`, PHI returns just 0.0175, reflecting how little
+of the standard normal curve's height remains that far into the tail.
+
+## Common errors
+
+### Confusing PHI's density with a cumulative probability
+
+<ExcelCode>{`PHI(0) → 0.3989, not the 0.5 cumulative probability at the mean`}</ExcelCode>
+
+PHI returns the curve's **height**, not the probability of a value
+falling below `x`. For the cumulative probability at the mean, use
+`NORM.S.DIST(0, TRUE)`, which correctly returns 0.5.
+
+### Expecting PHI's output to stay under 1 like a probability
+
+<ExcelCode>{`PHI(0) → 0.3989, always under 1 for the standard normal, but a density in general can exceed 1`}</ExcelCode>
+
+For the standard normal specifically, PHI happens to never exceed
+about 0.3989 — but that's a property of this particular curve's
+shape, not a general rule that all densities stay below 1. Don't
+extend that assumption to differently-scaled distributions.
+
+export const faqs = [
+  {
+    question: 'PHI vs NORM.S.DIST — what\'s the difference?',
+    answer: 'None in terms of calculation — PHI(x) always equals NORM.S.DIST(x, FALSE) exactly. PHI is simply a shorter way to write the same density calculation, matching the standard mathematical notation φ(x).',
+  },
+  {
+    question: 'Why does PHI(0) equal approximately 0.3989?',
+    answer: 'That\'s the exact peak height of the standard normal curve, mathematically equal to 1/√(2π) — the highest point the density ever reaches, right at the mean.',
+  },
+  {
+    question: 'What is PHI actually used for in practice?',
+    answer: "Mostly for plotting the standard normal curve's shape, or as a building block inside more complex formulas (like a kernel density estimate) that need the bell curve's raw height at many points rather than a cumulative probability.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PHI from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PHI(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim density As Double
+    density = Application.WorksheetFunction.Phi(1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import norm
+
+    density = norm.pdf(1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the general
+  standard-normal function this shorthand is equivalent to.
+- [GAUSS](/docs/statistical/gauss) — a related shorthand, for the
+  probability between the mean and x.
+- [STANDARDIZE](/docs/statistical/standardize) — converts a raw value
+  into the z-score PHI expects as input.

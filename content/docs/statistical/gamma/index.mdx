@@ -1,0 +1,157 @@
+---
+title: GAMMA
+description: The gamma function — a smooth extension of the factorial to non-integers.
+---
+
+Return the value of the gamma function at a given number — a smooth
+extension of the factorial that's defined for non-integers too, not
+just whole numbers.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'For a positive integer n, GAMMA(n+1) equals n factorial', type: 'check' },
+  { text: 'Grows extremely fast — overflows well before GAMMALN would', type: 'warn' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GAMMA(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GAMMA(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the gamma function at.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of the gamma function at `x`.
+
+## Description
+
+The gamma function is the standard way to extend the factorial to
+values that aren't positive integers — including fractions and
+(with the exception of zero and negative integers, where it's
+undefined) negative numbers. For any positive integer `n`,
+`GAMMA(n)` equals `(n − 1)!`, so `GAMMA(5)` returns 24, matching
+`FACT(4)`. Every continuous probability distribution in this
+section's gamma family (`GAMMA.DIST`, `BETA.DIST`, `CHISQ.DIST`,
+`F.DIST`) is built on this same function internally, evaluated at the
+distribution's shape parameters.
+
+<Callout type="warn">
+  GAMMA grows explosively fast — `GAMMA(171)` already exceeds Excel's
+  numeric range and returns `#NUM!`, the same overflow point as
+  `FACT(171)`. Use `GAMMALN` (its logarithm) instead whenever the
+  input might be large.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '1.0000', '0.5': '1.7725', '3': '2.0000', '5': '24.0000' }}
+  defaultValue="5"
+  label={'Live preview — =GAMMA({x})'}
+  fieldLabel="x"
+/>
+
+`GAMMA(5)` returns 24, matching `4!` (since `GAMMA(n) = (n-1)!` for
+whole numbers). `GAMMA(0.5)` returns approximately 1.7725 — exactly
+the square root of π, one of the gamma function's most famous
+special values, showing the function genuinely extends to
+non-integers rather than just interpolating between them.
+
+## Common errors
+
+### #NUM! — x is zero or a negative integer
+
+<ExcelCode>{`GAMMA(0) → #NUM!`}</ExcelCode>
+
+The gamma function has poles (is undefined) at zero and every
+negative integer.
+
+### #NUM! from a large positive x
+
+<ExcelCode>{`GAMMA(171) → #NUM!`}</ExcelCode>
+
+The gamma function grows so quickly that it overflows Excel's
+numeric range past `x = 170` — the same practical ceiling `FACT`
+hits. Use `GAMMALN` if a large `x` needs to be evaluated.
+
+export const faqs = [
+  {
+    question: 'How is GAMMA related to the factorial function?',
+    answer: 'For any positive integer n, GAMMA(n) equals (n − 1)! — so GAMMA(5) = 4! = 24. The gamma function extends this same pattern smoothly to non-integer and (except at zero and negative integers) negative values.',
+  },
+  {
+    question: 'Why does GAMMA(0.5) equal the square root of pi?',
+    answer: "It's a genuine mathematical identity of the gamma function, not a coincidence or approximation — GAMMA(0.5) = √π exactly, one of the function's best-known special values from its integral definition.",
+  },
+  {
+    question: 'GAMMA vs GAMMALN — which should I use?',
+    answer: 'GAMMA for the raw value, when the input is small enough to avoid overflow (roughly x < 171). GAMMALN for the logarithm instead, which stays numerically well-behaved for much larger inputs — most gamma-based distribution math is actually done this way internally.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GAMMA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GAMMA(5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim gammaValue As Double
+    gammaValue = Application.WorksheetFunction.Gamma(5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.special import gamma
+
+    gamma_value = gamma(5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GAMMALN](/docs/statistical/gammaln) — the logarithm of this same
+  function, well-behaved for much larger inputs.
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — the probability
+  distribution built on this function.
+- [FACT](/docs/math/fact) — the ordinary factorial, matching GAMMA at
+  positive integers.

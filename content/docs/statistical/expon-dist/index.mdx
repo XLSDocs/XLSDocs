@@ -1,0 +1,170 @@
+---
+title: EXPON.DIST
+description: The exponential distribution — models the waiting time between independent, randomly-occurring events.
+---
+
+Return a value from the exponential distribution — the standard model
+for the waiting time until the next event in a Poisson-style process,
+like the time between support calls or between equipment failures.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'lambda is a rate (events per unit time) — the reciprocal of the mean wait', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=EXPON.DIST(x, lambda, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EXPON.DIST(x, lambda, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The waiting time to evaluate — must be non-negative.',
+  },
+  {
+    name: 'lambda',
+    type: 'number',
+    required: true,
+    description: 'The rate parameter — the average number of events per unit time. Must be positive.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that the waiting time until
+the next event is `x` or less. With `cumulative` `FALSE`: the density
+of that curve at `x`.
+
+## Description
+
+EXPON.DIST is the natural companion to `POISSON.DIST`: while
+POISSON.DIST answers "how many events happen in a fixed interval,"
+EXPON.DIST answers "how long until the next one happens," given the
+same underlying constant event rate `lambda`. The distribution's mean
+waiting time is `1 / lambda` — a `lambda` of 4 events per hour implies
+an average wait of 15 minutes (`1/4` of an hour) between events.
+
+<Callout type="idea">
+  The exponential distribution is famously **memoryless**: the
+  probability of waiting at least an additional `t` units, given that
+  no event has happened yet, is exactly the same as the probability
+  of waiting `t` units from the very start. Past waiting time gives no
+  information about how much longer the wait will be — a property
+  essentially no other common distribution shares.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '0.2212', '2': '0.3935', '4': '0.6321', '8': '0.8647' }}
+  defaultValue="4"
+  label={'Live preview — =EXPON.DIST({x}, 0.25, TRUE)'}
+  fieldLabel="x"
+/>
+
+A process averaging 0.25 events per unit time — a mean wait of `1 /
+0.25 = 4` units between events. The chance of waiting 4 units or less
+is 0.6321 (again `1 − 1/e`, the same landmark value seen on
+`WEIBULL.DIST`'s page), and the chance of waiting 8 units or less —
+double the mean wait — climbs to 0.8647.
+
+## Common errors
+
+### #NUM! — x is negative, or lambda isn't positive
+
+<ExcelCode>{`EXPON.DIST(-1, 0.25, TRUE) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative, and `lambda` must be strictly positive.
+
+### Confusing lambda (a rate) with the mean wait time itself
+
+<ExcelCode>{`EXPON.DIST(4, 4, TRUE) → treats 4 as the rate (4 events per unit time), not a 4-unit mean wait`}</ExcelCode>
+
+`lambda` is a rate — events per unit time — not the average wait
+directly. If the known quantity is an average wait time (say, 4
+minutes between calls), pass its reciprocal: `lambda = 1/4 = 0.25`.
+
+export const faqs = [
+  {
+    question: 'How does EXPON.DIST relate to POISSON.DIST?',
+    answer: 'They describe the same underlying constant-rate process from two angles: POISSON.DIST gives the probability of a certain number of events in a fixed interval, while EXPON.DIST gives the probability distribution of the waiting time until the next single event. Both use the same rate.',
+  },
+  {
+    question: 'What does "memoryless" mean for the exponential distribution?',
+    answer: 'It means the distribution of remaining wait time is exactly the same regardless of how long you\'ve already waited — if no event has happened in the last 10 minutes, the expected additional wait is identical to what it would be starting fresh. This is a distinctive mathematical property, not true of most other distributions like Weibull with alpha ≠ 1.',
+  },
+  {
+    question: 'Is EXPON.DIST the same as the legacy EXPONDIST function?',
+    answer: 'Yes — EXPONDIST(x, lambda, cumulative) and EXPON.DIST return identical results. EXPONDIST still works for backward compatibility, but Microsoft recommends EXPON.DIST for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EXPON.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EXPON.DIST(4, 0.25, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Expon_Dist(4, 0.25, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import expon
+
+    probability = expon.cdf(4, scale=1/0.25)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [POISSON.DIST](/docs/statistical/poisson-dist) — the companion
+  distribution for counting events, rather than timing them.
+- [WEIBULL.DIST](/docs/statistical/weibull-dist) — a generalization
+  that drops the memoryless assumption, allowing failure rate to
+  change over time.
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — models the total
+  waiting time for several exponential events in a row.

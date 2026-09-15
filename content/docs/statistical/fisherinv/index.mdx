@@ -1,0 +1,159 @@
+---
+title: FISHERINV
+description: The reverse of FISHER — converts a Fisher-transformed value back to a correlation coefficient.
+---
+
+Convert a Fisher-transformed value back into a correlation
+coefficient — the reverse of `FISHER`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Always returns a value strictly between -1 and 1', type: 'check' },
+  { text: 'FISHERINV(0) always returns exactly 0', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FISHERINV(y)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FISHERINV(y)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'y',
+    type: 'number',
+    required: true,
+    description: 'A Fisher-transformed value to convert back to a correlation coefficient.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The correlation coefficient corresponding to `y`:
+`(EXP(2y) − 1) / (EXP(2y) + 1)`, always a value strictly between -1
+and 1.
+
+## Description
+
+FISHERINV undoes `FISHER`'s transformation, converting a value that
+was manipulated using ordinary normal-distribution statistics (a
+confidence interval endpoint, an average of several Fisher-
+transformed correlations) back onto the familiar -1-to-1 correlation
+scale. No matter how large or small `y` gets, FISHERINV's result
+always stays strictly within `(-1, 1)` — it can never produce an
+invalid correlation coefficient.
+
+<Callout type="idea">
+  FISHERINV is mathematically identical to the hyperbolic tangent
+  function, `tanh(y)` — its output range of `(-1, 1)` is exactly
+  `tanh`'s own asymptotic range, which is precisely why the Fisher
+  transformation works as a bijection onto valid correlation values.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-0.5': '-0.4621', '0': '0.0000', '0.5': '0.4621', '1': '0.7616' }}
+  defaultValue="0.5"
+  label={'Live preview — =FISHERINV({y})'}
+  fieldLabel="y"
+/>
+
+`FISHERINV(0)` returns exactly 0, and `FISHERINV(-0.5)` and
+`FISHERINV(0.5)` are exact mirror images (-0.4621 and 0.4621).
+`FISHERINV(1)` returns 0.7616 — notice how much the output compresses
+toward 1 as the input grows, since the result can never actually
+reach or exceed 1.
+
+## Common errors
+
+### Expecting FISHERINV(FISHER(x)) to introduce rounding error
+
+<ExcelCode>{`FISHERINV(FISHER(0.5)) → 0.5, an exact round trip`}</ExcelCode>
+
+FISHER and FISHERINV are exact mathematical inverses — round-tripping
+a value through both functions returns the original number back
+(subject only to Excel's normal floating-point precision), not a
+meaningfully different approximation.
+
+### Feeding a raw correlation coefficient into FISHERINV by mistake
+
+<ExcelCode>{`FISHERINV(0.5) → 0.4621, not the identity function — 0.5 is treated as an already-transformed value`}</ExcelCode>
+
+FISHERINV expects a Fisher-transformed value as input, not a
+correlation coefficient directly — passing a raw correlation through
+FISHERINV by mistake silently produces a different (and incorrect)
+number rather than erroring.
+
+export const faqs = [
+  {
+    question: 'Why can FISHERINV never return exactly -1 or 1?',
+    answer: 'Because its formula is mathematically equivalent to the hyperbolic tangent function, which approaches but never reaches ±1 for any finite input — matching the fact that a correlation of exactly ±1 has no valid Fisher-transformed counterpart in the first place.',
+  },
+  {
+    question: 'What is FISHERINV typically used for?',
+    answer: "Converting the endpoints of a confidence interval (built in Fisher-transformed, normally-distributed space) back to the original correlation scale, or converting an average of several Fisher-transformed correlations back to a single combined correlation coefficient.",
+  },
+  {
+    question: 'Is FISHERINV the same as tanh?',
+    answer: 'Yes — FISHERINV(y) computes exactly the same value as the hyperbolic tangent function, tanh(y), found in most programming languages and statistical software.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FISHERINV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FISHERINV(0.5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim correlation As Double
+    correlation = Application.WorksheetFunction.FisherInv(0.5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    correlation = np.tanh(0.5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FISHER](/docs/statistical/fisher) — the reverse: converts a
+  correlation coefficient into a Fisher-transformed value.
+- [CORREL](/docs/statistical/correl) — computes the correlation
+  coefficient this function's output represents.
+- [PEARSON](/docs/statistical/pearson) — an alternate name for the
+  same correlation calculation as CORREL.

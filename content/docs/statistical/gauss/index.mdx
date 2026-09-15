@@ -1,0 +1,157 @@
+---
+title: GAUSS
+description: The probability that a standard normal variable falls between the mean and x — a shorthand built on NORM.S.DIST.
+---
+
+Return the probability that a standard normal random variable falls
+between 0 (the mean) and `x` — a convenient shorthand for a
+calculation otherwise built from two separate pieces.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Equivalent to NORM.S.DIST(x, TRUE) - 0.5', type: 'warn' },
+  { text: 'GAUSS(0) always returns exactly 0', type: 'check' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GAUSS(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GAUSS(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The z-score (a value on the standard normal scale) to measure the probability out to.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The probability that a standard normal random variable falls between
+0 and `x`.
+
+## Description
+
+GAUSS packages a very common statistical question — "what fraction of
+values fall between the mean and this many standard deviations away"
+— into a single call. It's mathematically identical to
+`NORM.S.DIST(x, TRUE) - 0.5`: taking the cumulative probability up to
+`x` and subtracting the 0.5 that always sits below the mean, leaving
+just the probability mass between the mean and `x`.
+
+<Callout type="idea">
+  `GAUSS(1.96)` returns almost exactly 0.475 — doubling it gives 0.95,
+  the familiar "95% of values fall within about 1.96 standard
+  deviations of the mean" rule that underlies the standard 95%
+  confidence interval.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.1915', '1': '0.3413', '1.96': '0.4750', '2.5': '0.4938' }}
+  defaultValue="1"
+  label={'Live preview — =GAUSS({x})'}
+  fieldLabel="x"
+/>
+
+`GAUSS(1)` returns 0.3413 — the familiar "34% of values fall within
+one standard deviation above the mean" fact behind the 68-95-99.7
+rule. `GAUSS(1.96)` returns 0.4750, so `2 × GAUSS(1.96)` gives almost
+exactly 0.95 — the standard 95% interval.
+
+## Common errors
+
+### Expecting GAUSS to return the full cumulative probability
+
+<ExcelCode>{`GAUSS(1) → 0.3413, not the 0.8413 cumulative probability up to x = 1`}</ExcelCode>
+
+GAUSS only measures the probability from the **mean** out to `x`, not
+from negative infinity. For the full cumulative probability, use
+`NORM.S.DIST(x, TRUE)` instead — or add 0.5 to GAUSS's result for a
+positive `x`.
+
+### Forgetting to double GAUSS's result for a two-sided interval
+
+<ExcelCode>{`GAUSS(1.96) → 0.4750, not the 0.95 two-sided probability within ±1.96`}</ExcelCode>
+
+GAUSS only covers one side (0 to `x`) — a symmetric two-sided
+interval like "within 1.96 standard deviations either way" needs
+`2 × GAUSS(x)`.
+
+export const faqs = [
+  {
+    question: 'GAUSS vs NORM.S.DIST — what\'s the difference?',
+    answer: 'GAUSS(x) always equals NORM.S.DIST(x, TRUE) - 0.5 — the probability between the mean and x, rather than the full cumulative probability from negative infinity. They\'re otherwise built from the exact same underlying calculation.',
+  },
+  {
+    question: 'How does GAUSS relate to the 68-95-99.7 rule?',
+    answer: 'Doubling GAUSS at 1, 2, and 3 reproduces that rule almost exactly: 2 × GAUSS(1) ≈ 0.6827, 2 × GAUSS(2) ≈ 0.9545, and 2 × GAUSS(3) ≈ 0.9973 — the percentage of a normal distribution within 1, 2, and 3 standard deviations of the mean.',
+  },
+  {
+    question: 'Why would I use GAUSS instead of just NORM.S.DIST?',
+    answer: 'Purely for convenience — GAUSS saves writing the "- 0.5" by hand whenever the question is naturally phrased as "how much probability lies between the mean and this point," which is a very common framing in confidence-interval and margin-of-error calculations.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GAUSS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GAUSS(1.96)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Gauss(1.96)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import norm
+
+    probability = norm.cdf(1.96) - 0.5
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the general
+  standard-normal function GAUSS is built from.
+- [PHI](/docs/statistical/phi) — a related shorthand, for the curve's
+  density instead of a probability.
+- [CONFIDENCE.NORM](/docs/statistical/confidence-norm) — uses this
+  same "probability within N standard deviations" logic to build a
+  margin of error.

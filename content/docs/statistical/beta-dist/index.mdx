@@ -1,0 +1,190 @@
+---
+title: BETA.DIST
+description: The beta distribution — models a probability or proportion confined to a fixed interval, like a conversion rate.
+---
+
+Return a value from the beta distribution — a flexible distribution
+confined to a fixed interval (by default 0 to 1), commonly used to
+model a probability, proportion, or conversion rate itself as an
+uncertain quantity.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'Defaults to the [0,1] interval — pass A and B to rescale to any other range', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BETA.DIST(x, alpha, beta, cumulative, [A], [B])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BETA.DIST(x, alpha, beta, cumulative, [A], [B])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at — between A and B.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The first shape parameter — must be positive.',
+  },
+  {
+    name: 'beta',
+    type: 'number',
+    required: true,
+    description: 'The second shape parameter — must be positive.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+  {
+    name: 'A',
+    type: 'number',
+    required: false,
+    description: 'The lower bound of x\'s interval. Defaults to 0.',
+  },
+  {
+    name: 'B',
+    type: 'number',
+    required: false,
+    description: 'The upper bound of x\'s interval. Defaults to 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a beta-distributed
+random variable is less than or equal to `x`. With `cumulative`
+`FALSE`: the density of that curve at `x`.
+
+## Description
+
+The beta distribution is uniquely suited to modeling quantities that
+are themselves confined to a bounded range — most naturally a
+probability or proportion between 0 and 1. Its two shape parameters,
+`alpha` and `beta`, together determine everything about the curve's
+form: equal values produce a symmetric curve, `alpha > beta` skews it
+toward 1, and `alpha < beta` skews it toward 0. It's the standard
+choice in Bayesian analysis for representing uncertainty about an
+unknown probability — like a website's true conversion rate, before
+or after observing data.
+
+<Callout type="idea">
+  With `alpha = 1` and `beta = 1`, the beta distribution reduces
+  exactly to the uniform distribution on `[A, B]` — every value in
+  the interval becomes equally likely, with no skew in either
+  direction.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.1': '0.1143', '0.3': '0.5798', '0.5': '0.8906', '0.7': '0.9891' }}
+  defaultValue="0.3"
+  label={'Live preview — =BETA.DIST({x}, 2, 5, TRUE)'}
+  fieldLabel="x"
+/>
+
+A beta distribution with `alpha = 2` and `beta = 5`, on the default
+[0, 1] interval — skewed toward 0 since `beta` is larger. The
+probability of a value at or below 0.3 is already 0.5798, more than
+half the distribution's total area, showing how concentrated this
+shape is toward the lower end of the range.
+
+## Common errors
+
+### #NUM! — x is outside the [A, B] interval, or alpha/beta isn't positive
+
+<ExcelCode>{`BETA.DIST(1.5, 2, 5, TRUE) → #NUM!, since 1.5 is outside the default [0,1] range`}</ExcelCode>
+
+`x` must fall between `A` and `B` (0 and 1 by default), and both
+`alpha` and `beta` must be strictly positive.
+
+### Forgetting A and B rescale the entire interval, not just x
+
+<ExcelCode>{`BETA.DIST(50, 2, 5, TRUE, 0, 100) → treats x on a 0-100 scale, not the default 0-1`}</ExcelCode>
+
+When `A` and `B` are supplied, `x` is interpreted on that rescaled
+interval throughout — `alpha` and `beta` still control the same
+underlying shape, just stretched to fit the new range.
+
+export const faqs = [
+  {
+    question: 'What do alpha and beta control in BETA.DIST?',
+    answer: 'Together they determine the curve\'s shape on its interval. Equal alpha and beta give a symmetric curve; alpha greater than beta skews the distribution toward the upper end of the interval, and alpha less than beta skews it toward the lower end.',
+  },
+  {
+    question: 'What is BETA.DIST typically used for?',
+    answer: "Modeling an unknown probability or proportion as an uncertain quantity in its own right — a classic use is Bayesian A/B testing, where a beta distribution represents belief about a true conversion rate both before and after observing conversion data.",
+  },
+  {
+    question: 'Is BETA.DIST the same as the legacy BETADIST function?',
+    answer: 'The core calculation is the same, but the legacy BETADIST has no cumulative argument — it\'s always cumulative, equivalent to BETA.DIST(..., TRUE, ...). BETA.DIST adds the option to compute the density instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BETA.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BETA.DIST(0.3, 2, 5, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Beta_Dist(0.3, 2, 5, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import beta
+
+    probability = beta.cdf(0.3, a=2, b=5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BETA.INV](/docs/statistical/beta-inv) — the reverse: finds the
+  value for a given cumulative probability.
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — a related distribution,
+  built from the same combinatorial foundations.
+- [PROB](/docs/statistical/prob) — sums probabilities across a
+  discrete range instead of a continuous one.

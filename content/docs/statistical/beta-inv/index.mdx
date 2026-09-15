@@ -1,0 +1,179 @@
+---
+title: BETA.INV
+description: The value for a given cumulative probability in the beta distribution — the reverse of BETA.DIST.
+---
+
+Find the value that corresponds to a given cumulative probability in
+the beta distribution — the reverse of `BETA.DIST`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Defaults to the [0,1] interval — pass A and B to rescale to any other range', type: 'warn' },
+  { text: 'probability must be strictly between 0 and 1', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BETA.INV(probability, alpha, beta, [A], [B])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BETA.INV(probability, alpha, beta, [A], [B])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The first shape parameter — must be positive.',
+  },
+  {
+    name: 'beta',
+    type: 'number',
+    required: true,
+    description: 'The second shape parameter — must be positive.',
+  },
+  {
+    name: 'A',
+    type: 'number',
+    required: false,
+    description: 'The lower bound of the interval. Defaults to 0.',
+  },
+  {
+    name: 'B',
+    type: 'number',
+    required: false,
+    description: 'The upper bound of the interval. Defaults to 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value `x` such that `BETA.DIST(x, alpha, beta, TRUE, A, B)`
+equals `probability`.
+
+## Description
+
+BETA.INV is most often used in Bayesian analysis to extract a
+credible interval from a posterior beta distribution — after
+observing data, an analyst updates `alpha` and `beta` to reflect what
+was learned, then uses BETA.INV to find, say, the 2.5th and 97.5th
+percentiles that bound a 95% credible interval for the true
+underlying probability.
+
+<Callout type="idea">
+  BETA.INV and `BETA.DIST` are exact inverses:
+  `BETA.INV(BETA.DIST(x, alpha, beta, TRUE), alpha, beta)` returns `x`
+  back, for any valid `x`, `alpha`, and `beta` on the matching
+  interval.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.25': '0.1612', '0.5': '0.2644', '0.75': '0.3895', '0.9': '0.5103' }}
+  defaultValue="0.5"
+  label={'Live preview — =BETA.INV({probability}, 2, 5)'}
+  fieldLabel="probability"
+/>
+
+The same `alpha = 2`, `beta = 5` beta distribution used on
+`BETA.DIST`'s page. `BETA.INV(0.5, 2, 5)` returns 0.2644 — the
+median, well below the interval's midpoint of 0.5, reflecting the
+same skew toward 0 shown on that page.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`BETA.INV(0, 2, 5) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1, and both
+`alpha` and `beta` must be strictly positive.
+
+### Forgetting to match A and B to how alpha/beta were fit
+
+<ExcelCode>{`BETA.INV(0.5, 2, 5, 0, 100) → 26.44, not 0.2644 — a rescaled result on a 0-100 interval`}</ExcelCode>
+
+If `alpha` and `beta` were determined assuming the default `[0, 1]`
+interval, omit `A` and `B` (or explicitly pass `0` and `1`) — adding
+a different interval rescales the result to match, which is easy to
+do by accident when copying a formula between contexts.
+
+export const faqs = [
+  {
+    question: 'What is BETA.INV typically used for?',
+    answer: "Finding a credible interval in Bayesian analysis — after updating a beta distribution's alpha and beta parameters based on observed data, BETA.INV pulls out specific percentiles (like 2.5% and 97.5%) that bound a range for the true unknown probability.",
+  },
+  {
+    question: 'Why isn\'t BETA.INV(0.5, alpha, beta) at the interval\'s midpoint?',
+    answer: 'Because the beta distribution is generally skewed unless alpha equals beta exactly — its median only sits at the interval\'s midpoint in that symmetric special case. Otherwise, a larger alpha pulls the median toward the upper end, and a larger beta pulls it toward the lower end.',
+  },
+  {
+    question: 'Is BETA.INV the same as the legacy BETAINV function?',
+    answer: 'Yes — BETAINV(probability, alpha, beta, A, B) and BETA.INV return identical results. BETAINV still works for backward compatibility, but Microsoft recommends BETA.INV for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BETA.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BETA.INV(0.5, 2, 5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim medianValue As Double
+    medianValue = Application.WorksheetFunction.Beta_Inv(0.5, 2, 5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import beta
+
+    median_value = beta.ppf(0.5, a=2, b=5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BETA.DIST](/docs/statistical/beta-dist) — the reverse: finds the
+  cumulative probability for a given value.
+- [GAMMA.INV](/docs/statistical/gamma-inv) — the equivalent inverse
+  lookup for the gamma distribution.
+- [CONFIDENCE.T](/docs/statistical/confidence-t) — another way to
+  build an interval estimate, using the t-distribution instead of the
+  beta distribution.

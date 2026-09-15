@@ -1,0 +1,160 @@
+---
+title: FISHER
+description: The Fisher transformation — converts a correlation coefficient into a value that can be tested and averaged with normal statistics.
+---
+
+Convert a correlation coefficient (a value between -1 and 1) into a
+value that behaves like a normally-distributed variable — making it
+possible to build confidence intervals and hypothesis tests around
+correlation using ordinary normal-distribution statistics.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'x must be strictly between -1 and 1 — a valid correlation coefficient', type: 'warn' },
+  { text: 'FISHER(0) always returns exactly 0', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FISHER(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FISHER(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'A correlation coefficient, strictly between -1 and 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The Fisher-transformed value of `x`: `0.5 × LN((1 + x) / (1 − x))`.
+
+## Description
+
+`CORREL` and `PEARSON` return a correlation coefficient bounded
+between -1 and 1 — but that boundedness makes it awkward to work with
+directly using standard normal-distribution statistics, especially
+near the extremes where the sampling distribution of correlation
+becomes noticeably skewed. FISHER re-expresses a correlation as a
+value that's approximately normally distributed with a known standard
+error, unlocking the usual toolkit: confidence intervals, hypothesis
+tests, and averaging correlations from multiple samples correctly
+(averaging raw correlations directly is a known statistical mistake;
+averaging their Fisher-transformed values first is the correct
+approach).
+
+<Callout type="idea">
+  FISHER is mathematically identical to the inverse hyperbolic tangent
+  function, `atanh(x)` — the same transformation shows up under that
+  name in most statistical software and textbooks outside Excel.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-0.7': '-0.8673', '0': '0.0000', '0.3': '0.3095', '0.7': '0.8673' }}
+  defaultValue="0.3"
+  label={'Live preview — =FISHER({x})'}
+  fieldLabel="x"
+/>
+
+`FISHER(0)` returns exactly 0, and `FISHER(-0.7)` and `FISHER(0.7)`
+are exact mirror images of each other (-0.8673 and 0.8673) — the
+transformation is symmetric around zero, since `FISHER(-x)` always
+equals `-FISHER(x)`.
+
+## Common errors
+
+### #NUM! — x is not strictly between -1 and 1
+
+<ExcelCode>{`FISHER(1) → #NUM!`}</ExcelCode>
+
+`x` must be strictly between -1 and 1 — a correlation of exactly ±1
+is a mathematical edge case FISHER can't transform (the underlying
+log would divide by zero).
+
+### Averaging raw correlation coefficients directly
+
+<ExcelCode>{`AVERAGE(0.9, 0.5) → 0.7, not the statistically correct way to combine two correlations`}</ExcelCode>
+
+Correlation coefficients aren't linear in the way averages assume —
+the statistically sound approach is `FISHERINV(AVERAGE(FISHER(0.9),
+FISHER(0.5)))`, which correctly weights the more extreme correlation
+less heavily than a naive average would.
+
+export const faqs = [
+  {
+    question: 'Why not just work with the correlation coefficient directly?',
+    answer: "Because a correlation coefficient's own sampling distribution becomes increasingly skewed as it approaches -1 or 1, which breaks the assumptions behind standard confidence intervals and hypothesis tests. The Fisher-transformed value is approximately normal with a known standard error, so ordinary normal-distribution statistics apply correctly to it.",
+  },
+  {
+    question: 'How do I build a confidence interval for a correlation coefficient?',
+    answer: 'Apply FISHER to the correlation, build a normal-distribution confidence interval around that transformed value (using its standard error, 1/SQRT(n-3)), then apply FISHERINV to both endpoints to convert the interval back to the original correlation scale.',
+  },
+  {
+    question: 'Is FISHER the same as atanh?',
+    answer: 'Yes — FISHER(x) computes exactly the same value as the inverse hyperbolic tangent function, atanh(x), found in most programming languages and statistical software.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FISHER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FISHER(0.3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim transformed As Double
+    transformed = Application.WorksheetFunction.Fisher(0.3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    transformed = np.arctanh(0.3)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FISHERINV](/docs/statistical/fisherinv) — the reverse: converts a
+  Fisher-transformed value back to a correlation coefficient.
+- [CORREL](/docs/statistical/correl) — computes the correlation
+  coefficient FISHER is typically applied to.
+- [PEARSON](/docs/statistical/pearson) — an alternate name for the
+  same correlation calculation as CORREL.

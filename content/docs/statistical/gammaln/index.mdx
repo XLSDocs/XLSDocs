@@ -1,0 +1,157 @@
+---
+title: GAMMALN
+description: The natural logarithm of the gamma function — a smooth extension of the factorial to non-integers.
+---
+
+Return the natural logarithm of the gamma function — the mathematical
+building block behind nearly every continuous probability
+distribution in this section, from `GAMMA.DIST` to `BETA.DIST` to
+`CHISQ.DIST`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'For a positive integer n, GAMMALN(n+1) = LN(n factorial)', type: 'check' },
+  { text: 'Returns the log of the gamma function, not the gamma function itself — see GAMMA for that', type: 'warn' },
+  { text: 'x must be positive', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GAMMALN(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GAMMALN(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the log-gamma function at — must be positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The natural logarithm of the gamma function at `x`.
+
+## Description
+
+The gamma function extends the factorial to non-integer values — for
+a positive integer `n`, `GAMMA(n)` equals `(n − 1)!`. GAMMALN returns
+its natural log instead of the raw value, which matters in practice
+because the gamma function itself grows explosively fast (it overflows
+a standard floating-point number well before `x = 200`), while its
+logarithm stays small and well-behaved. Every gamma-based distribution
+function on this site (`GAMMA.DIST`, `BETA.DIST`, `CHISQ.DIST`,
+`F.DIST`, and more) is actually computed internally using log-gamma
+sums and differences rather than raw gamma values, for exactly this
+reason.
+
+<Callout type="idea">
+  For a positive integer `n`, `GAMMALN(n + 1)` equals `LN(FACT(n))` —
+  a way to compute the log of a huge factorial (say, 500!) without
+  ever computing the astronomically large factorial itself, which
+  `FACT` alone can't do — it overflows at `171!`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '0.0000', '5': '3.1781', '10': '12.8018', '20': '39.3399' }}
+  defaultValue="5"
+  label={'Live preview — =GAMMALN({x})'}
+  fieldLabel="x"
+/>
+
+`GAMMALN(1)` returns 0, since `GAMMA(1) = 1` and `LN(1) = 0`.
+`GAMMALN(5)` returns 3.1781 — matching `LN(GAMMA(5))`, and since
+`GAMMA(5) = 4! = 24`, this also equals `LN(24)`.
+
+## Common errors
+
+### #NUM! — x is zero or negative
+
+<ExcelCode>{`GAMMALN(0) → #NUM!`}</ExcelCode>
+
+`x` must be strictly positive — the gamma function has poles at zero
+and every negative integer.
+
+### Expecting GAMMALN to return the gamma function itself
+
+<ExcelCode>{`GAMMALN(5) → 3.1781, not GAMMA(5) → 24`}</ExcelCode>
+
+GAMMALN returns the **logarithm** of the gamma function. To get the
+raw gamma value back, exponentiate the result: `EXP(GAMMALN(5))`
+returns 24, matching `GAMMA(5)` directly.
+
+export const faqs = [
+  {
+    question: 'GAMMALN vs GAMMALN.PRECISE — which should I use?',
+    answer: 'GAMMALN.PRECISE for new formulas — it uses a more accurate underlying algorithm. GAMMALN is kept for backward compatibility and still gives the same result for nearly all practical inputs; the difference only shows up in edge cases far beyond typical spreadsheet precision needs.',
+  },
+  {
+    question: 'Why compute the log of the gamma function instead of the gamma function itself?',
+    answer: "Because the gamma function grows extremely fast — GAMMA(171) already overflows a standard floating-point number. Its logarithm grows far more slowly and stays numerically well-behaved, which is why nearly every gamma-based statistical calculation (including every distribution function on this site that touches GAMMA internally) is built on log-gamma arithmetic rather than raw gamma values.",
+  },
+  {
+    question: 'How does GAMMALN relate to the factorial function?',
+    answer: 'For a positive integer n, GAMMALN(n + 1) equals LN(n!) — the gamma function at n + 1 is exactly n factorial. This lets GAMMALN compute the log of a factorial far larger than FACT can handle directly.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GAMMALN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GAMMALN(5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim logGamma As Double
+    logGamma = Application.WorksheetFunction.GammaLn(5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.special import gammaln
+
+    log_gamma = gammaln(5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GAMMALN.PRECISE](/docs/statistical/gammaln-precise) — a more
+  accurate version of the same calculation.
+- [GAMMA](/docs/statistical/gamma) — the raw gamma function, without
+  the logarithm.
+- [FACT](/docs/math/fact) — the ordinary factorial, which GAMMALN can
+  effectively extend past FACT's own overflow point.

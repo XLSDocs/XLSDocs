@@ -1,0 +1,154 @@
+---
+title: GAMMALN.PRECISE
+description: A more accurate version of GAMMALN — the natural logarithm of the gamma function.
+---
+
+Return the natural logarithm of the gamma function, using a more
+accurate underlying algorithm than the legacy `GAMMALN`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Same result as GAMMALN for nearly all practical inputs', type: 'check' },
+  { text: 'x must be positive', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GAMMALN.PRECISE(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GAMMALN.PRECISE(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the log-gamma function at — must be positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The natural logarithm of the gamma function at `x`.
+
+## Description
+
+GAMMALN.PRECISE calculates exactly the same mathematical quantity as
+the older `GAMMALN` — the natural log of the gamma function — but
+using a more accurate approximation algorithm internally. For nearly
+every practical input a spreadsheet formula would ever use, both
+functions return identical results to the precision Excel displays;
+the improvement only shows up in edge cases at the far limits of
+floating-point precision.
+
+<Callout type="info">
+  Microsoft added GAMMALN.PRECISE in Excel 2010 as part of a broader
+  wave of "more accurate" statistical function replacements
+  (`NORM.S.DIST`, `CONFIDENCE.T`, and others followed the same
+  pattern) — GAMMALN itself was never actually wrong for typical
+  values, just less numerically robust at extremes than the newer
+  algorithm.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '0.0000', '5': '3.1781', '10': '12.8018', '20': '39.3399' }}
+  defaultValue="5"
+  label={'Live preview — =GAMMALN.PRECISE({x})'}
+  fieldLabel="x"
+/>
+
+The same values as `GAMMALN`'s own page — at typical inputs like
+these, the two functions agree exactly. `GAMMALN.PRECISE(5)` returns
+3.1781, matching `LN(GAMMA(5))` = `LN(24)`.
+
+## Common errors
+
+### #NUM! — x is zero or negative
+
+<ExcelCode>{`GAMMALN.PRECISE(-2) → #NUM!`}</ExcelCode>
+
+`x` must be strictly positive — the gamma function has poles at zero
+and every negative integer.
+
+### Expecting a visibly different result from GAMMALN
+
+<ExcelCode>{`GAMMALN.PRECISE(5) → 3.1781, the same as GAMMALN(5) → 3.1781`}</ExcelCode>
+
+The two functions only diverge at precision far beyond what a
+spreadsheet cell typically displays — don't expect to see a
+difference in ordinary use.
+
+export const faqs = [
+  {
+    question: 'What is actually different between GAMMALN and GAMMALN.PRECISE?',
+    answer: "The underlying approximation algorithm — GAMMALN.PRECISE uses a more numerically robust method that stays accurate across a wider range of inputs. For typical spreadsheet values, both return the same displayed result.",
+  },
+  {
+    question: 'Should I switch existing GAMMALN formulas to GAMMALN.PRECISE?',
+    answer: "There's no real need to for existing formulas — GAMMALN isn't deprecated and works fine for ordinary use. GAMMALN.PRECISE is worth choosing in new formulas mainly on general principle (newer, more robust algorithm), not because GAMMALN is producing wrong answers.",
+  },
+  {
+    question: 'Does GAMMALN.PRECISE work in older Excel versions?',
+    answer: 'No — it requires Excel 2010 or later, the same cutoff as most of the ".DIST"/".INV"-renamed statistical functions introduced in that release. GAMMALN itself works in every version.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GAMMALN.PRECISE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GAMMALN.PRECISE(5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim logGamma As Double
+    logGamma = Application.WorksheetFunction.GammaLn_Precise(5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.special import gammaln
+
+    log_gamma = gammaln(5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GAMMALN](/docs/statistical/gammaln) — the legacy version of the
+  same calculation.
+- [GAMMA](/docs/statistical/gamma) — the raw gamma function, without
+  the logarithm.
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — the gamma distribution,
+  built internally on log-gamma arithmetic.

@@ -1,0 +1,178 @@
+---
+title: PROB
+description: Sum the probabilities assigned to a range of values that fall within given bounds.
+---
+
+Sum the probabilities of every value in a range that falls between a
+lower and upper limit — given a custom, hand-specified probability
+for each individual outcome, rather than a formula-based
+distribution.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'prob_range values must sum to 1 (or very close to it)', type: 'warn' },
+  { text: 'Omitting upper_limit gives the probability of exactly lower_limit', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PROB(x_range, prob_range, lower_limit, [upper_limit])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PROB(x_range, prob_range, lower_limit, [upper_limit])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x_range',
+    type: 'range',
+    required: true,
+    description: 'The set of possible outcome values.',
+  },
+  {
+    name: 'prob_range',
+    type: 'range',
+    required: true,
+    description: 'The probability assigned to each corresponding value in x_range. Must sum to 1.',
+  },
+  {
+    name: 'lower_limit',
+    type: 'number',
+    required: true,
+    description: 'The lower bound of the range to sum probabilities over.',
+  },
+  {
+    name: 'upper_limit',
+    type: 'number',
+    required: false,
+    description: 'The upper bound of the range. If omitted, only lower_limit (exactly) is evaluated.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of every probability in `prob_range` whose corresponding
+value in `x_range` falls between `lower_limit` and `upper_limit`,
+inclusive.
+
+## Description
+
+Unlike every other function in this round, PROB doesn't assume any
+particular mathematical distribution — it works directly from a
+custom probability table supplied by hand, one probability per
+possible outcome. This makes it the right tool whenever outcomes and
+their likelihoods are known individually (a loaded die, survey
+response percentages, a discrete payoff table) rather than following
+a standard distribution shape like binomial or Poisson.
+
+<Callout type="warn">
+  Excel expects `prob_range`'s values to sum to (very close to) 1 —
+  if they don't, PROB returns `#N/A` rather than silently normalizing
+  or rescaling them. Always double-check a custom probability table
+  actually sums to 1 before relying on PROB's result.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '0.1000', '2': '0.2500', '4': '0.6000', '6': '1.0000' }}
+  defaultValue="4"
+  label={'Live preview — =PROB(x_range, prob_range, 1, {upper_limit})'}
+  fieldLabel="upper_limit"
+/>
+
+A loaded six-sided die with a custom probability for each face (0.10,
+0.15, 0.15, 0.20, 0.20, 0.20 — heavier toward the higher numbers).
+The chance of rolling between 1 and 2 is 0.25, rising to 0.60 for 1
+through 4, and reaching the full 1.00 once the range covers every
+face from 1 to 6.
+
+## Common errors
+
+### #N/A — prob_range doesn't sum to 1
+
+<ExcelCode>{`PROB(x_range, prob_range, 1, 6) → #N/A if prob_range's values sum to 0.95 or 1.05`}</ExcelCode>
+
+`prob_range` must sum to 1 (Excel allows a small floating-point
+tolerance, but a genuinely incomplete or overcounted probability
+table returns `#N/A` rather than an approximate answer.
+
+### #N/A — x_range and prob_range are different sizes
+
+<ExcelCode>{`PROB(A2:A6, B2:B7, 1, 6) → #N/A`}</ExcelCode>
+
+Every value in `x_range` needs exactly one matching probability in
+`prob_range` — the two ranges must be the same size.
+
+export const faqs = [
+  {
+    question: 'PROB vs BINOM.DIST/POISSON.DIST — which should I use?',
+    answer: 'PROB when the possible outcomes and their probabilities are known individually and don\'t follow a standard distribution shape — a custom payoff table, survey results, or a loaded die. BINOM.DIST, POISSON.DIST, and the other named distributions when the underlying process genuinely matches one of those standard mathematical forms.',
+  },
+  {
+    question: 'What happens if upper_limit is omitted?',
+    answer: 'PROB returns the probability of exactly lower_limit — the single value in prob_range matching that one entry in x_range, rather than summing across a range.',
+  },
+  {
+    question: 'Does x_range need to be sorted or evenly spaced?',
+    answer: "No — PROB matches each value in x_range to its corresponding probability regardless of order, and sums whichever ones fall within [lower_limit, upper_limit]. The values don't need to be sorted, consecutive, or evenly spaced.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PROB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PROB(A2:A7, B2:B7, 1, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Prob(Range("A2:A7"), Range("B2:B7"), 1, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    x_range = [1, 2, 3, 4, 5, 6]
+    prob_range = [0.10, 0.15, 0.15, 0.20, 0.20, 0.20]
+
+    probability = sum(p for x, p in zip(x_range, prob_range) if 1 <= x <= 4)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.DIST](/docs/statistical/binom-dist) — a standard distribution
+  shape PROB doesn't assume.
+- [SUMIFS](/docs/math/sumifs) — sums values by condition in a similar
+  spirit, without the probability-table framing.
+- [BETA.DIST](/docs/statistical/beta-dist) — models a probability
+  itself as a continuous uncertain quantity, rather than a discrete
+  table.

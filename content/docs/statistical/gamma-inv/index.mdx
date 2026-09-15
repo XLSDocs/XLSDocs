@@ -1,0 +1,163 @@
+---
+title: GAMMA.INV
+description: The value for a given cumulative probability in the gamma distribution — the reverse of GAMMA.DIST.
+---
+
+Find the value that corresponds to a given cumulative probability in
+the gamma distribution — the reverse of `GAMMA.DIST`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'GAMMA.INV(0.5, alpha, beta) gives the median, which is below the mean (alpha × beta)', type: 'warn' },
+  { text: 'probability must be strictly between 0 and 1', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GAMMA.INV(probability, alpha, beta)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GAMMA.INV(probability, alpha, beta)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The shape parameter — must be positive.',
+  },
+  {
+    name: 'beta',
+    type: 'number',
+    required: true,
+    description: 'The scale parameter — must be positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value `x` such that `GAMMA.DIST(x, alpha, beta, TRUE)` equals
+`probability`.
+
+## Description
+
+GAMMA.INV answers "what value has this much of the gamma
+distribution's area to its left" — the reverse lookup from
+`GAMMA.DIST`'s cumulative mode. Because the gamma distribution is
+right-skewed, its percentiles aren't evenly spaced around the mean
+the way a normal distribution's are: the gap between the 10th and
+50th percentile is smaller than the gap between the 50th and 90th.
+
+<Callout type="idea">
+  GAMMA.INV and `GAMMA.DIST` are exact inverses:
+  `GAMMA.INV(GAMMA.DIST(x, alpha, beta, TRUE), alpha, beta)` returns
+  `x` back, for any valid `x`, `alpha`, and `beta`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.25': '2.8838', '0.5': '5.0350', '0.75': '8.0779', '0.9': '11.6692' }}
+  defaultValue="0.5"
+  label={'Live preview — =GAMMA.INV({probability}, 2, 3)'}
+  fieldLabel="probability"
+/>
+
+The same shape-2, scale-3 gamma distribution used on `GAMMA.DIST`'s
+page (mean = 6). `GAMMA.INV(0.5, 2, 3)` returns 5.0350 — the true
+median, noticeably below the mean of 6, a direct look at the
+right-skew `GAMMA.DIST`'s own page described.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`GAMMA.INV(1, 2, 3) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1, and both
+`alpha` and `beta` must be strictly positive.
+
+### Assuming the median equals alpha × beta
+
+<ExcelCode>{`GAMMA.INV(0.5, 2, 3) → 5.0350, not 6 (which is the mean, alpha × beta)`}</ExcelCode>
+
+Because the gamma distribution is right-skewed, its median
+(`GAMMA.INV(0.5, ...)`) sits below its mean — the two aren't the same
+value, unlike in a symmetric distribution like the normal.
+
+export const faqs = [
+  {
+    question: 'Why is GAMMA.INV(0.5, alpha, beta) not the same as alpha × beta?',
+    answer: 'alpha × beta is the distribution\'s mean, not its median. Because the gamma distribution is right-skewed (a long tail stretching toward larger values), the median sits below the mean — GAMMA.INV(0.5, ...) finds the true 50th-percentile value, which is a genuinely different number.',
+  },
+  {
+    question: 'What is GAMMA.INV typically used for?',
+    answer: 'Finding a specific percentile of a gamma-distributed quantity — like the claim size an insurer\'s reserve needs to cover 95% of expected claims, or the waiting time below which 90% of a Poisson-driven process\'s wait times fall.',
+  },
+  {
+    question: 'Is GAMMA.INV the same as the legacy GAMMAINV function?',
+    answer: 'Yes — GAMMAINV(probability, alpha, beta) and GAMMA.INV return identical results. GAMMAINV still works for backward compatibility, but Microsoft recommends GAMMA.INV for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GAMMA.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GAMMA.INV(0.5, 2, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim medianValue As Double
+    medianValue = Application.WorksheetFunction.Gamma_Inv(0.5, 2, 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import gamma
+
+    median_value = gamma.ppf(0.5, a=2, scale=3)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — the reverse: finds the
+  cumulative probability for a given value.
+- [GAMMA](/docs/statistical/gamma) — the underlying gamma function.
+- [BETA.INV](/docs/statistical/beta-inv) — the equivalent inverse
+  lookup for the beta distribution.

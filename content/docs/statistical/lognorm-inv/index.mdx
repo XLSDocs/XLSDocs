@@ -1,0 +1,166 @@
+---
+title: LOGNORM.INV
+description: The value for a given cumulative probability in the lognormal distribution — the reverse of LOGNORM.DIST.
+---
+
+Find the value that corresponds to a given cumulative probability in
+the lognormal distribution — the reverse of `LOGNORM.DIST`.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'mean and standard_dev describe LN(x), not x itself', type: 'warn' },
+  { text: 'LOGNORM.INV(0.5, mean, sd) equals EXP(mean) — the distribution\'s median', type: 'check' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LOGNORM.INV(probability, mean, standard_dev)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOGNORM.INV(probability, mean, standard_dev)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: 'The mean of LN(x) — not the mean of x itself.',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The standard deviation of LN(x). Must be positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value `x` such that `LOGNORM.DIST(x, mean, standard_dev, TRUE)`
+equals `probability`.
+
+## Description
+
+LOGNORM.INV computes `EXP(mean + standard_dev × z)`, where `z` is the
+standard-normal z-score for `probability` — the same inverse-normal
+lookup `NORM.S.INV` performs, exponentiated back onto the lognormal
+scale. Because `EXP` is a strictly increasing function, LOGNORM.INV
+inherits the underlying normal distribution's symmetry in z-score
+terms even though the result itself is skewed on the original scale.
+
+<Callout type="idea">
+  `LOGNORM.INV(0.5, mean, standard_dev)` always equals exactly
+  `EXP(mean)` — the median of a lognormal distribution has this clean
+  closed form, unlike the gamma or beta distributions covered
+  elsewhere in this round, which need genuine numerical inversion even
+  at the 50th percentile.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.1': '0.5269', '0.5': '1.0000', '0.9': '1.8980', '0.95': '2.2760' }}
+  defaultValue="0.5"
+  label={'Live preview — =LOGNORM.INV({probability}, 0, 0.5)'}
+  fieldLabel="probability"
+/>
+
+The same `mean = 0`, `standard_dev = 0.5` lognormal distribution used
+on `LOGNORM.DIST`'s page. `LOGNORM.INV(0.5, 0, 0.5)` returns exactly
+1.0000 — matching `EXP(0)`, confirming the median is exactly `EXP(mean)`
+regardless of `standard_dev`.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`LOGNORM.INV(1, 0, 0.5) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than 0 and less than 1, and
+`standard_dev` must be positive.
+
+### Expecting the result to equal EXP(mean) at every probability
+
+<ExcelCode>{`LOGNORM.INV(0.9, 0, 0.5) → 1.8980, not EXP(0) = 1 — that shortcut only applies exactly at probability = 0.5`}</ExcelCode>
+
+Only the median (`probability = 0.5`) has the clean `EXP(mean)`
+shortcut — every other percentile genuinely depends on
+`standard_dev` too, requiring the full inverse-normal calculation.
+
+export const faqs = [
+  {
+    question: 'Why does LOGNORM.INV(0.5, mean, sd) always equal EXP(mean)?',
+    answer: 'Because the normal distribution underlying LN(x) is symmetric around its own mean — the z-score for probability 0.5 is always exactly 0, so LOGNORM.INV(0.5, mean, sd) simplifies to EXP(mean + sd × 0) = EXP(mean), regardless of standard_dev.',
+  },
+  {
+    question: 'What is LOGNORM.INV typically used for?',
+    answer: 'Finding a specific percentile of a lognormally-distributed quantity — like the income level below which 90% of a population falls, or a value-at-risk threshold for an asset whose returns are modeled as lognormal.',
+  },
+  {
+    question: 'Is LOGNORM.INV the same as the legacy LOGINV function?',
+    answer: 'Yes — LOGINV(probability, mean, standard_dev) and LOGNORM.INV return identical results. LOGINV still works for backward compatibility, but Microsoft recommends LOGNORM.INV for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LOGNORM.INV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LOGNORM.INV(0.9, 0, 0.5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim value As Double
+    value = Application.WorksheetFunction.LogNorm_Inv(0.9, 0, 0.5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import lognorm
+
+    value = lognorm.ppf(0.9, s=0.5, scale=1)  # scale = exp(mean)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LOGNORM.DIST](/docs/statistical/lognorm-dist) — the reverse: finds
+  the cumulative probability for a given value.
+- [NORM.S.INV](/docs/statistical/norm-s-inv) — the underlying
+  standard-normal inverse LOGNORM.INV is built from.
+- [GAMMA.INV](/docs/statistical/gamma-inv) — the equivalent inverse
+  lookup for the gamma distribution.

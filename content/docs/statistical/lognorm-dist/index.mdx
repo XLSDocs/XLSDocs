@@ -1,0 +1,177 @@
+---
+title: LOGNORM.DIST
+description: The lognormal distribution — models positive, right-skewed quantities like income, stock prices, or city populations.
+---
+
+Return a value from the lognormal distribution — used for positive
+quantities whose **logarithm** is normally distributed, like income,
+stock prices, and city populations.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'mean and standard_dev describe LN(x), not x itself', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LOGNORM.DIST(x, mean, standard_dev, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOGNORM.DIST(x, mean, standard_dev, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at — must be positive.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: 'The mean of LN(x) — not the mean of x itself.',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The standard deviation of LN(x). Must be positive.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a lognormally-
+distributed random variable is less than or equal to `x`. With
+`cumulative` `FALSE`: the density of that curve at `x`.
+
+## Description
+
+A quantity is lognormally distributed when its natural logarithm
+follows a normal distribution — which is exactly how LOGNORM.DIST
+computes its answer internally:
+`LOGNORM.DIST(x, mean, standard_dev, TRUE)` equals
+`NORM.S.DIST((LN(x) - mean) / standard_dev, TRUE)`. This pattern
+shows up naturally whenever a quantity results from multiplying many
+independent random factors together (compounding growth, cumulative
+error) rather than adding them — the Central Limit Theorem's
+multiplicative cousin.
+
+<Callout type="warn">
+  `mean` and `standard_dev` describe **LN(x)**, not `x` itself — a
+  common mistake is plugging in the actual average and spread of the
+  raw data. If the raw data's own mean and standard deviation are
+  known, they need to be converted to the log scale first (or fitted
+  from `LN` of the actual data) before use here.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.0828', '1': '0.5000', '2': '0.9172', '4': '0.9972' }}
+  defaultValue="1"
+  label={'Live preview — =LOGNORM.DIST({x}, 0, 0.5, TRUE)'}
+  fieldLabel="x"
+/>
+
+A lognormal distribution with `mean = 0` and `standard_dev = 0.5` on
+the log scale. Because `mean = 0`, `LN(1) = 0` sits exactly at the
+center, so `LOGNORM.DIST(1, 0, 0.5, TRUE)` returns exactly 0.5000 —
+the median of this distribution is 1, not 0.
+
+## Common errors
+
+### #NUM! — x or standard_dev is not positive
+
+<ExcelCode>{`LOGNORM.DIST(-1, 0, 0.5, TRUE) → #NUM!`}</ExcelCode>
+
+`x` must be greater than 0 (a lognormal variable can never be zero or
+negative), and `standard_dev` must be positive.
+
+### Plugging in x's own mean and standard deviation instead of LN(x)'s
+
+<ExcelCode>{`LOGNORM.DIST(x, mean_of_x, sd_of_x, TRUE) → wrong, unless mean_of_x and sd_of_x were computed from LN(x), not x`}</ExcelCode>
+
+`mean` and `standard_dev` must describe the logged values —
+`=AVERAGE(LN(range))` and `=STDEV.S(LN(range))`, not
+`AVERAGE(range)` and `STDEV.S(range)` directly.
+
+export const faqs = [
+  {
+    question: 'How is LOGNORM.DIST related to NORM.DIST?',
+    answer: "LOGNORM.DIST(x, mean, sd, TRUE) equals NORM.S.DIST((LN(x) - mean) / sd, TRUE) — a lognormal variable is, by definition, one whose natural logarithm is normally distributed with that mean and standard deviation.",
+  },
+  {
+    question: 'What kinds of real-world data are actually lognormal?',
+    answer: 'Quantities produced by multiplying many independent random factors together tend toward lognormal — household income, stock prices over time, city population sizes, and particle sizes in a crushing process are all classic examples.',
+  },
+  {
+    question: 'Is LOGNORM.DIST the same as the legacy LOGNORMDIST function?',
+    answer: 'The core calculation is the same, but the legacy LOGNORMDIST has no cumulative argument — it\'s always cumulative, equivalent to LOGNORM.DIST(..., TRUE). LOGNORM.DIST adds the option to compute the density instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LOGNORM.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LOGNORM.DIST(1, 0, 0.5, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.LogNorm_Dist(1, 0, 0.5, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import lognorm
+
+    probability = lognorm.cdf(1, s=0.5, scale=1)  # scale = exp(mean)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LOGNORM.INV](/docs/statistical/lognorm-inv) — the reverse: finds
+  the value for a given cumulative probability.
+- [NORM.DIST](/docs/statistical/norm-dist) — the underlying normal
+  distribution LOGNORM.DIST applies to LN(x).
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — another right-skewed
+  distribution for positive quantities, built differently.

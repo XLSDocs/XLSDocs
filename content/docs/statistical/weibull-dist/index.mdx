@@ -1,0 +1,180 @@
+---
+title: WEIBULL.DIST
+description: The Weibull distribution — the standard model for time-to-failure and reliability analysis.
+---
+
+Return a value from the Weibull distribution — the standard model in
+reliability engineering for time until a component fails, with a
+shape parameter flexible enough to represent early "infant mortality"
+failures, random failures, or wear-out failures.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'cumulative TRUE gives a probability (0-1); FALSE gives the curve\'s height', type: 'warn' },
+  { text: 'alpha < 1 models decreasing failure rate; alpha = 1 constant; alpha > 1 increasing', type: 'warn' },
+  { text: 'Requires Excel 2010 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=WEIBULL.DIST(x, alpha, beta, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=WEIBULL.DIST(x, alpha, beta, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at — must be non-negative.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The shape parameter — must be positive.',
+  },
+  {
+    name: 'beta',
+    type: 'number',
+    required: true,
+    description: 'The scale parameter — must be positive.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a Weibull-distributed
+random variable is less than or equal to `x`. With `cumulative`
+`FALSE`: the density of that curve at `x`.
+
+## Description
+
+The Weibull distribution's shape parameter `alpha` directly describes
+how failure risk changes over time — its single most useful property
+in reliability analysis. `alpha < 1` models a decreasing failure
+rate (early "infant mortality" defects that show up fast, then
+taper off); `alpha = 1` models a constant failure rate (random
+failures unrelated to age); `alpha > 1` models an increasing failure
+rate (wear-out, where risk grows the longer a part has been in
+service). `beta` sets the characteristic scale — roughly, the age by
+which about 63% of units have failed.
+
+<Callout type="idea">
+  When `alpha = 1`, the Weibull distribution reduces exactly to the
+  exponential distribution with rate `1/beta` —
+  `WEIBULL.DIST(x, 1, beta, TRUE)` and `EXPON.DIST(x, 1/beta, TRUE)`
+  return identical results.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2': '0.1479', '5': '0.6321', '8': '0.9227', '12': '0.9968' }}
+  defaultValue="5"
+  label={'Live preview — =WEIBULL.DIST({x}, 2, 5, TRUE)'}
+  fieldLabel="x"
+/>
+
+A Weibull distribution with shape `alpha = 2` (an increasing,
+wear-out-style failure rate) and scale `beta = 5`. At `x = 5` — the
+scale parameter itself — the cumulative probability is always
+0.6321, regardless of `alpha`, since `beta` is defined as the point
+where the distribution reaches `1 − 1/e`.
+
+## Common errors
+
+### #NUM! — x is negative, or alpha/beta isn't positive
+
+<ExcelCode>{`WEIBULL.DIST(-1, 2, 5, TRUE) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative, and both `alpha` and `beta` must be
+strictly positive.
+
+### Assuming alpha = 1 always models "typical" failure behavior
+
+<ExcelCode>{`WEIBULL.DIST(x, 1, beta, TRUE) → assumes a constant failure rate, unrealistic for most mechanical wear-out`}</ExcelCode>
+
+Most real mechanical components wear out over time (`alpha > 1`), not
+fail at a constant random rate — fitting `alpha = 1` by default
+without checking the actual failure pattern can badly misrepresent
+reliability, especially at the tails.
+
+export const faqs = [
+  {
+    question: 'What does alpha actually tell me about a product\'s reliability?',
+    answer: 'It describes how failure risk changes with age. alpha below 1 means failures cluster early (manufacturing defects); alpha equal to 1 means failures are random and age-independent; alpha above 1 means failure risk grows with age (wear-out) — the higher alpha, the more sharply failures cluster around beta.',
+  },
+  {
+    question: 'How does WEIBULL.DIST relate to EXPON.DIST?',
+    answer: 'EXPON.DIST is the special case of the Weibull distribution where alpha = 1 — a constant, age-independent failure rate. Any Weibull distribution with alpha other than 1 captures failure-rate behavior EXPON.DIST cannot represent on its own.',
+  },
+  {
+    question: 'Is WEIBULL.DIST the same as the legacy WEIBULL function?',
+    answer: 'Yes — WEIBULL(x, alpha, beta, cumulative) and WEIBULL.DIST return identical results. WEIBULL still works for backward compatibility, but Microsoft recommends WEIBULL.DIST for new formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with WEIBULL.DIST from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=WEIBULL.DIST(5, 2, 5, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim probability As Double
+    probability = Application.WorksheetFunction.Weibull_Dist(5, 2, 5, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.stats import weibull_min
+
+    probability = weibull_min.cdf(5, c=2, scale=5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [EXPON.DIST](/docs/statistical/expon-dist) — the special case of
+  this distribution where alpha = 1.
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — another flexible
+  distribution for positive, skewed quantities.
+- [NORM.DIST](/docs/statistical/norm-dist) — the symmetric
+  distribution most other quantities (not time-to-failure) are
+  modeled with instead.
