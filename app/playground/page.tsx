@@ -207,6 +207,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         href: '/docs/statistical/t-inv-2t#try-it',
         teaser: 'Tighten from a 95% to a 99% confidence level and watch the critical value jump from 2.18 to 3.05.',
       },
+      {
+        fn: 'F.INV.RT',
+        href: '/docs/statistical/f-inv-rt#try-it',
+        teaser: 'Drop the significance level from 0.10 to 0.01 and watch the F critical value climb from 2.73 all the way to 6.55.',
+      },
     ],
   },
 ];

@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-09-14',
+    title: 'CHISQ.DIST, CHISQ.DIST.RT, CHISQ.INV, CHISQ.INV.RT, F.DIST, F.DIST.RT, F.INV, and F.INV.RT',
+    description:
+      "Round 6 of the Statistical audit — the chi-square and F distribution families that CHISQ.TEST and F.TEST build on internally. Each family threads one shared scenario through its left-tailed, right-tailed, and inverse variants, so it's easy to see exactly how a 0.05 significance level and a 9.4877 critical value are the same fact stated two ways.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-09-14',
     title: 'T.DIST, T.DIST.RT, T.DIST.2T, T.INV, and T.INV.2T',
     description:
       "Round 5 of the Statistical audit — the T-distribution family. All five pages follow the same t-statistic (12 degrees of freedom) across left-tailed, right-tailed, and two-tailed variants and their inverses, so it's easy to see exactly how T.DIST.2T's 0.0687 is just double T.DIST.RT's 0.0343 on the identical input.",
