@@ -222,6 +222,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         href: '/docs/statistical/gamma#try-it',
         teaser: 'Drop to x = 0.5 and watch the gamma function land exactly on the square root of pi — a smooth extension of the factorial, not just an interpolation.',
       },
+      {
+        fn: 'FORECAST.ETS',
+        href: '/docs/statistical/forecast-ets#try-it',
+        teaser: "Pick a different future quarter and watch the forecast keep the exact same seasonal shape — peak in Q2, dip in Q3/Q4 — that every prior year already showed.",
+      },
     ],
   },
 ];

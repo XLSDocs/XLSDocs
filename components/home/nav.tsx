@@ -24,9 +24,6 @@ export function HomeNav() {
           >
             <Logo />
           </Link>
-          <span className="rounded-full border border-fd-border px-2 py-0.5 font-mono text-[11px] text-fd-muted-foreground">
-            2027
-          </span>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-fd-muted-foreground md:flex">
           {NAV_LINKS.map((link) => (

@@ -16,9 +16,6 @@ export function Hero() {
             <span className="size-1.5 rounded-full bg-fd-primary" />
             EXCEL REFERENCE
           </span>
-          <span className="rounded-full border border-fd-border px-3 py-1 font-mono text-xs text-fd-muted-foreground">
-            Pro 2027
-          </span>
         </div>
         <h1 className="text-balance text-5xl font-normal leading-[1.1] md:text-6xl">
           The Excel reference built for{' '}
@@ -50,7 +47,7 @@ export function Hero() {
           </span>
         </div>
         <p className="mt-3 text-xs text-fd-muted-foreground">
-          Built by Excel power users · Free to use · No sign-up needed
+          Built by Excel power users · No sign-up needed
         </p>
       </div>
     </section>

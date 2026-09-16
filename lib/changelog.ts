@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-16',
+    title: 'FORECAST.ETS, FORECAST.ETS.SEASONALITY, FORECAST.ETS.STAT, and FORECAST.ETS.CONFINT — the Statistical audit is complete',
+    description:
+      "The final round of a 9-round project that started three weeks ago and added over 90 Statistical functions. FORECAST.ETS models genuine seasonal patterns (not just a straight-line trend) using exponential smoothing, SEASONALITY detects the repeating cycle length automatically, STAT reports the fitted model's own accuracy, and CONFINT bounds the forecast with a confidence interval.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-09-15',
     title: 'BETA.DIST, BETA.INV, GAMMA, GAMMA.DIST, GAMMA.INV, GAMMALN, GAMMALN.PRECISE, GAUSS, LOGNORM.DIST, LOGNORM.INV, WEIBULL.DIST, EXPON.DIST, FISHER, FISHERINV, PHI, and PROB',
     description:
