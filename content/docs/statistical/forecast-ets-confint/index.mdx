@@ -1,0 +1,228 @@
+---
+title: FORECAST.ETS.CONFINT
+description: The confidence interval around a FORECAST.ETS forecast, based on how well the model fits its own historical data.
+---
+
+Return the width of the confidence interval around a `FORECAST.ETS`
+forecast — how much uncertainty surrounds that single predicted
+number, based on how well the underlying model actually explains its
+own historical data.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns a margin — the actual interval is forecast ± this value', type: 'warn' },
+  { text: 'A tighter historical fit produces a narrower interval', type: 'check' },
+  { text: 'Requires Excel 2016 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FORECAST.ETS.CONFINT(target_date, values, timeline, [confidence_level], [seasonality], [data_completion], [aggregation])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FORECAST.ETS.CONFINT(target_date, values, timeline, [confidence_level], [seasonality], [data_completion], [aggregation])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'target_date',
+    type: 'date',
+    required: true,
+    description: 'The future date the forecast (and its confidence interval) applies to.',
+  },
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The historical values to forecast from.',
+  },
+  {
+    name: 'timeline',
+    type: 'range',
+    required: true,
+    description: 'The dates corresponding to values — must be evenly spaced.',
+  },
+  {
+    name: 'confidence_level',
+    type: 'number',
+    required: false,
+    description: 'A value between 0 and 1 — defaults to 0.95 (95% confidence) if omitted.',
+  },
+  {
+    name: 'seasonality',
+    type: 'number',
+    required: false,
+    description: '1 to force a non-seasonal model; 0 (or omitted) to auto-detect; a specific positive integer to force that pattern length.',
+  },
+  {
+    name: 'data_completion',
+    type: 'number',
+    required: false,
+    description: 'How to handle missing points in timeline: 1 (default) interpolates; 0 treats them as zeros.',
+  },
+  {
+    name: 'aggregation',
+    type: 'number',
+    required: false,
+    description: 'Which function (1=AVERAGE, 2=COUNT, ... 7=SUM) to use when timeline has duplicate dates. Defaults to AVERAGE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The margin of error around the `FORECAST.ETS` forecast at
+`target_date` — the true interval is
+`FORECAST.ETS(target_date, ...) ± FORECAST.ETS.CONFINT(target_date, ...)`.
+
+## Description
+
+FORECAST.ETS.CONFINT estimates the margin of error from how well the
+fitted exponential smoothing model explains the historical data it
+was trained on: a model with small, consistent historical errors
+(the same idea `FORECAST.ETS.STAT`'s RMSE and MAE measure directly)
+produces a tighter interval, while a model wrestling with noisy or
+poorly-fitting history produces a wider one. The interval also widens
+the further `target_date` sits beyond the end of the known history —
+forecasting 12 months out is inherently less certain than forecasting
+1 month out from the same data.
+
+<Callout type="warn">
+  This page's example reuses `FORECAST.ETS`'s deliberately
+  **noise-free** historical data — every point lands exactly on the
+  underlying trend-plus-season pattern, so the fitted model's
+  historical error is genuinely zero. That's exactly why the margin
+  below comes out to 0.0000 at every confidence level: with a perfect
+  historical fit, there's no estimated forecast variance for any
+  confidence multiplier to scale up, regardless of exactly how
+  Excel's internal formula computes it. Real-world data always has
+  some noise, so a genuine forecast in practice will show a real,
+  non-zero margin — this example is chosen specifically to make the
+  *zero-margin edge case* provably correct, not to represent a
+  typical result.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.8': '0.0000', '0.9': '0.0000', '0.95': '0.0000', '0.99': '0.0000' }}
+  defaultValue="0.95"
+  label={'Live preview — =FORECAST.ETS.CONFINT(4/1/2026, sales, dates, {confidence_level})'}
+  fieldLabel="confidence_level"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Quarter', b1: 'Sales',
+      a2: '1/1/2024', b2: '100',
+      a3: '4/1/2024', b3: '125',
+      a4: '7/1/2024', b4: '100',
+      a5: '10/1/2024', b5: '105',
+      a6: '1/1/2025', b6: '120',
+      a7: '4/1/2025', b7: '145',
+      a8: '7/1/2025', b8: '120',
+      a9: '10/1/2025', b9: '125',
+    },
+    highlightMap: { '0.8': 'A2:B9', '0.9': 'A2:B9', '0.95': 'A2:B9', '0.99': 'A2:B9' },
+  }}
+/>
+
+Every confidence level from 80% to 99% returns a margin of exactly
+0.0000 on this dataset — not because higher confidence stops
+mattering, but because there's zero historical forecast error for
+any confidence multiplier to act on. On real, noisy data, raising the
+confidence level would widen the margin at every level, the same way
+`CONFIDENCE.NORM` and `CONFIDENCE.T` widen with a higher requested
+confidence elsewhere on this site.
+
+## Common errors
+
+### #NUM! — confidence_level is outside the 0–1 range
+
+<ExcelCode>{`FORECAST.ETS.CONFINT(target, values, timeline, 1.5) → #NUM!`}</ExcelCode>
+
+`confidence_level` must be strictly between 0 and 1.
+
+### Treating the result as the forecast itself, not a margin
+
+<ExcelCode>{`FORECAST.ETS.CONFINT(target, values, timeline) → a margin, not the forecast — add it to FORECAST.ETS's own result to get the interval's upper bound`}</ExcelCode>
+
+FORECAST.ETS.CONFINT never returns a forecasted value on its own —
+it always needs to be combined with a separate `FORECAST.ETS` call at
+the same `target_date` to build the actual interval.
+
+export const faqs = [
+  {
+    question: 'Why did my confidence interval come out to exactly 0?',
+    answer: "That happens when the model's historical data fits the underlying pattern essentially perfectly, leaving no measurable historical error for the confidence multiplier to scale up. It's a legitimate result for unusually clean data, not a sign of a broken formula — genuinely noisy real-world data will always show a non-zero margin.",
+  },
+  {
+    question: 'Does the confidence interval get wider the further out I forecast?',
+    answer: 'Yes — forecasting further beyond the end of known history carries more accumulated uncertainty, so FORECAST.ETS.CONFINT\'s margin generally grows with the gap between the last historical date and target_date, for a fixed confidence_level.',
+  },
+  {
+    question: 'How do I build the full confidence interval, not just the margin?',
+    answer: 'Compute FORECAST.ETS at the same target_date and other arguments, then add and subtract FORECAST.ETS.CONFINT\'s result: the interval runs from FORECAST.ETS(...) - FORECAST.ETS.CONFINT(...) to FORECAST.ETS(...) + FORECAST.ETS.CONFINT(...).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FORECAST.ETS.CONFINT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FORECAST.ETS.CONFINT(DATE(2026,4,1), B2:B9, A2:A9, 0.95)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim margin As Double
+    margin = Application.WorksheetFunction.Forecast_ETS_ConfInt( _
+        DateSerial(2026, 4, 1), Range("B2:B9"), Range("A2:A9"), 0.95)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from statsmodels.tsa.holtwinters import ExponentialSmoothing
+    from scipy.stats import norm
+    import numpy as np
+
+    sales = [100, 125, 100, 105, 120, 145, 120, 125]
+    model = ExponentialSmoothing(sales, trend="add", seasonal="add", seasonal_periods=4).fit()
+    residual_std = np.std(model.resid, ddof=1)
+    margin = norm.ppf(0.975) * residual_std  # 95% confidence
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FORECAST.ETS](/docs/statistical/forecast-ets) — the point forecast
+  this margin surrounds.
+- [FORECAST.ETS.STAT](/docs/statistical/forecast-ets-stat) — reports
+  the historical fit-error measures this margin is built from.
+- [CONFIDENCE.NORM](/docs/statistical/confidence-norm) — a similar
+  margin-of-error calculation, for a simple sample mean instead of an
+  ETS forecast.

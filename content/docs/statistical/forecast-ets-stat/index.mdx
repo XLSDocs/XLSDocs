@@ -1,0 +1,220 @@
+---
+title: FORECAST.ETS.STAT
+description: Return a specific statistic (smoothing constants or error measures) from the exponential smoothing model FORECAST.ETS fits internally.
+---
+
+Return a specific statistic — a fitted smoothing constant, or a
+measure of forecast accuracy — from the exponential smoothing model
+`FORECAST.ETS` builds internally.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'statistic_type selects which of 8 different values to return', type: 'warn' },
+  { text: 'Types 4-7 measure historical fit error; smaller is better', type: 'check' },
+  { text: 'Requires Excel 2016 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FORECAST.ETS.STAT(values, timeline, statistic_type, [seasonality], [data_completion], [aggregation])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FORECAST.ETS.STAT(values, timeline, statistic_type, [seasonality], [data_completion], [aggregation])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The historical values the model is fitted to.',
+  },
+  {
+    name: 'timeline',
+    type: 'range',
+    required: true,
+    description: 'The dates corresponding to values — must be evenly spaced.',
+  },
+  {
+    name: 'statistic_type',
+    type: 'number',
+    required: true,
+    description: '1=alpha, 2=beta, 3=gamma (fitted smoothing constants); 4=MASE, 5=SMAPE, 6=MAE, 7=RMSE (fit error measures); 8=the detected seasonality length.',
+  },
+  {
+    name: 'seasonality',
+    type: 'number',
+    required: false,
+    description: '1 to force a non-seasonal model; 0 (or omitted) to auto-detect; a specific positive integer to force that pattern length.',
+  },
+  {
+    name: 'data_completion',
+    type: 'number',
+    required: false,
+    description: 'How to handle missing points in timeline: 1 (default) interpolates; 0 treats them as zeros.',
+  },
+  {
+    name: 'aggregation',
+    type: 'number',
+    required: false,
+    description: 'Which function (1=AVERAGE, 2=COUNT, ... 7=SUM) to use when timeline has duplicate dates. Defaults to AVERAGE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The requested statistic from the exponential smoothing model fitted
+to `values` and `timeline` — its meaning depends entirely on
+`statistic_type`.
+
+## Description
+
+FORECAST.ETS.STAT is a diagnostic window into the same model
+`FORECAST.ETS` fits to produce a forecast, without needing a
+`target_date` at all. `statistic_type` 1 through 3 return the model's
+fitted smoothing constants (how heavily it weights recent data over
+older data, for the level, trend, and seasonal components
+respectively); 4 through 7 measure how well the fitted model actually
+explains the historical data it was trained on, in four different
+common error-measurement conventions; 8 returns the same seasonal
+pattern length `FORECAST.ETS.SEASONALITY` detects directly.
+
+<Callout type="warn">
+  This page's `statistic_type` 4-7 examples use the same noise-free
+  historical data as `FORECAST.ETS`'s own page — a dataset engineered
+  so the fitted model reproduces every historical point exactly, with
+  zero error. That's genuinely why every error statistic below reads
+  0.0000, regardless of which smoothing constants Excel's optimizer
+  actually settles on. The fitted alpha/beta/gamma constants
+  themselves (`statistic_type` 1-3) aren't shown here: with a
+  perfect historical fit, *any* smoothing constants achieve the same
+  zero error, so there's no single "correct" value those types would
+  return for this specific dataset — real, noisy data doesn't have
+  this ambiguity.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4': '0.0000', '6': '0.0000', '7': '0.0000', '8': '4' }}
+  defaultValue="8"
+  label={'Live preview — =FORECAST.ETS.STAT(sales, dates, {statistic_type})'}
+  fieldLabel="statistic_type"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Quarter', b1: 'Sales',
+      a2: '1/1/2024', b2: '100',
+      a3: '4/1/2024', b3: '125',
+      a4: '7/1/2024', b4: '100',
+      a5: '10/1/2024', b5: '105',
+      a6: '1/1/2025', b6: '120',
+      a7: '4/1/2025', b7: '145',
+      a8: '7/1/2025', b8: '120',
+      a9: '10/1/2025', b9: '125',
+    },
+    highlightMap: { '4': 'A2:B9', '6': 'A2:B9', '7': 'A2:B9', '8': 'A2:B9' },
+  }}
+/>
+
+MASE (type 4), MAE (type 6), and RMSE (type 7) all read exactly
+0.0000 on this dataset — three different error-measurement conventions
+unanimously agreeing the model's historical fit is perfect, which it
+genuinely is for this deliberately noise-free example. Type 8, the
+detected seasonality length, returns 4 — the same quarterly pattern
+`FORECAST.ETS.SEASONALITY` finds directly. Real sales data never fits
+as cleanly as the error stats show here; seeing them converge to zero
+is really a demonstration of what a perfect fit looks like, not a
+typical result.
+
+## Common errors
+
+### #N/A — timeline values aren't evenly spaced
+
+<ExcelCode>{`FORECAST.ETS.STAT(values, timeline, 4) → #N/A if timeline skips or doubles up an interval`}</ExcelCode>
+
+`timeline` needs a consistent step size throughout, with at most one
+missing point tolerated (interpolated per `data_completion`).
+
+### #NUM! — statistic_type is outside the 1-8 range
+
+<ExcelCode>{`FORECAST.ETS.STAT(values, timeline, 9) → #NUM!`}</ExcelCode>
+
+`statistic_type` only accepts whole numbers from 1 to 8.
+
+export const faqs = [
+  {
+    question: 'What do the alpha, beta, and gamma statistics actually mean?',
+    answer: "They're the fitted smoothing constants, each between 0 and 1, controlling how heavily the model weights the most recent observation versus its own prior estimate for the level (alpha), trend (beta), and seasonal component (gamma). A constant close to 1 means the model reacts quickly to recent changes; close to 0 means it stays close to its longer-run estimate.",
+  },
+  {
+    question: 'Which error statistic (MASE, SMAPE, MAE, RMSE) should I look at?',
+    answer: "RMSE and MAE are in the same units as the original data, making them easy to interpret directly (an RMSE of 5 means typical forecast errors of about 5 units). MASE and SMAPE are scale-independent percentages, useful for comparing forecast quality across datasets with very different scales.",
+  },
+  {
+    question: 'Why don\'t alpha, beta, and gamma have one clear \"correct\" value for a given dataset?',
+    answer: "Because the optimization that fits them minimizes total forecast error — for data with a genuine, complex noise pattern, there's usually one clear best combination. But for cleaner-than-typical data (or too little history), several different combinations of alpha/beta/gamma can fit almost equally well, so the specific values an optimizer converges to become more a function of its starting point and search method than the data itself.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FORECAST.ETS.STAT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FORECAST.ETS.STAT(B2:B9, A2:A9, 7)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rmse As Double
+    rmse = Application.WorksheetFunction.Forecast_ETS_Stat( _
+        Range("B2:B9"), Range("A2:A9"), 7)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from statsmodels.tsa.holtwinters import ExponentialSmoothing
+    import numpy as np
+
+    sales = [100, 125, 100, 105, 120, 145, 120, 125]
+    model = ExponentialSmoothing(sales, trend="add", seasonal="add", seasonal_periods=4).fit()
+    rmse = np.sqrt(np.mean(model.resid ** 2))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FORECAST.ETS](/docs/statistical/forecast-ets) — the forecast this
+  function reports diagnostics for.
+- [FORECAST.ETS.SEASONALITY](/docs/statistical/forecast-ets-seasonality) —
+  the same seasonal-length detection as statistic_type 8, callable
+  directly.
+- [FORECAST.ETS.CONFINT](/docs/statistical/forecast-ets-confint) —
+  turns this model's fit quality into a confidence interval around a
+  specific forecast.

@@ -1,0 +1,200 @@
+---
+title: FORECAST.ETS.SEASONALITY
+description: Detect the length of the repeating seasonal pattern in historical data, the same detection FORECAST.ETS uses internally.
+---
+
+Detect the length of the repeating seasonal pattern in historical
+data — the same automatic detection step `FORECAST.ETS` runs
+internally before fitting its forecast.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'Returns 1 when no reliable seasonal pattern is detected', type: 'warn' },
+  { text: 'The returned number is a count of periods, not a calendar unit', type: 'warn' },
+  { text: 'Requires Excel 2016 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FORECAST.ETS.SEASONALITY(values, timeline, [data_completion], [aggregation])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FORECAST.ETS.SEASONALITY(values, timeline, [data_completion], [aggregation])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The historical values to detect a pattern in.',
+  },
+  {
+    name: 'timeline',
+    type: 'range',
+    required: true,
+    description: 'The dates corresponding to values — must be evenly spaced.',
+  },
+  {
+    name: 'data_completion',
+    type: 'number',
+    required: false,
+    description: 'How to handle missing points in timeline: 1 (default) interpolates; 0 treats them as zeros.',
+  },
+  {
+    name: 'aggregation',
+    type: 'number',
+    required: false,
+    description: 'Which function (1=AVERAGE, 2=COUNT, ... 7=SUM) to use when timeline has duplicate dates. Defaults to AVERAGE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of points in one repeating cycle of `values` — for
+example, `4` for a clear quarterly-within-year pattern, or `1` if no
+reliable seasonal pattern is found.
+
+## Description
+
+FORECAST.ETS.SEASONALITY looks for the shortest repeating pattern
+length that best explains the up-and-down shape in `values`, after
+accounting for any overall trend. This is a genuinely useful
+diagnostic on its own — separate from actually forecasting anything —
+for confirming a dataset really does have the seasonal shape it's
+assumed to have, or for discovering a pattern length that wasn't
+obvious just from eyeballing the numbers.
+
+<Callout type="idea">
+  `FORECAST.ETS.SEASONALITY(values, timeline)` is exactly the value
+  `FORECAST.ETS` uses internally when its own `seasonality` argument
+  is left at its default (auto-detect). Calling this function
+  directly is a way to see that detected length explicitly, or to
+  reuse it as the explicit `seasonality` argument in a separate
+  `FORECAST.ETS` call.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'quarterly pattern': '4', 'three-period pattern': '3' }}
+  defaultValue="quarterly pattern"
+  label={'Live preview — =FORECAST.ETS.SEASONALITY({scenario} values, dates)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    rowsByInput: {
+      'quarterly pattern': {
+        a1: 'Period', b1: 'Value',
+        a2: '1', b2: '100', a3: '2', b3: '125', a4: '3', b4: '100', a5: '4', b5: '105',
+        a6: '5', b6: '120', a7: '6', b7: '145', a8: '7', b8: '120', a9: '8', b9: '125',
+      },
+      'three-period pattern': {
+        a1: 'Period', b1: 'Value',
+        a2: '1', b2: '50', a3: '2', b3: '66', a4: '3', b4: '37', a5: '4', b5: '53',
+        a6: '5', b6: '69', a7: '6', b7: '40', a8: '7', b8: '56', a9: '8', b9: '72',
+      },
+    },
+  }}
+/>
+
+Two differently-shaped datasets, both with a trend riding underneath
+their seasonal swings. The first repeats every 4 periods (the same
+quarterly sales pattern used on `FORECAST.ETS`'s own page);
+the second repeats every 3 — FORECAST.ETS.SEASONALITY correctly
+identifies each pattern length despite the trend layered on top of
+both.
+
+## Common errors
+
+### #N/A — timeline values aren't evenly spaced
+
+<ExcelCode>{`FORECAST.ETS.SEASONALITY(values, timeline) → #N/A if timeline skips or doubles up an interval`}</ExcelCode>
+
+`timeline` needs a consistent step size throughout, with at most one
+missing point tolerated (interpolated per `data_completion`).
+
+### Expecting a calendar unit instead of a period count
+
+<ExcelCode>{`FORECAST.ETS.SEASONALITY(values, timeline) → 4, meaning every 4th data point, not "every 4 months" unless the data itself is monthly`}</ExcelCode>
+
+The returned number counts data points in `values`, not any specific
+calendar unit — a return value of 12 means "repeats every 12 rows,"
+which is a yearly cycle if the data is monthly, but would mean
+something entirely different on daily or quarterly data.
+
+export const faqs = [
+  {
+    question: 'What does a result of 1 mean?',
+    answer: "That no reliable repeating pattern was detected in the data — either there genuinely isn't a seasonal shape, or there isn't enough history yet to distinguish one from noise. FORECAST.ETS treats a seasonality of 1 as a signal to fit a trend-only model, with no seasonal component.",
+  },
+  {
+    question: 'How much history is needed to reliably detect a seasonal pattern?',
+    answer: 'At least two full cycles of the suspected pattern — a monthly cycle needs at least 24 months of history, a weekly cycle needs at least 14 days, and so on. With less than two cycles, there isn\'t enough repetition to distinguish a real pattern from coincidence.',
+  },
+  {
+    question: 'Can I use this result directly as FORECAST.ETS\'s seasonality argument?',
+    answer: "Yes — since it's the same detection FORECAST.ETS runs automatically by default, passing this function's result back in explicitly produces the same forecast as leaving FORECAST.ETS's own seasonality argument at its default.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FORECAST.ETS.SEASONALITY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FORECAST.ETS.SEASONALITY(B2:B9, A2:A9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim periodLength As Long
+    periodLength = Application.WorksheetFunction.Forecast_ETS_Seasonality( _
+        Range("B2:B9"), Range("A2:A9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from statsmodels.tsa.stattools import acf
+    import numpy as np
+
+    values = np.array([100, 125, 100, 105, 120, 145, 120, 125])
+    detrended = values - np.polyval(np.polyfit(range(len(values)), values, 1), range(len(values)))
+    period_length = np.argmax(acf(detrended, nlags=len(values) // 2)[2:]) + 2
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FORECAST.ETS](/docs/statistical/forecast-ets) — uses this same
+  seasonal-pattern detection internally by default.
+- [FORECAST.ETS.STAT](/docs/statistical/forecast-ets-stat) — reports
+  the smoothing constants and error statistics behind the same fitted
+  model.
+- [FORECAST.LINEAR](/docs/statistical/forecast-linear) — ignores
+  seasonality entirely, fitting one straight line instead.

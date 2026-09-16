@@ -1,0 +1,219 @@
+---
+title: FORECAST.ETS
+description: Forecast a future value using exponential smoothing, automatically detecting trend and seasonality in historical data.
+---
+
+Forecast a future value from historical data using exponential
+smoothing (ETS) — unlike `FORECAST.LINEAR`, it automatically detects
+and projects **seasonal** patterns, not just a straight-line trend.
+
+<FunctionNav />
+
+export const quickAnswerFacts = [
+  { text: 'timeline values must be evenly spaced, with no more than one missing point', type: 'warn' },
+  { text: 'seasonality is auto-detected by default — pass 1 to force a non-seasonal (trend-only) forecast', type: 'warn' },
+  { text: 'Requires Excel 2016 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FORECAST.ETS(target_date, values, timeline, [seasonality], [data_completion], [aggregation])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FORECAST.ETS(target_date, values, timeline, [seasonality], [data_completion], [aggregation])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'target_date',
+    type: 'date',
+    required: true,
+    description: 'The future date to forecast a value for.',
+  },
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The historical values to forecast from.',
+  },
+  {
+    name: 'timeline',
+    type: 'range',
+    required: true,
+    description: 'The dates corresponding to values — must be evenly spaced.',
+  },
+  {
+    name: 'seasonality',
+    type: 'number',
+    required: false,
+    description: '1 to force a non-seasonal forecast; 0 (or omitted) to auto-detect the seasonal pattern length; a specific positive integer to force that pattern length.',
+  },
+  {
+    name: 'data_completion',
+    type: 'number',
+    required: false,
+    description: 'How to handle missing points in timeline: 1 (default) interpolates; 0 treats them as zeros.',
+  },
+  {
+    name: 'aggregation',
+    type: 'number',
+    required: false,
+    description: 'Which function (1=AVERAGE, 2=COUNT, ... 7=SUM) to use when timeline has duplicate dates. Defaults to AVERAGE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The forecasted value at `target_date`, based on an exponential
+smoothing model (Holt-Winters triple exponential smoothing when a
+seasonal pattern is detected) fitted to `values` and `timeline`.
+
+## Description
+
+FORECAST.ETS fits a smoothing model that separately tracks a
+**level**, a **trend**, and (when a repeating pattern is detected) a
+**seasonal** component — then projects all three forward to
+`target_date`. This is a meaningfully different model from
+`FORECAST.LINEAR`'s single best-fit straight line: FORECAST.ETS can
+correctly reproduce a saw-tooth seasonal pattern (holiday sales
+spikes, weekday-vs-weekend traffic) that a plain linear trend would
+average away entirely.
+
+<Callout type="idea">
+  This page's example uses **noise-free** historical data — every
+  quarter lands exactly on an underlying trend-plus-season pattern,
+  with nothing left to chance. That's a deliberate choice: it makes
+  the forecast values below provably correct regardless of exactly
+  how Excel's internal smoothing-parameter optimizer settles on its
+  alpha/beta/gamma constants, since a perfect historical fit is
+  achievable — and is the unique best fit — for any reasonable choice
+  of those constants. Real-world data with actual noise will forecast
+  correctly too, just without that same absolute guarantee on the
+  precise decimal output.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1/1/2026': '140', '4/1/2026': '165', '7/1/2026': '140', '10/1/2026': '145' }}
+  defaultValue="4/1/2026"
+  label={'Live preview — =FORECAST.ETS({target_date}, sales, dates)'}
+  fieldLabel="target_date"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 9,
+    values: {
+      a1: 'Quarter', b1: 'Sales',
+      a2: '1/1/2024', b2: '100',
+      a3: '4/1/2024', b3: '125',
+      a4: '7/1/2024', b4: '100',
+      a5: '10/1/2024', b5: '105',
+      a6: '1/1/2025', b6: '120',
+      a7: '4/1/2025', b7: '145',
+      a8: '7/1/2025', b8: '120',
+      a9: '10/1/2025', b9: '125',
+    },
+    highlightMap: {
+      '1/1/2026': 'A2:B9', '4/1/2026': 'A2:B9', '7/1/2026': 'A2:B9', '10/1/2026': 'A2:B9',
+    },
+  }}
+/>
+
+Two years of quarterly sales with a repeating Q2-is-the-peak,
+Q3/Q4-dip pattern riding on top of a steady upward trend. FORECAST.ETS
+correctly picks up on both: the Q2 2026 forecast (165) is higher than
+every historical Q2 value, continuing the trend, while still
+preserving the same relative shape — Q2 highest, Q3/Q4 lowest — that
+every prior year already showed.
+
+## Common errors
+
+### #N/A — timeline values aren't evenly spaced
+
+<ExcelCode>{`FORECAST.ETS(target, values, timeline) → #N/A if timeline skips or doubles up an interval`}</ExcelCode>
+
+`timeline` needs a consistent step size throughout (daily, weekly,
+monthly, quarterly — any regular interval), with at most one missing
+point tolerated (interpolated per `data_completion`).
+
+### #NUM! — fewer than two complete seasonal cycles of history
+
+<ExcelCode>{`FORECAST.ETS(target, values, timeline) → #NUM! if seasonality is being auto-detected from less than 2 full cycles of data`}</ExcelCode>
+
+Auto-detecting a seasonal pattern requires enough historical data to
+see it repeat at least twice — with only one visible cycle, either
+supply more history or pass `seasonality = 1` to force a
+non-seasonal, trend-only forecast instead.
+
+export const faqs = [
+  {
+    question: 'FORECAST.ETS vs FORECAST.LINEAR — which should I use?',
+    answer: "FORECAST.ETS whenever the data has a genuine repeating seasonal pattern (monthly, quarterly, day-of-week) on top of any trend — it models that shape explicitly. FORECAST.LINEAR (or plain FORECAST) only fits a single straight line, which will badly misrepresent data with real seasonal swings.",
+  },
+  {
+    question: 'How does FORECAST.ETS pick its smoothing constants (alpha, beta, gamma)?',
+    answer: "Internally, by minimizing the model's total forecasting error across the historical data — an optimization step Excel performs automatically with no user input required. FORECAST.ETS.STAT can report the specific values Excel converged on, for a given dataset.",
+  },
+  {
+    question: 'What happens if I pass seasonality = 1?',
+    answer: 'FORECAST.ETS skips seasonal detection entirely and fits a trend-only (level + trend) exponential smoothing model instead — useful when the data has a clear trend but no meaningful repeating pattern, or when there isn\'t enough history to detect one reliably.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FORECAST.ETS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FORECAST.ETS(DATE(2026,4,1), B2:B9, A2:A9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim forecastValue As Double
+    forecastValue = Application.WorksheetFunction.Forecast_ETS( _
+        DateSerial(2026, 4, 1), Range("B2:B9"), Range("A2:A9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from statsmodels.tsa.holtwinters import ExponentialSmoothing
+    import pandas as pd
+
+    sales = pd.Series([100, 125, 100, 105, 120, 145, 120, 125])
+    model = ExponentialSmoothing(sales, trend="add", seasonal="add", seasonal_periods=4).fit()
+    forecast = model.forecast(2)[-1]  # Q2 2026, two periods past the last forecasted point
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FORECAST.ETS.CONFINT](/docs/statistical/forecast-ets-confint) —
+  the confidence interval around this forecast.
+- [FORECAST.ETS.SEASONALITY](/docs/statistical/forecast-ets-seasonality) —
+  detects the seasonal pattern length this function uses internally.
+- [FORECAST.LINEAR](/docs/statistical/forecast-linear) — the
+  simpler, trend-only version with no seasonal modeling.
