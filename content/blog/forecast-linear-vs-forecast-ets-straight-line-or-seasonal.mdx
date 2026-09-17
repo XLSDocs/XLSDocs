@@ -1,0 +1,93 @@
+---
+title: "FORECAST.LINEAR vs FORECAST.ETS: Straight Line or Seasonal?"
+description: One function draws a single straight line through your history. The other notices your sales always spike in Q2 — and keeps spiking it forward.
+date: "2026-09-17"
+category: Tutorials
+readTime: 4 min read
+---
+
+Both functions predict a future value from historical data, and both
+ship with modern Excel. The difference isn't in how accurate either
+one is in the abstract — it's whether your data has a repeating
+up-and-down shape that a single straight line simply can't represent.
+
+## The same history, two different shapes of answer
+
+<ExcelCode>{`=FORECAST.LINEAR(6, {10,20,30,40,50}, {1,2,3,4,5}) → 60`}</ExcelCode>
+
+Five months of sales climbing by exactly 10 each time.
+`FORECAST.LINEAR` fits one straight line through those points and
+extends it — month 6 comes out to 60, month 7 to 70, and so on. There's
+no seasonality to model here, so a straight line is the whole story.
+
+<ExcelCode>{`=FORECAST.ETS(DATE(2026,4,1), quarterlySales, quarterlyDates) → 165`}</ExcelCode>
+
+Now take two years of quarterly sales that peak every Q2 and dip every
+Q3/Q4, riding on top of a steady upward trend. `FORECAST.ETS` picks up
+on **both** patterns at once — the Q2 2026 forecast (165) is higher
+than every historical Q2, continuing the trend, while still landing
+above the Q3/Q4 forecasts the same way every prior year did. A
+straight-line fit through that same data would average the peaks and
+dips away entirely, missing the shape a reader would spot on a chart
+in two seconds.
+
+## The test that actually decides it
+
+<Callout type="idea">
+  Plot the data. If it just goes up (or down) in roughly a straight
+  line, `FORECAST.LINEAR` (or plain `FORECAST` — they're identical)
+  is the right tool and the simpler one. If it has a repeating shape —
+  a holiday spike, a weekday/weekend swing, a Q2-is-always-the-peak
+  pattern — `FORECAST.ETS` is built specifically to keep projecting
+  that shape forward, not just the overall direction.
+</Callout>
+
+`FORECAST.LINEAR` genuinely can't see seasonality even if you want it
+to — it only ever fits one line. `FORECAST.ETS` can still handle
+trend-only data with no seasonal shape at all (pass `seasonality = 1`
+to skip pattern detection), so it's the more general tool, at the
+cost of needing more historical data to work with — auto-detecting a
+seasonal pattern requires at least two full cycles of history, while
+a straight line can technically be fit through as few as two points.
+
+## Why FORECAST.LINEAR exists at all
+
+`FORECAST.LINEAR` calculates the exact same result as the original
+`FORECAST` function — there's no difference between them. It was
+added in Excel 2016 purely so the straight-line method would have an
+equally explicit name alongside the new `FORECAST.ETS`, not because
+`FORECAST` needed fixing. If compatibility with older Excel files
+matters, plain `FORECAST` is the safer choice; if not, either works
+identically.
+
+## What FORECAST.ETS actually needs to work
+
+Two things `FORECAST.LINEAR` doesn't care about at all: `timeline`
+values have to be **evenly spaced** (daily, monthly, quarterly — any
+regular interval), and there has to be enough history to see a
+suspected pattern repeat **at least twice**. A monthly seasonal
+pattern needs 24+ months of data before `FORECAST.ETS` will trust
+it's real rather than coincidence; with less, it falls back to a
+trend-only forecast automatically.
+
+export const faqs = [
+  {
+    question: 'Can FORECAST.ETS replace FORECAST.LINEAR entirely?',
+    answer: "Functionally, yes — passing seasonality = 1 to FORECAST.ETS produces a trend-only forecast with no seasonal component, similar to FORECAST.LINEAR. In practice, FORECAST.LINEAR stays simpler and faster to reason about for data that's genuinely just a straight line, with no real advantage to switching.",
+  },
+  {
+    question: 'How much history does FORECAST.ETS need?',
+    answer: "At least two full cycles of whatever pattern you expect it to detect — 24 months of history for a suspected yearly pattern, 14 days for a weekly one. With less than that, FORECAST.ETS can't reliably tell a real repeating pattern from ordinary noise.",
+  },
+  {
+    question: 'Does FORECAST.ETS also give a confidence interval?',
+    answer: "Yes — FORECAST.ETS.CONFINT returns the margin of error around a FORECAST.ETS forecast, based on how well the model fit its own historical data. FORECAST.LINEAR has no equivalent built-in confidence interval function.",
+  },
+];
+
+See the full reference for [FORECAST.LINEAR](/docs/statistical/forecast-linear)
+and [FORECAST.ETS](/docs/statistical/forecast-ets) for the complete
+argument list, common errors, and a live example you can edit
+yourself — plus [FORECAST.ETS.SEASONALITY](/docs/statistical/forecast-ets-seasonality)
+if you just want to check whether your data has a detectable pattern
+at all before choosing between them.

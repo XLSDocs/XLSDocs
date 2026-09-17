@@ -1,0 +1,96 @@
+---
+title: "T.TEST vs Z.TEST: The Question That Actually Decides It"
+description: Neither function asks you directly, but one fact about your data — whether the population standard deviation is genuinely known — is the entire deciding factor.
+date: "2026-09-17"
+category: Tutorials
+readTime: 4 min read
+---
+
+Both functions test whether a sample's results are likely real or
+just chance. Both return a probability, not a raw score. And it's
+easy to reach for whichever one you used last time, since they answer
+what sounds like the same question. The actual deciding factor is
+narrower than either name suggests.
+
+## The question neither function's name answers
+
+<Callout type="idea">
+  Do you genuinely **know** the population's standard deviation in
+  advance — from a specification, a long-established process, or
+  some other outside source — or are you estimating it from the
+  sample itself? If it's truly known, `Z.TEST`. If you're estimating
+  it (which is almost always the real situation), `T.TEST`.
+</Callout>
+
+That's the whole distinction. Sample size, number of groups, one-tail
+or two — none of that decides which function to use. Only whether the
+standard deviation came from somewhere outside the sample, or from
+the sample.
+
+## The same kind of question, two different tools
+
+<ExcelCode>{`=Z.TEST(scores, 85, 5) → 0.0100`}</ExcelCode>
+
+Five test scores (mean 90.2), tested against a hypothesized mean of
+85, with a **known** population standard deviation of 5 supplied
+directly. Z.TEST returns 0.0100 — strong evidence the true mean is
+really above 85.
+
+<ExcelCode>{`=T.TEST(group1, group2, 2, 2) → 0.0761`}</ExcelCode>
+
+Two independent groups of 5 values each, compared with T.TEST instead
+— no population standard deviation supplied anywhere, because T.TEST
+never takes one. It estimates the spread from the samples themselves,
+which is exactly why it's the far more commonly correct choice: in
+real analysis, the true population standard deviation is essentially
+never known outright.
+
+## Why the wrong choice matters
+
+Z.TEST assumes the standard deviation it's given is exactly right. If
+that number is actually just an estimate dressed up as a known value,
+Z.TEST's result understates how much uncertainty is really in play —
+it doesn't know the estimate itself carries error. T.TEST's
+underlying t-distribution has deliberately fatter tails than the
+normal distribution Z.TEST uses, which is precisely the extra margin
+that accounts for not knowing the standard deviation for certain. That
+gap matters most with small samples and shrinks as sample size grows,
+but it never fully disappears.
+
+## T.TEST also asks a second question Z.TEST doesn't have
+
+Z.TEST always compares one sample against a hypothesized mean. T.TEST
+covers three different comparison shapes through its `type` argument
+— paired (matched before/after measurements on the same subjects),
+two-sample assuming equal variance, and two-sample assuming unequal
+variance (Welch's test, the safer default when in doubt). Picking the
+wrong `type` on the same data can noticeably change the answer:
+
+<ExcelCode>{`=T.TEST(group1, group2, 2, 1) → 0.1916   ' paired
+=T.TEST(group1, group2, 2, 2) → 0.0761   ' equal variance
+=T.TEST(group1, group2, 2, 3) → 0.0781   ' unequal variance`}</ExcelCode>
+
+On the identical two groups, treating unrelated data as paired
+(`type = 1`) gives a meaningfully different — and wrong — answer here,
+since these two groups were never actually matched pairs.
+
+export const faqs = [
+  {
+    question: 'Is T.TEST ever the wrong choice if I\'m not sure?',
+    answer: "Rarely — T.TEST is the safer default whenever the population standard deviation isn't genuinely known outright, which covers nearly every real-world case. Z.TEST is only correct when that number comes from a real outside source, not an estimate.",
+  },
+  {
+    question: 'Does sample size decide between T.TEST and Z.TEST?',
+    answer: "No — that's a common misconception. Sample size affects how close the t-distribution and normal distribution get to each other (they converge as samples grow), but the actual deciding factor is always whether the standard deviation is known or estimated, regardless of how large the sample is.",
+  },
+  {
+    question: 'What if I only have one sample and a hypothesized mean, with T.TEST?',
+    answer: 'T.TEST always compares two arrays against each other — it has no single-sample-vs-hypothesized-mean mode the way Z.TEST does. A one-sample test with an unknown standard deviation is usually done with CONFIDENCE.T to build an interval, or by comparing before/after values as a paired T.TEST.',
+  },
+];
+
+See the full reference for [T.TEST](/docs/statistical/t-test) and
+[Z.TEST](/docs/statistical/z-test) for the complete argument list,
+common errors, and a live example you can edit yourself — plus
+[F.TEST](/docs/statistical/f-test), which can help decide between
+T.TEST's equal- and unequal-variance types.
