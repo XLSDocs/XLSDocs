@@ -8,8 +8,6 @@ text, right inside a cell. WEBSERVICE only issues GET requests and
 has no support for headers, authentication, or POST bodies — it's a
 lightweight way to pull a URL's contents in, not a full HTTP client.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'GET requests only — no headers, auth, or POST bodies', type: 'warn' },
   { text: 'Not available in Excel for the web, and silently fails on Mac', type: 'warn' },
@@ -160,3 +158,30 @@ export const compatibility = [
   safe to insert into a WEBSERVICE URL.
 - [FILTERXML](/docs/web/filterxml) — extracts specific values out of
   an XML response, often used directly on WEBSERVICE's output.
+
+## Examples
+
+<ExampleCard number="01" label="Fetching a simple text response" formula={`=WEBSERVICE("https://api.example.com/status")`}>
+  Returns whatever text the endpoint sends back, up to Excel's
+  32,767-character cell limit — no parsing applied.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building the URL from a cell, safely" formula={`=WEBSERVICE("https://api.example.com/search?q=" & ENCODEURL(A1))`}>
+  Wrapping the cell value in ENCODEURL before concatenating it into
+  the URL prevents spaces or symbols in A1 from breaking the request.
+</ExampleCard>
+
+<ExampleCard number="03" label="Extracting one value from a JSON-like or XML response" formula={`=FILTERXML(WEBSERVICE("https://api.example.com/data.xml"), "//price")`}>
+  WEBSERVICE's raw text output is commonly piped straight into
+  FILTERXML to pull out a specific field, without a helper cell.
+</ExampleCard>
+
+<ExampleCard number="04" label="#VALUE! from a URL over 2,048 characters" formula={`=WEBSERVICE(A1&B1&C1&D1)`}>
+  Returns `#VALUE!` if concatenating several cells produces a URL
+  longer than 2,048 characters — the GET request limit.
+</ExampleCard>
+
+<ExampleCard number="05" label="#VALUE! from an unsupported protocol" formula={`=WEBSERVICE("ftp://files.example.com/data.txt")`}>
+  Returns `#VALUE!` immediately — WEBSERVICE only supports `http://`
+  and `https://` URLs.
+</ExampleCard>

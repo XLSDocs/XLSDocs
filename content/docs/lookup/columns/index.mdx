@@ -6,8 +6,6 @@ description: Count how many columns are in a range or array — a count, not a p
 Count how many columns a range or array spans — the horizontal
 counterpart to ROWS, and the sizing half of COLUMN's position.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Returns a count, not a column position — see COLUMN for position', type: 'warn' },
   { text: 'Works on an array or a named range, not just a plain cell reference', type: 'check' },
@@ -159,3 +157,28 @@ export const compatibility = [
   instead of columns.
 - [HSTACK](/docs/arrays/hstack) — often validated with COLUMNS
   beforehand to confirm ranges combine cleanly.
+
+## Examples
+
+<ExampleCard number="01" label="Count the columns in a table" formula={`=COLUMNS(A1:F1)`}>
+  Returns 6 — the number of columns spanned by the range.
+</ExampleCard>
+
+<ExampleCard number="02" label="Checking two ranges are the same width" formula={`=COLUMNS(A1:C1)=COLUMNS(D1:F1)`}>
+  Returns TRUE if both ranges have the same number of columns — a
+  quick sanity check before combining them with VSTACK.
+</ExampleCard>
+
+<ExampleCard number="03" label="Measuring the width of a generated array" formula={`=COLUMNS(SEQUENCE(3,5))`}>
+  Returns 5 — COLUMNS measures the dimensions of any array or
+  reference, not just a literal worksheet range.
+</ExampleCard>
+
+<ExampleCard number="04" label="A single cell always counts as 1" formula={`=COLUMNS(A1)`}>
+  Returns 1 — a single-cell reference is a 1-column range.
+</ExampleCard>
+
+<ExampleCard number="05" label="Confusing COLUMNS with COLUMN" formula={`=COLUMNS(A1:C1)`}>
+  Returns 3 (a count) — not 1, which is what COLUMN(A1:C1) would
+  return as a position in a legacy formula.
+</ExampleCard>

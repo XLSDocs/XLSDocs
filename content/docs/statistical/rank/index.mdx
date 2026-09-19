@@ -7,8 +7,6 @@ Find where a number stands within a list — 1st, 2nd, 3rd, and so
 on — without manually sorting anything. The function behind
 leaderboards, sales rankings, and "top performer" reports.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Default: largest number ranks 1st (descending)', type: 'warn' },
   { text: 'Tied values get the same rank, skipping the next position', type: 'warn' },
@@ -180,3 +178,29 @@ export const compatibility = [
   of the list.
 - [PERCENTILE](/docs/statistical/percentile) — expresses standing
   as a percentile instead of a whole-number rank.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — sales leaderboard" formula={`=RANK(B2, $B$2:$B$10)`}>
+  Ranks each salesperson's total against everyone else's, largest
+  first.
+</ExampleCard>
+
+<ExampleCard number="02" label="Ascending order (lowest = 1st)" formula={`=RANK(B2, $B$2:$B$10, 1)`}>
+  Useful for something like race times, where the smallest value
+  should rank 1st.
+</ExampleCard>
+
+<ExampleCard number="03" label="Breaking ties for a unique rank" formula={`=RANK(B2,$B$2:$B$10) + COUNTIF($B$2:B2,B2) - 1`}>
+  Nudges each tied duplicate to its own sequential rank instead of
+  sharing a position.
+</ExampleCard>
+
+<ExampleCard number="04" label="Top 3 flag using RANK" formula={`=IF(RANK(B2,$B$2:$B$10)<=3, "Top 3", "")`}>
+  Flags only the three highest-ranked rows.
+</ExampleCard>
+
+<ExampleCard number="05" label="Rank as a percentage" formula={`=1 - (RANK(B2,$B$2:$B$10)-1)/(COUNT($B$2:$B$10)-1)`}>
+  Converts a whole-number rank into a percentile-style figure
+  between 0 and 1.
+</ExampleCard>

@@ -7,8 +7,6 @@ Measure how spread out a set of numbers is from their average, in
 squared units, when the data represents an **entire population** —
 every relevant value, not a sample drawn from a larger group.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Assumes the data is the whole population, not a sample', type: 'warn' },
   { text: 'Divides by n instead of n-1 — slightly smaller than VAR.S on the same data', type: 'check' },
@@ -167,3 +165,30 @@ export const compatibility = [
 - [VAR](/docs/statistical/var) — the legacy name for VAR.S.
 - [STDEV.P](/docs/statistical/stdev-p) — the square root of VAR.P,
   in the same units as the original data.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — variance across an entire batch" formula={`=VAR.P(FullBatch[Weight])`}>
+  Returns the population variance when every unit produced is
+  included, not a sample of them.
+</ExampleCard>
+
+<ExampleCard number="02" label="Deriving population standard deviation" formula={`=SQRT(VAR.P(AllScores[Value]))`}>
+  Confirms the relationship between VAR.P and STDEV.P — this always
+  matches STDEV.P on the same data.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing population vs sample" formula={`=VAR.P(Data[Value]) - VAR.S(Data[Value])`}>
+  Shows that VAR.P is always less than or equal to VAR.S on identical
+  data — the result here is always zero or negative.
+</ExampleCard>
+
+<ExampleCard number="04" label="Variance of every reading, not a sample" formula={`=VAR.P(SensorLog[Reading])`}>
+  Valid as a population calculation only when the log covers every
+  reading taken, not a subset of them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Comparing spread across two full datasets" formula={`=VAR.P(GroupA[Value]) / VAR.P(GroupB[Value])`}>
+  A variance ratio between two complete populations, rather than
+  samples.
+</ExampleCard>

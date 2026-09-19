@@ -8,8 +8,6 @@ even — the rate at which their net present value equals exactly
 zero. The standard way to compare investments or projects with
 different cash flow timing on a single, comparable number.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'The first value (usually negative) is the initial investment', type: 'warn' },
   { text: 'An iterative approximation — can fail to converge without a guess', type: 'warn' },
@@ -206,3 +204,33 @@ export const compatibility = [
   equal payments every period rather than IRR's varying cash flows.
 - [PMT](/docs/financial/pmt) and [PV](/docs/financial/pv) — assume
   a constant payment amount, a simpler shape than IRR handles.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — rate of return on a project" formula={`=IRR({-50000, 15000, 18000, 20000})`}>
+  A $50,000 initial investment followed by three years of returns —
+  IRR finds the rate at which this breaks even.
+</ExampleCard>
+
+<ExampleCard number="02" label="Using a range instead of literal values" formula={`=IRR(Cashflows[Amount])`}>
+  IRR accepts a range directly — cleaner than listing each cash flow
+  as a separate value once there are more than a few.
+</ExampleCard>
+
+<ExampleCard number="03" label="Supplying a guess for a hard-to-converge case" formula={`=IRR(Cashflows[Amount], 20%)`}>
+  A starting `guess` closer to the expected real rate helps the
+  iterative solver converge on genuinely difficult cash flow
+  patterns.
+</ExampleCard>
+
+<ExampleCard number="04" label="Checking against a required return" formula={`=IRR(Cashflows[Amount]) > 12%`}>
+  Compares the calculated IRR against a required rate of return —
+  TRUE means the project clears the bar.
+</ExampleCard>
+
+<ExampleCard number="05" label="Verifying with NPV at the IRR rate" formula={`=NPV(IRR({-50000,15000,18000,20000}), {15000,18000,20000}) - 50000`}>
+  Feeding IRR's own result back into NPV (excluding the initial
+  investment from the NPV call, same as any other NPV usage) should
+  land at very close to zero — a useful sanity check on the
+  calculation.
+</ExampleCard>

@@ -8,8 +8,6 @@ its actual numeric value — the reverse of what TEXT does, and the
 standard fix for "numbers stored as text" that won't sum or sort
 correctly.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Converts a number-like text string into a real number', type: 'check' },
   { text: 'Works in every Excel version', type: 'check' },
@@ -158,3 +156,31 @@ export const compatibility = [
 - [NUMBERVALUE](/docs/text/numbervalue) — like VALUE, but with
   explicit control over decimal and thousands separators for
   international number formats.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — convert text to a number" formula={`=VALUE(A2)`}>
+  Converts a text-formatted number like `"1,234"` into the real
+  number `1234` so it can be summed or compared numerically.
+</ExampleCard>
+
+<ExampleCard number="02" label="Converting an extracted substring" formula={`=VALUE(LEFT(A2, 4))`}>
+  LEFT/MID/RIGHT always return text — wrapping the result in VALUE()
+  converts an extracted numeric segment (like a year) back into a
+  real number.
+</ExampleCard>
+
+<ExampleCard number="03" label="Converting a text date" formula={`=VALUE("1/5/2027")`}>
+  Returns the date serial number for January 5, 2027 — format the
+  cell as a date afterward to display it normally.
+</ExampleCard>
+
+<ExampleCard number="04" label="Stripping non-numeric characters first" formula={`=VALUE(SUBSTITUTE(A2, " units", ""))`}>
+  Removes the trailing text VALUE can't parse on its own, then
+  converts what's left.
+</ExampleCard>
+
+<ExampleCard number="05" label="With error handling" formula={`=IFERROR(VALUE(A2), 0)`}>
+  Falls back to `0` instead of `#VALUE!` for any cell that isn't
+  actually a parseable number.
+</ExampleCard>

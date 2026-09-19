@@ -7,8 +7,6 @@ Pull a set number of characters from the **end** of a text string —
 the last 4 digits of an account number, a file extension, or the
 last name from a "Last, First" formatted string.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Works in every Excel version', type: 'check' },
   { text: 'num_chars defaults to 1 if omitted', type: 'check' },
@@ -164,3 +162,29 @@ export const compatibility = [
   up stray whitespace before or after extracting a substring.
 - [TEXTAFTER](/docs/text/textafter) — extracts past a delimiter
   directly, instead of a fixed character count.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — last 4 characters" formula={`=RIGHT(A2, 4)`}>
+  Returns the last 4 characters of A2 — useful for pulling a fixed
+  suffix like a year from an invoice code.
+</ExampleCard>
+
+<ExampleCard number="02" label="Default num_chars (1 character)" formula={`=RIGHT(A2)`}>
+  Omitting `num_chars` returns just the last character.
+</ExampleCard>
+
+<ExampleCard number="03" label="Extract a file extension" formula={`=RIGHT(A2, LEN(A2) - FIND(".", A2))`}>
+  Works for filenames of any length, since FIND locates the period
+  dynamically instead of assuming a fixed position.
+</ExampleCard>
+
+<ExampleCard number="04" label="Extracting a number for math" formula={`=VALUE(RIGHT(A2, 4))`}>
+  RIGHT always returns text — wrap it in VALUE() to convert back to
+  a real number before using it in a calculation.
+</ExampleCard>
+
+<ExampleCard number="05" label="Combined with TRIM for messy data" formula={`=RIGHT(TRIM(A2), 5)`}>
+  Trimming first avoids counting trailing spaces as part of the last
+  5 characters.
+</ExampleCard>

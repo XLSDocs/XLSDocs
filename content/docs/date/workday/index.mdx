@@ -8,8 +8,6 @@ start date — weekends skipped automatically, holidays skipped too if
 a list is supplied. The inverse of NETWORKDAYS: instead of counting
 business days between two known dates, this finds the date itself.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Positive days moves forward, negative moves backward', type: 'check' },
   { text: 'start_date itself is never counted as one of the days', type: 'warn' },
@@ -151,3 +149,28 @@ export const compatibility = [
   instead of business days.
 - [WEEKDAY](/docs/date/weekday) — identifies the day of the week for
   a single date, the building block WORKDAY uses internally.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — 10 business days from today" formula={`=WORKDAY(TODAY(), 10)`}>
+  Finds the date 10 working days from now, skipping weekends.
+</ExampleCard>
+
+<ExampleCard number="02" label="Shipping estimate with holidays" formula={`=WORKDAY(Orders[ShipDate], 5, Holidays[Date])`}>
+  Skips both weekends and any date listed in the Holidays column.
+</ExampleCard>
+
+<ExampleCard number="03" label="A date before a given date" formula={`=WORKDAY(A2, -5)`}>
+  A negative `days` value counts backward instead of forward.
+</ExampleCard>
+
+<ExampleCard number="04" label="The very next working day" formula={`=WORKDAY(A2, 1)`}>
+  Finds the next working day after A2 — useful for "processed the
+  next business day" logic.
+</ExampleCard>
+
+<ExampleCard number="05" label="Custom weekend schedule" formula={`=WORKDAY.INTL(A2, 10, 11)`}>
+  [WORKDAY.INTL](/docs/date/workday-intl)'s weekend code `11` treats
+  only Sunday as the weekend, matching
+  [NETWORKDAYS.INTL](/docs/date/networkdays-intl)'s same code.
+</ExampleCard>

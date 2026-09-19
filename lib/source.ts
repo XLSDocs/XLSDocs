@@ -27,13 +27,12 @@ export const source = loader({
     transformers: [
       {
         // Every function page (e.g. content/docs/date/datedif/) is a folder
-        // containing index.mdx + examples.mdx, but its meta.json sets
-        // `"pages": []` so neither is listed as a sidebar child (Examples is
-        // reached via the in-page FunctionNav tabs instead). That leaves an
-        // empty-children folder node, which fumadocs-ui still renders with a
-        // chevron even though expanding it reveals nothing. Category folders
-        // always have real children, so this only ever collapses function
-        // (leaf) nodes into a plain link.
+        // containing a single index.mdx, but its meta.json sets `"pages": []`
+        // so that file isn't also listed as a redundant sidebar child under
+        // its own folder. That leaves an empty-children folder node, which
+        // fumadocs-ui still renders with a chevron even though expanding it
+        // reveals nothing. Category folders always have real children, so
+        // this only ever collapses function (leaf) nodes into a plain link.
         folder(node) {
           // Must be a fresh object, not `node.index` itself: fumadocs tracks
           // node ownership by object identity to dedupe a file appearing in

@@ -7,8 +7,6 @@ Find the value below which a given percentage of the data falls —
 the 90th percentile of response times, the 25th percentile of test
 scores. A more nuanced view of a distribution than a single average.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'k is a fraction between 0 and 1, not a whole percentage', type: 'warn' },
   { text: 'The legacy name for PERCENTILE.INC — still fully supported', type: 'check' },
@@ -180,3 +178,29 @@ export const compatibility = [
   whole-number position instead of a percentile.
 - [LARGE](/docs/math/large) and [SMALL](/docs/math/small) — find a
   value at a specific rank position rather than a percentile.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — 90th percentile load time" formula={`=PERCENTILE(ResponseTimes[Seconds], 0.9)`}>
+  Returns the load time that 90% of requests were at or faster than.
+</ExampleCard>
+
+<ExampleCard number="02" label="A test score cutoff for the top 10%" formula={`=PERCENTILE(Scores[Value], 0.9)`}>
+  Finds the score threshold that separates the top 10% of students
+  from the rest.
+</ExampleCard>
+
+<ExampleCard number="03" label="Verifying the MEDIAN relationship" formula={`=PERCENTILE(Scores[Value], 0.5) = MEDIAN(Scores[Value])`}>
+  The 50th percentile and the median are always the same value —
+  this should return TRUE.
+</ExampleCard>
+
+<ExampleCard number="04" label="Interquartile range" formula={`=PERCENTILE(Scores[Value], 0.75) - PERCENTILE(Scores[Value], 0.25)`}>
+  The gap between the 75th and 25th percentiles — a common measure
+  of spread that ignores extreme outliers.
+</ExampleCard>
+
+<ExampleCard number="05" label="Flagging values above the 95th percentile" formula={`=A2 > PERCENTILE(ResponseTimes[Seconds], 0.95)`}>
+  Flags unusually slow response times relative to the rest of the
+  data.
+</ExampleCard>

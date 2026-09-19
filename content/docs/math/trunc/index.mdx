@@ -7,8 +7,6 @@ Remove the decimal portion of a number by cutting it off, not
 rounding it — and always toward zero, regardless of sign.
 `TRUNC(4.9)` is `4`, and `TRUNC(-4.9)` is `-4`, not `-5`.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Always moves toward zero, unlike INT which moves toward negative infinity', type: 'warn' },
   { text: 'Cuts the decimal off — never rounds up, even at .9999', type: 'check' },

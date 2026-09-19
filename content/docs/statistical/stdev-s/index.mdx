@@ -7,8 +7,6 @@ Estimate standard deviation from a sample of data — the modern,
 explicitly-named version of `STDEV`, introduced so the function name
 itself makes clear it's the sample (not population) calculation.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Assumes the data is a sample, not the whole population', type: 'warn' },
   { text: 'Identical calculation to the legacy STDEV — same result, clearer name', type: 'check' },
@@ -172,3 +170,29 @@ export const compatibility = [
   used when the data isn't a sample.
 - [VAR.S](/docs/statistical/var-s) — sample variance, the squared
   value STDEV.S takes the square root of.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — spread of test scores" formula={`=STDEV.S(Scores[Value])`}>
+  Returns the sample standard deviation of a set of test scores.
+</ExampleCard>
+
+<ExampleCard number="02" label="Quality control tolerance" formula={`=STDEV.S(Batch[Weight]) * 3`}>
+  A common manufacturing check — three standard deviations from the
+  mean, used to flag statistically unusual measurements.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing sample vs population" formula={`=STDEV.S(Data[Value]) - STDEV.P(Data[Value])`}>
+  Shows the (usually small) gap between the sample and population
+  calculations on the same data — always non-negative.
+</ExampleCard>
+
+<ExampleCard number="04" label="Coefficient of variation" formula={`=STDEV.S(Prices[Amount]) / AVERAGE(Prices[Amount])`}>
+  Standard deviation relative to the mean — useful for comparing
+  spread across datasets with very different scales.
+</ExampleCard>
+
+<ExampleCard number="05" label="Flagging outliers beyond 2 standard deviations" formula={`=ABS(A2 - AVERAGE(Data[Value])) > 2 * STDEV.S(Data[Value])`}>
+  Flags a value as unusual if it's more than two standard deviations
+  from the mean.
+</ExampleCard>

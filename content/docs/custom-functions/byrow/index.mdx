@@ -7,8 +7,6 @@ Run a calculation across each row of a table and get back one value
 per row — a row total, a per-row flag, a weighted average — without
 a helper column repeated down the sheet.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'lambda takes exactly one parameter: the entire row as an array', type: 'warn' },
   { text: 'lambda\'s calculation must reduce the row to a single value', type: 'warn' },
@@ -162,3 +160,31 @@ export const compatibility = [
   individual element instead of a whole row at once.
 - [LAMBDA](/docs/custom-functions/lambda) — defines the one-parameter
   calculation BYROW runs on each row.
+
+## Examples
+
+<ExampleCard number="01" label="Row totals across three columns" formula={`=BYROW(A2:C10, LAMBDA(row, SUM(row)))`}>
+  Spills a single column of row totals, one per row, without a
+  helper column or a dragged-down SUM formula.
+</ExampleCard>
+
+<ExampleCard number="02" label="Row-wise average" formula={`=BYROW(A2:F10, LAMBDA(row, AVERAGE(row)))`}>
+  Averages each row across all 6 columns, spilling one average per
+  row.
+</ExampleCard>
+
+<ExampleCard number="03" label="Flag rows where every value passes a threshold" formula={`=BYROW(A2:C10, LAMBDA(row, AND(row>0)))`}>
+  Returns TRUE for a row only if every value in it is greater than
+  0, FALSE otherwise — one flag per row.
+</ExampleCard>
+
+<ExampleCard number="04" label="Weighted score using specific columns" formula={`=BYROW(A2:C10, LAMBDA(row, INDEX(row,1)*0.5 + INDEX(row,2)*0.3 + INDEX(row,3)*0.2))`}>
+  Indexes into specific positions of each row to apply different
+  weights to each column before combining them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Forgetting to reduce the row to one value" formula={`=BYROW(A2:C10, LAMBDA(row, row))`}>
+  Each result cell shows a nested array instead of a single number —
+  the lambda needs an aggregate like SUM or AVERAGE to collapse the
+  row properly.
+</ExampleCard>

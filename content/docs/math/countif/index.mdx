@@ -7,8 +7,6 @@ Count how many cells in a range match **one** condition — orders in
 the West region, amounts over $500, and so on. For more than one
 condition, use [COUNTIFS](/docs/math/countifs) instead.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Single condition only — use COUNTIFS for more than one', type: 'check' },
   { text: 'Works in every Excel version', type: 'check' },
@@ -172,3 +170,29 @@ export const compatibility = [
   totals a value range instead of counting rows.
 - [AVERAGEIF](/docs/math/averageif) — same idea, averaging the
   matching rows instead of counting them.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — count sales by region" formula={`=COUNTIF(Sales[Region], "West")`}>
+  Counts every row where Region equals "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="Comparison operator" formula={`=COUNTIF(Sales[Amount], ">1000")`}>
+  Counts every amount over $1,000 — comparison operators must be part
+  of a quoted string.
+</ExampleCard>
+
+<ExampleCard number="03" label="Wildcard match" formula={`=COUNTIF(Products[Name], "*Pro*")`}>
+  `*` matches any number of characters — this counts every product
+  whose name contains "Pro" anywhere.
+</ExampleCard>
+
+<ExampleCard number="04" label="Counting blank cells" formula={`=COUNTIF(Sales[Notes], "")`}>
+  Passing `""` as the criteria counts rows where that column is
+  blank.
+</ExampleCard>
+
+<ExampleCard number="05" label="Excluding a value" formula={`=COUNTIF(Sales[Region], "<>West")`}>
+  `<>` means "not equal to" — counts every sale **outside** the West
+  region.
+</ExampleCard>

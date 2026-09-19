@@ -8,8 +8,6 @@ need — complete years for an age, complete months for tenure, or
 total days for a duration. The standard formula behind age and
 anniversary calculations in Excel.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Great for age, tenure, or duration calculations', type: 'check' },
   { text: 'Several unit codes for different granularities', type: 'check' },
@@ -173,3 +171,30 @@ export const compatibility = [
 - [DateDiff](/docs/vba/datediff) — VBA's near-namesake, with a
   different argument order and different rules for counting boundary
   crossings versus DATEDIF's complete elapsed intervals.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — age in complete years" formula={`=DATEDIF(A2, TODAY(), "Y")`}>
+  The standard age formula — complete years between a birth date and
+  today.
+</ExampleCard>
+
+<ExampleCard number="02" label="Employee tenure in years and months" formula={`=DATEDIF(A2, TODAY(), "Y") & " years, " & DATEDIF(A2, TODAY(), "YM") & " months"`}>
+  Combines two DATEDIF calls to build a "X years, Y months" style
+  tenure string.
+</ExampleCard>
+
+<ExampleCard number="03" label="Project duration in total days" formula={`=DATEDIF(A2, B2, "D")`}>
+  Returns the total number of days between a project's start and end
+  date.
+</ExampleCard>
+
+<ExampleCard number="04" label="Days until next birthday" formula={`=DATEDIF(TODAY(), DATE(YEAR(TODAY()), MONTH(A2), DAY(A2)), "D")`}>
+  Rebuilds this year's version of a birth date, then measures the
+  gap to today — a common trick for "days until" calculations.
+</ExampleCard>
+
+<ExampleCard number="05" label="With error handling for future dates" formula={`=IFERROR(DATEDIF(A2, B2, "Y"), "Check dates")`}>
+  Falls back to a message instead of `#NUM!` if start_date
+  accidentally comes after end_date.
+</ExampleCard>

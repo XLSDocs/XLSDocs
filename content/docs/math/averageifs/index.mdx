@@ -7,8 +7,6 @@ Average a range of values, but only for rows that match **all** of
 one or more conditions — the same condition-matching shape as
 SUMIFS, just averaging instead of summing.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'All conditions must match (AND logic)', type: 'check' },
   { text: 'Works in every Excel version', type: 'check' },
@@ -192,3 +190,30 @@ export const compatibility = [
   rows instead of averaging a value range.
 - [IFERROR](/docs/logical/iferror) — wraps AVERAGEIFS to replace
   `#DIV/0!` on a zero-match result with a fallback value.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — average sales by region" formula={`=AVERAGEIFS(Sales[Amount], Sales[Region], "West")`}>
+  Averages every value in `Sales[Amount]` where the matching row's
+  region is "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="Multiple conditions" formula={`=AVERAGEIFS(Sales[Amount], Sales[Region], "West", Sales[Quarter], "Q4")`}>
+  Both conditions must be true (AND logic) — West region **and** Q4.
+</ExampleCard>
+
+<ExampleCard number="03" label="With error handling" formula={`=IFERROR(AVERAGEIFS(Sales[Amount], Sales[Region], "Central"), 0)`}>
+  Returns `0` instead of `#DIV/0!` if no rows match "Central" —
+  useful when the condition might legitimately have zero matches.
+</ExampleCard>
+
+<ExampleCard number="04" label="Comparison operator from a cell" formula={`=AVERAGEIFS(Sales[Amount], Sales[Date], ">="&D2, Sales[Date], "<"&EDATE(D2,1)`}>
+  Averages all sales within a one-month window starting at the date
+  in D2 — the operator is concatenated with `&`, not compared
+  directly.
+</ExampleCard>
+
+<ExampleCard number="05" label="Excluding a value" formula={`=AVERAGEIFS(Sales[Amount], Sales[Region], "<>West")`}>
+  `<>` means "not equal to" — this averages every sale **outside**
+  the West region.
+</ExampleCard>

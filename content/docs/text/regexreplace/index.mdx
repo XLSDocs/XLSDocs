@@ -7,8 +7,6 @@ Find every piece of text matching a pattern and replace it —
 optionally reusing parts of the match itself in the replacement,
 which is what lets REGEXREPLACE reorder text, not just swap it out.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'No match found returns the original text unchanged, not an error', type: 'check' },
   { text: 'Capturing groups in pattern are reused in replacement as $1, $2, etc.', type: 'check' },
@@ -185,3 +183,31 @@ export const compatibility = [
   instead of replacing it.
 - [SUBSTITUTE](/docs/text/substitute) — the older, non-regex way to
   replace one exact piece of text with another.
+
+## Examples
+
+<ExampleCard number="01" label="Reordering 'Last, First' into 'First Last'" formula={`=REGEXREPLACE("Smith, John", "([A-Za-z]+), ([A-Za-z]+)", "$2 $1")`}>
+  The two capturing groups — surname and first name — are swapped in
+  the replacement, turning `"Smith, John"` into `"John Smith"`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Masking every digit" formula={`=REGEXREPLACE("Card ending 4521", "[0-9]", "*")`}>
+  Replaces every individual digit with `*`, returning
+  `"Card ending ****"`.
+</ExampleCard>
+
+<ExampleCard number="03" label="Replacing only the second match" formula={`=REGEXREPLACE("2024-06-15", "-", "/", 2)`}>
+  With occurrence set to 2, only the second hyphen is replaced,
+  returning `"2024-06/15"` — the first hyphen is left alone.
+</ExampleCard>
+
+<ExampleCard number="04" label="Collapsing repeated spaces" formula={`=REGEXREPLACE(A1, " {2,}", " ")`}>
+  Matches runs of two or more spaces and collapses each run down to
+  a single space — a regex-based alternative to TRIM for
+  inconsistent internal spacing.
+</ExampleCard>
+
+<ExampleCard number="05" label="No match leaves the text unchanged" formula={`=REGEXREPLACE("hello world", "[0-9]+", "#")`}>
+  Returns `"hello world"` exactly as entered — since there are no
+  digits to match, nothing is replaced and no error is raised.
+</ExampleCard>

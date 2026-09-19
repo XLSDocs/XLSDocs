@@ -8,8 +8,6 @@ guarantee a variable is genuinely text before concatenating it,
 displaying it, or passing it somewhere that expects a String type
 specifically rather than a Variant that merely behaves like one.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Converts using the system\'s current locale settings (decimal separator, date format)', type: 'warn' },
   { text: 'Raises a runtime error on Null, unlike the "&" concatenation operator', type: 'warn' },
@@ -137,3 +135,30 @@ export const compatibility = [
   pattern, avoiding CStr's locale-dependent default formatting.
 - [IsNumeric](/docs/vba/isnumeric) — the reverse direction: checking
   whether a String can be converted back into a number.
+
+## Examples
+
+<ExampleCard number="01" label="Convert a number to text" formula={`CStr(1234.5)`}>
+  Returns "1234.5" as a genuine String, not a Variant/Double that
+  merely displays like one.
+</ExampleCard>
+
+<ExampleCard number="02" label="Convert a Boolean" formula={`CStr(True)`}>
+  Returns "True" — VBA's default text representation for Boolean
+  values.
+</ExampleCard>
+
+<ExampleCard number="03" label="Convert a date" formula={`CStr(#1/15/2027#)`}>
+  Returns the date formatted using the system's current short date
+  setting, e.g. "1/15/2027".
+</ExampleCard>
+
+<ExampleCard number="04" label="Guarding against Null before converting" formula={`If IsNull(rs.Fields("Notes").Value) Then s = "" Else s = CStr(rs.Fields("Notes").Value)`}>
+  Checks for Null first — a common pattern when converting values
+  read from a database recordset.
+</ExampleCard>
+
+<ExampleCard number="05" label="Runtime error on Null" formula={`CStr(Null)`}>
+  Raises runtime error 94 ("Invalid use of Null") — CStr doesn't
+  silently coerce Null the way string concatenation with & does.
+</ExampleCard>

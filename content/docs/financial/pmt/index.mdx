@@ -8,8 +8,6 @@ Calculate the fixed payment required each period to pay off a loan
 rate — the formula behind every basic loan/mortgage payment
 calculator.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'rate must match the period of nper (monthly rate for monthly payments)', type: 'warn' },
   { text: 'Result is negative when pv is positive — a cash outflow', type: 'warn' },
@@ -226,3 +224,32 @@ export const compatibility = [
   instead of the payment, given the other terms.
 - [PPMT](/docs/financial/ppmt) / [IPMT](/docs/financial/ipmt) — split
   one specific payment into its principal and interest portions.
+
+## Examples
+
+<ExampleCard number="01" label="30-year mortgage payment" formula={`=-PMT(5%/12, 30*12, 200000)`}>
+  A $200,000 loan at 5% annual interest, paid monthly over 30 years —
+  the annual rate is divided by 12 and the term multiplied by 12 to
+  match the monthly payment period.
+</ExampleCard>
+
+<ExampleCard number="02" label="5-year auto loan" formula={`=-PMT(6.5%/12, 5*12, 28000)`}>
+  Same shape, shorter term — a $28,000 loan at 6.5% annual interest
+  over 5 years of monthly payments.
+</ExampleCard>
+
+<ExampleCard number="03" label="Without negating the result" formula={`=PMT(5%/12, 30*12, 200000)`}>
+  Returns `-1073.64` — the raw sign convention, useful when the
+  payment feeds into another calculation that expects a negative
+  (outflow) value.
+</ExampleCard>
+
+<ExampleCard number="04" label="Payments due at the start of the period" formula={`=-PMT(5%/12, 30*12, 200000, 0, 1)`}>
+  Setting `type` to `1` calculates a slightly lower payment, since
+  each payment has one fewer period to accrue interest.
+</ExampleCard>
+
+<ExampleCard number="05" label="Saving toward a target instead of paying off a loan" formula={`=-PMT(4%/12, 10*12, 0, 50000)`}>
+  With `pv` at 0 and `fv` set to a target, PMT instead calculates
+  the monthly contribution needed to reach $50,000 in 10 years.
+</ExampleCard>

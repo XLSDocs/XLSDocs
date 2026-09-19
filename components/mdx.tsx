@@ -6,7 +6,6 @@ import { TryIt } from './try-it';
 import { ExcelCode } from './excel-code';
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs';
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
-import { FunctionNav } from './function-nav';
 import { ExampleCard } from './example-card';
 import { Compatibility } from './compatibility';
 import { Faq } from './faq';
@@ -48,7 +47,6 @@ export function getMDXComponents(components?: MDXComponents) {
     Tab,
     Accordion,
     Accordions,
-    FunctionNav,
     ExampleCard,
     Compatibility,
     Faq,

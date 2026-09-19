@@ -9,8 +9,6 @@ VBA's `Replace` actually works like the worksheet's `SUBSTITUTE`
 (find-and-replace by text), not like worksheet `REPLACE`
 (position-and-length based).
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Finds and replaces by matching text, not by position — despite the name overlap with worksheet REPLACE', type: 'warn' },
   { text: 'Case-sensitive by default, unlike Excel\'s SUBSTITUTE', type: 'warn' },
@@ -177,3 +175,30 @@ export const compatibility = [
 - [REPLACE](/docs/text/replace) — the worksheet function that
   actually matches VBA Replace's *name*, but works completely
   differently (position and length, not text matching).
+
+## Examples
+
+<ExampleCard number="01" label="Strip formatting characters from a phone number" formula={`Replace("(555) 123-4567", "-", "")`}>
+  Returns "(555) 1234567" — removes every hyphen; chaining several
+  Replace calls strips out parentheses and spaces too.
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive replacement" formula={`Replace("Hello World", "WORLD", "Excel", 1, -1, vbTextCompare)`}>
+  Returns "Hello Excel" — matches regardless of case, unlike the
+  case-sensitive default.
+</ExampleCard>
+
+<ExampleCard number="03" label="Replace only the first occurrence" formula={`Replace("a-b-a-b-a", "a", "X", 1, 1)`}>
+  Returns "X-b-a-b-a" — limiting count to 1 stops after the first
+  match instead of replacing every occurrence.
+</ExampleCard>
+
+<ExampleCard number="04" label="Remove a substring entirely" formula={`Replace("Product #12345#", "#", "")`}>
+  Returns "Product 12345" — an empty replaceWith deletes every match
+  of find outright.
+</ExampleCard>
+
+<ExampleCard number="05" label="Assuming it works like worksheet REPLACE" formula={`Replace("Hello World", 7, 5)`}>
+  Not valid VBA — Replace has no position-and-length mode; that's
+  worksheet REPLACE's behavior, not this function's.
+</ExampleCard>

@@ -7,8 +7,6 @@ Calculate how much of one specific payment goes toward paying down
 the principal (the original loan balance), as opposed to interest —
 the building block behind a full amortization schedule.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'per must be between 1 and nper — it identifies which payment', type: 'warn' },
   { text: 'PPMT + IPMT for the same per always equals the total PMT', type: 'check' },
@@ -211,3 +209,33 @@ export const compatibility = [
   period, before splitting into principal and interest.
 - [NPER](/docs/financial/nper) — the total number of payment periods
   for the loan.
+
+## Examples
+
+<ExampleCard number="01" label="Principal portion of the first payment" formula={`=PPMT(5%/12, 1, 30*12, 200000)`}>
+  On a $200,000 loan at 5% over 30 years, only about $240.31 of the
+  first ~$1,073.64 payment goes toward principal — the rest is
+  interest.
+</ExampleCard>
+
+<ExampleCard number="02" label="Principal portion of the last payment" formula={`=PPMT(5%/12, 360, 30*12, 200000)`}>
+  By the final payment (period 360), almost the entire payment is
+  principal — the balance is nearly paid off, so there's very little
+  left to charge interest on.
+</ExampleCard>
+
+<ExampleCard number="03" label="Confirming PPMT + IPMT equals PMT" formula={`=PPMT(5%/12,1,360,200000) + IPMT(5%/12,1,360,200000)`}>
+  Adding the principal and interest portions of the same payment
+  returns exactly the total payment PMT would calculate on its own.
+</ExampleCard>
+
+<ExampleCard number="04" label="Building one row of an amortization schedule" formula={`=PPMT($B$1/12, ROW()-1, $B$2*12, $B$3)`}>
+  Using absolute references for the loan terms and `ROW()-1` for
+  `per` lets this formula be dragged down a column to generate the
+  principal portion of every payment.
+</ExampleCard>
+
+<ExampleCard number="05" label="Invalid payment number" formula={`=PPMT(5%/12, 400, 360, 200000)`}>
+  Returns `#NUM!` — period 400 doesn't exist on a 360-payment loan;
+  `per` must be between 1 and `nper`.
+</ExampleCard>

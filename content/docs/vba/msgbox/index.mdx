@@ -7,8 +7,6 @@ Display a message box to the user — the most basic way for a macro
 to communicate anything, from a simple "Done" notification to a
 Yes/No/Cancel confirmation before a destructive action.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Parentheses are required only when capturing the return value', type: 'warn' },
   { text: 'buttons combines a button set and an icon into one number', type: 'check' },
@@ -157,3 +155,29 @@ export const compatibility = [
   of just a button click.
 - [Format](/docs/vba/format) — often used to build the `prompt`
   string, formatting a number or date for display.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — simple notification" formula={`MsgBox "Import complete."`}>
+  Shows a plain message with a single OK button, no return value
+  captured.
+</ExampleCard>
+
+<ExampleCard number="02" label="Yes/No confirmation" formula={`If MsgBox("Overwrite existing file?", vbYesNo) = vbYes Then`}>
+  Captures the result and branches on whether the user clicked Yes
+  or No.
+</ExampleCard>
+
+<ExampleCard number="03" label="Custom title and icon" formula={`MsgBox "Invalid entry.", vbCritical, "Input Error"`}>
+  Sets a custom title bar and shows a red critical-error icon instead
+  of the default.
+</ExampleCard>
+
+<ExampleCard number="04" label="Multi-line message" formula={`MsgBox "Row " & i & " skipped:" & vbCrLf & "Missing required field"`}>
+  Uses vbCrLf to break the message onto a second line.
+</ExampleCard>
+
+<ExampleCard number="05" label="Three-way Yes/No/Cancel" formula={`result = MsgBox("Save changes before closing?", vbYesNoCancel)`}>
+  Captures one of three possible outcomes — vbYes, vbNo, or
+  vbCancel — for a three-way branch.
+</ExampleCard>

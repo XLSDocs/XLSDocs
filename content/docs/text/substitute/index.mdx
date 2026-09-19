@@ -7,8 +7,6 @@ Replace occurrences of one piece of text with another, by matching
 the text content — swap hyphens for slashes, fix a recurring typo
 across a column, or strip out a specific unwanted character.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Replaces all occurrences by default', type: 'check' },
   { text: 'Works in every Excel version', type: 'check' },
@@ -179,3 +177,30 @@ export const compatibility = [
   source of confusion given the overlapping names.
 - [REGEXREPLACE](/docs/text/regexreplace) — replaces based on a full
   regular expression pattern, instead of one exact piece of text.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — reformat a date separator" formula={`=SUBSTITUTE(A2, "-", "/")`}>
+  Replaces every hyphen with a slash — "2027-01-15" becomes
+  "2027/01/15".
+</ExampleCard>
+
+<ExampleCard number="02" label="Replacing only one occurrence" formula={`=SUBSTITUTE(A2, "-", "/", 1)`}>
+  With `instance_num` set to `1`, only the first hyphen is replaced,
+  leaving any others untouched.
+</ExampleCard>
+
+<ExampleCard number="03" label="Removing non-breaking spaces" formula={`=SUBSTITUTE(A2, CHAR(160), " ")`}>
+  Converts non-breaking spaces (common in web-pasted text) into
+  regular ones — often chained with TRIM afterward.
+</ExampleCard>
+
+<ExampleCard number="04" label="Nested SUBSTITUTE for multiple replacements" formula={`=SUBSTITUTE(SUBSTITUTE(A2, "-", "/"), " ", "_")`}>
+  Nesting SUBSTITUTE calls chains multiple find-and-replace
+  operations in one formula.
+</ExampleCard>
+
+<ExampleCard number="05" label="Removing a character entirely" formula={`=SUBSTITUTE(A2, "$", "")`}>
+  Passing an empty string as `new_text` deletes every occurrence of
+  `old_text` instead of replacing it with something else.
+</ExampleCard>

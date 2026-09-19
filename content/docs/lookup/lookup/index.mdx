@@ -8,8 +8,6 @@ the corresponding value from another. Simpler than VLOOKUP or
 XLOOKUP in a few ways, but with a strict requirement neither of them
 share: the lookup range **must** be sorted ascending.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'lookup_vector must be sorted ascending — no exceptions', type: 'warn' },
   { text: 'Always approximate match — no exact-match option', type: 'warn' },
@@ -180,3 +178,31 @@ export const compatibility = [
 - [INDEX](/docs/lookup/index) and [MATCH](/docs/lookup/match) —
   together, a more flexible alternative that doesn't require sorted
   data.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — a grade lookup table" formula={`=LOOKUP(A2, {0,60,70,80,90}, {"F","D","C","B","A"})`}>
+  Finds the largest threshold at or below the score in A2 and
+  returns the matching letter grade.
+</ExampleCard>
+
+<ExampleCard number="02" label="Using table columns instead of literals" formula={`=LOOKUP(A2, Grades[MinScore], Grades[Letter])`}>
+  The same idea, referencing real columns instead of typed-in
+  arrays — MinScore must be sorted ascending.
+</ExampleCard>
+
+<ExampleCard number="03" label="Omitting result_vector" formula={`=LOOKUP(A2, {10,20,30,40})`}>
+  Without a third argument, LOOKUP returns the matching value from
+  the lookup range itself — the largest value at or below A2.
+</ExampleCard>
+
+<ExampleCard number="04" label="#N/A below the smallest value" formula={`=LOOKUP(5, {10,20,30}, {"A","B","C"})`}>
+  Returns `#N/A` — there's no value in the lookup range less than or
+  equal to 5.
+</ExampleCard>
+
+<ExampleCard number="05" label="The modern equivalent with XLOOKUP" formula={`=XLOOKUP(A2, Grades[MinScore], Grades[Letter], , -1)`}>
+  XLOOKUP's `match_mode=-1` finds the same "largest value at or
+  below" result, without LOOKUP's silent-failure risk on unsorted
+  data.
+</ExampleCard>

@@ -7,8 +7,6 @@ Return the probability that the number of successes across a fixed
 number of independent trials falls within a given range — without
 subtracting two separate `BINOM.DIST` calls to get there.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Omitting number_s2 gives the probability of exactly number_s1 successes', type: 'warn' },
   { text: 'Equivalent to BINOM.DIST(number_s2, ..., TRUE) − BINOM.DIST(number_s1 − 1, ..., TRUE)', type: 'check' },

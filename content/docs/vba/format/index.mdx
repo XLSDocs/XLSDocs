@@ -7,8 +7,6 @@ Format a number, date, or string into text using a pattern — the VBA
 equivalent of Excel's `TEXT` worksheet function, for building
 readable strings inside a macro instead of inside a cell.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Always returns a String, regardless of the input type', type: 'check' },
   { text: 'Uses the same pattern codes as Excel custom number formats', type: 'check' },
@@ -131,3 +129,29 @@ export const compatibility = [
   date inside its message text.
 - [InStr](/docs/vba/instr) — a common next step for parsing a
   string, once it's been formatted or before it's converted.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — two decimal places" formula={`Format(1234.5, "#,##0.00")`}>
+  Returns "1,234.50" — a thousands separator and exactly two decimal
+  places.
+</ExampleCard>
+
+<ExampleCard number="02" label="Date for a file name" formula={`Format(Date, "yyyy-mm-dd")`}>
+  Returns today's date as a sortable, filename-safe string like
+  "2027-03-14".
+</ExampleCard>
+
+<ExampleCard number="03" label="Named currency format" formula={`Format(1500, "Currency")`}>
+  Uses the system's regional currency settings, e.g. "$1,500.00".
+</ExampleCard>
+
+<ExampleCard number="04" label="Zero-padded numbers" formula={`Format(7, "000")`}>
+  Returns "007" — useful for building consistently-sized ID or file
+  suffixes.
+</ExampleCard>
+
+<ExampleCard number="05" label="Percent formatting" formula={`Format(0.256, "0.0%")`}>
+  Returns "25.6%", converting a decimal fraction to a display
+  percentage.
+</ExampleCard>

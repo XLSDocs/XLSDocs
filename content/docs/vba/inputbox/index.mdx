@@ -7,8 +7,6 @@ Prompt the user to type a value and return it as a string — the
 simplest way for a macro to ask a question that needs more than a
 button click to answer.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Always returns a String, even if the user types a number', type: 'warn' },
   { text: 'Returns an empty string if Cancel is clicked', type: 'warn' },
@@ -151,3 +149,26 @@ export const compatibility = [
   button click instead of typed text.
 - [Split](/docs/vba/split) — often used right after InputBox to
   break a comma-separated answer into an array.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — ask for a name" formula={`userName = InputBox("Enter your name:")`}>
+  Prompts for free-text input and stores whatever was typed.
+</ExampleCard>
+
+<ExampleCard number="02" label="Pre-filled default value" formula={`sheetName = InputBox("Sheet name:", "New Sheet", "Sheet" & (Sheets.Count + 1))`}>
+  Suggests a default value the user can accept or overwrite.
+</ExampleCard>
+
+<ExampleCard number="03" label="Validating numeric input" formula={`If IsNumeric(qtyText) Then qty = CInt(qtyText)`}>
+  Checks the typed text is actually a number before converting it,
+  since InputBox always returns a string.
+</ExampleCard>
+
+<ExampleCard number="04" label="Treating a blank result as Cancel" formula={`If InputBox("Search term:") = "" Then Exit Sub`}>
+  Exits early if the user clicked Cancel or submitted nothing.
+</ExampleCard>
+
+<ExampleCard number="05" label="Looping until valid input" formula={`Do: entry = InputBox("Enter a positive number:"): Loop Until IsNumeric(entry) And CDbl(entry) > 0`}>
+  Keeps re-prompting until the user provides a valid positive number.
+</ExampleCard>

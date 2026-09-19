@@ -7,8 +7,6 @@ Find where one string first appears inside another — the VBA
 equivalent of Excel's `FIND` and `SEARCH` worksheet functions, for
 locating a substring inside code instead of inside a cell formula.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Returns 0 if the substring isn\'t found — not an error', type: 'warn' },
   { text: 'Case-sensitive by default, unlike Excel\'s SEARCH', type: 'warn' },
@@ -150,3 +148,28 @@ export const compatibility = [
 - [FIND](/docs/text/find) and [SEARCH](/docs/text/search) — the
   worksheet-formula equivalents, for use inside a cell instead of
   VBA code.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — find the @ in an email" formula={`InStr(1, "user@example.com", "@")`}>
+  Returns 5 — the position of the @ character.
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive keyword check" formula={`InStr(1, cellText, "urgent", vbTextCompare) > 0`}>
+  Returns TRUE if "urgent" appears anywhere in cellText, regardless
+  of case.
+</ExampleCard>
+
+<ExampleCard number="03" label="Checking a substring exists" formula={`If InStr(fileName, ".xlsx") = 0 Then fileName = fileName & ".xlsx"`}>
+  Appends a file extension only if it isn't already present.
+</ExampleCard>
+
+<ExampleCard number="04" label="Searching from a later position" formula={`InStr(10, longText, "the")`}>
+  Starts the search at character 10 instead of the beginning of the
+  string.
+</ExampleCard>
+
+<ExampleCard number="05" label="Splitting a path at the last backslash" formula={`fileOnly = Mid(fullPath, InStrRev(fullPath, "\\") + 1)`}>
+  Uses InStrRev to find the last backslash, then extracts everything
+  after it.
+</ExampleCard>

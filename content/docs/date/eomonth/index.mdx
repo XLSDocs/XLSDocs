@@ -8,8 +8,6 @@ a month some number of months before or after it. The standard
 formula behind month-end deadlines, billing dates, and reporting
 periods.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Always returns the last day of a month', type: 'check' },
   { text: "0 months gives start_date's own month-end", type: 'check' },
@@ -162,3 +160,29 @@ export const compatibility = [
   a month-end lookup with `DATE(year, month + 1, 0)`.
 - [TODAY](/docs/date/today) — a common `start_date` input for
   "current month-end" style formulas.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — last day of the current month" formula={`=EOMONTH(TODAY(), 0)`}>
+  Returns today's month-end date, regardless of what day of the
+  month it currently is.
+</ExampleCard>
+
+<ExampleCard number="02" label="First day of next month" formula={`=EOMONTH(TODAY(), 0) + 1`}>
+  Adding 1 to this month's last day lands on the 1st of next month.
+</ExampleCard>
+
+<ExampleCard number="03" label="Billing cutoff 3 months out" formula={`=EOMONTH(A2, 3)`}>
+  Finds the last day of the month that falls 3 months after A2 — a
+  common pattern for quarterly billing or renewal cutoffs.
+</ExampleCard>
+
+<ExampleCard number="04" label="Days remaining in the current month" formula={`=EOMONTH(TODAY(), 0) - TODAY()`}>
+  Subtracting today from this month's last day gives the number of
+  days left in the month.
+</ExampleCard>
+
+<ExampleCard number="05" label="Looking back to a prior month-end" formula={`=EOMONTH(A2, -1)`}>
+  A negative `months` value finds the last day of the month before
+  A2's month.
+</ExampleCard>

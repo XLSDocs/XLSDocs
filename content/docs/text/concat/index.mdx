@@ -7,8 +7,6 @@ Join text from multiple cells, ranges, or literal strings into one
 combined string. The modern replacement for CONCATENATE — same idea,
 but it accepts whole ranges instead of listing every cell by hand.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Accepts ranges directly, unlike CONCATENATE', type: 'check' },
   { text: 'Replaces the older CONCATENATE function', type: 'check' },
@@ -164,3 +162,31 @@ export const compatibility = [
 - [CONCATENATE](/docs/text/concatenate) — the older function CONCAT
   replaces; still works, but doesn't accept whole ranges as a single
   argument.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — full name from two cells" formula={`=CONCAT(A2, " ", B2)`}>
+  Joins a first and last name with a literal space between them.
+</ExampleCard>
+
+<ExampleCard number="02" label="Joining an entire range" formula={`=CONCAT(A1:A5)`}>
+  CONCAT flattens the range and joins every value inside it — no
+  need to list `A1, A2, A3, A4, A5` individually like CONCATENATE
+  would require.
+</ExampleCard>
+
+<ExampleCard number="03" label="Including a formatted date" formula={`=CONCAT("Order placed on ", TEXT(A2, "mmmm d, yyyy"))`}>
+  Wrapping the date in `TEXT()` keeps it readable ("January 5,
+  2027") instead of showing a raw serial number.
+</ExampleCard>
+
+<ExampleCard number="04" label="Building a full address" formula={`=CONCAT(A2, ", ", B2, ", ", C2, " ", D2)`}>
+  Mixes cell references and literal strings (the commas and spaces)
+  to build a one-line address from separate street/city/state/zip
+  columns.
+</ExampleCard>
+
+<ExampleCard number="05" label="With a separator via TEXTJOIN instead" formula={`=TEXTJOIN(", ", TRUE, A1:A5)`}>
+  When every joined item needs the same separator between it, reach
+  for TEXTJOIN instead — CONCAT never inserts one automatically.
+</ExampleCard>

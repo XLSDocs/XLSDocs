@@ -8,8 +8,6 @@ start date, using a **customizable weekend** — Friday/Saturday,
 Sunday-only, or any other pattern, instead of `WORKDAY`'s fixed
 Saturday/Sunday.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Adds a weekend argument between days and holidays', type: 'check' },
   { text: 'Weekend can be a preset code (1-7, 11-17) or a custom 7-character string', type: 'warn' },
@@ -189,3 +187,28 @@ export const compatibility = [
   calculation with the same customizable weekend argument.
 - [EDATE](/docs/date/edate) — shifts a date by a number of *months*
   instead of business days.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — Sunday-only weekend" formula={`=WORKDAY.INTL(A2, 10, 11)`}>
+  Finds the date 10 working days out, treating only Sunday as the
+  weekend.
+</ExampleCard>
+
+<ExampleCard number="02" label="Friday/Saturday weekend" formula={`=WORKDAY.INTL(A2, 10, 7)`}>
+  Uses preset code 7 for a Sunday-Thursday work week.
+</ExampleCard>
+
+<ExampleCard number="03" label="Custom weekend string" formula={`=WORKDAY.INTL(A2, 10, "0000001")`}>
+  A 7-character string starting Monday — here, only Sunday (the last
+  character) is marked as the weekend.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combining a custom weekend with holidays" formula={`=WORKDAY.INTL(Orders[ShipDate], 10, 7, Holidays[Date])`}>
+  Skips both the custom weekend pattern and any listed holiday dates.
+</ExampleCard>
+
+<ExampleCard number="05" label="Finding a date before, not after" formula={`=WORKDAY.INTL(A2, -5, 1)`}>
+  A negative days value finds a date before start_date instead of
+  after, with the standard Saturday/Sunday weekend.
+</ExampleCard>

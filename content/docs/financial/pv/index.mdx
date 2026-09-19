@@ -7,8 +7,6 @@ Calculate what a series of future payments is worth in today's
 money — the lump sum that, invested now at a given rate, would fund
 that exact stream of payments.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'rate must match the period of nper', type: 'warn' },
   { text: 'Result sign is opposite pmt — a loan you receive is positive, payments you make are negative', type: 'warn' },
@@ -178,3 +176,31 @@ export const compatibility = [
   present value, instead of the present value of a given payment.
 - [NPV](/docs/financial/npv) — present value of a series of *uneven*
   cash flows, instead of PV's constant-payment assumption.
+
+## Examples
+
+<ExampleCard number="01" label="Verify a loan amount from a known payment" formula={`=PV(5%/12, 30*12, -1073.64)`}>
+  Given a $1,073.64 monthly payment at 5% annual interest over 30
+  years, this returns the original loan principal (~$200,000).
+</ExampleCard>
+
+<ExampleCard number="02" label="Present value of a target future amount" formula={`=PV(6%/12, 20*12, 0, -50000)`}>
+  With `pmt` at 0 and `fv` set to a target, PV calculates the lump
+  sum needed today to grow to $50,000 in 20 years.
+</ExampleCard>
+
+<ExampleCard number="03" label="Combining ongoing payments and a target" formula={`=PV(5%/12, 10*12, -300, -10000)`}>
+  Both `pmt` (ongoing contributions) and `fv` (a target balance) can
+  be set at once — PV finds the lump sum needed today to reach the
+  target given the contributions.
+</ExampleCard>
+
+<ExampleCard number="04" label="Positive pmt gives the wrong sign" formula={`=PV(5%/12, 30*12, 1073.64)`}>
+  Returns a negative value — `pmt` was entered as positive
+  (backwards from the convention).
+</ExampleCard>
+
+<ExampleCard number="05" label="Payments at the start of each period" formula={`=PV(5%/12, 30*12, -1073.64, 0, 1)`}>
+  Setting `type` to `1` produces a slightly higher present value,
+  since each payment is discounted one period less.
+</ExampleCard>

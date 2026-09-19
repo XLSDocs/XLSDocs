@@ -7,8 +7,6 @@ Return every distinct value from a range — no helper columns, no
 Remove Duplicates dialog, no manual dedup. The list spills
 automatically and updates live as the source data changes.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Live formula — updates automatically', type: 'check' },
   { text: 'Returns multiple rows, not just one', type: 'check' },
@@ -166,3 +164,31 @@ export const compatibility = [
   before UNIQUE deduplicates them: `UNIQUE(VSTACK(...))`.
 - [COUNTIF](/docs/math/countif) — useful alongside UNIQUE to count how
   many times each distinct value occurs.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — distinct list" formula={`=UNIQUE(Sales[Region])`}>
+  Returns every distinct region, each shown once, in order of first
+  appearance.
+</ExampleCard>
+
+<ExampleCard number="02" label="Sorted distinct list" formula={`=SORT(UNIQUE(Sales[Region]))`}>
+  Wrapping UNIQUE in SORT alphabetizes the distinct list instead of
+  leaving it in first-appearance order.
+</ExampleCard>
+
+<ExampleCard number="03" label="Values appearing exactly once" formula={`=UNIQUE(Sales[Region], FALSE, TRUE)`}>
+  With `exactly_once=TRUE`, only regions that appear **exactly one
+  time** in the data are returned — duplicated regions are excluded
+  entirely, not collapsed to one row.
+</ExampleCard>
+
+<ExampleCard number="04" label="Distinct values matching a condition" formula={`=UNIQUE(FILTER(Sales[Region], Sales[Status]="Open"))`}>
+  Filters to open orders first, then returns the distinct regions
+  among just those rows.
+</ExampleCard>
+
+<ExampleCard number="05" label="Counting distinct values" formula={`=ROWS(UNIQUE(Sales[Region]))`}>
+  Wrapping UNIQUE in ROWS returns how many distinct regions exist,
+  as a single number instead of a spilled list.
+</ExampleCard>

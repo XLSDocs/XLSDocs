@@ -8,8 +8,6 @@ tie-handling rule than `RANK`/`RANK.EQ`: tied values share the
 **average** of the ranks they'd otherwise occupy, instead of all
 claiming the higher one.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Default: largest number ranks 1st (descending)', type: 'warn' },
   { text: 'Tied values share the average of their ranks — can return a decimal', type: 'warn' },
@@ -173,3 +171,30 @@ export const compatibility = [
   matches RANK.EQ's tie behavior, never RANK.AVG's.
 - [SMALL](/docs/math/small) — the value at a given rank position
   from the low end, the inverse question from RANK.AVG.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — averaged rank" formula={`=RANK.AVG(A2, $B$2:$B$10)`}>
+  Ranks a value against the list, returning a decimal if it's tied
+  with another value.
+</ExampleCard>
+
+<ExampleCard number="02" label="Comparing to RANK.EQ" formula={`=RANK.AVG(A2, $B$2:$B$10) - RANK.EQ(A2, $B$2:$B$10)`}>
+  Shows the gap between the two tie-handling rules — zero when
+  there's no tie, positive whenever one exists.
+</ExampleCard>
+
+<ExampleCard number="03" label="Ascending order" formula={`=RANK.AVG(A2, $B$2:$B$10, 1)`}>
+  Ranks smallest first, useful for a "lower is better" metric like
+  race times.
+</ExampleCard>
+
+<ExampleCard number="04" label="Detecting whether a value is tied" formula={`=RANK.AVG(A2, $B$2:$B$10) <> RANK.EQ(A2, $B$2:$B$10)`}>
+  Returns TRUE only when the value is part of a tie, since the two
+  functions only disagree in that case.
+</ExampleCard>
+
+<ExampleCard number="05" label="Rounding to a whole-number rank" formula={`=ROUND(RANK.AVG(A2, $B$2:$B$10), 0)`}>
+  Forces a whole number when a decimal rank isn't usable downstream,
+  at the cost of losing the tie information.
+</ExampleCard>

@@ -7,8 +7,6 @@ Measure how spread out a set of numbers is from their average, when
 the data represents an **entire population** — every relevant value,
 not a sample drawn from a larger group.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Assumes the data is the whole population, not a sample', type: 'warn' },
   { text: 'Divides by n instead of n-1 — slightly smaller than STDEV.S on the same data', type: 'check' },
@@ -171,3 +169,30 @@ export const compatibility = [
 - [STDEV](/docs/statistical/stdev) — the legacy name for STDEV.S.
 - [VAR.P](/docs/statistical/var-p) — population variance, the
   squared value STDEV.P takes the square root of.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — spread across an entire batch" formula={`=STDEV.P(FullBatch[Weight])`}>
+  Returns the population standard deviation when every unit produced
+  is included, not a sample of them.
+</ExampleCard>
+
+<ExampleCard number="02" label="Every student's score on a single test" formula={`=STDEV.P(ClassScores[Value])`}>
+  Valid as a population calculation only when the range covers every
+  student who took the test — the whole population, not a subset.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing population vs sample" formula={`=STDEV.P(Data[Value]) - STDEV.S(Data[Value])`}>
+  Shows that STDEV.P is always less than or equal to STDEV.S on
+  identical data — the result here is always zero or negative.
+</ExampleCard>
+
+<ExampleCard number="04" label="Population coefficient of variation" formula={`=STDEV.P(Readings[Value]) / AVERAGE(Readings[Value])`}>
+  Spread relative to the mean, using the population version — useful
+  when comparing complete datasets of different scales.
+</ExampleCard>
+
+<ExampleCard number="05" label="Z-score using population parameters" formula={`=(A2 - AVERAGE(Data[Value])) / STDEV.P(Data[Value])`}>
+  Standardizes a value into units of population standard deviation
+  from the mean.
+</ExampleCard>

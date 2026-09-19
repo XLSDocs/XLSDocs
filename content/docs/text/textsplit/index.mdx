@@ -7,8 +7,6 @@ Split a string into a live spilled array using a delimiter — no
 Text to Columns dialog, no combination of MID/FIND/SEARCH, and no
 fixed destination range to worry about ahead of time.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Splits into columns by default, rows too if row_delimiter is given', type: 'check' },
   { text: 'Live formula — updates automatically', type: 'check' },
@@ -177,3 +175,29 @@ export const compatibility = [
 - [VSTACK](/docs/arrays/vstack) — combines multiple ranges rather
   than splitting one string, but produces the same kind of spilled
   array result.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — comma-separated tags" formula={`=TEXTSPLIT(A2, ",")`}>
+  Spills each tag into its own column.
+</ExampleCard>
+
+<ExampleCard number="02" label="Splitting into rows instead of columns" formula={`=TEXTSPLIT(A2, , ";")`}>
+  Skips the column delimiter and splits on semicolons into separate
+  rows instead.
+</ExampleCard>
+
+<ExampleCard number="03" label="Full 2D split" formula={`=TEXTSPLIT(A2, ",", ";")`}>
+  Splits into columns on commas and rows on semicolons, producing a
+  grid in one formula.
+</ExampleCard>
+
+<ExampleCard number="04" label="Ignoring empty pieces" formula={`=TEXTSPLIT(A2, ",", , TRUE)`}>
+  Collapses consecutive commas instead of leaving blank pieces
+  between them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Padding ragged rows with a blank instead of #N/A" formula={`=TEXTSPLIT(A2, ",", ";", , , "")`}>
+  Fills any gaps from uneven row lengths with an empty string instead
+  of the default #N/A.
+</ExampleCard>

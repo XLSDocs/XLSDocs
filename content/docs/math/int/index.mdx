@@ -8,8 +8,6 @@ toward negative infinity, not toward zero. `INT(4.7)` gives `4`, and
 `INT(-4.7)` gives `-5`, not `-4`. That distinction is the single
 biggest source of confusion around this function.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Rounds toward negative infinity, not toward zero', type: 'warn' },
   { text: 'For negative numbers, differs from TRUNC — INT(-4.7) is -5, TRUNC(-4.7) is -4', type: 'warn' },

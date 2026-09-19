@@ -7,8 +7,6 @@ Convert every letter in a text string to uppercase — the standard
 way to normalize inconsistent casing in codes, IDs, or names before
 comparing or displaying them.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Works in every Excel version', type: 'check' },
   { text: 'Leaves numbers and symbols unchanged', type: 'check' },
@@ -157,3 +155,29 @@ export const compatibility = [
   spacing at the same time as casing.
 - [EXACT](/docs/text/exact) — the case-sensitive comparison UPPER is
   often used to normalize text before or around.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — normalize a product code" formula={`=UPPER(A2)`}>
+  Converts a mixed-case code like "sku-42" to "SKU-42".
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive comparison" formula={`=IF(UPPER(A2)=UPPER(B2), "Match", "No match")`}>
+  Uppercasing both sides before comparing avoids false mismatches
+  caused only by casing differences.
+</ExampleCard>
+
+<ExampleCard number="03" label="Cleaning up spacing and casing together" formula={`=TRIM(UPPER(A2))`}>
+  Removes extra spaces and normalizes casing in one formula.
+</ExampleCard>
+
+<ExampleCard number="04" label="Uppercasing part of a string" formula={`=UPPER(LEFT(A2, 3)) & MID(A2, 4, 100)`}>
+  Uppercases only the first 3 characters, leaving the rest of the
+  string as-is.
+</ExampleCard>
+
+<ExampleCard number="05" label="Making a permanent change" formula={`=UPPER(A2:A10) then Paste Special > Values`}>
+  Build the uppercase versions in a helper column, then paste the
+  results back as values to make the change stick without keeping
+  the formula.
+</ExampleCard>

@@ -7,8 +7,6 @@ Pull out one or more specific rows from an array by number — the
 first row, the last row, or any combination in any order — without
 slicing a range by hand or nesting INDEX calls.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'A negative row number counts from the end — -1 is the last row', type: 'warn' },
   { text: 'Rows can be selected more than once, and in any order', type: 'check' },
@@ -167,3 +165,30 @@ export const compatibility = [
 - [INDEX](/docs/lookup/index) — returns a single cell or range by
   position, the single-row/column building block CHOOSEROWS
   generalizes.
+
+## Examples
+
+<ExampleCard number="01" label="First and last row only" formula={`=CHOOSEROWS(A1:C10, 1, -1)`}>
+  Returns just row 1 and the last row, skipping everything in
+  between.
+</ExampleCard>
+
+<ExampleCard number="02" label="Reversing row order" formula={`=CHOOSEROWS(A1:C5, -1, -2, -3, -4, -5)`}>
+  Lists rows from last to first, returning the entire array with its
+  rows in reverse order.
+</ExampleCard>
+
+<ExampleCard number="03" label="Duplicating a header row above a summary" formula={`=VSTACK(CHOOSEROWS(A1:C10, 1), CHOOSEROWS(A1:C10, -1))`}>
+  Combines the header row (row 1) with just the last row, using
+  VSTACK to stack them into a compact 2-row summary.
+</ExampleCard>
+
+<ExampleCard number="04" label="Selecting a non-contiguous subset" formula={`=CHOOSEROWS(A1:C20, 2, 5, 9)`}>
+  Pulls exactly rows 2, 5, and 9 — an arbitrary, non-contiguous
+  selection TAKE alone couldn't express.
+</ExampleCard>
+
+<ExampleCard number="05" label="Out-of-range row number" formula={`=CHOOSEROWS(A1:C10, 25)`}>
+  Returns `#VALUE!` — the range only has 10 rows, so row 25 doesn't
+  exist.
+</ExampleCard>

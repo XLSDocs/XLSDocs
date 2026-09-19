@@ -6,8 +6,6 @@ description: Extract the text that comes before a delimiter.
 Extract the portion of a string that comes before a delimiter — no
 more combining LEFT with FIND just to split text at a character.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Case-sensitive by default', type: 'warn' },
   { text: 'Returns #N/A if the delimiter isn\'t found, unless if_not_found is set', type: 'warn' },
@@ -185,3 +183,27 @@ export const compatibility = [
   with LEFT to do what TEXTBEFORE does in one step.
 - [LEFT](/docs/text/left) — extracts a fixed number of characters,
   rather than up to a dynamically located delimiter.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — username from an email" formula={`=TEXTBEFORE(A2, "@")`}>
+  Extracts everything before the @ symbol.
+</ExampleCard>
+
+<ExampleCard number="02" label="File name without extension" formula={`=TEXTBEFORE(A2, ".", -1)`}>
+  Splits at the last period, useful for file names that might
+  contain other periods.
+</ExampleCard>
+
+<ExampleCard number="03" label="First word of a sentence" formula={`=TEXTBEFORE(A2, " ")`}>
+  Grabs everything before the first space.
+</ExampleCard>
+
+<ExampleCard number="04" label="Handling a missing delimiter" formula={`=TEXTBEFORE(A2, "@", 1, 0, 0, "No @ found")`}>
+  Returns a friendly fallback instead of #N/A when the text doesn't
+  contain an @ symbol.
+</ExampleCard>
+
+<ExampleCard number="05" label="Text before the second occurrence" formula={`=TEXTBEFORE(A2, "-", 2)`}>
+  Splits at the second dash instead of the first, using instance_num.
+</ExampleCard>

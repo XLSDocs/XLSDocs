@@ -7,8 +7,6 @@ Extract the portion of a string that comes after a delimiter — the
 mirror image of `TEXTBEFORE`, replacing the older combination of MID
 and FIND/SEARCH.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Case-sensitive by default', type: 'warn' },
   { text: 'Returns #N/A if the delimiter isn\'t found, unless if_not_found is set', type: 'warn' },
@@ -184,3 +182,27 @@ export const compatibility = [
   with MID to do what TEXTAFTER does in one step.
 - [RIGHT](/docs/text/right) — extracts a fixed number of characters
   from the end, rather than after a dynamically located delimiter.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — domain from an email" formula={`=TEXTAFTER(A2, "@")`}>
+  Extracts everything after the @ symbol.
+</ExampleCard>
+
+<ExampleCard number="02" label="File extension" formula={`=TEXTAFTER(A2, ".", -1)`}>
+  Splits at the last period, returning just the extension.
+</ExampleCard>
+
+<ExampleCard number="03" label="Last word of a sentence" formula={`=TEXTAFTER(A2, " ", -1)`}>
+  Grabs everything after the last space.
+</ExampleCard>
+
+<ExampleCard number="04" label="Handling a missing delimiter" formula={`=TEXTAFTER(A2, "@", 1, 0, 0, "No @ found")`}>
+  Returns a friendly fallback instead of #N/A when the text doesn't
+  contain an @ symbol.
+</ExampleCard>
+
+<ExampleCard number="05" label="Text after the second occurrence" formula={`=TEXTAFTER(A2, "-", 2)`}>
+  Splits after the second dash instead of the first, using
+  instance_num.
+</ExampleCard>

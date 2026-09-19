@@ -8,8 +8,6 @@ automatically excluding rows hidden by a filter, something plain
 SUM/AVERAGE/COUNT can't do. The function behind Excel Table and
 AutoFilter's built-in totals row.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Always ignores filtered-out rows, regardless of function_num', type: 'check' },
   { text: 'function_num 1–11 includes manually-hidden rows; 101–111 excludes them too', type: 'warn' },
@@ -162,3 +160,31 @@ export const compatibility = [
 - [STDEV](/docs/statistical/stdev) and [VAR](/docs/statistical/var) —
   two of the aggregates SUBTOTAL can compute, selectable via
   `function_num`.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — sum of visible rows" formula={`=SUBTOTAL(109, Sales[Amount])`}>
+  Totals only the rows currently visible after any active filter —
+  updates automatically as the filter changes.
+</ExampleCard>
+
+<ExampleCard number="02" label="Count of visible rows" formula={`=SUBTOTAL(103, Sales[OrderID])`}>
+  Counts non-blank visible cells — useful as a live "how many rows
+  match the current filter" indicator.
+</ExampleCard>
+
+<ExampleCard number="03" label="Average of visible rows" formula={`=SUBTOTAL(101, Sales[Amount])`}>
+  Averages only the currently-visible rows, the SUBTOTAL equivalent
+  of AVERAGE.
+</ExampleCard>
+
+<ExampleCard number="04" label="Including manually-hidden rows" formula={`=SUBTOTAL(9, Sales[Amount])`}>
+  Using `9` instead of `109` still excludes filtered rows, but keeps
+  manually-hidden rows in the total.
+</ExampleCard>
+
+<ExampleCard number="05" label="A nested subtotal doesn't double-count" formula={`=SUBTOTAL(109, A2:A100)`}>
+  If A2:A100 already contains other SUBTOTAL formulas (e.g. per-group
+  subtotals), this grand total automatically ignores them rather than
+  adding them in twice.
+</ExampleCard>

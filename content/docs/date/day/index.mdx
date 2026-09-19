@@ -7,8 +7,6 @@ Pull the day-of-month out of a date as a number from 1 to 31 —
 useful for comparing the day component of two dates, or checking
 whether a date falls near the start or end of its month.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Returns 1–31, the day within the month', type: 'check' },
   { text: 'Works in every Excel version', type: 'check' },
@@ -142,3 +140,28 @@ export const compatibility = [
 - [MONTH](/docs/date/month) — extracts the month from the same date.
 - [WEEKDAY](/docs/date/weekday) — a different question entirely: the
   day of the *week*, not the day of the month.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — extract the day" formula={`=DAY(A2)`}>
+  Returns just the day-of-month number from whatever date is in A2.
+</ExampleCard>
+
+<ExampleCard number="02" label="Checking for the last day of the month" formula={`=A2=EOMONTH(A2,0)`}>
+  TRUE only when A2 falls exactly on the final day of its month.
+</ExampleCard>
+
+<ExampleCard number="03" label="Flagging early vs late month" formula={`=IF(DAY(A2)<=15, "First half", "Second half")`}>
+  Splits dates into first-half/second-half-of-month buckets based on
+  the day number alone.
+</ExampleCard>
+
+<ExampleCard number="04" label="Payroll cutoff logic" formula={`=IF(DAY(A2)>25, "Next cycle", "This cycle")`}>
+  A common pattern for assigning transactions near month-end to the
+  following processing cycle.
+</ExampleCard>
+
+<ExampleCard number="05" label="Two-digit day for display" formula={`=TEXT(A2, "dd")`}>
+  TEXT pads the day to two digits ("05") — DAY itself returns a
+  plain unpadded number.
+</ExampleCard>

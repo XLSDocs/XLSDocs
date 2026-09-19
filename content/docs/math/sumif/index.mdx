@@ -7,8 +7,6 @@ Sum a range of values, but only for rows that match **one**
 condition — sales in the West region, invoices over $500, and so on.
 For more than one condition, use [SUMIFS](/docs/math/sumifs) instead.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Single condition only — use SUMIFS for more than one', type: 'check' },
   { text: 'Works in every Excel version', type: 'check' },
@@ -191,3 +189,30 @@ export const compatibility = [
   dividing a sum by a count that might be zero.
 - [SUMPRODUCT](/docs/math/sumproduct) — handles OR logic across
   conditions, which SUMIF can't express directly.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — sum sales by region" formula={`=SUMIF(Sales[Region], "West", Sales[Amount])`}>
+  Sums the Amount column for every row where Region equals "West".
+</ExampleCard>
+
+<ExampleCard number="02" label="No separate sum_range" formula={`=SUMIF(Sales[Amount], ">1000")`}>
+  When `sum_range` is omitted, SUMIF sums `range` itself — this totals
+  every amount over $1,000 in one condition.
+</ExampleCard>
+
+<ExampleCard number="03" label="Wildcard text match" formula={`=SUMIF(Sales[Region], "*East*", Sales[Amount])`}>
+  `*` matches any number of characters, so this catches "East",
+  "Northeast", and "Southeast" in one condition.
+</ExampleCard>
+
+<ExampleCard number="04" label="Dynamic criteria from a cell" formula={`=SUMIF(Sales[Region], D2, Sales[Amount])`}>
+  Referencing a cell instead of hardcoding "West" lets the same
+  formula answer a different question when D2 changes — no need to
+  edit the formula itself.
+</ExampleCard>
+
+<ExampleCard number="05" label="Excluding a value" formula={`=SUMIF(Sales[Region], "<>West", Sales[Amount])`}>
+  `<>` means "not equal to" — sums every sale **outside** the West
+  region.
+</ExampleCard>

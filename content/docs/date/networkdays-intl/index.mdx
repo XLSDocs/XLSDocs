@@ -7,8 +7,6 @@ Count the number of working days between two dates, using a
 **customizable weekend** — Friday/Saturday, Sunday-only, or any other
 pattern, instead of `NETWORKDAYS`'s fixed Saturday/Sunday.
 
-<FunctionNav />
-
 export const quickAnswerFacts = [
   { text: 'Both start_date and end_date are included in the count', type: 'check' },
   { text: 'Adds a weekend argument between end_date and holidays', type: 'check' },
@@ -183,3 +181,29 @@ export const compatibility = [
   with the same customizable weekend argument.
 - [DATEDIF](/docs/date/datedif) — counts total calendar days between
   two dates, without excluding weekends.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — Sunday-only weekend" formula={`=NETWORKDAYS.INTL(A2, B2, 11)`}>
+  Counts business days between two dates, treating only Sunday as
+  the weekend.
+</ExampleCard>
+
+<ExampleCard number="02" label="Friday/Saturday weekend" formula={`=NETWORKDAYS.INTL(A2, B2, 7)`}>
+  Uses preset code 7 for a Sunday-Thursday work week.
+</ExampleCard>
+
+<ExampleCard number="03" label="Custom weekend string" formula={`=NETWORKDAYS.INTL(A2, B2, "0000001")`}>
+  A 7-character string starting Monday — here, only Sunday (the last
+  character) is marked as the weekend.
+</ExampleCard>
+
+<ExampleCard number="04" label="Combining a custom weekend with holidays" formula={`=NETWORKDAYS.INTL(Project[Start], Project[End], 7, Holidays[Date])`}>
+  Excludes both the custom weekend pattern and any listed holiday
+  dates.
+</ExampleCard>
+
+<ExampleCard number="05" label="Guarding against a negative result" formula={`=IF(B2<A2, "Check dates", NETWORKDAYS.INTL(A2, B2, 1))`}>
+  Returns a friendly message instead of a negative count when the
+  end date is before the start date.
+</ExampleCard>
