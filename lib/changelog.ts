@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-23',
+    title: 'A new Cube category: CUBEMEMBER, CUBEVALUE, CUBEMEMBERPROPERTY, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, and CUBEKPIMEMBER',
+    description:
+      "The first round of a fresh gap-check covering Engineering and Cube functions, the last two categories never previously audited. Cube functions pull members, sets, and aggregated values straight out of a live OLAP connection — CUBEVALUE returns a number, CUBESET builds a reusable collection on the server, and CUBERANKEDMEMBER pulls a specific ranked item out of one.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-16',
     title: 'FORECAST.ETS, FORECAST.ETS.SEASONALITY, FORECAST.ETS.STAT, and FORECAST.ETS.CONFINT — the Statistical audit is complete',
     description:
