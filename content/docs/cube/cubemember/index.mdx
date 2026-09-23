@@ -1,0 +1,152 @@
+---
+title: CUBEMEMBER
+description: Return a member or tuple from an OLAP cube — the foundational building block every other cube function is built on.
+---
+
+Return a single member or tuple from an OLAP cube connection —
+confirming it actually exists in the cube, and giving it a cell
+reference other cube functions can point to.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a live connection to an OLAP data source (SQL Server Analysis Services or later)', type: 'warn' },
+  { text: 'The cell briefly shows #GETTING_DATA… while the cube server responds', type: 'warn' },
+  { text: 'Its cell reference can be reused as an argument inside other CUBE functions', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CUBEMEMBER(connection, member_expression, [caption])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUBEMEMBER(connection, member_expression, [caption])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'connection',
+    type: 'text',
+    required: true,
+    description: 'The name of the workbook connection to the cube, as text.',
+  },
+  {
+    name: 'member_expression',
+    type: 'text',
+    required: true,
+    description: 'A text string of a multidimensional expression (MDX) identifying a member or tuple, or a range/array of such strings.',
+  },
+  {
+    name: 'caption',
+    type: 'text',
+    required: false,
+    description: "Text to display in the cell instead of the cube's own caption for the member.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The member or tuple identified by `member_expression`, displayed
+using `caption` if supplied or the cube's own default caption
+otherwise.
+
+## Description
+
+CUBEMEMBER is the foundational cube function — it validates that a
+member or tuple genuinely exists in the connected cube and gives it a
+worksheet cell reference. Every other cube function that accepts a
+`member_expression` argument can point at a `CUBEMEMBER` cell instead
+of repeating the raw MDX string, which is both easier to read and
+avoids retyping a long expression in multiple formulas.
+
+<Callout type="warn">
+  When a `CUBEMEMBER` cell is used as an argument inside another cube
+  function, Excel passes along the underlying MDX expression, not the
+  caption text displayed in the cell — changing `caption` never
+  changes what other formulas referencing that cell actually retrieve.
+</Callout>
+
+<ExcelCode>{`=CUBEMEMBER("Sales", "[Product].[Category].[Bikes]") → "Bikes"`}</ExcelCode>
+
+<ExcelCode>{`=CUBEMEMBER("Sales", "[Product].[Category].[Bikes]", "Bike Sales") → "Bike Sales"`}</ExcelCode>
+
+## Common errors
+
+### #NAME? — the connection doesn't exist or the server is unreachable
+
+`connection` must exactly match an existing workbook connection name,
+and the OLAP server it points to must actually be reachable.
+
+### #N/A — the member doesn't exist, or the MDX syntax is wrong
+
+`member_expression` must be valid MDX identifying a real member in
+the cube. A typo in a dimension, hierarchy, or member name returns
+`#N/A` rather than a partial or guessed match.
+
+### #VALUE! — member_expression is over 255 characters as a literal string
+
+A long MDX expression typed directly into the formula hits a
+255-character limit. Put the expression in a cell instead (up to
+32,767 characters) and reference that cell.
+
+export const faqs = [
+  {
+    question: 'What is a "tuple" in CUBEMEMBER\'s context?',
+    answer: 'A tuple is a combination of members from different dimensions treated as a single point — for example, "Bikes sold in the Northwest region" combines a Product-dimension member with a Geography-dimension member into one tuple.',
+  },
+  {
+    question: 'Why does the cell briefly show #GETTING_DATA…?',
+    answer: "That's normal — CUBEMEMBER queries a live external cube server rather than computing from data already in the workbook, so there's a real network round-trip before the result is ready. It clears automatically once the response arrives.",
+  },
+  {
+    question: 'Can CUBEMEMBER work with an Excel Data Model built in Power Pivot?',
+    answer: "Not reliably — cube functions expect a genuine multidimensional (OLAP) source. A Data Model edited directly in Power Pivot isn't structured as a multidimensional cube, so some cube functions (CUBEMEMBERPROPERTY in particular) are documented as not working against it.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUBEMEMBER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUBEMEMBER("Sales", "[Product].[Category].[Bikes]")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim member As Variant
+    member = Range("A1").Formula
+    ' Cube functions are entered as worksheet formulas - VBA typically
+    ' writes the formula string rather than calling a direct equivalent.
+    Range("A1").Formula = "=CUBEMEMBER(""Sales"", ""[Product].[Category].[Bikes]"")"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CUBEVALUE](/docs/cube/cubevalue) — returns an aggregated value,
+  often built from one or more CUBEMEMBER cells.
+- [CUBEMEMBERPROPERTY](/docs/cube/cubememberproperty) — returns a
+  specific property of a member, rather than the member itself.
+- [CUBESET](/docs/cube/cubeset) — the equivalent building block for a
+  whole set of members instead of a single one.

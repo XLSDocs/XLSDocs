@@ -1,0 +1,23 @@
+---
+title: Cube
+description: Pull members, sets, and aggregated values directly from an OLAP cube connection — no PivotTable required.
+---
+
+Cube functions pull data straight out of an OLAP cube — a multi-
+dimensional data source like SQL Server Analysis Services, or an
+Excel Data Model connected as an OLAP source — without building a
+PivotTable first. They require a live cube connection to actually
+return data; none of the examples on these pages can be tried in a
+plain worksheet the way `SUMIFS` or `VLOOKUP` can.
+
+## Functions
+
+<Cards className="grid-cols-3">
+  <Card title="CUBEVALUE" description="Return an aggregated value from the cube." href="/docs/cube/cubevalue" />
+  <Card title="CUBEMEMBER" description="Return a member or tuple from the cube." href="/docs/cube/cubemember" />
+  <Card title="CUBEMEMBERPROPERTY" description="Return the value of a member property from the cube." href="/docs/cube/cubememberproperty" />
+  <Card title="CUBESET" description="Define a calculated set of members or tuples on the cube server." href="/docs/cube/cubeset" />
+  <Card title="CUBESETCOUNT" description="Return the number of items in a set." href="/docs/cube/cubesetcount" />
+  <Card title="CUBERANKEDMEMBER" description="Return the nth ranked member in a set." href="/docs/cube/cuberankedmember" />
+  <Card title="CUBEKPIMEMBER" description="Return a key performance indicator (KPI) property." href="/docs/cube/cubekpimember" />
+</Cards>

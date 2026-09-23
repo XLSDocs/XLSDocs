@@ -1,0 +1,166 @@
+---
+title: CUBEKPIMEMBER
+description: Return a specific component of a Key Performance Indicator (KPI) defined in the cube — its value, goal, status, trend, weight, or time context.
+---
+
+Return one specific component of a Key Performance Indicator (KPI)
+already defined inside the cube — the actual value, the target goal,
+a status indicator, or one of several other pieces that together make
+up a single KPI.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a live connection to an OLAP data source (SQL Server Analysis Services or later)', type: 'warn' },
+  { text: 'kpi_property selects which of 6 components to return', type: 'warn' },
+  { text: 'The KPI itself must already be defined in the cube — CUBEKPIMEMBER can\'t create one', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CUBEKPIMEMBER(connection, kpi_name, kpi_property, [caption])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUBEKPIMEMBER(connection, kpi_name, kpi_property, [caption])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'connection',
+    type: 'text',
+    required: true,
+    description: 'The name of the workbook connection to the cube, as text.',
+  },
+  {
+    name: 'kpi_name',
+    type: 'text',
+    required: true,
+    description: 'The name of the KPI as defined in the cube, as text.',
+  },
+  {
+    name: 'kpi_property',
+    type: 'number',
+    required: true,
+    description: 'An integer 1-6 selecting which component of the KPI to return (see the table below).',
+  },
+  {
+    name: 'caption',
+    type: 'text',
+    required: false,
+    description: 'Text to display in the cell instead of the KPI name and property.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The requested component of `kpi_name` — its meaning depends entirely
+on `kpi_property`.
+
+## Description
+
+A KPI in an OLAP cube isn't a single number — it's a small bundle of
+related values that together describe performance against a target.
+CUBEKPIMEMBER pulls out exactly one of those pieces at a time, chosen
+by `kpi_property`:
+
+| Value | Constant | Returns |
+|---|---|---|
+| 1 | KPIValue | The actual current value |
+| 2 | KPIGoal | The target value being measured against |
+| 3 | KPIStatus | The state of the KPI at this moment (on track, at risk, etc.) |
+| 4 | KPITrend | A measure of the value's change over time |
+| 5 | KPIWeight | The relative importance assigned to this KPI |
+| 6 | KPICurrentTimeMember | The temporal context the KPI is being evaluated at |
+
+<Callout type="idea">
+  Displaying a full KPI dashboard typically means calling
+  CUBEKPIMEMBER **multiple times** for the same `kpi_name` — once per
+  property needed (value, goal, and status are the most common
+  three) — since each call only returns one component.
+</Callout>
+
+<ExcelCode>{`=CUBEKPIMEMBER("Sales", "Gross Profit Margin", 1) → the current value`}</ExcelCode>
+
+<ExcelCode>{`=CUBEKPIMEMBER("Sales", "Gross Profit Margin", 3) → the status indicator (e.g. on-track / at-risk / off-track)`}</ExcelCode>
+
+## Common errors
+
+### #NAME? — the connection doesn't exist or the server is unreachable
+
+`connection` must exactly match an existing workbook connection name
+pointing to a reachable OLAP server.
+
+### #N/A — kpi_name doesn't exist, or kpi_property is outside 1-6
+
+`kpi_name` must match a KPI that's genuinely defined in the cube
+(CUBEKPIMEMBER can't create one), and `kpi_property` only accepts
+whole numbers from 1 to 6.
+
+### The cell only shows the KPI's name, not a number
+
+That's expected specifically when `kpi_property` is 1 (KPIValue) —
+the cell displays the KPI's name rather than a raw number by design;
+the underlying value is still what other formulas referencing this
+cell will retrieve.
+
+export const faqs = [
+  {
+    question: 'What is a KPI in this context?',
+    answer: "A Key Performance Indicator defined inside the cube itself (in SQL Server Analysis Services), bundling together a current value, a target goal, a status, and a trend — CUBEKPIMEMBER just retrieves pieces of a KPI that already exists, rather than defining one.",
+  },
+  {
+    question: 'Can I build my own KPI directly from Excel with CUBEKPIMEMBER?',
+    answer: "No — the KPI has to already be defined on the cube server (in SQL Server Analysis Services or a compatible OLAP source). CUBEKPIMEMBER only reads an existing KPI's components; it has no way to create or modify one.",
+  },
+  {
+    question: 'How is KPIStatus typically represented?',
+    answer: "It usually comes back as a value the cube's own KPI definition maps to a visual indicator (like a traffic-light icon) in tools like Excel PivotTables or Power BI — the raw value CUBEKPIMEMBER returns depends entirely on how the specific cube defines that KPI's status graphic.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUBEKPIMEMBER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUBEKPIMEMBER("Sales", "Gross Profit Margin", 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Cube functions are entered as worksheet formulas - VBA typically
+    ' writes the formula string rather than calling a direct equivalent.
+    Range("A1").Formula = _
+        "=CUBEKPIMEMBER(""Sales"", ""Gross Profit Margin"", 1)"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CUBEMEMBERPROPERTY](/docs/cube/cubememberproperty) — a similar
+  idea for a regular member's attributes, rather than a KPI's
+  components.
+- [CUBEVALUE](/docs/cube/cubevalue) — returns an aggregated measure
+  directly, without the KPI-specific value/goal/status structure.
+- [CUBEMEMBER](/docs/cube/cubemember) — the foundational cube
+  function CUBEKPIMEMBER's KPI-specific behavior builds on.

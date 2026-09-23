@@ -1,0 +1,148 @@
+---
+title: CUBEVALUE
+description: Return an aggregated value from an OLAP cube — Excel's most direct way to pull a single number out of a live cube connection.
+---
+
+Return a single aggregated value from an OLAP cube — the most
+commonly used cube function, since it's the one that actually
+retrieves a number (a total, an average, a count) rather than a
+member, set, or property.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a live connection to an OLAP data source (SQL Server Analysis Services or later)', type: 'warn' },
+  { text: 'Omitting every member_expression returns the cube\'s grand total', type: 'warn' },
+  { text: 'Accepts up to 254 member_expression arguments to intersect together', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CUBEVALUE(connection, [member_expression1], [member_expression2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUBEVALUE(connection, [member_expression1], [member_expression2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'connection',
+    type: 'text',
+    required: true,
+    description: 'The name of the workbook connection to the cube, as text.',
+  },
+  {
+    name: 'member_expression1, ...',
+    type: 'text',
+    required: false,
+    description: 'Up to 254 MDX expressions (or CUBEMEMBER/CUBESET cell references) that together define the intersection to aggregate. Omitted entirely, CUBEVALUE returns the cube\'s grand total.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The aggregated value (using the cube's default measure, or a measure
+named explicitly in one of the `member_expression` arguments) at the
+intersection of every supplied member and set.
+
+## Description
+
+CUBEVALUE intersects however many members and sets are passed to it
+and returns the aggregated number at that specific point in the
+cube — most often a sum, but whatever the cube's own measure
+definition specifies. Passing zero `member_expression` arguments
+returns the cube's overall grand total, since an empty intersection
+means "every member of every dimension."
+
+<Callout type="warn">
+  OLAP databases represent a blank/missing value as a zero-length
+  text string (`""`), not a numeric zero — `SUM` handles this
+  transparently, but a direct comparison like `CUBEVALUE(...) = 0`
+  can behave unexpectedly on a cell that's actually empty rather than
+  truly zero. Wrap the result in `N()` or test with `ISTEXT()` first
+  if that distinction matters.
+</Callout>
+
+<ExcelCode>{`=CUBEVALUE("Sales", "[Measures].[Total Sales]") → the grand total across the whole cube`}</ExcelCode>
+
+<ExcelCode>{`=CUBEVALUE("Sales", "[Measures].[Total Sales]", "[Product].[Category].[Bikes]", "[Geography].[Region].[Northwest]") → total bike sales in the Northwest region only`}</ExcelCode>
+
+## Common errors
+
+### #NAME? — the connection doesn't exist or the server is unreachable
+
+`connection` must exactly match an existing workbook connection name
+pointing to a reachable OLAP server.
+
+### #N/A — a member doesn't exist, or the members come from incompatible dimensions
+
+Every `member_expression` needs to identify a real member, and a set
+passed as one of the arguments can't mix members from dimensions the
+intersection can't reconcile.
+
+### A result that looks like blank text instead of 0
+
+OLAP nulls come back as zero-length strings, not numeric zeros — this
+shows as visually blank rather than `0`, and can throw off formulas
+expecting a real number rather than text.
+
+export const faqs = [
+  {
+    question: 'What does CUBEVALUE return with no member_expression arguments at all?',
+    answer: "The cube's grand total — an intersection with nothing specified means every member of every dimension is included, which is the definition of the overall total.",
+  },
+  {
+    question: 'Can I pass a CUBESET or CUBEMEMBER cell reference instead of raw MDX text?',
+    answer: "Yes — that's the whole point of building those cells first. CUBEVALUE(connection, cubememberCell, cubesetCell) works the same as passing the equivalent MDX strings directly, and is far easier to read and maintain.",
+  },
+  {
+    question: 'Why does my CUBEVALUE result not match what I expect from the measure definition?',
+    answer: "Double-check which measure is actually being aggregated — if no measure is named explicitly in any member_expression, CUBEVALUE uses the cube's default measure, which might not be the one intended.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUBEVALUE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUBEVALUE("Sales", "[Measures].[Total Sales]", A1, A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Cube functions are entered as worksheet formulas - VBA typically
+    ' writes the formula string rather than calling a direct equivalent.
+    Range("B1").Formula = _
+        "=CUBEVALUE(""Sales"", ""[Measures].[Total Sales]"", A1, A2)"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CUBEMEMBER](/docs/cube/cubemember) — builds the individual member
+  references CUBEVALUE often intersects together.
+- [CUBESET](/docs/cube/cubeset) — builds a whole set that can be
+  passed as one of CUBEVALUE's arguments.
+- [SUMIFS](/docs/math/sumifs) — the equivalent aggregation idea for
+  ordinary worksheet ranges, without an OLAP connection.

@@ -1,0 +1,128 @@
+---
+title: CUBESETCOUNT
+description: Return the number of items in a set built by CUBESET — the simplest cube function, with exactly one argument.
+---
+
+Return the number of items in a set — the simplest cube function by
+far, taking exactly one argument and returning a plain count.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a live connection to an OLAP data source (SQL Server Analysis Services or later)', type: 'warn' },
+  { text: 'The only cube function with a single argument', type: 'check' },
+  { text: 'set must be (or reference) a real CUBESET result', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CUBESETCOUNT(set)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUBESETCOUNT(set)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'set',
+    type: 'text',
+    required: true,
+    description: 'A CUBESET function, or a cell reference to a cell containing one.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of members or tuples in `set`.
+
+## Description
+
+CUBESETCOUNT does exactly one thing: count how many items are in a
+set that `CUBESET` already built. It's often used alongside
+`CUBERANKEDMEMBER` in a loop-like pattern — count the set first, then
+pull ranked members `1` through that count into a spilled list, or
+check the count before assuming a "top 10" set actually has 10 items
+to show.
+
+<Callout type="idea">
+  A set filtered down to a small category can easily have fewer
+  members than expected — checking `CUBESETCOUNT` before looping
+  through ranked members with `CUBERANKEDMEMBER` avoids pulling
+  `#N/A` for ranks past the set's actual size.
+</Callout>
+
+<ExcelCode>{`=CUBESETCOUNT(A1) → 12, if A1 holds a CUBESET of 12 products`}</ExcelCode>
+
+## Common errors
+
+### #N/A — set doesn't reference a valid CUBESET result
+
+`set` must point to (or contain) an actual, successfully-built
+`CUBESET` — a cell with plain text or an unrelated formula doesn't
+count.
+
+### #NAME? — the underlying CUBESET's connection is invalid
+
+Since `CUBESETCOUNT` just counts an already-built set, an error here
+usually traces back to the `CUBESET` formula it references, not
+`CUBESETCOUNT` itself.
+
+export const faqs = [
+  {
+    question: 'Can CUBESETCOUNT take a raw MDX set expression directly, instead of a CUBESET reference?',
+    answer: "No — CUBESETCOUNT's argument specifically expects a CUBESET function or a cell referencing one, not a bare MDX string. Build the set with CUBESET first, then count it.",
+  },
+  {
+    question: 'Why use CUBESETCOUNT instead of just looking at how many rows the set fills?',
+    answer: "A CUBESET result doesn't spill into multiple cells the way a dynamic array does — it's a single reference to a set held on the server. CUBESETCOUNT is the only way to get its size as a usable number in a formula.",
+  },
+  {
+    question: 'Does CUBESETCOUNT re-query the cube server each time it recalculates?',
+    answer: "It reflects the current state of the CUBESET it references, so if the underlying set changes (a filter changes, new data arrives in the cube), CUBESETCOUNT's result updates on the next recalculation.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUBESETCOUNT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUBESETCOUNT(A1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Cube functions are entered as worksheet formulas - VBA typically
+    ' writes the formula string rather than calling a direct equivalent.
+    Range("B1").Formula = "=CUBESETCOUNT(A1)"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CUBESET](/docs/cube/cubeset) — builds the set CUBESETCOUNT counts.
+- [CUBERANKEDMEMBER](/docs/cube/cuberankedmember) — often used
+  alongside CUBESETCOUNT to pull specific ranked members from the
+  same set.
+- [CUBEVALUE](/docs/cube/cubevalue) — aggregates a measure across a
+  set, rather than counting its members.

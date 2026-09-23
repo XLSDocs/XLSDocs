@@ -1,0 +1,172 @@
+---
+title: CUBESET
+description: Define a calculated set of members or tuples on the cube server, then reuse it as a single reference in other cube functions.
+---
+
+Send a set expression to the cube server, which builds the set there
+and returns it to Excel as a single reference — the multi-member
+equivalent of what `CUBEMEMBER` does for one member at a time.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a live connection to an OLAP data source (SQL Server Analysis Services or later)', type: 'warn' },
+  { text: 'sort_order values 1 and 2 require sort_by; every other value ignores it', type: 'warn' },
+  { text: 'The returned set can be reused directly inside CUBEVALUE, CUBERANKEDMEMBER, or CUBESETCOUNT', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CUBESET(connection, set_expression, [caption], [sort_order], [sort_by])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUBESET(connection, set_expression, [caption], [sort_order], [sort_by])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'connection',
+    type: 'text',
+    required: true,
+    description: 'The name of the workbook connection to the cube, as text.',
+  },
+  {
+    name: 'set_expression',
+    type: 'text',
+    required: true,
+    description: 'A text string of an MDX set expression, or a cell reference containing one.',
+  },
+  {
+    name: 'caption',
+    type: 'text',
+    required: false,
+    description: "Text to display in the cell instead of the cube's own caption for the set.",
+  },
+  {
+    name: 'sort_order',
+    type: 'number',
+    required: false,
+    description: 'An integer 0-6 controlling how the set is sorted (see the table below). Defaults to 0 (no sorting) if omitted.',
+  },
+  {
+    name: 'sort_by',
+    type: 'text',
+    required: false,
+    description: 'The value to sort by — required when sort_order is 1 or 2, ignored otherwise.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A reference to the calculated set, displayed using `caption` if
+supplied. The set itself is computed and held on the cube server, not
+inside the workbook.
+
+## Description
+
+CUBESET is the set-building counterpart to `CUBEMEMBER` — instead of
+identifying one member, it defines a whole collection (say, "every
+product in the Bikes category") as a single reusable reference. That
+reference can then be passed directly into `CUBEVALUE` to aggregate
+across the whole set, into `CUBERANKEDMEMBER` to pull out a specific
+ranked item from it, or into `CUBESETCOUNT` to just count how many
+items it contains.
+
+`sort_order` takes any integer from 0 to 6:
+
+| Value | Constant | Effect |
+|---|---|---|
+| 0 | SortNone | Leaves the set in its existing order (default) |
+| 1 | SortAscending | Sorts ascending by `sort_by` |
+| 2 | SortDescending | Sorts descending by `sort_by` |
+| 3 | SortAlphaAscending | Sorts alphabetically, ascending |
+| 4 | SortAlphaDescending | Sorts alphabetically, descending |
+| 5 | SortNaturalAscending | Sorts in the cube's natural hierarchy order, ascending |
+| 6 | SortNaturalDescending | Sorts in the cube's natural hierarchy order, descending |
+
+Only `sort_order` values 1 and 2 use `sort_by` — every other value
+ignores it entirely, and supplying `sort_by` without `sort_order`
+being 1 or 2 has no effect.
+
+<ExcelCode>{`=CUBESET("Sales", "[Product].[Category].[Bikes].Children") → every individual bike product`}</ExcelCode>
+
+<ExcelCode>{`=CUBESET("Sales", "[Geography].[Region].Members", "All Regions", 1, "[Measures].[Total Sales]") → every region, sorted ascending by total sales`}</ExcelCode>
+
+## Common errors
+
+### #NAME? — the connection doesn't exist or the server is unreachable
+
+`connection` must exactly match an existing workbook connection name
+pointing to a reachable OLAP server.
+
+### #N/A — the set expression is invalid, or mixes incompatible dimensions
+
+`set_expression` must be valid MDX, and every tuple in the resulting
+set needs to come from dimensions the set can reconcile together.
+
+### #VALUE! — sort_order is 1 or 2 with sort_by omitted
+
+Ascending or descending sort (values 1 and 2) genuinely needs
+something to sort by — supply `sort_by`, or use one of the other
+sort_order values that don't require it.
+
+export const faqs = [
+  {
+    question: 'What is a "set" in CUBESET\'s context?',
+    answer: 'A collection of members or tuples treated as one group — every product in a category, every region, or a hand-picked list of specific members combined together with an MDX set expression.',
+  },
+  {
+    question: 'Can I sort a CUBESET result without specifying sort_by?',
+    answer: 'Yes, for four of the seven sort_order options — SortNone, and the four alphabetical/natural-hierarchy options (3-6) — sort_by is ignored entirely. It\'s only required for numeric ascending/descending sort (1 and 2).',
+  },
+  {
+    question: 'How do I get the bottom N members instead of the top N?',
+    answer: "Sort the set in the opposite direction (SortDescending for a normally-ascending metric, or vice versa) before passing it to CUBERANKEDMEMBER, then rank from the front of that reversed order.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUBESET from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUBESET("Sales", "[Product].[Category].[Bikes].Children", "Bikes", 1, "[Measures].[Total Sales]")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Cube functions are entered as worksheet formulas - VBA typically
+    ' writes the formula string rather than calling a direct equivalent.
+    Range("A1").Formula = _
+        "=CUBESET(""Sales"", ""[Product].[Category].[Bikes].Children"", ""Bikes"", 1, ""[Measures].[Total Sales]"")"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CUBESETCOUNT](/docs/cube/cubesetcount) — counts how many items are
+  in a set CUBESET built.
+- [CUBERANKEDMEMBER](/docs/cube/cuberankedmember) — pulls a specific
+  ranked item out of a CUBESET result.
+- [CUBEVALUE](/docs/cube/cubevalue) — aggregates a measure across an
+  entire set built by CUBESET.

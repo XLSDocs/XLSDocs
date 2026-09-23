@@ -1,6 +1,7 @@
 {
   "pages": [
     "arrays",
+    "cube",
     "custom-functions",
     "database",
     "date",

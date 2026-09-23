@@ -1,0 +1,150 @@
+---
+title: CUBEMEMBERPROPERTY
+description: Return the value of a specific property of a cube member, like a product's color or a customer's region.
+---
+
+Return the value of a named property attached to a cube member —
+pulling out an attribute like a product's color or a customer's
+region, rather than an aggregated measure.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a live connection to an OLAP data source (SQL Server Analysis Services or later)', type: 'warn' },
+  { text: 'Does not work against an Excel Data Model edited in Power Pivot', type: 'warn' },
+  { text: 'All three arguments are required', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CUBEMEMBERPROPERTY(connection, member_expression, property)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUBEMEMBERPROPERTY(connection, member_expression, property)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'connection',
+    type: 'text',
+    required: true,
+    description: 'The name of the workbook connection to the cube, as text.',
+  },
+  {
+    name: 'member_expression',
+    type: 'text',
+    required: true,
+    description: 'A text string of an MDX expression identifying a single cube member, or a CUBEMEMBER cell reference.',
+  },
+  {
+    name: 'property',
+    type: 'text',
+    required: true,
+    description: 'The name of the member property to return, as text or a cell reference containing it.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of `property` for the member identified by
+`member_expression` — the specific attribute's value, not a
+measure or aggregation.
+
+## Description
+
+Cube members often carry attributes beyond their name and position in
+a hierarchy — a Product member might have a Color, a Customer member
+might have a Region, a Date member might have a Fiscal Quarter. These
+attributes are exposed as **member properties**, and
+CUBEMEMBERPROPERTY is the function that retrieves one by name for a
+specific member.
+
+<Callout type="warn">
+  CUBEMEMBERPROPERTY specifically does not work against an Excel Data
+  Model that's been edited in Power Pivot — Power Pivot models aren't
+  structured as true multidimensional cubes, even though other cube
+  functions can sometimes query them. A genuine SQL Server Analysis
+  Services (or later) connection is needed for member properties to
+  resolve correctly.
+</Callout>
+
+<ExcelCode>{`=CUBEMEMBERPROPERTY("Sales", "[Product].[Product Name].[Mountain-200]", "Color") → "Silver"`}</ExcelCode>
+
+## Common errors
+
+### #NAME? — the connection doesn't exist or the server is unreachable
+
+`connection` must exactly match an existing workbook connection name
+pointing to a reachable OLAP server.
+
+### #N/A — the member doesn't exist, or property isn't a real property name
+
+Both `member_expression` and `property` need to resolve to something
+that genuinely exists in the cube — a mistyped property name returns
+`#N/A` rather than a blank or default value.
+
+### No result at all against a Power Pivot Data Model
+
+CUBEMEMBERPROPERTY is documented as not working against Excel Data
+Models edited in Power Pivot, since those aren't true multidimensional
+cubes — a genuine OLAP/SSAS connection is required.
+
+export const faqs = [
+  {
+    question: 'What counts as a "member property" in a cube?',
+    answer: "Any attribute attached to a member beyond its name and hierarchy position — a product's color or list price, a customer's country, a date's fiscal year. These are defined when the cube itself is designed, not something Excel adds.",
+  },
+  {
+    question: 'Can I use a cell reference for the property argument instead of typing the name?',
+    answer: "Yes — property accepts either a literal text string naming the property, or a reference to a cell containing that text, which is useful for building a table that looks up several different properties for the same member.",
+  },
+  {
+    question: 'Why doesn\'t CUBEMEMBERPROPERTY work with my Power Pivot model?',
+    answer: "Power Pivot builds an in-memory tabular data model, not a true multidimensional (OLAP) cube — CUBEMEMBERPROPERTY specifically expects the multidimensional structure and member-property metadata that only a real OLAP source like SQL Server Analysis Services provides.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUBEMEMBERPROPERTY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUBEMEMBERPROPERTY("Sales", A1, "Color")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Cube functions are entered as worksheet formulas - VBA typically
+    ' writes the formula string rather than calling a direct equivalent.
+    Range("B1").Formula = "=CUBEMEMBERPROPERTY(""Sales"", A1, ""Color"")"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CUBEMEMBER](/docs/cube/cubemember) — builds the member reference
+  CUBEMEMBERPROPERTY looks up a property for.
+- [CUBEVALUE](/docs/cube/cubevalue) — returns an aggregated measure,
+  rather than a member's own attribute.
+- [CUBEKPIMEMBER](/docs/cube/cubekpimember) — a similar idea for a
+  specific KPI's own components (value, goal, status, trend).

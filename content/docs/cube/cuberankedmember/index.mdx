@@ -1,0 +1,157 @@
+---
+title: CUBERANKEDMEMBER
+description: Return the nth ranked member in a set — the top sales performer, the 3rd-best product, or any other specific position.
+---
+
+Return the nth member in a set, by position — the top sales
+performer, the 3rd-highest product by revenue, or any other specific
+rank, once the set has already been sorted the right way.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a live connection to an OLAP data source (SQL Server Analysis Services or later)', type: 'warn' },
+  { text: 'rank 1 returns the first item in the set as currently ordered', type: 'warn' },
+  { text: 'The set must already be sorted the way you want before ranking it', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CUBERANKEDMEMBER(connection, set_expression, rank, [caption])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CUBERANKEDMEMBER(connection, set_expression, rank, [caption])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'connection',
+    type: 'text',
+    required: true,
+    description: 'The name of the workbook connection to the cube, as text.',
+  },
+  {
+    name: 'set_expression',
+    type: 'text',
+    required: true,
+    description: 'A text string of an MDX set expression, or a CUBESET cell reference.',
+  },
+  {
+    name: 'rank',
+    type: 'number',
+    required: true,
+    description: 'The position to return — 1 for the first item in the set, 2 for the second, and so on.',
+  },
+  {
+    name: 'caption',
+    type: 'text',
+    required: false,
+    description: "Text to display in the cell instead of the cube's own caption for the member.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The member at position `rank` within `set_expression`, in whatever
+order that set is currently in.
+
+## Description
+
+CUBERANKEDMEMBER only understands **position**, not any concept of
+"best" or "highest" on its own — `rank = 1` always means "whatever
+is first in this set right now." Getting a genuinely meaningful
+top-N or bottom-N result depends entirely on sorting the set
+correctly first, which is `CUBESET`'s `sort_order` argument's job, not
+something CUBERANKEDMEMBER controls.
+
+<Callout type="warn">
+  Passing an unsorted set (or one sorted the wrong direction) to
+  CUBERANKEDMEMBER silently returns a real member — just not the one
+  that was actually intended. There's no error to catch this, since
+  "first in the set" is always a valid answer regardless of whether
+  the set was meaningfully ordered beforehand.
+</Callout>
+
+<ExcelCode>{`=CUBERANKEDMEMBER("Sales", A1, 1) → the top item, if A1's CUBESET is sorted descending by the relevant measure`}</ExcelCode>
+
+<ExcelCode>{`=CUBERANKEDMEMBER("Sales", A1, 3, "3rd Place") → the 3rd item, captioned "3rd Place"`}</ExcelCode>
+
+## Common errors
+
+### #NAME? — the connection doesn't exist or the server is unreachable
+
+`connection` must exactly match an existing workbook connection name
+pointing to a reachable OLAP server.
+
+### #N/A — rank exceeds the set's actual size
+
+Requesting `rank = 10` from a set that only has 6 members returns
+`#N/A` — check the set's size with `CUBESETCOUNT` first if the
+count isn't already known.
+
+### A "top" result that isn't actually the top value
+
+The set wasn't sorted the way assumed — `CUBERANKEDMEMBER` returns
+whatever sits at that position in the set's *current* order, which
+is only meaningful once `CUBESET`'s `sort_order` has been set up
+correctly.
+
+export const faqs = [
+  {
+    question: 'How do I get the actual top-selling product, not just "the first item"?',
+    answer: 'Build the set with CUBESET, sorting it descending by the sales measure (sort_order = 2, with sort_by set to the measure), then pass that sorted set into CUBERANKEDMEMBER with rank = 1. CUBERANKEDMEMBER itself has no concept of "highest" — the sort has to happen in CUBESET first.',
+  },
+  {
+    question: 'What happens if rank is larger than the set\'s size?',
+    answer: 'CUBERANKEDMEMBER returns #N/A — there\'s no wraparound or clamping to the last valid rank.',
+  },
+  {
+    question: 'Can I build a full "top 10" list with CUBERANKEDMEMBER?',
+    answer: "Yes — call CUBERANKEDMEMBER once per rank (1 through 10) against the same sorted CUBESET reference, typically down a column, to build the full list one row at a time.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CUBERANKEDMEMBER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CUBERANKEDMEMBER("Sales", A1, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Cube functions are entered as worksheet formulas - VBA typically
+    ' writes the formula string rather than calling a direct equivalent.
+    Range("B1").Formula = "=CUBERANKEDMEMBER(""Sales"", A1, 1)"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CUBESET](/docs/cube/cubeset) — builds and sorts the set
+  CUBERANKEDMEMBER pulls a specific position from.
+- [CUBESETCOUNT](/docs/cube/cubesetcount) — checks a set's size
+  before ranking into it, to avoid an out-of-range #N/A.
+- [LARGE](/docs/math/large) — the equivalent "nth-ranked value" idea
+  for an ordinary worksheet range, without a cube connection.
