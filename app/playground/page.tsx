@@ -229,6 +229,16 @@ const CATEGORIES: PlaygroundCategory[] = [
       },
     ],
   },
+  {
+    name: 'Engineering',
+    items: [
+      {
+        fn: 'BIN2DEC',
+        href: '/docs/engineering/bin2dec#try-it',
+        teaser: "Switch to a full 10-digit binary number starting with 1 and watch the result flip to -5 instead of a huge positive number — two's complement in action.",
+      },
+    ],
+  },
 ];
 
 export default function PlaygroundPage() {

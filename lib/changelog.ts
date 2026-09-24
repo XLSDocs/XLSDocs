@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-09-24',
+    title: 'A new Engineering category: all 12 number-base conversion functions',
+    description:
+      "BIN2DEC, BIN2HEX, BIN2OCT, DEC2BIN, DEC2HEX, DEC2OCT, HEX2BIN, HEX2DEC, HEX2OCT, OCT2BIN, OCT2DEC, and OCT2HEX — every combination for converting between binary, decimal, hexadecimal, and octal. Each page's Try It shares one verified number across all four bases, including how two's-complement notation represents a negative value differently in each one.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-09-23',
     title: 'A new Cube category: CUBEMEMBER, CUBEVALUE, CUBEMEMBERPROPERTY, CUBESET, CUBESETCOUNT, CUBERANKEDMEMBER, and CUBEKPIMEMBER',
     description:
