@@ -1,0 +1,151 @@
+---
+title: BIN2OCT
+description: Convert a binary number to octal, with optional zero-padding to a fixed width.
+---
+
+Convert a binary number (up to 10 digits) directly to octal — the
+same two's-complement rules as every other function in this
+conversion family.
+
+export const quickAnswerFacts = [
+  { text: 'number can be at most 10 binary digits (0s and 1s)', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative binary input always returns a 10-character octal result', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BIN2OCT(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BIN2OCT(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The binary number to convert — at most 10 digits (0s and 1s only).',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if number is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The octal equivalent of `number`, as text — padded to `places`
+characters if supplied and the result is positive.
+
+## Description
+
+BIN2OCT converts directly from base 2 to base 8. Because 8 is a power
+of 2 (2³), binary and octal digits actually line up cleanly in groups
+of three — every octal digit corresponds to exactly 3 binary digits,
+which is part of why octal was historically popular as a more compact
+stand-in for binary in early computing.
+
+<Callout type="idea">
+  `BIN2OCT` is functionally identical to chaining `BIN2DEC` into
+  `DEC2OCT` — it exists purely as a convenience so the intermediate
+  decimal value never needs its own cell.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1000': '10', '11010': '32', '11111111': '377', '1111111011': '7777777773' }}
+  defaultValue="11010"
+  label={'Live preview — =BIN2OCT({number})'}
+  fieldLabel="number"
+/>
+
+`BIN2OCT(11010)` returns `32` — the same value `DEC2OCT(26)` would
+give. `BIN2OCT(1111111011)` returns a full 10-character `7777777773`,
+the two's-complement octal representation of -5.
+
+## Common errors
+
+### #NUM! — number isn't valid binary, or has more than 10 digits
+
+`number` can only contain the digits `0` and `1`, and can be at most
+10 digits long.
+
+### #NUM! — places is too small for the result
+
+<ExcelCode>{`BIN2OCT(11111111, 2) → #NUM!, since "377" needs 3 characters`}</ExcelCode>
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Why do binary and octal digits line up so cleanly?',
+    answer: 'Because 8 is 2 cubed — every group of exactly 3 binary digits maps to one octal digit, with no remainder. This is the same reason binary and hexadecimal line up in groups of 4 (since 16 is 2 to the 4th power).',
+  },
+  {
+    question: 'What is the difference between BIN2OCT and just using DEC2OCT(BIN2DEC(number))?',
+    answer: 'Nothing in the result — BIN2OCT produces exactly the same value as chaining those two functions together. It just saves writing the intermediate step as a separate formula.',
+  },
+  {
+    question: 'Why would I use octal instead of hex for a binary value?',
+    answer: "In modern spreadsheet work, hex (BIN2HEX) is far more common, since it maps to bytes more naturally. Octal shows up mostly in legacy contexts (older Unix file permissions, some older hardware documentation) where BIN2OCT's conversion is still occasionally useful.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BIN2OCT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BIN2OCT(11010)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim octalValue As String
+    octalValue = Application.WorksheetFunction.Bin2Oct("11010")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    binary_str = "11010"
+    octal_value = format(int(binary_str, 2), "o")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [OCT2BIN](/docs/engineering/oct2bin) — the reverse: converts an
+  octal number back to binary.
+- [BIN2DEC](/docs/engineering/bin2dec) — converts the same binary
+  input to decimal instead of octal.
+- [BIN2HEX](/docs/engineering/bin2hex) — converts the same binary
+  input to hexadecimal instead.

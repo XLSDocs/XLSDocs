@@ -1,0 +1,155 @@
+---
+title: DEC2HEX
+description: Convert a decimal number to hexadecimal — negative numbers use a 40-bit two's-complement representation.
+---
+
+Convert a decimal number to hexadecimal — the reverse of `HEX2DEC`,
+and the widest-range conversion in this family, spanning a full
+40-bit signed integer.
+
+export const quickAnswerFacts = [
+  { text: 'number must be between -549,755,813,888 and 549,755,813,887', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative number always returns a full 10-character hex result', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DEC2HEX(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DEC2HEX(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The decimal integer to convert — must be between -549,755,813,888 and 549,755,813,887.',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if number is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hexadecimal equivalent of `number`, as text — padded to `places`
+characters if supplied and `number` is positive.
+
+## Description
+
+DEC2HEX supports a 40-bit signed range — each of its 10 possible hex
+characters represents 4 binary bits, so 10 hex digits cover 40 bits
+total, one of which is the two's-complement sign bit. That gives
+DEC2HEX by far the widest range of any function in this conversion
+family, since `DEC2BIN` is stuck at 10 bits and `DEC2OCT` at 30.
+
+<Callout type="idea">
+  Hexadecimal is the most commonly useful base in this entire family
+  for real technical work — color codes, memory addresses, and byte
+  values are almost always expressed in hex, which is exactly why
+  DEC2HEX supports such a wide range compared to its binary and octal
+  counterparts.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '8': '8', '26': '1A', '255': 'FF', '-5': 'FFFFFFFFFB' }}
+  defaultValue="26"
+  label={'Live preview — =DEC2HEX({number})'}
+  fieldLabel="number"
+/>
+
+`DEC2HEX(255)` returns `FF` — the familiar maximum value of a single
+byte. `DEC2HEX(-5)` returns the full 10-character `FFFFFFFFFB`, the
+two's-complement hex representation of -5 across the full 40-bit
+width.
+
+## Common errors
+
+### #NUM! — number is outside the valid 40-bit range
+
+<ExcelCode>{`DEC2HEX(600000000000) → #NUM!`}</ExcelCode>
+
+`number` must fall between -549,755,813,888 and 549,755,813,887.
+
+### #NUM! — places is too small for the result
+
+<ExcelCode>{`DEC2HEX(255, 1) → #NUM!, since "FF" needs 2 characters`}</ExcelCode>
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Why does DEC2HEX support such a wide range compared to DEC2BIN?',
+    answer: "Because each hex digit packs 4 bits of information instead of 1 — 10 hex characters cover a full 40-bit signed integer, versus DEC2BIN's 10 raw binary digits covering just 10 bits. Hex is a much more compact way to represent the same amount of underlying binary data.",
+  },
+  {
+    question: 'Does DEC2HEX return uppercase or lowercase letters?',
+    answer: "Uppercase — A through F. If lowercase is needed for a specific use case (like a CSS color code), wrap the result in LOWER().",
+  },
+  {
+    question: 'What is DEC2HEX commonly used for?',
+    answer: 'Generating hex color codes, working with memory addresses or byte values in low-level technical documentation, and any spreadsheet task that needs to bridge decimal calculations with a system that expects hexadecimal input.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DEC2HEX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEC2HEX(255)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim hexValue As String
+    hexValue = Application.WorksheetFunction.Dec2Hex(255)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    number = 255
+    hex_value = format(number, "X")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HEX2DEC](/docs/engineering/hex2dec) — the reverse: converts a
+  hexadecimal number back to decimal.
+- [DEC2BIN](/docs/engineering/dec2bin) — converts the same decimal
+  input to binary, over a much narrower range.
+- [DEC2OCT](/docs/engineering/dec2oct) — converts the same decimal
+  input to octal instead.

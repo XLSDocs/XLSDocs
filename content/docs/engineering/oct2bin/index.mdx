@@ -1,0 +1,152 @@
+---
+title: OCT2BIN
+description: Convert an octal number to binary — the input must resolve to a value binary's 10-bit range can actually hold.
+---
+
+Convert an octal number to binary — the reverse of `BIN2OCT`,
+constrained by binary's narrower 10-bit range even though `number`
+itself can be a full 10-character octal value.
+
+export const quickAnswerFacts = [
+  { text: 'number must resolve to a value between -512 and 511 (binary\'s own range)', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative result always returns a full 10-character binary string', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=OCT2BIN(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=OCT2BIN(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The octal number to convert — at most 10 characters, and must resolve to a value between -512 and 511.',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if the result is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The binary equivalent of `number`, as text — padded to `places`
+characters if supplied and the result is positive.
+
+## Description
+
+OCT2BIN is more restrictive than `OCT2DEC` on its input — while
+OCT2DEC accepts any valid 10-character octal value (spanning the full
+30-bit signed range), OCT2BIN's *result* still has to fit inside
+binary's much narrower 10-bit range, so `number` can only run from
+`7777777000` (the octal form of -512) up through `777` (511 in
+decimal).
+
+<Callout type="idea">
+  Because 8 is 2 cubed, converting octal to binary is really just
+  expanding each octal digit into its own 3-bit binary group —
+  `OCT2BIN` does that expansion (and the two's-complement handling for
+  negative values) in one step.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '10': '1000', '32': '11010', '377': '11111111', '7777777773': '1111111011' }}
+  defaultValue="32"
+  label={'Live preview — =OCT2BIN({number})'}
+  fieldLabel="number"
+/>
+
+`OCT2BIN(32)` returns `11010` — the same value `DEC2BIN(26)` would
+give. `OCT2BIN(7777777773)`, the 10-character two's-complement octal
+form of -5, returns the full 10-character `1111111011`.
+
+## Common errors
+
+### #NUM! — number isn't valid octal, or is outside binary's range
+
+`number` must be valid octal (digits 0-7 only), at most 10 characters,
+and must resolve to a value binary's own narrower range can actually
+hold.
+
+### #NUM! — places is too small for the result
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Why does OCT2BIN reject an octal value that OCT2DEC accepts fine?',
+    answer: "Because OCT2BIN's output has to fit in binary's fixed 10-bit range, much narrower than the 30-bit range OCT2DEC supports. An octal value representing a decimal number larger than 511 is valid octal but can't be expressed as a 10-bit binary number.",
+  },
+  {
+    question: 'What is the largest octal value OCT2BIN accepts?',
+    answer: '777, which equals 511 in decimal — the largest value that fits in binary\'s 9 magnitude bits (with the 10th reserved for sign).',
+  },
+  {
+    question: 'What is the difference between OCT2BIN and using OCT2DEC then DEC2BIN?',
+    answer: 'Nothing in the result if the value is in range — OCT2BIN produces exactly the same value as chaining those two functions. It just saves writing the intermediate decimal step.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with OCT2BIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=OCT2BIN(32)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim binaryValue As String
+    binaryValue = Application.WorksheetFunction.Oct2Bin("32")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    octal_str = "32"
+    binary_value = format(int(octal_str, 8), "b")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BIN2OCT](/docs/engineering/bin2oct) — the reverse: converts a
+  binary number back to octal.
+- [OCT2DEC](/docs/engineering/oct2dec) — converts the same octal
+  input to decimal, over a much wider valid range.
+- [OCT2HEX](/docs/engineering/oct2hex) — converts the same octal
+  input to hexadecimal instead.

@@ -1,0 +1,152 @@
+---
+title: HEX2BIN
+description: Convert a hexadecimal number to binary — the input must resolve to a value binary's 10-bit range can actually hold.
+---
+
+Convert a hexadecimal number to binary — the reverse of `BIN2HEX`,
+constrained by binary's much narrower 10-bit range even though
+`number` itself can be a full 10-character hex value.
+
+export const quickAnswerFacts = [
+  { text: 'number must resolve to a value between -512 and 511 (binary\'s own range)', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative result always returns a full 10-character binary string', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=HEX2BIN(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HEX2BIN(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The hexadecimal number to convert — at most 10 characters, and must resolve to a value between -512 and 511.',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if the result is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The binary equivalent of `number`, as text — padded to `places`
+characters if supplied and the result is positive.
+
+## Description
+
+HEX2BIN is more restrictive than `HEX2DEC` — while HEX2DEC accepts
+any valid 10-character hex value (spanning the full 40-bit signed
+range), HEX2BIN's *result* still has to fit inside binary's 10-bit
+range, so `number` can only run from `FFFFFFFE00` (the hex form of
+-512) up through `1FF` (511 in decimal).
+
+<Callout type="warn">
+  Passing a hex value that's perfectly valid for `HEX2DEC` but too
+  large for 10-bit binary — say, `200` (decimal 512) — returns
+  `#NUM!` here even though `HEX2DEC("200")` would happily return 512.
+  The two functions don't share the same valid input range.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '8': '1000', '1A': '11010', 'FF': '11111111', 'FFFFFFFFFB': '1111111011' }}
+  defaultValue="1A"
+  label={'Live preview — =HEX2BIN({number})'}
+  fieldLabel="number"
+/>
+
+`HEX2BIN(1A)` returns `11010` — the same value `DEC2BIN(26)` would
+give. `HEX2BIN(FFFFFFFFFB)`, the 10-character two's-complement hex
+form of -5, returns the full 10-character `1111111011`.
+
+## Common errors
+
+### #NUM! — number isn't valid hexadecimal, or is outside binary's range
+
+<ExcelCode>{`HEX2BIN(200) → #NUM!, since 200 in hex is 512, outside binary's -512 to 511 range`}</ExcelCode>
+
+`number` must be valid hex, at most 10 characters, and must resolve to
+a value binary's own narrower range can actually hold.
+
+### #NUM! — places is too small for the result
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Why does HEX2BIN reject a hex value that HEX2DEC accepts fine?',
+    answer: "Because HEX2BIN's output has to fit in binary's fixed 10-bit range (-512 to 511), which is much narrower than the 40-bit range HEX2DEC supports. A hex value representing, say, 1000 in decimal is perfectly valid hex but simply can't be expressed as a 10-bit binary number.",
+  },
+  {
+    question: 'What is the largest hex value HEX2BIN accepts?',
+    answer: '1FF, which equals 511 in decimal — the largest value that fits in binary\'s 9 magnitude bits (with the 10th reserved for sign).',
+  },
+  {
+    question: 'What is the difference between HEX2BIN and using HEX2DEC then DEC2BIN?',
+    answer: 'Nothing in the result if the value is in range — HEX2BIN produces exactly the same value as chaining those two functions. It just saves writing the intermediate decimal step.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HEX2BIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HEX2BIN("1A")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim binaryValue As String
+    binaryValue = Application.WorksheetFunction.Hex2Bin("1A")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    hex_str = "1A"
+    binary_value = format(int(hex_str, 16), "b")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BIN2HEX](/docs/engineering/bin2hex) — the reverse: converts a
+  binary number back to hexadecimal.
+- [HEX2DEC](/docs/engineering/hex2dec) — converts the same hex input
+  to decimal, over a much wider valid range.
+- [HEX2OCT](/docs/engineering/hex2oct) — converts the same hex input
+  to octal instead.

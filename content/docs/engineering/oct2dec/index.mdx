@@ -1,0 +1,149 @@
+---
+title: OCT2DEC
+description: Convert an octal number to decimal — negative numbers use a 30-bit two's-complement representation.
+---
+
+Convert an octal number to decimal — the reverse of `DEC2OCT`.
+
+export const quickAnswerFacts = [
+  { text: 'number can be at most 10 octal characters (digits 0-7)', type: 'warn' },
+  { text: 'A full 10-character value starting with 4-7 is negative, using two\'s-complement notation', type: 'warn' },
+  { text: 'number can be entered as text or an actual number — both work', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=OCT2DEC(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=OCT2DEC(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The octal number to convert — at most 10 characters (digits 0-7 only).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The decimal equivalent of `number`.
+
+## Description
+
+OCT2DEC reads `number` as a base-8 value and returns its decimal
+equivalent. A full 10-character octal value whose leftmost digit is 4
+or higher (meaning its leading bit is 1) is interpreted as negative,
+using the same 30-bit two's-complement convention `DEC2OCT` uses to
+produce negative results.
+
+<Callout type="idea">
+  `OCT2DEC` and `HEX2DEC` solve the same underlying problem for a
+  different base — both exist for the same reason: converting a value
+  that arrived in a non-decimal format (from outside Excel, or from
+  another one of these conversion functions) back into an ordinary
+  number that can be calculated with directly.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '10': '8', '32': '26', '377': '255', '7777777773': '-5' }}
+  defaultValue="32"
+  label={'Live preview — =OCT2DEC({number})'}
+  fieldLabel="number"
+/>
+
+`OCT2DEC(32)` returns 26. `OCT2DEC(7777777773)`, a full 10-character
+octal value starting with `7` (≥ 4), returns **-5**, not a large
+positive number.
+
+## Common errors
+
+### #NUM! — number isn't valid octal, or has more than 10 characters
+
+<ExcelCode>{`OCT2DEC(89) → #NUM!, since 8 and 9 aren't valid octal digits`}</ExcelCode>
+
+`number` can only contain the digits `0` through `7`, and can be at
+most 10 characters long.
+
+### Expecting a negative result from any leading digit 4 or higher
+
+<ExcelCode>{`OCT2DEC(377) → 255, not negative — only a FULL 10-character octal value triggers two's-complement`}</ExcelCode>
+
+A short octal value with a high leading digit is still an ordinary
+positive number — the two's-complement sign rule only applies once
+the value reaches its full 10-character width.
+
+export const faqs = [
+  {
+    question: 'Why does OCT2DEC(7777777773) return -5 instead of a large positive number?',
+    answer: "Because it's a full 10-character octal value with its leftmost bit set, OCT2DEC reads it using two's-complement notation — the whole 10-character pattern represents -5, not the unsigned value that a plain octal-to-decimal reading would otherwise give.",
+  },
+  {
+    question: 'What is the largest positive number OCT2DEC can convert?',
+    answer: '7777777777 is actually invalid as a positive number - the largest genuinely positive value is 3777777777, which equals 536,870,911 - the largest value expressible in 29 magnitude bits, with the 30th reserved for sign.',
+  },
+  {
+    question: 'Is OCT2DEC used much in modern spreadsheet work?',
+    answer: "Less than HEX2DEC — octal mostly survives in legacy contexts like Unix file-permission notation. HEX2DEC comes up far more often for real technical data like color codes and memory addresses.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with OCT2DEC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=OCT2DEC(32)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim decimalValue As Long
+    decimalValue = Application.WorksheetFunction.Oct2Dec("32")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    octal_str = "7777777773"
+    decimal_value = int(octal_str, 8)
+    if len(octal_str) == 10 and int(octal_str[0], 8) >= 4:
+        decimal_value -= 8 ** 10  # two's-complement sign correction
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DEC2OCT](/docs/engineering/dec2oct) — the reverse: converts a
+  decimal number back to octal.
+- [OCT2BIN](/docs/engineering/oct2bin) — converts the same octal
+  input to binary, over a much narrower valid range.
+- [OCT2HEX](/docs/engineering/oct2hex) — converts the same octal
+  input to hexadecimal instead.

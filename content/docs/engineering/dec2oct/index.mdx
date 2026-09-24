@@ -1,0 +1,153 @@
+---
+title: DEC2OCT
+description: Convert a decimal number to octal — negative numbers use a 30-bit two's-complement representation.
+---
+
+Convert a decimal number to octal — the reverse of `OCT2DEC`, covering
+a 30-bit signed range, wider than binary but narrower than
+hexadecimal.
+
+export const quickAnswerFacts = [
+  { text: 'number must be between -536,870,912 and 536,870,911', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative number always returns a full 10-character octal result', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DEC2OCT(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DEC2OCT(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The decimal integer to convert — must be between -536,870,912 and 536,870,911.',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if number is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The octal equivalent of `number`, as text — padded to `places`
+characters if supplied and `number` is positive.
+
+## Description
+
+DEC2OCT supports a 30-bit signed range — each of its 10 possible octal
+characters represents 3 binary bits, so 10 octal digits cover 30 bits
+total, one of which is the two's-complement sign bit. That puts its
+range between `DEC2BIN`'s narrow 10-bit limit and `DEC2HEX`'s much
+wider 40-bit limit.
+
+<Callout type="idea">
+  Octal sees far less everyday use than hex in modern spreadsheet
+  work — it mostly comes up in legacy contexts, like older Unix-style
+  file-permission notation (`755`, `644`), where DEC2OCT can still be
+  the right tool.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '8': '10', '26': '32', '255': '377', '-5': '7777777773' }}
+  defaultValue="26"
+  label={'Live preview — =DEC2OCT({number})'}
+  fieldLabel="number"
+/>
+
+`DEC2OCT(26)` returns `32`. `DEC2OCT(-5)` returns the full
+10-character `7777777773`, the two's-complement octal representation
+of -5 across the full 30-bit width.
+
+## Common errors
+
+### #NUM! — number is outside the valid 30-bit range
+
+<ExcelCode>{`DEC2OCT(600000000) → #NUM!`}</ExcelCode>
+
+`number` must fall between -536,870,912 and 536,870,911.
+
+### #NUM! — places is too small for the result
+
+<ExcelCode>{`DEC2OCT(255, 2) → #NUM!, since "377" needs 3 characters`}</ExcelCode>
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Why does DEC2OCT support a wider range than DEC2BIN but narrower than DEC2HEX?',
+    answer: "Each format's range depends entirely on how many bits its digits pack: binary is 1 bit per digit (10 digits = 10 bits), octal is 3 bits per digit (10 digits = 30 bits), and hex is 4 bits per digit (10 digits = 40 bits) — DEC2OCT sits in between by that same logic.",
+  },
+  {
+    question: 'Where does octal notation still actually get used?',
+    answer: 'Unix and Linux file permissions are the most common surviving use — a permission like 755 is genuinely octal, with each digit representing a 3-bit combination of read/write/execute flags for owner, group, and others.',
+  },
+  {
+    question: 'What is the difference between DEC2OCT and using MOD/INT to build an octal string manually?',
+    answer: "DEC2OCT handles the entire conversion (including the two's-complement negative-number case) in one call, whereas a manual MOD/INT approach would need to be built from scratch and wouldn't naturally handle negative values the same way.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DEC2OCT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEC2OCT(26)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim octalValue As String
+    octalValue = Application.WorksheetFunction.Dec2Oct(26)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    number = 26
+    octal_value = format(number, "o")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [OCT2DEC](/docs/engineering/oct2dec) — the reverse: converts an
+  octal number back to decimal.
+- [DEC2BIN](/docs/engineering/dec2bin) — converts the same decimal
+  input to binary, over a much narrower range.
+- [DEC2HEX](/docs/engineering/dec2hex) — converts the same decimal
+  input to hexadecimal, over a much wider range.

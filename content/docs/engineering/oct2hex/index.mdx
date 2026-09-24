@@ -1,0 +1,149 @@
+---
+title: OCT2HEX
+description: Convert an octal number to hexadecimal, with optional zero-padding to a fixed width.
+---
+
+Convert an octal number directly to hexadecimal — the reverse of
+`HEX2OCT`, and the last function in this conversion family.
+
+export const quickAnswerFacts = [
+  { text: 'number can be at most 10 octal characters (digits 0-7)', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative octal input always returns a 10-character hex result', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=OCT2HEX(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=OCT2HEX(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The octal number to convert — at most 10 characters (digits 0-7 only).',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if number is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hexadecimal equivalent of `number`, as text — padded to `places`
+characters if supplied and the result is positive.
+
+## Description
+
+Unlike `HEX2OCT` and `OCT2BIN`/`HEX2BIN`, OCT2HEX doesn't have a
+narrower output range to worry about — octal's 30-bit range comfortably
+fits within hexadecimal's wider 40-bit range, so every valid
+10-character octal input converts cleanly.
+
+<Callout type="idea">
+  `OCT2HEX` is functionally identical to chaining `OCT2DEC` into
+  `DEC2HEX` — it exists purely as a convenience so the intermediate
+  decimal value never needs its own cell.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '10': '8', '32': '1A', '377': 'FF', '7777777773': 'FFFFFFFFFB' }}
+  defaultValue="32"
+  label={'Live preview — =OCT2HEX({number})'}
+  fieldLabel="number"
+/>
+
+`OCT2HEX(32)` returns `1A` — the same value `DEC2HEX(26)` would give.
+`OCT2HEX(7777777773)`, the 10-character two's-complement octal form of
+-5, returns the full 10-character `FFFFFFFFFB`.
+
+## Common errors
+
+### #NUM! — number isn't valid octal, or has more than 10 characters
+
+`number` can only contain the digits `0` through `7`, and can be at
+most 10 characters long.
+
+### #NUM! — places is too small for the result
+
+<ExcelCode>{`OCT2HEX(377, 1) → #NUM!, since "FF" needs 2 characters`}</ExcelCode>
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Does OCT2HEX have the same narrower-range restriction as OCT2BIN or HEX2OCT?',
+    answer: "No — octal's full 30-bit range fits comfortably inside hexadecimal's wider 40-bit range, so unlike OCT2BIN (limited by binary's 10-bit range) or HEX2OCT (limited by octal's own 30-bit range on the way back), every valid octal input to OCT2HEX converts without a range restriction beyond octal's own 10-character limit.",
+  },
+  {
+    question: 'What is the difference between OCT2HEX and using OCT2DEC then DEC2HEX?',
+    answer: 'Nothing in the result — OCT2HEX produces exactly the same value as chaining those two functions together. It just saves writing the intermediate decimal step.',
+  },
+  {
+    question: 'Why would octal-to-hex conversion ever be needed directly?',
+    answer: "Mostly when working with legacy systems or documentation that expresses values in octal (like Unix file permissions) alongside modern tooling that expects hex — OCT2HEX bridges the two without a manual detour through decimal.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with OCT2HEX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=OCT2HEX(32)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim hexValue As String
+    hexValue = Application.WorksheetFunction.Oct2Hex("32")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    octal_str = "32"
+    hex_value = format(int(octal_str, 8), "X")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HEX2OCT](/docs/engineering/hex2oct) — the reverse: converts a
+  hexadecimal number back to octal.
+- [OCT2DEC](/docs/engineering/oct2dec) — converts the same octal
+  input to decimal instead of hexadecimal.
+- [OCT2BIN](/docs/engineering/oct2bin) — converts the same octal
+  input to binary instead.

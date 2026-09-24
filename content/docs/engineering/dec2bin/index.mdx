@@ -1,0 +1,155 @@
+---
+title: DEC2BIN
+description: Convert a decimal number to binary — negative numbers (-512 to -1) use two's-complement notation.
+---
+
+Convert a decimal number to binary — the reverse of `BIN2DEC`, limited
+to the range a 10-digit binary number can actually represent.
+
+export const quickAnswerFacts = [
+  { text: 'number must be between -512 and 511', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative number always returns a full 10-character binary result', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DEC2BIN(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DEC2BIN(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The decimal integer to convert — must be between -512 and 511.',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if number is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The binary equivalent of `number`, as text — padded to `places`
+characters if supplied and `number` is positive.
+
+## Description
+
+DEC2BIN's valid range (-512 to 511) is deliberately narrow — it's
+exactly what fits in a 10-bit two's-complement representation, the
+same fixed width every function in this conversion family shares.
+`places` lets a positive result be padded with leading zeros to a
+consistent width (useful for lining up a column of binary values),
+but it's silently ignored for a negative number, which always occupies
+the full 10 characters regardless.
+
+<Callout type="warn">
+  DEC2BIN's range is asymmetric — it goes down to **-512** but only up
+  to **511**, not -511 to 511. That's a direct consequence of two's
+  complement: with 10 bits total and one reserved for sign, there are
+  512 possible negative values (-512 through -1) but only 511 nonzero
+  positive ones (1 through 511), plus zero.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '8': '1000', '26': '11010', '255': '11111111', '-5': '1111111011' }}
+  defaultValue="26"
+  label={'Live preview — =DEC2BIN({number})'}
+  fieldLabel="number"
+/>
+
+`DEC2BIN(26)` returns `11010`. `DEC2BIN(-5)` returns the full
+10-character `1111111011` — the two's-complement binary
+representation, not a minus sign followed by the binary form of 5.
+
+## Common errors
+
+### #NUM! — number is outside the -512 to 511 range
+
+<ExcelCode>{`DEC2BIN(600) → #NUM!`}</ExcelCode>
+
+`number` must fall within DEC2BIN's fixed 10-bit range.
+
+### #NUM! — places is too small for the result
+
+<ExcelCode>{`DEC2BIN(26, 3) → #NUM!, since "11010" already needs 5 characters`}</ExcelCode>
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Why is -512 valid but 512 isn\'t?',
+    answer: "Because of how two's complement splits up a fixed number of bits: with 10 bits and one used for the sign, there are 512 distinct negative values (-512 through -1) but only 511 positive ones (1 through 511) alongside zero — the ranges aren't symmetric around zero.",
+  },
+  {
+    question: 'How do I convert a decimal number larger than 511?',
+    answer: "DEC2BIN can't — its 10-bit range is fixed. For a wider view of a large number's bits, convert it to hexadecimal with DEC2HEX instead, which supports a much larger range.",
+  },
+  {
+    question: 'Why does DEC2BIN(-5) return a 10-character result even though 5 only needs 3 binary digits?',
+    answer: "Because a negative two's-complement value needs its full bit width to be represented correctly — the leading 1s aren't padding, they're part of what makes the pattern actually equal -5 rather than a large positive number.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DEC2BIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEC2BIN(26)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim binaryValue As String
+    binaryValue = Application.WorksheetFunction.Dec2Bin(26)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    number = -5
+    binary_value = format(number & 0b1111111111, "010b")  # 10-bit two's complement
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BIN2DEC](/docs/engineering/bin2dec) — the reverse: converts a
+  binary number back to decimal.
+- [DEC2HEX](/docs/engineering/dec2hex) — converts the same decimal
+  input to hexadecimal, with a much wider valid range.
+- [DEC2OCT](/docs/engineering/dec2oct) — converts the same decimal
+  input to octal instead.

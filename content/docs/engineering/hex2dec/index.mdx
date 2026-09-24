@@ -1,0 +1,151 @@
+---
+title: HEX2DEC
+description: Convert a hexadecimal number to decimal — negative numbers use a 40-bit two's-complement representation.
+---
+
+Convert a hexadecimal number to decimal — the reverse of `DEC2HEX`,
+and the most commonly useful conversion in this family since hex
+values (color codes, memory addresses) show up constantly in
+technical work.
+
+export const quickAnswerFacts = [
+  { text: 'number can be at most 10 hexadecimal characters', type: 'warn' },
+  { text: 'A full 10-character value starting with 8-F is negative, using two\'s-complement notation', type: 'warn' },
+  { text: 'number can be entered as text or an actual number — both work', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=HEX2DEC(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HEX2DEC(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The hexadecimal number to convert — at most 10 characters (0-9, A-F).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The decimal equivalent of `number`.
+
+## Description
+
+HEX2DEC reads `number` as a base-16 value and returns its decimal
+equivalent. A full 10-character hexadecimal value whose leftmost
+hex digit is 8 or higher (meaning its leading bit is 1) is
+interpreted as negative, using the same 40-bit two's-complement
+convention `DEC2HEX` uses to produce negative results.
+
+<Callout type="idea">
+  Hex is the most practically useful conversion base of the whole
+  family — HEX2DEC is the function to reach for when a color code, a
+  memory address, or any other hex value from outside Excel needs to
+  become an ordinary number for calculation.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '8': '8', '1A': '26', 'FF': '255', 'FFFFFFFFFB': '-5' }}
+  defaultValue="1A"
+  label={'Live preview — =HEX2DEC({number})'}
+  fieldLabel="number"
+/>
+
+`HEX2DEC(FF)` returns 255 — a single byte's maximum value.
+`HEX2DEC(FFFFFFFFFB)`, a full 10-character hex value starting with
+`F` (≥ 8), returns **-5**, not a huge positive number.
+
+## Common errors
+
+### #NUM! — number isn't valid hexadecimal, or has more than 10 characters
+
+<ExcelCode>{`HEX2DEC(GG) → #NUM!`}</ExcelCode>
+
+`number` can only contain the digits `0-9` and letters `A-F`, and can
+be at most 10 characters long.
+
+### Expecting a negative result from any hex digit 8 or higher
+
+<ExcelCode>{`HEX2DEC(FF) → 255, not negative — only a FULL 10-character hex value triggers two's-complement`}</ExcelCode>
+
+A short hex value with a high leading digit is still an ordinary
+positive number — the two's-complement sign rule only applies once
+the value reaches its full 10-character width.
+
+export const faqs = [
+  {
+    question: 'Why does HEX2DEC(FFFFFFFFFB) return -5 instead of a huge positive number?',
+    answer: "Because it's a full 10-character hex value with its leftmost bit set, HEX2DEC reads it using two's-complement notation — the whole 10-character pattern represents -5, not the unsigned value that a plain hex-to-decimal reading would otherwise give.",
+  },
+  {
+    question: 'What is the largest positive number HEX2DEC can convert?',
+    answer: '7FFFFFFFFF, which equals 549,755,813,887 — the largest value expressible in 39 magnitude bits, with the 40th bit reserved for sign.',
+  },
+  {
+    question: 'Is HEX2DEC case-sensitive for the letters A-F?',
+    answer: "No — both uppercase and lowercase hex letters (FF or ff) are accepted and produce the same result.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with HEX2DEC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=HEX2DEC("FF")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim decimalValue As Long
+    decimalValue = Application.WorksheetFunction.Hex2Dec("FF")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    hex_str = "FFFFFFFFFB"
+    decimal_value = int(hex_str, 16)
+    if len(hex_str) == 10 and int(hex_str[0], 16) >= 8:
+        decimal_value -= 16 ** 10  # two's-complement sign correction
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DEC2HEX](/docs/engineering/dec2hex) — the reverse: converts a
+  decimal number back to hexadecimal.
+- [HEX2BIN](/docs/engineering/hex2bin) — converts the same hex input
+  to binary, over a much narrower valid range.
+- [HEX2OCT](/docs/engineering/hex2oct) — converts the same hex input
+  to octal instead.

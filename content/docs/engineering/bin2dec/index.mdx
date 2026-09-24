@@ -1,0 +1,153 @@
+---
+title: BIN2DEC
+description: Convert a binary number to decimal — negative numbers use two's-complement notation.
+---
+
+Convert a binary number (up to 10 digits) to its decimal equivalent —
+the most basic of Excel's number-base conversion functions.
+
+export const quickAnswerFacts = [
+  { text: 'number can be at most 10 binary digits (0s and 1s)', type: 'warn' },
+  { text: 'A leading 1 in a full 10-digit number means negative, using two\'s-complement notation', type: 'warn' },
+  { text: 'number can be entered as text or an actual number — both work', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BIN2DEC(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BIN2DEC(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The binary number to convert — at most 10 digits (0s and 1s only).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The decimal equivalent of `number`.
+
+## Description
+
+BIN2DEC reads `number` as a base-2 (binary) value and returns the
+equivalent base-10 (decimal) number. Binary numbers up to 9 digits are
+always positive; a **full 10-digit** binary number is interpreted
+using two's-complement notation, where the leftmost digit is a sign
+bit — `1` means negative, `0` means positive.
+
+<Callout type="warn">
+  Two's complement means a 10-digit binary number that starts with `1`
+  doesn't mean "make this number negative" the way a minus sign
+  would — the whole 10-digit pattern together encodes the negative
+  value. `1111111011` isn't "positive 111111011 with a negative
+  flag" — it's the bit pattern for **-5**, and only resolves to that
+  value as a complete 10-digit binary number.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1000': '8', '11010': '26', '11111111': '255', '1111111011': '-5' }}
+  defaultValue="11010"
+  label={'Live preview — =BIN2DEC({number})'}
+  fieldLabel="number"
+/>
+
+`BIN2DEC(11010)` returns 26 — an ordinary positive conversion.
+`BIN2DEC(1111111011)`, a full 10-digit binary number starting with
+`1`, returns **-5**, not a huge positive number — the two's-complement
+sign bit changes how the whole pattern is read.
+
+## Common errors
+
+### #NUM! — number isn't valid binary, or has more than 10 digits
+
+<ExcelCode>{`BIN2DEC(102) → #NUM!`}</ExcelCode>
+
+`number` can only contain the digits `0` and `1`, and can be at most
+10 digits long.
+
+### Expecting a negative result from a leading 1 that isn't in a full 10-digit number
+
+<ExcelCode>{`BIN2DEC(1010) → 10, not negative — only a FULL 10-digit binary number triggers two's-complement`}</ExcelCode>
+
+A short binary number starting with `1` is still just an ordinary
+positive value — the two's-complement sign-bit rule only applies once
+the number reaches its full 10-digit width.
+
+export const faqs = [
+  {
+    question: 'Why does BIN2DEC(1111111011) return -5 instead of a large positive number?',
+    answer: "Because it's a full 10-digit binary number, BIN2DEC reads its leftmost digit as a sign bit using two's-complement notation — the entire 10-digit pattern together represents -5, not the unsigned value 1019 that a plain binary-to-decimal reading would otherwise give.",
+  },
+  {
+    question: 'What is the largest positive number BIN2DEC can convert?',
+    answer: '111111111 (nine 1s) — the largest 9-digit binary number, which equals 511. A 10th digit is reserved for the sign, so a genuinely positive 10-digit binary number isn\'t possible; a 10-digit number starting with 0 is redundant with a shorter one.',
+  },
+  {
+    question: 'Can I enter the binary number as an actual number instead of text?',
+    answer: 'Yes — BIN2DEC(11010) and BIN2DEC("11010") both work identically. Just be aware that a genuinely long binary value typed as a number could lose leading zeros if Excel reformats the cell, so text is the safer choice for values that matter down to the exact digit count.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BIN2DEC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BIN2DEC(11010)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim decimalValue As Long
+    decimalValue = Application.WorksheetFunction.Bin2Dec("11010")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    binary_str = "1111111011"
+    decimal_value = int(binary_str, 2)
+    if len(binary_str) == 10 and binary_str[0] == "1":
+        decimal_value -= 1024  # two's-complement sign correction
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DEC2BIN](/docs/engineering/dec2bin) — the reverse: converts a
+  decimal number back to binary.
+- [BIN2HEX](/docs/engineering/bin2hex) and
+  [BIN2OCT](/docs/engineering/bin2oct) — convert the same binary
+  input to hexadecimal or octal instead of decimal.
+- [HEX2DEC](/docs/engineering/hex2dec) — the equivalent conversion
+  starting from a hexadecimal number.

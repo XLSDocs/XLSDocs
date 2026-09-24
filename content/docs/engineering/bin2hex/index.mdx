@@ -1,0 +1,152 @@
+---
+title: BIN2HEX
+description: Convert a binary number to hexadecimal, with optional zero-padding to a fixed width.
+---
+
+Convert a binary number (up to 10 digits) directly to hexadecimal —
+skipping a manual trip through decimal in between.
+
+export const quickAnswerFacts = [
+  { text: 'number can be at most 10 binary digits (0s and 1s)', type: 'warn' },
+  { text: 'places pads the result with leading zeros — ignored entirely for a negative number', type: 'warn' },
+  { text: 'A negative binary input always returns a 10-character hex result', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BIN2HEX(number, [places])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BIN2HEX(number, [places])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'text, number',
+    required: true,
+    description: 'The binary number to convert — at most 10 digits (0s and 1s only).',
+  },
+  {
+    name: 'places',
+    type: 'number',
+    required: false,
+    description: 'The number of characters to pad the result to with leading zeros. Ignored if number is negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hexadecimal equivalent of `number`, as text — padded to `places`
+characters if supplied and the result is positive.
+
+## Description
+
+BIN2HEX converts directly between two bases that don't naturally
+align (base 2 and base 16), without needing a separate decimal step.
+Like every function in this conversion family, a full 10-digit binary
+input starting with `1` is read as a negative two's-complement value
+— and in that case, `places` is ignored entirely, always returning a
+fixed 10-character hexadecimal result.
+
+<Callout type="idea">
+  `BIN2HEX` is functionally identical to chaining `BIN2DEC` into
+  `DEC2HEX` — it exists as a convenience so the intermediate decimal
+  value never needs its own cell.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1000': '8', '11010': '1A', '11111111': 'FF', '1111111011': 'FFFFFFFFFB' }}
+  defaultValue="11010"
+  label={'Live preview — =BIN2HEX({number})'}
+  fieldLabel="number"
+/>
+
+`BIN2HEX(11010)` returns `1A` — the same value `DEC2HEX(26)` would
+give, since `11010` in binary is 26 in decimal. `BIN2HEX(1111111011)`
+returns a full 10-character `FFFFFFFFFB`, the two's-complement hex
+representation of -5.
+
+## Common errors
+
+### #NUM! — number isn't valid binary, or has more than 10 digits
+
+`number` can only contain the digits `0` and `1`, and can be at most
+10 digits long.
+
+### #NUM! — places is too small for the result
+
+<ExcelCode>{`BIN2HEX(11111111, 1) → #NUM!, since "FF" needs 2 characters`}</ExcelCode>
+
+`places` must be large enough to hold every digit of the actual
+result — it can only pad with extra leading zeros, never truncate.
+
+export const faqs = [
+  {
+    question: 'Why is places ignored for a negative binary input?',
+    answer: 'A negative two\'s-complement value always needs its full width to be represented correctly — BIN2HEX (like every function in this family) returns a fixed 10-character hexadecimal result for any negative input, regardless of what places is set to.',
+  },
+  {
+    question: 'What is the difference between BIN2HEX and just using DEC2HEX(BIN2DEC(number))?',
+    answer: 'Nothing in the result — BIN2HEX produces exactly the same value as chaining those two functions together. It just saves writing the intermediate step as a separate formula.',
+  },
+  {
+    question: 'Does BIN2HEX return uppercase or lowercase hex digits?',
+    answer: 'Uppercase — A through F, matching the convention used throughout Excel\'s hex-related functions (DEC2HEX, HEX2DEC, and the others in this family).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BIN2HEX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BIN2HEX(11010)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim hexValue As String
+    hexValue = Application.WorksheetFunction.Bin2Hex("11010")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    binary_str = "11010"
+    hex_value = format(int(binary_str, 2), "X")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HEX2BIN](/docs/engineering/hex2bin) — the reverse: converts a
+  hexadecimal number back to binary.
+- [BIN2DEC](/docs/engineering/bin2dec) — converts the same binary
+  input to decimal instead of hexadecimal.
+- [BIN2OCT](/docs/engineering/bin2oct) — converts the same binary
+  input to octal instead.
