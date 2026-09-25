@@ -11,6 +11,7 @@ const FOOTER_COLUMNS = [
       { href: '/functions', label: 'Functions' },
       { href: '/tools/formula-builder', label: 'Formula Builder' },
       { href: '/tools/quick-fix', label: 'Quick Fix' },
+      { href: '/tools/large-file-viewer', label: 'Large File Viewer' },
       { href: '/playground', label: 'Playground' },
       { href: '/pricing', label: 'Pricing' },
     ],
