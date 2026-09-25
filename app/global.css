@@ -32,6 +32,12 @@
      blocks down was left alone — not part of this fix. */
   --color-fd-muted-foreground: #5c5c5c;
 
+  /* A warm off-white instead of Fumadocs' default neutral-gray #f5f5f5 —
+     same lightness, just less clinical (matches the warm-cream tone Row
+     Zero uses for its own light background). Card/popover/border tokens
+     are untouched, so this is scoped to the page background only. */
+  --color-fd-background: #f7f7f3;
+
   /* emerald-600 — light-mode counterpart to the .dark block's emerald-500 accent below. Previously unset in light mode, so accent-colored UI (buttons, active nav, this file's --excel-fn) fell back to Fumadocs' near-black default. */
   --color-fd-primary: oklch(0.596 0.145 163.23);
   --color-fd-primary-foreground: #ffffff;
