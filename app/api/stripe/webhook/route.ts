@@ -10,8 +10,12 @@ const HANDLED_PREFIX = 'customer.subscription.';
 
 export async function POST(req: NextRequest) {
   const stripe = getStripe();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!stripe || !webhookSecret) {
+  // Live and test mode each sign with their own secret, even for the same
+  // endpoint URL — try both rather than forcing a single mode to work.
+  const webhookSecrets = [process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_WEBHOOK_SECRET_TEST].filter(
+    (secret): secret is string => !!secret,
+  );
+  if (!stripe || webhookSecrets.length === 0) {
     return NextResponse.json({ error: 'Webhook not configured.' }, { status: 503 });
   }
 
@@ -24,16 +28,22 @@ export async function POST(req: NextRequest) {
   // req.json() first.
   const payload = await req.text();
 
-  let event: Stripe.Event;
-  try {
-    event = await stripe.webhooks.constructEventAsync(
-      payload,
-      signature,
-      webhookSecret,
-      undefined,
-      Stripe.createSubtleCryptoProvider(),
-    );
-  } catch {
+  let event: Stripe.Event | undefined;
+  for (const webhookSecret of webhookSecrets) {
+    try {
+      event = await stripe.webhooks.constructEventAsync(
+        payload,
+        signature,
+        webhookSecret,
+        undefined,
+        Stripe.createSubtleCryptoProvider(),
+      );
+      break;
+    } catch {
+      // Try the next secret before giving up.
+    }
+  }
+  if (!event) {
     return NextResponse.json({ error: 'Invalid signature.' }, { status: 400 });
   }
 
