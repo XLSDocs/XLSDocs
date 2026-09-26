@@ -1,0 +1,171 @@
+---
+title: BITOR
+description: Bitwise OR of two numbers — a result bit is 1 wherever either input has a 1 at that position.
+---
+
+Compare two non-negative integers bit by bit, returning a number
+whose bits are 1 wherever **either** input had a 1 at that same
+position — the function form of a bitwise OR.
+
+export const quickAnswerFacts = [
+  { text: 'Both numbers must be non-negative integers, at most 281,474,976,710,655 (2^48-1)', type: 'warn' },
+  { text: 'A result bit is 1 if EITHER number1 or number2 (or both) has a 1 at that position', type: 'check' },
+  { text: 'Commonly used to combine several individual flag bits into one packed value', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BITOR(number1, number2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BITOR(number1, number2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'A non-negative integer, at most 281,474,976,710,655 (2^48-1), in decimal form.',
+  },
+  {
+    name: 'number2',
+    type: 'number',
+    required: true,
+    description: 'A non-negative integer, at most 281,474,976,710,655 (2^48-1), in decimal form.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A decimal number representing the bitwise OR of `number1` and `number2`.
+
+## Description
+
+BITOR compares `number1` and `number2` one binary digit at a time.
+For each position, the result has a `1` if **either** number (or
+both) has a `1` there — a position only stays `0` if both numbers
+have `0` at that spot. This makes BITOR the natural way to combine
+several separately-set bits into one packed value, since OR-ing
+together numbers that each set a different bit turns all of those
+bits on at once without disturbing the others.
+
+<Callout type="warn">
+  Both arguments are read as **decimal** numbers, not binary text —
+  `BITOR(45, 21)` treats 45 and 21 as plain decimal integers and
+  compares their binary representations internally. To OR two values
+  that are already written as binary text (like `"101101"`), convert
+  them with [BIN2DEC](/docs/engineering/bin2dec) first.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '21': '61', '60': '61', '0': '45' }}
+  defaultValue="21"
+  label={'Live preview — =BITOR(45, {value})'}
+  fieldLabel="number2"
+/>
+
+45 is `101101` and 21 is `010101` — combined, every position that's
+`1` in either one turns on, giving `111101` = **61**. 60 (`111100`)
+happens to OR with 45 to the same `111101` = **61**, since between
+them every bit position is covered. OR-ing against 0 always returns
+the other number unchanged, since 0 has no bits of its own to add.
+
+## Common errors
+
+### #NUM! — a negative number, a non-integer, or a value over 2^48-1
+
+<ExcelCode>{`BITOR(-1, 5) → #NUM!`}</ExcelCode>
+
+Both `number1` and `number2` must be non-negative integers no larger
+than `281,474,976,710,655` (2^48-1). A negative number, a decimal like
+`4.5`, or a value beyond that ceiling all return `#NUM!`.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`BITOR("abc", 5) → #VALUE!`}</ExcelCode>
+
+Text that can't be read as a number returns `#VALUE!` rather than
+`#NUM!` — that error is reserved for numbers that are out of range,
+not for the wrong data type entirely.
+
+### Mixing up OR with AND
+
+<ExcelCode>{`BITOR(45, 0) → 45, not 0 — OR only needs ONE number to have the bit set`}</ExcelCode>
+
+A common slip is expecting BITOR to require agreement between both
+numbers the way BITAND does. BITOR is more permissive: a bit survives
+into the result as soon as *either* input has it, which is why
+OR-ing against 0 just returns the other number as-is.
+
+export const faqs = [
+  {
+    question: 'What is BITOR used for in practice?',
+    answer: 'Combining several individually-set flag bits into one packed value — each source number contributes whichever bits it has turned on, and OR-ing them together merges all of those bits into a single result without needing to add or track them separately.',
+  },
+  {
+    question: 'Can BITOR work on binary text like "101101" directly?',
+    answer: 'No — both arguments are read as decimal numbers. Convert binary text to a decimal number first with BIN2DEC, run BITOR, then convert the result back to binary with DEC2BIN if needed.',
+  },
+  {
+    question: 'Why does BITOR(45, 0) return 45 unchanged?',
+    answer: "Because OR only needs a bit to be set in at least one of the two numbers, and 0 contributes no bits of its own — so the result is exactly whatever bits number1 already had.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BITOR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BITOR(45, 21)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = Application.WorksheetFunction.BitOr(45, 21)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = 45 | 21  # Python's native bitwise OR operator
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BITAND](/docs/engineering/bitand) — sets a result bit only where
+  *both* numbers have it, instead of either.
+- [BITXOR](/docs/engineering/bitxor) — sets a result bit only where
+  the two numbers *differ*.
+- [BITLSHIFT](/docs/engineering/bitlshift) and
+  [BITRSHIFT](/docs/engineering/bitrshift) — shift a number's bits
+  left or right instead of comparing two numbers.
+- [DEC2BIN](/docs/engineering/dec2bin) — see the actual binary digits
+  BITOR is comparing, as text.

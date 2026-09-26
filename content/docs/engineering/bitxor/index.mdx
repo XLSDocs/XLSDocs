@@ -1,0 +1,173 @@
+---
+title: BITXOR
+description: Bitwise exclusive OR of two numbers — a result bit is 1 only where the two inputs differ at that position.
+---
+
+Compare two non-negative integers bit by bit, returning a number
+whose bits are 1 exactly where the two inputs **differ** at that
+position — the function form of a bitwise exclusive OR (XOR).
+
+export const quickAnswerFacts = [
+  { text: 'Both numbers must be non-negative integers, at most 281,474,976,710,655 (2^48-1)', type: 'warn' },
+  { text: 'A result bit is 1 only where number1 and number2 DISAGREE at that position — 0 where they match', type: 'check' },
+  { text: 'A number XORed with itself always returns 0, since every position agrees', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BITXOR(number1, number2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BITXOR(number1, number2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'A non-negative integer, at most 281,474,976,710,655 (2^48-1), in decimal form.',
+  },
+  {
+    name: 'number2',
+    type: 'number',
+    required: true,
+    description: 'A non-negative integer, at most 281,474,976,710,655 (2^48-1), in decimal form.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A decimal number representing the bitwise exclusive OR (XOR) of
+`number1` and `number2`.
+
+## Description
+
+BITXOR compares `number1` and `number2` one binary digit at a time.
+For each position, the result has a `1` only when the two numbers
+**disagree** at that position (one is `0` and the other is `1`) — a
+position where both numbers match, whether both `0` or both `1`,
+becomes `0` in the result. XOR is commonly used to spot exactly which
+bits changed between two values, or to toggle a specific bit on or off
+without affecting any others.
+
+<Callout type="warn">
+  Unlike a plain "difference," XOR treats a matching pair of `1`s
+  exactly the same as a matching pair of `0`s — both become `0` in the
+  result. `BITXOR(5, 3)` (`101` vs `011`) returns `6` (`110`), not
+  some measure of how far apart 5 and 3 are numerically — the two
+  share a `1` at position 0, which cancels to `0`, while positions 1
+  and 2 disagree and survive.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '21': '56', '60': '17', '0': '45' }}
+  defaultValue="21"
+  label={'Live preview — =BITXOR(45, {value})'}
+  fieldLabel="number2"
+/>
+
+45 is `101101` and 21 is `010101` — every position disagrees except
+positions 2 and 0, giving `111000` = **56**. Against 60 (`111100`),
+only positions 5 and 3 disagree, giving `010001` = **17**. XORing
+against 0 always returns the other number unchanged, since a number
+never disagrees with a string of all-`0`s.
+
+## Common errors
+
+### #NUM! — a negative number, a non-integer, or a value over 2^48-1
+
+<ExcelCode>{`BITXOR(-1, 5) → #NUM!`}</ExcelCode>
+
+Both `number1` and `number2` must be non-negative integers no larger
+than `281,474,976,710,655` (2^48-1). A negative number, a decimal like
+`4.5`, or a value beyond that ceiling all return `#NUM!`.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`BITXOR("abc", 5) → #VALUE!`}</ExcelCode>
+
+Text that can't be read as a number returns `#VALUE!` rather than
+`#NUM!` — that error is reserved for numbers that are out of range,
+not for the wrong data type entirely.
+
+### Forgetting that matching 1s cancel out too
+
+<ExcelCode>{`BITXOR(5, 5) → 0 — identical numbers always XOR to 0`}</ExcelCode>
+
+It's easy to assume XOR only cancels matching `0`s and preserves
+matching `1`s. It cancels **both** — any position where the two
+numbers agree, regardless of which value they agree on, becomes `0`.
+XORing a number with itself always returns 0 for exactly this reason.
+
+export const faqs = [
+  {
+    question: 'What is BITXOR used for in practice?',
+    answer: "Detecting which bits differ between two values — for example, comparing a value's old and new state to find exactly which flags changed — or toggling a specific bit on or off by XORing against a mask, since XORing the same bit twice restores its original value.",
+  },
+  {
+    question: 'Why does BITXOR(5, 5) return 0?',
+    answer: 'Because XOR returns 0 wherever the two inputs agree, and a number compared against itself agrees at every single position — there is nowhere left for a 1 to appear.',
+  },
+  {
+    question: 'Is BITXOR the same as taking the difference between two numbers?',
+    answer: "No — XOR operates bit by bit, not numerically. BITXOR(5, 3) returns 6, not 2 (the arithmetic difference), because it's comparing binary digits at each position independently rather than subtracting the two values.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BITXOR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BITXOR(45, 21)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = Application.WorksheetFunction.BitXor(45, 21)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = 45 ^ 21  # Python's native bitwise XOR operator
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BITAND](/docs/engineering/bitand) — sets a result bit only where
+  *both* numbers have it.
+- [BITOR](/docs/engineering/bitor) — sets a result bit where *either*
+  number has it.
+- [BITLSHIFT](/docs/engineering/bitlshift) and
+  [BITRSHIFT](/docs/engineering/bitrshift) — shift a number's bits
+  left or right instead of comparing two numbers.
+- [DEC2BIN](/docs/engineering/dec2bin) — see the actual binary digits
+  BITXOR is comparing, as text.

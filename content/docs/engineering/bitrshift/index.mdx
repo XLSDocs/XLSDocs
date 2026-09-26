@@ -1,0 +1,174 @@
+---
+title: BITRSHIFT
+description: Shift a number's bits right by a given amount — equivalent to stripping digits off the end of its binary representation.
+---
+
+Shift `number`'s binary digits right by `shift_amount` positions,
+discarding whatever falls off the right-hand end — the same operation
+as stripping `shift_amount` digits off the end of `number`'s binary
+representation.
+
+export const quickAnswerFacts = [
+  { text: 'number must be a non-negative integer, at most 281,474,976,710,655 (2^48-1)', type: 'warn' },
+  { text: 'shift_amount must have an absolute value of 53 or less', type: 'warn' },
+  { text: 'A negative shift_amount shifts LEFT instead — equivalent to BITLSHIFT', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BITRSHIFT(number, shift_amount)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BITRSHIFT(number, shift_amount)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'A non-negative integer, at most 281,474,976,710,655 (2^48-1).',
+  },
+  {
+    name: 'shift_amount',
+    type: 'number',
+    required: true,
+    description: 'An integer with an absolute value of 53 or less — how many bit positions to shift right.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` with its bits shifted right by `shift_amount` positions.
+
+## Description
+
+Shifting right is the same as stripping `shift_amount` digits off the
+right-hand end of `number`'s binary form: `13` (`1101` in binary)
+shifted right by 2 becomes `11`, which is 3 — the whatever-falls-off
+digits are simply discarded, not rounded. This is equivalent to
+integer division by `2^shift_amount`, always rounding toward zero. A
+**negative** `shift_amount` reverses direction and shifts left
+instead, producing the exact same result as calling
+[BITLSHIFT](/docs/engineering/bitlshift) with the equivalent positive
+amount.
+
+<Callout type="warn">
+  The digits that fall off the right are gone, not rounded —
+  `BITRSHIFT(15, 1)` (`1111` shifted right by 1) returns `7`
+  (`111`), not `7.5` or `8`. Treat a right shift as always truncating
+  toward zero, the same way `INT` truncates a division result rather
+  than rounding it.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '22', '2': '11', '-2': '180' }}
+  defaultValue="2"
+  label={'Live preview — =BITRSHIFT(45, {value})'}
+  fieldLabel="shift_amount"
+/>
+
+45 is `101101` in binary. Shifting right by 1 strips the rightmost
+digit (`10110` = **22**); shifting right by 2 strips two (`1011` =
+**11**). A shift_amount of **-2** reverses direction, appending 2
+zeros instead (`10110100` = **180**) — the exact same result
+[BITLSHIFT](/docs/engineering/bitlshift) gives for a *positive*
+shift of 2 on the same number.
+
+## Common errors
+
+### #NUM! — number negative/non-integer, or shift_amount's absolute value over 53
+
+<ExcelCode>{`BITRSHIFT(45, 60) → #NUM! (60 exceeds the maximum shift_amount of 53)`}</ExcelCode>
+
+`number` must be a non-negative integer no larger than
+`281,474,976,710,655` (2^48-1), and `shift_amount`'s absolute value
+can't exceed 53. Either violation returns `#NUM!`.
+
+### Expecting rounding instead of truncation
+
+<ExcelCode>{`BITRSHIFT(15, 1) → 7, not 7.5 or 8 — the dropped bit is simply discarded`}</ExcelCode>
+
+A right shift always rounds toward zero by discarding whatever bits
+fall off the end — it never rounds up or averages. Treat the result
+the same way you'd treat `INT(15 / 2)`, not `ROUND(15 / 2, 0)`.
+
+### Forgetting a negative shift_amount reverses direction
+
+<ExcelCode>{`BITRSHIFT(45, -2) → 180, not an error — a negative shift_amount shifts LEFT`}</ExcelCode>
+
+A negative `shift_amount` isn't invalid — it flips BITRSHIFT into a
+left shift, identical to calling BITLSHIFT with the positive
+equivalent, and can therefore trigger the same overflow #NUM! that
+BITLSHIFT can if the result gets too large.
+
+export const faqs = [
+  {
+    question: 'What does BITRSHIFT actually compute?',
+    answer: "It divides number by 2 raised to the power of shift_amount and discards any remainder, expressed in terms of stripping binary digits off the right — BITRSHIFT(13, 2) is 13 ÷ 2² truncated to 3, the same answer either way of thinking about it.",
+  },
+  {
+    question: 'What happens with a negative shift_amount?',
+    answer: 'BITRSHIFT shifts left instead of right, producing the same result BITLSHIFT would give for the positive version of that same amount. BITRSHIFT(45, -2) equals BITLSHIFT(45, 2).',
+  },
+  {
+    question: 'Does BITRSHIFT round the result?',
+    answer: 'No — it truncates. Any bits that fall off the right-hand end during the shift are simply discarded, equivalent to integer division rounding toward zero rather than to the nearest whole number.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BITRSHIFT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BITRSHIFT(45, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = Application.WorksheetFunction.BitRshift(45, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = 45 >> 2  # Python's native right-shift operator
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BITLSHIFT](/docs/engineering/bitlshift) — shifts left instead of
+  right; a negative shift_amount on either function is equivalent to
+  a positive shift_amount on the other.
+- [BITAND](/docs/engineering/bitand), [BITOR](/docs/engineering/bitor),
+  and [BITXOR](/docs/engineering/bitxor) — compare two numbers'
+  bits directly instead of shifting one number's bits.
+- [DEC2BIN](/docs/engineering/dec2bin) — see the actual binary digits
+  BITRSHIFT is shifting, as text.

@@ -1,0 +1,173 @@
+---
+title: BITLSHIFT
+description: Shift a number's bits left by a given amount — equivalent to appending zeros to its binary representation.
+---
+
+Shift `number`'s binary digits left by `shift_amount` positions,
+filling the vacated positions on the right with zeros — the same
+operation as appending `shift_amount` zeros to the end of `number`'s
+binary representation.
+
+export const quickAnswerFacts = [
+  { text: 'number must be a non-negative integer, at most 281,474,976,710,655 (2^48-1)', type: 'warn' },
+  { text: 'shift_amount must have an absolute value of 53 or less', type: 'warn' },
+  { text: 'A negative shift_amount shifts RIGHT instead — equivalent to BITRSHIFT', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BITLSHIFT(number, shift_amount)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BITLSHIFT(number, shift_amount)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'A non-negative integer, at most 281,474,976,710,655 (2^48-1).',
+  },
+  {
+    name: 'shift_amount',
+    type: 'number',
+    required: true,
+    description: 'An integer with an absolute value of 53 or less — how many bit positions to shift left.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` with its bits shifted left by `shift_amount` positions.
+
+## Description
+
+Shifting left is the same as appending `shift_amount` zeros to the
+right of `number`'s binary form: `4` (`100` in binary) shifted left
+by 2 becomes `10000`, which is 16 — the same result as multiplying by
+`2^shift_amount`. A **negative** `shift_amount` reverses direction and
+shifts right instead, producing the exact same result as calling
+[BITRSHIFT](/docs/engineering/bitrshift) with the equivalent positive
+amount.
+
+<Callout type="warn">
+  A shift can push the result **past** the 2^48-1 ceiling even when
+  `number` and `shift_amount` are each individually valid on their
+  own — Excel checks the *result*, not just the inputs. `BITLSHIFT(2^40,
+  10)` would produce `2^50`, which exceeds 2^48-1, so it returns
+  `#NUM!` even though `2^40` and `10` both pass their own individual
+  range checks.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '90', '2': '180', '-2': '11' }}
+  defaultValue="2"
+  label={'Live preview — =BITLSHIFT(45, {value})'}
+  fieldLabel="shift_amount"
+/>
+
+45 is `101101` in binary. Shifting left by 1 appends a single zero
+(`1011010` = **90**); shifting left by 2 appends two (`10110100` =
+**180**). A shift_amount of **-2** reverses direction, stripping the
+rightmost 2 digits instead (`1011` = **11**) — the exact same result
+[BITRSHIFT](/docs/engineering/bitrshift) gives for a *positive*
+shift of 2 on the same number.
+
+## Common errors
+
+### #NUM! — the shifted result exceeds 2^48-1
+
+<ExcelCode>{`BITLSHIFT(2^40, 10) → #NUM! (the result would be 2^50, past the 2^48-1 ceiling)`}</ExcelCode>
+
+Even a `number` and `shift_amount` that are each independently valid
+can produce a result too large to represent — Excel returns `#NUM!`
+in that case rather than a wrapped-around or truncated value.
+
+### #NUM! — number negative/non-integer, or shift_amount's absolute value over 53
+
+<ExcelCode>{`BITLSHIFT(45, 60) → #NUM! (60 exceeds the maximum shift_amount of 53)`}</ExcelCode>
+
+`number` must be a non-negative integer, and `shift_amount`'s absolute
+value can't exceed 53 — either violation returns `#NUM!`, independent
+of the result-overflow check above.
+
+### Forgetting a negative shift_amount reverses direction
+
+<ExcelCode>{`BITLSHIFT(45, -2) → 11, not an error — a negative shift_amount shifts RIGHT`}</ExcelCode>
+
+A negative `shift_amount` isn't invalid — it flips BITLSHIFT into a
+right shift, identical to calling BITRSHIFT with the positive
+equivalent. Don't assume a negative shift_amount is a mistake to
+guard against.
+
+export const faqs = [
+  {
+    question: 'What does BITLSHIFT actually compute?',
+    answer: "It multiplies number by 2 raised to the power of shift_amount, expressed in terms of shifting binary digits left and filling in zeros on the right — BITLSHIFT(4, 2) is 4 × 2² = 16, the same answer either way of thinking about it.",
+  },
+  {
+    question: 'What happens with a negative shift_amount?',
+    answer: 'BITLSHIFT shifts right instead of left, producing the same result BITRSHIFT would give for the positive version of that same amount. BITLSHIFT(45, -2) equals BITRSHIFT(45, 2).',
+  },
+  {
+    question: 'Why can BITLSHIFT return #NUM! even when both arguments look valid?',
+    answer: "Because Excel also checks whether the shifted RESULT fits within 2^48-1, not just whether number and shift_amount individually pass their own range checks. A large enough number shifted left far enough can overflow that ceiling even though each input was valid on its own.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BITLSHIFT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BITLSHIFT(45, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = Application.WorksheetFunction.BitLshift(45, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = 45 << 2  # Python's native left-shift operator
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BITRSHIFT](/docs/engineering/bitrshift) — shifts right instead of
+  left; a negative shift_amount on either function is equivalent to a
+  positive shift_amount on the other.
+- [BITAND](/docs/engineering/bitand), [BITOR](/docs/engineering/bitor),
+  and [BITXOR](/docs/engineering/bitxor) — compare two numbers'
+  bits directly instead of shifting one number's bits.
+- [DEC2BIN](/docs/engineering/dec2bin) — see the actual binary digits
+  BITLSHIFT is shifting, as text.
