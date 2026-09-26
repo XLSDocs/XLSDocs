@@ -1,0 +1,141 @@
+---
+title: IMREAL
+description: Extract the real coefficient from a complex number written as text.
+---
+
+Pull the real coefficient `x` out of a complex number written as text
+in `x + yi` (or `x + yj`) form.
+
+export const quickAnswerFacts = [
+  { text: 'inumber must be text in x + yi or x + yj format — a plain real number also works, treated as having 0i', type: 'check' },
+  { text: 'Returns a plain number, not text — the reverse of what COMPLEX produces', type: 'check' },
+  { text: 'An unparseable inumber returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMREAL(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMREAL(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to extract the real coefficient from.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The real coefficient `x` of `inumber`, as a plain number.
+
+## Description
+
+IMREAL parses `inumber`'s text and returns just the real part, discarding
+the imaginary term entirely. A plain number with no imaginary suffix at
+all — `IMREAL(4)` — still works, returning `4`, since a real number is
+just a complex number with an imaginary coefficient of 0.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '3', '1-2i': '1', '5-12i': '5' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMREAL("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMREAL("3+4i")` returns `3` — just the real coefficient, with the
+`+4i` term dropped entirely. The sign of the imaginary part doesn't
+affect the real part at all: `IMREAL("1-2i")` still returns the plain
+real coefficient, `1`.
+
+## Common errors
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMREAL("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting IMREAL to also validate the suffix
+
+<ExcelCode>{`IMREAL("3+4i") and IMREAL("3+4j") both return 3 — IMREAL doesn't care which suffix was used`}</ExcelCode>
+
+Unlike functions that combine two or more complex numbers (which
+require matching suffixes), IMREAL only ever looks at a single
+`inumber` — there's no second value to mismatch against, so it accepts
+either suffix without complaint.
+
+export const faqs = [
+  {
+    question: 'Does IMREAL work on a plain number, not just complex-number text?',
+    answer: 'Yes — a plain number is treated as a complex number with an imaginary coefficient of 0, so IMREAL(4) simply returns 4.',
+  },
+  {
+    question: 'What is the opposite of IMREAL?',
+    answer: 'COMPLEX builds a complex number back up from separate real and imaginary coefficients — COMPLEX(IMREAL(z), IMAGINARY(z)) reconstructs the original complex number z (assuming its default "i" suffix).',
+  },
+  {
+    question: 'Does IMREAL care whether the suffix is "i" or "j"?',
+    answer: "No — since IMREAL only reads one complex number at a time, there's no second value it could mismatch against, so either suffix parses the same way.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMREAL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMREAL("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Imreal("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    z = complex(3, 4)
+    result = z.real
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMAGINARY](/docs/engineering/imaginary) — extracts the imaginary
+  coefficient instead of the real one.
+- [COMPLEX](/docs/engineering/complex) — the reverse operation,
+  building a complex number from separate coefficients.
+- [IMABS](/docs/engineering/imabs) — the overall magnitude of a
+  complex number, combining both coefficients.

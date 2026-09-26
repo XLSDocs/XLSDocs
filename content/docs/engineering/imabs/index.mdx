@@ -1,0 +1,147 @@
+---
+title: IMABS
+description: The absolute value (modulus) of a complex number — its distance from the origin on the complex plane.
+---
+
+Compute the absolute value, or modulus, of a complex number — the
+straight-line distance from the origin to the point `(x, y)` on the
+complex plane, using the same Pythagorean formula as a right triangle.
+
+export const quickAnswerFacts = [
+  { text: 'IMABS(x + yi) = SQRT(x² + y²) — the same formula as a right triangle\'s hypotenuse', type: 'check' },
+  { text: 'Always returns a non-negative real number, regardless of the signs of x or y', type: 'check' },
+  { text: 'An unparseable inumber returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMABS(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMABS(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the absolute value of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The absolute value (modulus) of `inumber`, as a non-negative real
+number.
+
+## Description
+
+For a complex number `x + yi`, IMABS computes `√(x² + y²)` — exactly
+the same formula used to find the hypotenuse of a right triangle with
+legs `x` and `y`. Geometrically, this is the distance from the origin
+to the point the complex number represents on the complex plane, which
+is why the result is always non-negative regardless of whether `x` or
+`y` themselves are negative.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '5', '5+12i': '13', '8+6i': '10' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMABS("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMABS("3+4i")` returns `5` — the familiar 3-4-5 right triangle,
+since `√(3² + 4²) = √25 = 5`. `"5+12i"` and `"8+6i"` are two more
+whole-number ("Pythagorean triple") examples, giving `13` and `10`
+respectively.
+
+## Common errors
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMABS("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting a negative result from a negative coefficient
+
+<ExcelCode>{`IMABS("3-4i") → 5, not -5 — the result is always non-negative`}</ExcelCode>
+
+Since IMABS measures a distance, the sign of `x` or `y` never carries
+through to the result. `"3-4i"` and `"3+4i"` are different points on
+the complex plane, but they're the same distance from the origin, so
+IMABS returns the same magnitude for both.
+
+export const faqs = [
+  {
+    question: 'What does IMABS actually measure?',
+    answer: "The distance from the origin to the point (x, y) that the complex number x + yi represents on the complex plane — computed with the same Pythagorean formula, √(x² + y²), used for a right triangle's hypotenuse.",
+  },
+  {
+    question: 'Can IMABS return a negative number?',
+    answer: "No — it's a distance, which is always zero or positive, regardless of the signs of the complex number's real and imaginary coefficients.",
+  },
+  {
+    question: 'Is IMABS related to IMARGUMENT?',
+    answer: "Yes — together they describe a complex number in polar form. IMABS gives the distance from the origin (the radius), and IMARGUMENT gives the angle from the positive real axis (the theta) — the same complex number, described two different ways.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMABS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMABS("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Imabs("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    z = complex(3, 4)
+    result = abs(z)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMARGUMENT](/docs/engineering/imargument) — the angle component
+  that, together with IMABS, fully describes a complex number in
+  polar form.
+- [IMREAL](/docs/engineering/imreal) and
+  [IMAGINARY](/docs/engineering/imaginary) — the individual
+  coefficients IMABS combines.
+- [IMCONJUGATE](/docs/engineering/imconjugate) — a related
+  transformation that leaves the magnitude unchanged.

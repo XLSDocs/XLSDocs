@@ -1,0 +1,167 @@
+---
+title: IMSUM
+description: Add two or more complex numbers together, matching real parts with real and imaginary parts with imaginary.
+---
+
+Add together 1 to 255 complex numbers, each written as text in `x +
+yi` (or `x + yj`) form — real coefficients combine with real, and
+imaginary coefficients combine with imaginary.
+
+export const quickAnswerFacts = [
+  { text: 'Accepts 1 to 255 complex numbers as separate arguments', type: 'check' },
+  { text: 'All arguments must use the SAME suffix ("i" or "j") — mixing them returns #VALUE!', type: 'warn' },
+  { text: 'A plain real number works as an argument too, treated as having 0i', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=IMSUM(inumber1, [inumber2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMSUM(inumber1, [inumber2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber1',
+    type: 'text',
+    required: true,
+    description: 'The first complex number, as text in x + yi or x + yj form.',
+  },
+  {
+    name: 'inumber2, ...',
+    type: 'text',
+    required: false,
+    description: 'Up to 254 additional complex numbers to add, all using the same suffix as inumber1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of all supplied complex numbers, as text in `x + yi`/`x + yj`
+form.
+
+## Description
+
+IMSUM adds complex numbers the way complex addition actually works:
+real parts add to real parts, and imaginary parts add to imaginary
+parts, independently — `(a + bi) + (c + di) = (a+c) + (b+d)i`. It
+accepts anywhere from 1 to 255 arguments, so it can total up a whole
+range of complex numbers in one call, not just two at a time.
+
+<Callout type="warn">
+  Every argument must use the **same** suffix. `IMSUM("3+4i", "1-2j")`
+  — one `i`, one `j` — returns `#VALUE!` rather than silently picking
+  one convention. Mixing suffixes anywhere in a chain of complex-number
+  formulas is one of the most common ways this whole function family
+  breaks.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1-2i': '4+2i', '4-3i': '7+i', 'i': '3+5i' }}
+  defaultValue="1-2i"
+  label={'Live preview — =IMSUM("3+4i", "{value}")'}
+  fieldLabel="inumber2"
+/>
+
+`IMSUM("3+4i", "1-2i")` returns `4+2i` — the real parts `3` and `1` add
+to `4`, and the imaginary parts `4` and `-2` add to `2`. Adding the
+pure imaginary unit `"i"` (that is, `"0+1i"`) only affects the
+imaginary side, giving `3+5i`.
+
+## Common errors
+
+### #VALUE! — mismatched suffixes across arguments
+
+<ExcelCode>{`IMSUM("3+4i", "1-2j") → #VALUE! — one argument uses "i", the other uses "j"`}</ExcelCode>
+
+Every complex number passed to IMSUM has to use the same suffix
+throughout the whole call. Pick one convention (usually whichever the
+rest of the sheet already uses) and stick with it.
+
+### #NUM! — an argument that isn't a valid complex number
+
+<ExcelCode>{`IMSUM("3+4i", "hello") → #NUM!`}</ExcelCode>
+
+Every argument has to be parseable as `x + yi`/`x + yj` text (or a
+plain number). Text that doesn't match that pattern at all returns
+`#NUM!`.
+
+### Trying to add complex numbers with the + operator directly
+
+<ExcelCode>{`"3+4i" + "1-2i" → #VALUE! — Excel can't add two text strings with +`}</ExcelCode>
+
+Since complex numbers are stored as text, the ordinary `+` operator
+can't combine them the way it combines actual numbers — IMSUM exists
+specifically because plain arithmetic operators don't understand this
+text format at all.
+
+export const faqs = [
+  {
+    question: 'How many complex numbers can IMSUM add at once?',
+    answer: 'Between 1 and 255, passed as separate arguments — useful for totaling an entire range of complex values in a single formula rather than chaining several two-at-a-time additions.',
+  },
+  {
+    question: 'Why can\'t I just use the + operator to add two complex numbers?',
+    answer: 'Complex numbers in Excel are stored as text ("3+4i"), not as a native numeric type, so the ordinary + operator has no way to interpret or combine them. IMSUM is the dedicated function that actually parses that text and performs real complex addition.',
+  },
+  {
+    question: 'What happens if I mix "i" and "j" suffixes in one IMSUM call?',
+    answer: 'It returns #VALUE! — every complex number passed to IMSUM (or any function combining two or more complex numbers) must use the same suffix throughout the call.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMSUM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMSUM("3+4i", "1-2i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imsum("3+4i", "1-2i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = complex(3, 4) + complex(1, -2)  # (4+2j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMSUB](/docs/engineering/imsub) — subtracts one complex number
+  from another instead of summing them.
+- [IMPRODUCT](/docs/engineering/improduct) and
+  [IMDIV](/docs/engineering/imdiv) — multiply or divide complex
+  numbers instead of adding them.
+- [COMPLEX](/docs/engineering/complex) — builds the complex-number
+  text that IMSUM's arguments expect.

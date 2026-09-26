@@ -1,0 +1,170 @@
+---
+title: IMDIV
+description: Divide one complex number by another, using the conjugate trick to eliminate the imaginary denominator.
+---
+
+Divide `inumber1` by `inumber2` — two complex numbers, each written as
+text in `x + yi` (or `x + yj`) form.
+
+export const quickAnswerFacts = [
+  { text: 'IMDIV takes exactly two arguments — a dividend and a divisor, in that order', type: 'check' },
+  { text: 'Both arguments must use the SAME suffix ("i" or "j") — mixing them returns #VALUE!', type: 'warn' },
+  { text: 'Dividing by 0 (zero) returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMDIV(inumber1, inumber2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMDIV(inumber1, inumber2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber1',
+    type: 'text',
+    required: true,
+    description: 'The complex numerator (dividend), as text in x + yi or x + yj form.',
+  },
+  {
+    name: 'inumber2',
+    type: 'text',
+    required: true,
+    description: 'The complex denominator (divisor), using the same suffix as inumber1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`inumber1` divided by `inumber2`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+Dividing directly by a complex denominator isn't straightforward, so
+IMDIV uses the standard trick: multiply both the numerator and
+denominator by the denominator's
+[complex conjugate](/docs/engineering/imconjugate). That turns the
+denominator into a purely real number (`c² + d²`), leaving an ordinary
+division to finish the job — `(a+bi)/(c+di) = [(ac+bd) + (bc-ad)i] /
+(c²+d²)`.
+
+<Callout type="warn">
+  Dividing by **zero** (`"0"` or `"0+0i"`) returns `#NUM!`, the same
+  way ordinary division by zero would — a zero denominator makes the
+  `c² + d²` term in the conjugate trick zero too, which is exactly the
+  undefined division the error is protecting against.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1-2i': '-1+2i', '4-3i': 'i', '3+4i': '1' }}
+  defaultValue="1-2i"
+  label={'Live preview — =IMDIV("3+4i", "{value}")'}
+  fieldLabel="inumber2"
+/>
+
+`IMDIV("3+4i", "1-2i")` returns `-1+2i`. Dividing `3+4i` by `4-3i`
+lands on exactly `i` — since `i × (4-3i) = 4i - 3i² = 3+4i`, the
+division undoes that multiplication cleanly. Dividing any complex
+number by itself, unsurprisingly, always returns `1`.
+
+## Common errors
+
+### #NUM! — dividing by zero
+
+<ExcelCode>{`IMDIV("3+4i", "0") → #NUM!`}</ExcelCode>
+
+A zero divisor is undefined for complex division the same way it is
+for ordinary division — Excel returns `#NUM!` instead of a value.
+
+### #VALUE! — mismatched suffixes across arguments
+
+<ExcelCode>{`IMDIV("3+4i", "1-2j") → #VALUE! — one argument uses "i", the other uses "j"`}</ExcelCode>
+
+Both complex numbers passed to IMDIV have to use the same suffix.
+
+### #NUM! — an argument that isn't a valid complex number
+
+<ExcelCode>{`IMDIV("3+4i", "hello") → #NUM!`}</ExcelCode>
+
+Both arguments have to be parseable as `x + yi`/`x + yj` text (or a
+plain number). Text that doesn't match that pattern at all returns
+`#NUM!`.
+
+### Getting the argument order backwards
+
+<ExcelCode>{`IMDIV("1-2i", "3+4i") is NOT the same as IMDIV("3+4i", "1-2i") — division isn't commutative`}</ExcelCode>
+
+`inumber1` is always the numerator and `inumber2` is always the
+denominator — swapping them gives the reciprocal-ish result, not the
+same answer, just as with ordinary division.
+
+export const faqs = [
+  {
+    question: 'How does IMDIV actually divide two complex numbers?',
+    answer: "It multiplies both the numerator and denominator by the denominator's complex conjugate. That turns the denominator into a purely real number (the sum of its coefficients squared), after which the division is a straightforward real-number calculation.",
+  },
+  {
+    question: 'Why does dividing by zero return #NUM! instead of #DIV/0!?',
+    answer: "Excel's complex-number functions consistently use #NUM! for out-of-range or undefined inputs, including a zero divisor here — rather than reusing #DIV/0!, which is reserved for the ordinary division operator and functions like plain division.",
+  },
+  {
+    question: 'Does the order of arguments matter in IMDIV?',
+    answer: "Yes — IMDIV(a, b) computes a divided by b, not b divided by a. These give different results in general, exactly as with ordinary real-number division.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMDIV from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMDIV("3+4i", "1-2i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imdiv("3+4i", "1-2i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = complex(3, 4) / complex(1, -2)  # (-1+2j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMPRODUCT](/docs/engineering/improduct) — the inverse operation,
+  multiplying complex numbers instead of dividing them.
+- [IMCONJUGATE](/docs/engineering/imconjugate) — the technique IMDIV
+  uses internally to eliminate the complex denominator.
+- [IMSUM](/docs/engineering/imsum) and
+  [IMSUB](/docs/engineering/imsub) — add or subtract complex numbers
+  instead of dividing them.

@@ -1,0 +1,148 @@
+---
+title: IMAGINARY
+description: Extract the imaginary coefficient from a complex number written as text.
+---
+
+Pull the imaginary coefficient `y` out of a complex number written as
+text in `x + yi` (or `x + yj`) form.
+
+export const quickAnswerFacts = [
+  { text: 'inumber must be text in x + yi or x + yj format — a plain real number also works, returning 0', type: 'check' },
+  { text: 'Returns a plain number, not text, and without the "i"/"j" suffix attached', type: 'check' },
+  { text: 'An unparseable inumber returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMAGINARY(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMAGINARY(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to extract the imaginary coefficient from.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The imaginary coefficient `y` of `inumber`, as a plain number (without
+the `i`/`j` suffix).
+
+## Description
+
+IMAGINARY parses `inumber`'s text and returns just the imaginary
+coefficient, discarding the real term and the suffix letter itself. A
+plain real number with no imaginary part — `IMAGINARY(4)` — returns
+`0`, since a real number is just a complex number whose imaginary
+coefficient happens to be zero.
+
+<Callout type="warn">
+  The result is a bare number, not `"4i"` or similar — `IMAGINARY("0-j")`
+  returns the number `-1`, not the text `"-j"` or `"-1j"`. It's easy to
+  expect the suffix to carry through, but IMAGINARY strips it entirely.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '4', '1-2i': '-2', '5-12i': '-12' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMAGINARY("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMAGINARY("3+4i")` returns `4` — just the imaginary coefficient, with
+the `3+` real term and the `i` suffix both dropped. A negative
+imaginary term, like in `"1-2i"`, comes back as a genuinely negative
+number (`-2`), not as `2` with the sign discarded.
+
+## Common errors
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMAGINARY("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting the suffix to carry through into the result
+
+<ExcelCode>{`IMAGINARY("3+4i") → 4, not "4i" — the suffix is stripped from the returned number`}</ExcelCode>
+
+IMAGINARY always returns a plain number. If the result needs to be
+displayed back as part of a complex number (with its `i`/`j` suffix
+restored), rebuild it with [COMPLEX](/docs/engineering/complex).
+
+export const faqs = [
+  {
+    question: 'Why does IMAGINARY("0-j") return -1 and not "-j"?',
+    answer: 'IMAGINARY always strips the suffix and returns just the bare numeric coefficient — "0-j" is shorthand for a coefficient of -1 on the imaginary unit, so -1 is exactly what the function returns.',
+  },
+  {
+    question: 'Does IMAGINARY work on a plain number, not just complex-number text?',
+    answer: 'Yes — a plain number is treated as a complex number with an imaginary coefficient of 0, so IMAGINARY(4) simply returns 0.',
+  },
+  {
+    question: 'What is the opposite of IMAGINARY?',
+    answer: 'COMPLEX builds a complex number back up from separate real and imaginary coefficients — COMPLEX(IMREAL(z), IMAGINARY(z)) reconstructs the original complex number z (assuming its default "i" suffix).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMAGINARY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMAGINARY("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Imaginary("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    z = complex(3, 4)
+    result = z.imag
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMREAL](/docs/engineering/imreal) — extracts the real coefficient
+  instead of the imaginary one.
+- [COMPLEX](/docs/engineering/complex) — the reverse operation,
+  building a complex number from separate coefficients.
+- [IMABS](/docs/engineering/imabs) — the overall magnitude of a
+  complex number, combining both coefficients.

@@ -1,0 +1,163 @@
+---
+title: IMSUB
+description: Subtract one complex number from another, matching real parts with real and imaginary parts with imaginary.
+---
+
+Subtract `inumber2` from `inumber1` — two complex numbers, each
+written as text in `x + yi` (or `x + yj`) form.
+
+export const quickAnswerFacts = [
+  { text: 'IMSUB takes exactly two arguments — unlike IMSUM, it doesn\'t accept more than two numbers', type: 'check' },
+  { text: 'Both arguments must use the SAME suffix ("i" or "j") — mixing them returns #VALUE!', type: 'warn' },
+  { text: 'A plain real number works as an argument too, treated as having 0i', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=IMSUB(inumber1, inumber2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMSUB(inumber1, inumber2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber1',
+    type: 'text',
+    required: true,
+    description: 'The complex number to subtract inumber2 from, as text in x + yi or x + yj form.',
+  },
+  {
+    name: 'inumber2',
+    type: 'text',
+    required: true,
+    description: 'The complex number to subtract, using the same suffix as inumber1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`inumber1` minus `inumber2`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMSUB subtracts complex numbers the way complex subtraction actually
+works: real parts subtract from real parts, and imaginary parts
+subtract from imaginary parts, independently — `(a + bi) - (c + di) =
+(a-c) + (b-d)i`. Unlike [IMSUM](/docs/engineering/imsum), which
+accepts up to 255 arguments, IMSUB only ever takes exactly two — order
+matters here (`inumber1 - inumber2`), so there's no ambiguous way to
+extend it to more terms.
+
+<Callout type="warn">
+  Both arguments must use the **same** suffix. `IMSUB("3+4i", "1-2j")`
+  — one `i`, one `j` — returns `#VALUE!` rather than silently picking
+  one convention.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1-2i': '2+6i', '4-3i': '-1+7i', 'i': '3+3i' }}
+  defaultValue="1-2i"
+  label={'Live preview — =IMSUB("3+4i", "{value}")'}
+  fieldLabel="inumber2"
+/>
+
+`IMSUB("3+4i", "1-2i")` returns `2+6i` — the real parts `3` and `1`
+subtract to `2`, and the imaginary parts `4` and `-2` subtract to `6`
+(since subtracting a negative adds). Subtracting the pure imaginary
+unit `"i"` only affects the imaginary side, giving `3+3i`.
+
+## Common errors
+
+### #VALUE! — mismatched suffixes across arguments
+
+<ExcelCode>{`IMSUB("3+4i", "1-2j") → #VALUE! — one argument uses "i", the other uses "j"`}</ExcelCode>
+
+Both complex numbers passed to IMSUB have to use the same suffix. Pick
+one convention and stick with it throughout the calculation.
+
+### #NUM! — an argument that isn't a valid complex number
+
+<ExcelCode>{`IMSUB("3+4i", "hello") → #NUM!`}</ExcelCode>
+
+Both arguments have to be parseable as `x + yi`/`x + yj` text (or a
+plain number). Text that doesn't match that pattern at all returns
+`#NUM!`.
+
+### Getting the argument order backwards
+
+<ExcelCode>{`IMSUB("1-2i", "3+4i") → -2-6i, the exact negative of IMSUB("3+4i", "1-2i")`}</ExcelCode>
+
+Unlike addition, subtraction isn't order-independent — `inumber1 -
+inumber2` and `inumber2 - inumber1` give exactly opposite results.
+Double-check which complex number is meant to be the starting point.
+
+export const faqs = [
+  {
+    question: 'Can IMSUB take more than two complex numbers, like IMSUM can?',
+    answer: "No — IMSUB always takes exactly two arguments, inumber1 and inumber2, and returns inumber1 minus inumber2. Subtraction's order-dependence makes a variadic version ambiguous in a way addition and multiplication aren't.",
+  },
+  {
+    question: 'Does the order of arguments matter in IMSUB?',
+    answer: 'Yes — IMSUB(a, b) computes a - b, not b - a. Swapping the two arguments flips the sign of both the real and imaginary parts of the result.',
+  },
+  {
+    question: 'What happens if I mix "i" and "j" suffixes in one IMSUB call?',
+    answer: 'It returns #VALUE! — both complex numbers passed to IMSUB (or any function combining two or more complex numbers) must use the same suffix.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMSUB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMSUB("3+4i", "1-2i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imsub("3+4i", "1-2i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = complex(3, 4) - complex(1, -2)  # (2+6j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMSUM](/docs/engineering/imsum) — adds complex numbers instead of
+  subtracting, and accepts more than two at once.
+- [IMPRODUCT](/docs/engineering/improduct) and
+  [IMDIV](/docs/engineering/imdiv) — multiply or divide complex
+  numbers instead of subtracting them.
+- [COMPLEX](/docs/engineering/complex) — builds the complex-number
+  text that IMSUB's arguments expect.

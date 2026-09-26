@@ -1,0 +1,165 @@
+---
+title: IMARGUMENT
+description: The argument (theta) of a complex number — its angle in radians from the positive real axis.
+---
+
+Compute the argument (theta, θ) of a complex number — the angle, in
+radians, between the positive real axis and the line from the origin
+to the point `(x, y)` on the complex plane.
+
+export const quickAnswerFacts = [
+  { text: 'Returns radians, not degrees — wrap with DEGREES() to convert', type: 'warn' },
+  { text: 'Result is always in the range -π < θ ≤ π', type: 'check' },
+  { text: 'IMARGUMENT of exactly 0 (zero) is mathematically undefined and returns #DIV/0!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMARGUMENT(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMARGUMENT(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the argument of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The argument θ of `inumber`, in radians, in the range `-π < θ ≤ π`.
+
+## Description
+
+For a complex number `x + yi`, IMARGUMENT computes the angle its point
+`(x, y)` makes with the positive real axis — equivalent to `ATAN2(x, y)`
+in Excel's own function terms. Together with
+[IMABS](/docs/engineering/imabs) (the distance from the origin),
+IMARGUMENT fully describes a complex number in **polar form**: a
+radius and an angle, instead of separate real and imaginary
+coefficients.
+
+<Callout type="warn">
+  The result is in **radians**, matching every other Excel
+  trigonometric function — not degrees. Wrap the result in `DEGREES()`
+  if a degree value is what's actually needed for display or further
+  calculation.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '0.9273', '1-2i': '-1.1071', 'i': '1.5708' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMARGUMENT("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMARGUMENT("3+4i")` returns about `0.9273` radians (roughly 53°) — the
+angle up and to the right from the origin. A negative imaginary part,
+like in `"1-2i"`, gives a negative angle (`-1.1071`, below the real
+axis). The pure imaginary unit `"i"` (which is `"0+1i"`) sits exactly
+on the positive imaginary axis, a quarter turn — `π/2`, or `1.5708`
+radians — from the positive real axis.
+
+## Common errors
+
+### #DIV/0! — inumber is exactly zero
+
+<ExcelCode>{`IMARGUMENT("0") → #DIV/0!`}</ExcelCode>
+
+The argument of `0 + 0i` is mathematically undefined — there's no
+well-defined angle from the origin to itself — so Excel returns
+`#DIV/0!` rather than an arbitrary angle like `0`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMARGUMENT("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Forgetting the result is in radians, not degrees
+
+<ExcelCode>{`IMARGUMENT("i") → 1.5708 radians, not 90 — wrap in DEGREES() to convert`}</ExcelCode>
+
+A result like `1.5708` is easy to misread as "close to zero" if degrees
+were expected. Use `=DEGREES(IMARGUMENT("i"))` to get `90` instead, the
+same way every other Excel trig function's radian output would be
+converted.
+
+export const faqs = [
+  {
+    question: 'Why does IMARGUMENT("0") return #DIV/0!?',
+    answer: "The argument is the angle from the origin to a point — but zero IS the origin, so there's no direction to measure an angle toward. Excel signals this undefined case with #DIV/0! rather than guessing a value.",
+  },
+  {
+    question: 'What range of values can IMARGUMENT return?',
+    answer: 'Radians strictly greater than -π and up to and including π — a full circle\'s worth of possible angles, expressed as a single continuous range rather than wrapping around past π back to -π.',
+  },
+  {
+    question: 'How is IMARGUMENT related to IMABS?',
+    answer: "They're the two halves of a complex number's polar form: IMABS gives the distance from the origin (the radius), and IMARGUMENT gives the angle (theta) — together they describe exactly the same complex number that x + yi does, just in a different coordinate system.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMARGUMENT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMARGUMENT("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Imargument("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    z = complex(3, 4)
+    result = cmath.phase(z)  # returns radians, same as IMARGUMENT
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMABS](/docs/engineering/imabs) — the radius component that,
+  together with IMARGUMENT, fully describes a complex number in polar
+  form.
+- [IMREAL](/docs/engineering/imreal) and
+  [IMAGINARY](/docs/engineering/imaginary) — the rectangular-form
+  coefficients IMARGUMENT is computed from.
+- [IMCONJUGATE](/docs/engineering/imconjugate) — negates the
+  argument's sign without changing the magnitude.

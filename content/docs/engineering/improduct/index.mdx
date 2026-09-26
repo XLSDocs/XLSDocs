@@ -1,0 +1,166 @@
+---
+title: IMPRODUCT
+description: Multiply two or more complex numbers together, using the FOIL-style complex multiplication rule.
+---
+
+Multiply together 1 to 255 complex numbers, each written as text in
+`x + yi` (or `x + yj`) form.
+
+export const quickAnswerFacts = [
+  { text: 'Accepts 1 to 255 complex numbers as separate arguments', type: 'check' },
+  { text: '(a+bi)(c+di) = (ac-bd) + (ad+bc)i — not just multiplying the real and imaginary parts separately', type: 'warn' },
+  { text: 'All arguments must use the SAME suffix ("i" or "j") — mixing them returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMPRODUCT(inumber1, [inumber2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMPRODUCT(inumber1, [inumber2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber1',
+    type: 'text',
+    required: true,
+    description: 'The first complex number, as text in x + yi or x + yj form.',
+  },
+  {
+    name: 'inumber2, ...',
+    type: 'text',
+    required: false,
+    description: 'Up to 254 additional complex numbers to multiply, all using the same suffix as inumber1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The product of all supplied complex numbers, as text in `x + yi`/`x +
+yj` form.
+
+## Description
+
+IMPRODUCT multiplies complex numbers using the same distribution rule
+as multiplying two binomials: `(a + bi)(c + di) = (ac - bd) + (ad +
+bc)i`. The `-bd` term is easy to forget — since `i × i = -1`, the
+product of the two imaginary parts flips sign and merges into the
+*real* part of the result, not the imaginary part. It accepts anywhere
+from 1 to 255 arguments, multiplying them all together in one call.
+
+<Callout type="warn">
+  Multiplying complex numbers is **not** the same as multiplying their
+  real parts together and their imaginary parts together separately.
+  `IMPRODUCT("3+4i", "5-3i")` isn't `(3×5) + (4×-3)i = 15-12i` — it's
+  `27+11i`, because the cross-terms (`ad` and `bc`) and the `i × i =
+  -1` flip both have to be accounted for.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1-2i': '11-2i', '4-3i': '24+7i', 'i': '-4+3i' }}
+  defaultValue="1-2i"
+  label={'Live preview — =IMPRODUCT("3+4i", "{value}")'}
+  fieldLabel="inumber2"
+/>
+
+`IMPRODUCT("3+4i", "1-2i")` returns `11-2i` — worked out as `(3×1 -
+4×-2) + (3×-2 + 4×1)i = (3+8) + (-6+4)i = 11-2i`. Multiplying by the
+pure imaginary unit `"i"` rotates the number a quarter turn on the
+complex plane, turning `3+4i` into `-4+3i`.
+
+## Common errors
+
+### #VALUE! — mismatched suffixes across arguments
+
+<ExcelCode>{`IMPRODUCT("3+4i", "1-2j") → #VALUE! — one argument uses "i", the other uses "j"`}</ExcelCode>
+
+Every complex number passed to IMPRODUCT has to use the same suffix
+throughout the whole call.
+
+### #NUM! — an argument that isn't a valid complex number
+
+<ExcelCode>{`IMPRODUCT("3+4i", "hello") → #NUM!`}</ExcelCode>
+
+Every argument has to be parseable as `x + yi`/`x + yj` text (or a
+plain number). Text that doesn't match that pattern at all returns
+`#NUM!`.
+
+### Multiplying real and imaginary parts separately
+
+<ExcelCode>{`IMPRODUCT("3+4i", "5-3i") → 27+11i, NOT 15-12i — cross-terms and i² = -1 both matter`}</ExcelCode>
+
+Complex multiplication distributes across all four term-pairs, and the
+`i × i` term flips sign into the real part — treating it like
+elementwise multiplication of the real and imaginary coefficients
+gives a completely wrong answer.
+
+export const faqs = [
+  {
+    question: 'Why does IMPRODUCT("3+4i", "5-3i") return 27+11i and not 15-12i?',
+    answer: 'Complex multiplication distributes like two binomials: (3+4i)(5-3i) = 3×5 + 3×(-3i) + 4i×5 + 4i×(-3i) = 15 - 9i + 20i -12i². Since i² = -1, the last term becomes +12, so the real part is 15+12=27 and the imaginary part is -9+20=11, giving 27+11i.',
+  },
+  {
+    question: 'How many complex numbers can IMPRODUCT multiply at once?',
+    answer: 'Between 1 and 255, passed as separate arguments — the same limit as IMSUM.',
+  },
+  {
+    question: 'What happens when you multiply a complex number by the imaginary unit i?',
+    answer: 'It rotates the number 90 degrees counterclockwise on the complex plane — IMPRODUCT("3+4i", "i") returns -4+3i, the original point rotated a quarter turn around the origin.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMPRODUCT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMPRODUCT("3+4i", "1-2i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Improduct("3+4i", "1-2i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = complex(3, 4) * complex(1, -2)  # (11-2j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMDIV](/docs/engineering/imdiv) — the inverse operation, dividing
+  one complex number by another.
+- [IMSUM](/docs/engineering/imsum) and
+  [IMSUB](/docs/engineering/imsub) — add or subtract complex numbers
+  instead of multiplying them.
+- [IMCONJUGATE](/docs/engineering/imconjugate) — the technique IMDIV
+  uses internally, built on the same multiplication rule as IMPRODUCT.

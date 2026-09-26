@@ -1,0 +1,151 @@
+---
+title: IMCONJUGATE
+description: The complex conjugate of a complex number — the same real part, with the imaginary part's sign flipped.
+---
+
+Compute the complex conjugate of a complex number — keep the real
+coefficient exactly as-is, and flip the sign of the imaginary
+coefficient.
+
+export const quickAnswerFacts = [
+  { text: 'IMCONJUGATE(x + yi) = x - yi — only the imaginary part\'s sign changes', type: 'check' },
+  { text: 'The conjugate has the same magnitude (IMABS) as the original — only the angle flips', type: 'check' },
+  { text: 'An unparseable inumber returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMCONJUGATE(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMCONJUGATE(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the conjugate of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The complex conjugate of `inumber`, as text in the same `x + yi`/`x +
+yj` form.
+
+## Description
+
+For a complex number `x + yi`, IMCONJUGATE returns `x - yi` — the real
+part is untouched, and only the imaginary part's sign flips.
+Geometrically, this reflects the point `(x, y)` across the real axis:
+the distance from the origin ([IMABS](/docs/engineering/imabs)) stays
+exactly the same, while the angle
+([IMARGUMENT](/docs/engineering/imargument)) flips sign. Conjugates
+show up constantly in complex-number division, since multiplying a
+complex number by its own conjugate always produces a purely real
+result (`x² + y²`) — the technique
+[IMDIV](/docs/engineering/imdiv) uses internally to divide two complex
+numbers.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '3-4i', '1-2i': '1+2i', '5-12i': '5+12i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMCONJUGATE("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMCONJUGATE("3+4i")` returns `3-4i` — the real `3` is unchanged, and
+the imaginary `+4i` becomes `-4i`. Since the original imaginary sign
+can go either way, an already-negative imaginary part flips positive:
+`IMCONJUGATE("1-2i")` returns `1+2i`.
+
+## Common errors
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMCONJUGATE("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting the real part to change too
+
+<ExcelCode>{`IMCONJUGATE("3+4i") → 3-4i, not -3-4i — only the imaginary sign flips`}</ExcelCode>
+
+IMCONJUGATE isn't the same as negating the whole complex number. Only
+the imaginary coefficient's sign changes; the real coefficient is left
+exactly as it was.
+
+export const faqs = [
+  {
+    question: 'What is a complex conjugate used for?',
+    answer: "Most commonly, dividing complex numbers: multiplying both the numerator and denominator of a division by the denominator's conjugate turns the denominator into a purely real number, making the division straightforward. It's also used to compute a complex number's squared magnitude (z times its own conjugate equals |z|²).",
+  },
+  {
+    question: 'Does IMCONJUGATE change a complex number\'s magnitude?',
+    answer: "No — reflecting a point across the real axis doesn't change its distance from the origin, so IMABS gives the same result for a number and its conjugate. Only the angle (IMARGUMENT) flips sign.",
+  },
+  {
+    question: 'What does IMCONJUGATE return for a purely real number?',
+    answer: 'The same number unchanged — a real number already has an imaginary coefficient of 0, and flipping the sign of 0 still gives 0.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMCONJUGATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMCONJUGATE("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imconjugate("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    z = complex(3, 4)
+    result = z.conjugate()  # (3-4j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMDIV](/docs/engineering/imdiv) — uses the conjugate technique
+  internally to divide two complex numbers.
+- [IMABS](/docs/engineering/imabs) and
+  [IMARGUMENT](/docs/engineering/imargument) — the magnitude (unchanged
+  by conjugation) and angle (sign-flipped by conjugation) of a complex
+  number.
+- [IMAGINARY](/docs/engineering/imaginary) — extracts just the
+  coefficient that IMCONJUGATE flips the sign of.

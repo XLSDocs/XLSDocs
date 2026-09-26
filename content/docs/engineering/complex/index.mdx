@@ -1,0 +1,181 @@
+---
+title: COMPLEX
+description: Combine a real and imaginary coefficient into a complex number, written as text in x + yi form.
+---
+
+Build a complex number out of separate real and imaginary
+coefficients, returned as text in `x + yi` (or `x + yj`) form — the
+starting point for every other complex-number function on this site,
+which all expect their input already in this text format.
+
+export const quickAnswerFacts = [
+  { text: 'Both real_num and i_num must be numeric — a non-numeric value returns #VALUE!', type: 'warn' },
+  { text: 'suffix must be lowercase "i" or "j" — anything else, including uppercase "I"/"J", returns #VALUE!', type: 'warn' },
+  { text: 'The result is TEXT, not a number — Excel has no native complex-number data type', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COMPLEX(real_num, i_num, [suffix])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COMPLEX(real_num, i_num, [suffix])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'real_num',
+    type: 'number',
+    required: true,
+    description: 'The real coefficient of the complex number.',
+  },
+  {
+    name: 'i_num',
+    type: 'number',
+    required: true,
+    description: 'The imaginary coefficient of the complex number.',
+  },
+  {
+    name: 'suffix',
+    type: 'text',
+    required: false,
+    description: 'The imaginary unit\'s suffix — "i" or "j" (lowercase only). Defaults to "i" if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A text string representing the complex number, in `x + yi` (or `x + yj`)
+form.
+
+## Description
+
+Every other complex-number function on this site — IMSUM, IMABS,
+IMARGUMENT, and the rest — expects its complex-number arguments as
+text in this exact `x + yi` format, since Excel has no dedicated
+complex-number data type. COMPLEX is how that text gets built in the
+first place: it takes two plain numbers and stitches them into the
+string those other functions can read. A zero coefficient drops out of
+the result entirely rather than printing as `0` — `COMPLEX(3, 0)`
+returns `3`, not `3+0i`, and `COMPLEX(0, 1)` returns `i`, not `0+1i`.
+
+<Callout type="warn">
+  The `suffix` argument only accepts lowercase `"i"` or `"j"` — typing
+  `"I"` or `"J"` returns `#VALUE!`, not a case-insensitive match. This
+  matters beyond COMPLEX itself: every function that takes two or more
+  complex numbers requires all of them to use the *same* suffix, so a
+  stray uppercase or mismatched suffix anywhere in a calculation chain
+  can break a later IMSUM or IMPRODUCT call downstream.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4': '3+4i', '-4': '3-4i', '0': '3' }}
+  defaultValue="4"
+  label={'Live preview — =COMPLEX(3, {value})'}
+  fieldLabel="i_num"
+/>
+
+`COMPLEX(3, 4)` returns `3+4i` — the pairing used as the running
+example across every other complex-number function on this site. A
+negative `i_num` flips the sign shown (`3-4i`); an `i_num` of exactly
+`0` drops the imaginary term entirely, returning the plain real number
+`3`.
+
+## Common errors
+
+### #VALUE! — a non-numeric real_num or i_num
+
+<ExcelCode>{`COMPLEX("abc", 4) → #VALUE!`}</ExcelCode>
+
+Both `real_num` and `i_num` must be numbers. Text that can't be
+interpreted as a number returns `#VALUE!`.
+
+### #VALUE! — an invalid or uppercase suffix
+
+<ExcelCode>{`COMPLEX(3, 4, "I") → #VALUE! — must be lowercase "i", not uppercase "I"`}</ExcelCode>
+
+`suffix` only accepts the exact lowercase characters `"i"` or `"j"`.
+Any other text, including the correctly-spelled letter in the wrong
+case, returns `#VALUE!` rather than being auto-corrected.
+
+### Mixing suffixes across a later calculation
+
+<ExcelCode>{`IMSUM(COMPLEX(3,4,"j"), "1-2i") → #VALUE! — one number uses "j", the other uses "i"`}</ExcelCode>
+
+COMPLEX itself won't catch this — the mismatch only surfaces once a
+downstream function like IMSUM or IMPRODUCT tries to combine two
+complex numbers built with different suffixes. Pick one suffix per
+calculation and use it consistently throughout.
+
+export const faqs = [
+  {
+    question: 'Why does COMPLEX(3, 0) return 3 instead of 3+0i?',
+    answer: 'Excel drops any coefficient that\'s exactly zero from the displayed text rather than printing a redundant "+0i" or "0+" term — matching how a mathematician would normally write a purely real or purely imaginary number.',
+  },
+  {
+    question: 'Can I use "j" instead of "i" for the imaginary unit?',
+    answer: 'Yes — pass "j" as the third argument, common in electrical engineering notation where "i" is reserved for current. Just make sure every complex number used together in a later calculation (IMSUM, IMPRODUCT, etc.) uses the same suffix, or those functions return an error.',
+  },
+  {
+    question: 'Is the result of COMPLEX an actual number Excel can do math on directly?',
+    answer: 'No — it\'s a text string. Excel has no native complex-number type, so every complex-number function (IMSUM, IMABS, IMARGUMENT, and so on) works by parsing that text, not by treating it as a real numeric value.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COMPLEX from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COMPLEX(3, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Complex(3, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = complex(3, 4)  # Python has a native complex type: (3+4j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMREAL](/docs/engineering/imreal) and
+  [IMAGINARY](/docs/engineering/imaginary) — the reverse operation,
+  pulling the real or imaginary coefficient back out of a complex
+  number's text.
+- [IMSUM](/docs/engineering/imsum), [IMSUB](/docs/engineering/imsub),
+  [IMPRODUCT](/docs/engineering/improduct), and
+  [IMDIV](/docs/engineering/imdiv) — arithmetic on complex numbers
+  built with COMPLEX.
+- [IMABS](/docs/engineering/imabs) — the magnitude of a complex
+  number.
