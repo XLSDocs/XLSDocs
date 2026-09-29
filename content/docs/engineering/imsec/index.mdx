@@ -1,0 +1,151 @@
+---
+title: IMSEC
+description: The secant of a complex number, the reciprocal of its complex cosine.
+---
+
+Compute the secant of a complex number — the reciprocal of its
+[complex cosine](/docs/engineering/imcos), the same relationship that
+defines ordinary secant for real numbers.
+
+export const quickAnswerFacts = [
+  { text: 'IMSEC(z) = 1 / IMCOS(z)', type: 'check' },
+  { text: 'For a purely real input, IMSEC gives the exact same result as SEC', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or TRUE/FALSE returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMSEC(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMSEC(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the secant of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The secant of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMSEC is the reciprocal of [IMCOS](/docs/engineering/imcos) — `1 /
+IMCOS(inumber)` — the same relationship real secant has to real
+cosine. Since IMCOS reduces to ordinary `COS` on a purely real input,
+IMSEC reduces to ordinary `SEC` there too.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-0.0363+0.0052i', 'i': '0.6481', '1+i': '0.4983+0.5911i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMSEC("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMSEC("3+4i")` returns `-0.0363+0.0052i`. The pure imaginary unit
+`"i"` gives exactly `1/cosh(1)` (`0.6481`) — a plain real number, with
+no imaginary component at all, since IMCOS itself returns a purely
+real value for a purely imaginary input.
+
+## Common errors
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMSEC(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMSEC("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Confusing IMSEC with IMCSC
+
+<ExcelCode>{`IMSEC(z) = 1/IMCOS(z), NOT 1/IMSIN(z) — that reciprocal is IMCSC instead`}</ExcelCode>
+
+Secant is the reciprocal of *cosine*, not sine — a common mix-up given
+how similar the names "secant" and "cosecant" look at a glance. The
+reciprocal of [IMSIN](/docs/engineering/imsin) is
+[IMCSC](/docs/engineering/imcsc), a different function entirely.
+
+export const faqs = [
+  {
+    question: 'Does IMSEC give the same answer as SEC for a real number?',
+    answer: 'Yes — since IMCOS reduces to ordinary COS on a real input, its reciprocal (IMSEC) reduces to ordinary SEC there too.',
+  },
+  {
+    question: 'Is IMSEC the reciprocal of IMSIN or IMCOS?',
+    answer: 'IMCOS — IMSEC(z) always equals 1/IMCOS(z). The reciprocal of IMSIN is a separate function, IMCSC.',
+  },
+  {
+    question: 'When is IMSEC undefined?',
+    answer: 'Mathematically, wherever the complex cosine is exactly zero — the same undefined points as ordinary secant. In practice, those points only occur at irrational multiples of π, which floating-point arithmetic can only approximate, so this case essentially never triggers an error for realistic inputs.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMSEC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMSEC("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imsec("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = 1 / cmath.cos(complex(3, 4))  # Python's cmath has no direct sec()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMCOS](/docs/engineering/imcos) — the function IMSEC takes the
+  reciprocal of.
+- [IMCSC](/docs/engineering/imcsc) — the reciprocal of IMSIN, easy to
+  confuse with IMSEC by name.
+- [IMSECH](/docs/engineering/imsech) — the hyperbolic counterpart.
+- [IMTAN](/docs/engineering/imtan) and
+  [IMCOT](/docs/engineering/imcot) — the other two functions in this
+  reciprocal trigonometric family.

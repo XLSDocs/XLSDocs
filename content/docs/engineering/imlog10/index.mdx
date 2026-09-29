@@ -1,0 +1,151 @@
+---
+title: IMLOG10
+description: The base-10 (common) logarithm of a complex number, rescaled from its natural logarithm.
+---
+
+Compute the base-10 (common) logarithm of a complex number — the same
+value as [IMLN](/docs/engineering/imln), rescaled by a constant
+factor.
+
+export const quickAnswerFacts = [
+  { text: 'IMLOG10(z) = IMLN(z) / ln(10)', type: 'check' },
+  { text: 'For a positive real input, IMLOG10 gives the exact same result as LOG10', type: 'check' },
+  { text: 'IMLOG10("0") is undefined and returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMLOG10(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMLOG10(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the common (base-10) logarithm of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The base-10 logarithm of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMLOG10 is [IMLN](/docs/engineering/imln)'s result divided by
+`ln(10)` (about `2.302585`) — the standard change-of-base relationship
+between natural and common logarithms, applied to both the real and
+imaginary parts at once. For a **positive real** input, this matches
+the ordinary `LOG10` function exactly.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '0.699+0.4027i', 'i': '0.6822i', '1+i': '0.1505+0.3411i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMLOG10("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMLOG10("3+4i")` returns `0.699+0.4027i` — exactly
+[IMLN](/docs/engineering/imln)'s `1.6094+0.9273i` divided by
+`ln(10) ≈ 2.302585` in both the real and imaginary parts. The real
+part, `0.699`, is recognizable as `log₁₀(5)`, since `5` is
+[IMABS](/docs/engineering/imabs)'s value for the same input.
+
+## Common errors
+
+### #NUM! — inumber is exactly zero
+
+<ExcelCode>{`IMLOG10("0") → #NUM!`}</ExcelCode>
+
+The logarithm of `0` is undefined in any base — the same reason plain
+`LOG10(0)` also returns `#NUM!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMLOG10("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting a negative real input to error, the way LOG10 does
+
+<ExcelCode>{`IMLOG10(-4) → 0.6021+1.3644i, NOT #NUM! — unlike ordinary LOG10(-4)`}</ExcelCode>
+
+Ordinary `LOG10` can't handle negative numbers and errors instead.
+IMLOG10 inherits IMLN's ability to handle a negative real as a complex
+number with an argument of `π`, so it returns a genuine complex answer
+instead of erroring.
+
+export const faqs = [
+  {
+    question: 'Does IMLOG10 give the same answer as LOG10 for a real number?',
+    answer: 'For a positive real number, yes. For a negative real number, IMLOG10 still returns a (complex) answer, while ordinary LOG10 would return #NUM!.',
+  },
+  {
+    question: 'How is IMLOG10 related to IMLN?',
+    answer: "IMLOG10(z) is always exactly IMLN(z) divided by ln(10) — the standard change-of-base formula between natural and base-10 logarithms, applied directly to IMLN's complex result.",
+  },
+  {
+    question: 'Is there a base-10 logarithm shortcut the way IMSQRT is for IMPOWER at 0.5?',
+    answer: "Not quite the same relationship, but similarly: IMLOG10 is defined purely in terms of IMLN (a division by a constant), the same way several other Engineering functions on this site are built directly from a more fundamental one instead of computed independently.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMLOG10 from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMLOG10("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imlog10("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.log10(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMLN](/docs/engineering/imln) — the natural logarithm that IMLOG10
+  is directly rescaled from.
+- [IMLOG2](/docs/engineering/imlog2) — the same logarithm rescaled to
+  base 2 instead of base 10.
+- [IMEXP](/docs/engineering/imexp) — the inverse-flavored operation
+  (base `e` exponential rather than base-10 logarithm).

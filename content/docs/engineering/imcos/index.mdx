@@ -1,0 +1,155 @@
+---
+title: IMCOS
+description: The cosine of a complex number, extending Excel's ordinary COS function into the complex plane.
+---
+
+Compute the cosine of a complex number — the same trigonometric
+cosine function used everywhere else in Excel, extended so it also
+accepts (and returns) complex numbers instead of just real ones.
+
+export const quickAnswerFacts = [
+  { text: 'IMCOS(x + yi) = cos(x)cosh(y) − i·sin(x)sinh(y) — real and imaginary parts computed separately', type: 'check' },
+  { text: 'For a purely real input, IMCOS gives the exact same result as COS', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or TRUE/FALSE returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMCOS(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMCOS(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the cosine of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cosine of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+For a complex number `x + yi`, IMCOS computes `cos(x)cosh(y) −
+i·sin(x)sinh(y)` — the ordinary cosine and sine of the real part `x`,
+combined with the hyperbolic cosine and sine of the imaginary part
+`y`. When `y` is `0` (a purely real input), the formula collapses to
+exactly `cos(x)`, so IMCOS never disagrees with the ordinary `COS`
+function on a real input. Interestingly, feeding IMCOS a **purely
+imaginary** number gives a purely real result: `cos(iy) = cosh(y)`,
+with no imaginary part at all.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-27.0349-3.8512i', 'i': '1.5431', '1+i': '0.8337-0.9889i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMCOS("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMCOS("3+4i")` returns `-27.0349-3.8512i`. The pure imaginary unit
+`"i"` gives exactly `cosh(1)` — `1.5431`, with **no** imaginary
+component at all, since `cos(iy) = cosh(y)` is always a real number
+regardless of `y`.
+
+## Common errors
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMCOS(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMCOS("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting a complex result from a purely imaginary input
+
+<ExcelCode>{`IMCOS("i") → 1.5431, a plain real number with no "i" at all`}</ExcelCode>
+
+It's easy to assume any complex-function call on an imaginary input
+produces another complex number. `cos(iy)` is a special case that
+always lands back on the real axis (`cosh(y)`) — the displayed result
+correctly omits the imaginary term entirely rather than showing a
+redundant `+0i`.
+
+export const faqs = [
+  {
+    question: 'Does IMCOS give the same answer as COS for a real number?',
+    answer: 'Yes — when the imaginary part is 0, IMCOS\'s formula collapses to exactly cos(x), the ordinary real cosine. IMCOS(4) and COS(4) agree exactly.',
+  },
+  {
+    question: 'Why does IMCOS("i") return a real number instead of a complex one?',
+    answer: 'Because cos(iy) = cosh(y) is a genuine mathematical identity — the cosine of a purely imaginary number is always purely real. This is different from IMSIN, where sin(iy) = i·sinh(y) stays purely imaginary.',
+  },
+  {
+    question: 'How is IMCOS related to IMEXP?',
+    answer: "IMCOS's formula, like IMSIN's, comes directly from Euler's formula — the same identity IMEXP is built on (e^(iy) = cos(y) + i·sin(y)). Both complex sine and cosine can be derived from complex exponentials.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMCOS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMCOS("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imcos("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.cos(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMSIN](/docs/engineering/imsin) — the complex sine, computed with
+  the same underlying identity.
+- [IMSEC](/docs/engineering/imsec) — the reciprocal of IMCOS.
+- [IMCOSH](/docs/engineering/imcosh) — the hyperbolic counterpart,
+  swapping which parts use ordinary vs. hyperbolic trig.
+- [IMEXP](/docs/engineering/imexp) — the complex exponential that
+  IMCOS's formula is derived from.

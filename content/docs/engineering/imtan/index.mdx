@@ -1,0 +1,164 @@
+---
+title: IMTAN
+description: The tangent of a complex number, computed as the ratio of its complex sine and cosine.
+---
+
+Compute the tangent of a complex number — the ratio of its
+[complex sine](/docs/engineering/imsin) to its
+[complex cosine](/docs/engineering/imcos), the same relationship that
+defines ordinary tangent for real numbers.
+
+export const quickAnswerFacts = [
+  { text: 'IMTAN(z) = IMSIN(z) / IMCOS(z) — the same sine-over-cosine relationship as ordinary tangent', type: 'check' },
+  { text: 'For a purely real input, IMTAN gives the exact same result as TAN', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format, or #NUM!/#VALUE! results', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMTAN(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMTAN(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the tangent of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The tangent of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMTAN divides the complex sine of `inumber` by its complex cosine,
+exactly mirroring how ordinary tangent is defined for real numbers
+(`tan(x) = sin(x)/cos(x)`). Since both
+[IMSIN](/docs/engineering/imsin) and
+[IMCOS](/docs/engineering/imcos) reduce to their ordinary real
+versions on a purely real input, IMTAN does too — `IMTAN(4)` and
+`TAN(4)` agree exactly.
+
+<Callout type="warn">
+  Unlike real tangent, which grows toward infinity only at specific
+  points (odd multiples of `π/2`), complex tangent stays **bounded**
+  as the imaginary part grows — it approaches `i` for large positive
+  imaginary parts and `-i` for large negative ones. This is the
+  opposite of [IMSIN](/docs/engineering/imsin) and
+  [IMCOS](/docs/engineering/imcos) themselves, which grow unboundedly
+  large.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-0.0002+0.9994i', 'i': '0.7616i', '1+i': '0.2718+1.0839i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMTAN("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMTAN("3+4i")` returns `-0.0002+0.9994i` — already very close to
+`i`, illustrating how quickly complex tangent approaches that limiting
+value as the imaginary part grows. The pure imaginary unit `"i"` gives
+exactly `tanh(1)i` (`0.7616i`), following the identity `tan(iy) =
+i·tanh(y)`.
+
+## Common errors
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMTAN("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMTAN(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### Expecting IMTAN to grow unboundedly like IMSIN/IMCOS do
+
+<ExcelCode>{`IMTAN("3+4i") → -0.0002+0.9994i, already nearly at the boundary value i — not a huge number`}</ExcelCode>
+
+IMSIN and IMCOS both grow rapidly for larger imaginary parts, but
+IMTAN doesn't inherit that growth — the two effects cancel in the
+division, and the ratio instead converges toward `±i`.
+
+export const faqs = [
+  {
+    question: 'Does IMTAN give the same answer as TAN for a real number?',
+    answer: 'Yes — since both IMSIN and IMCOS reduce to their ordinary real versions on a real input, their ratio (IMTAN) reduces to ordinary TAN as well.',
+  },
+  {
+    question: 'Why doesn\'t IMTAN grow to huge values the way IMSIN and IMCOS do?',
+    answer: "Both the numerator (complex sine) and denominator (complex cosine) grow at the same rate for large imaginary parts, so their ratio converges to a bounded value — specifically i or -i — instead of growing without limit.",
+  },
+  {
+    question: 'What causes IMTAN to return #NUM!?',
+    answer: 'Text that can\'t be parsed as a complex number at all, like IMTAN("hello"). In principle IMTAN is undefined anywhere the complex cosine is exactly zero, mathematically the same way real TAN is undefined at odd multiples of π/2 — but since π can only ever be entered as an approximation, that exact-zero case essentially never comes up in practice, the same way TAN(PI()/2) returns a huge finite number in Excel rather than erroring.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMTAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMTAN("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imtan("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.tan(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMCOT](/docs/engineering/imcot) — the reciprocal of IMTAN.
+- [IMSIN](/docs/engineering/imsin) and
+  [IMCOS](/docs/engineering/imcos) — the two functions IMTAN divides
+  to get its result.
+- [IMSEC](/docs/engineering/imsec) and
+  [IMCSC](/docs/engineering/imcsc) — the other two reciprocal
+  trigonometric functions in this family.

@@ -1,0 +1,163 @@
+---
+title: IMPOWER
+description: Raise a complex number to a power — integer, fractional, or negative — using its polar form.
+---
+
+Raise a complex number to a power — the complex-number equivalent of
+[POWER](/docs/math/power), accepting integer, fractional, or negative
+exponents.
+
+export const quickAnswerFacts = [
+  { text: 'number can be an integer, a fraction, or negative — not just a whole number', type: 'check' },
+  { text: 'IMPOWER(z, 0.5) gives the same result as IMSQRT(z)', type: 'check' },
+  { text: 'number must be numeric — a non-numeric second argument returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMPOWER(inumber, number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMPOWER(inumber, number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to raise to a power.',
+  },
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The power to raise inumber to — may be an integer, a fraction, or negative.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`inumber` raised to `number`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMPOWER works by converting `inumber` to **polar form** (a magnitude
+via [IMABS](/docs/engineering/imabs) and an angle via
+[IMARGUMENT](/docs/engineering/imargument)), raising the magnitude to
+`number` and multiplying the angle by `number`, then converting back —
+`r^n · (cos(nθ) + i·sin(nθ))`. This works uniformly whether `number` is
+a whole number (repeated multiplication), a negative number (a
+reciprocal), or a fraction (a root) — unlike
+[IMPRODUCT](/docs/engineering/improduct), which can only multiply a
+complex number by itself a whole number of times.
+
+## Try it
+
+<TryIt
+  data={{ '2': '-7+24i', '0.5': '2+i', '-1': '0.12-0.16i' }}
+  defaultValue="2"
+  label={'Live preview — =IMPOWER("3+4i", {value})'}
+  fieldLabel="number"
+/>
+
+`IMPOWER("3+4i", 2)` returns `-7+24i` — the same result
+[IMPRODUCT](/docs/engineering/improduct) would give for `"3+4i"`
+multiplied by itself. A `number` of `0.5` gives exactly `2+i` — the
+same answer [IMSQRT](/docs/engineering/imsqrt) gives for this input,
+since a square root **is** raising to the power `0.5`. A `number` of
+`-1` gives the reciprocal, `0.12-0.16i`, the same value
+[IMDIV](/docs/engineering/imdiv) computes for `1` divided by `"3+4i"`.
+
+## Common errors
+
+### #VALUE! — number is nonnumeric
+
+<ExcelCode>{`IMPOWER("3+4i", "two") → #VALUE!`}</ExcelCode>
+
+`number` must be an actual number — text that can't be interpreted as
+one returns `#VALUE!`.
+
+### #NUM! — inumber isn't a valid complex number
+
+<ExcelCode>{`IMPOWER("hello", 2) → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Assuming IMPOWER only works for whole-number exponents
+
+<ExcelCode>{`IMPOWER("3+4i", 0.5) → 2+i, a perfectly valid fractional power — not an error`}</ExcelCode>
+
+Unlike repeated multiplication with
+[IMPRODUCT](/docs/engineering/improduct), which only makes sense for
+whole numbers, IMPOWER's polar-form approach handles fractional and
+negative exponents just as naturally as whole ones.
+
+export const faqs = [
+  {
+    question: 'Is IMPOWER("3+4i", 0.5) the same as IMSQRT("3+4i")?',
+    answer: 'Yes — a square root is exactly the same operation as raising to the power 0.5, and both return the identical result, 2+i, for this input.',
+  },
+  {
+    question: 'Can the exponent in IMPOWER be negative?',
+    answer: 'Yes — a negative number produces the reciprocal-and-rotated result, the same way a negative exponent works for real numbers. IMPOWER("3+4i", -1) gives the same answer as 1 divided by "3+4i".',
+  },
+  {
+    question: 'How does IMPOWER handle a fractional exponent internally?',
+    answer: "It converts the complex number to polar form (a magnitude and an angle), raises the magnitude to the given power, multiplies the angle by that same power, then converts back to x + yi form — the same technique used for IMSQRT, just generalized to any exponent instead of only 0.5.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMPOWER from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMPOWER("3+4i", 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Impower("3+4i", 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = complex(3, 4) ** 2  # (-7+24j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMSQRT](/docs/engineering/imsqrt) — the special case of IMPOWER
+  with an exponent of exactly `0.5`.
+- [IMPRODUCT](/docs/engineering/improduct) — repeated multiplication,
+  the whole-number-only special case IMPOWER generalizes.
+- [IMABS](/docs/engineering/imabs) and
+  [IMARGUMENT](/docs/engineering/imargument) — the polar-form
+  magnitude and angle IMPOWER computes internally.

@@ -1,0 +1,151 @@
+---
+title: IMLOG2
+description: The base-2 logarithm of a complex number, rescaled from its natural logarithm.
+---
+
+Compute the base-2 logarithm of a complex number — the same value as
+[IMLN](/docs/engineering/imln), rescaled by a constant factor.
+
+export const quickAnswerFacts = [
+  { text: 'IMLOG2(z) = IMLN(z) / ln(2)', type: 'check' },
+  { text: 'For a positive real input, IMLOG2 gives the exact same result as LOG(x, 2)', type: 'check' },
+  { text: 'IMLOG2("0") is undefined and returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMLOG2(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMLOG2(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the base-2 logarithm of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The base-2 logarithm of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMLOG2 is [IMLN](/docs/engineering/imln)'s result divided by `ln(2)`
+(about `0.693147`) — the standard change-of-base relationship between
+natural and base-2 logarithms, applied to both the real and imaginary
+parts at once. For a **positive real** input, this matches Excel's
+general `LOG` function called with base `2` (`LOG(x, 2)`) exactly.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '2.3219+1.3378i', 'i': '2.2662i', '1+i': '0.5+1.1331i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMLOG2("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMLOG2("3+4i")` returns `2.3219+1.3378i` — exactly
+[IMLN](/docs/engineering/imln)'s `1.6094+0.9273i` divided by
+`ln(2) ≈ 0.693147` in both the real and imaginary parts. The real
+part, `2.3219`, is recognizable as `log₂(5)`, since `5` is
+[IMABS](/docs/engineering/imabs)'s value for the same input.
+
+## Common errors
+
+### #NUM! — inumber is exactly zero
+
+<ExcelCode>{`IMLOG2("0") → #NUM!`}</ExcelCode>
+
+The logarithm of `0` is undefined in any base — the same reason
+`LOG(0, 2)` also returns `#NUM!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMLOG2("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting a negative real input to error, the way LOG does
+
+<ExcelCode>{`IMLOG2(-4) → 2+4.5324i, NOT #NUM! — unlike ordinary LOG(-4, 2)`}</ExcelCode>
+
+Ordinary `LOG` can't handle negative numbers and errors instead.
+IMLOG2 inherits IMLN's ability to handle a negative real as a complex
+number with an argument of `π`, so it returns a genuine complex answer
+instead of erroring — notice the real part, `2`, is exactly `log₂(4)`,
+confirming the magnitude side of the calculation still works normally.
+
+export const faqs = [
+  {
+    question: 'Does IMLOG2 give the same answer as LOG(x, 2) for a real number?',
+    answer: 'For a positive real number, yes. For a negative real number, IMLOG2 still returns a (complex) answer, while ordinary LOG would return #NUM!.',
+  },
+  {
+    question: 'How is IMLOG2 related to IMLN?',
+    answer: "IMLOG2(z) is always exactly IMLN(z) divided by ln(2) — the standard change-of-base formula between natural and base-2 logarithms, applied directly to IMLN's complex result.",
+  },
+  {
+    question: 'Why would base-2 logarithms of a complex number ever be needed?',
+    answer: "Base-2 logarithms come up in information theory and digital signal processing contexts — the same general engineering domains this whole Engineering function category is aimed at, where a complex-valued signal's magnitude is sometimes measured in bits rather than natural or common log units.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMLOG2 from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMLOG2("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imlog2("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.log(complex(3, 4), 2)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMLN](/docs/engineering/imln) — the natural logarithm that IMLOG2
+  is directly rescaled from.
+- [IMLOG10](/docs/engineering/imlog10) — the same logarithm rescaled
+  to base 10 instead of base 2.
+- [IMEXP](/docs/engineering/imexp) — the inverse-flavored operation
+  (base `e` exponential rather than base-2 logarithm).

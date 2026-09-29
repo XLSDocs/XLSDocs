@@ -1,0 +1,155 @@
+---
+title: IMCOT
+description: The cotangent of a complex number, computed as the ratio of its complex cosine and sine.
+---
+
+Compute the cotangent of a complex number — the ratio of its
+[complex cosine](/docs/engineering/imcos) to its
+[complex sine](/docs/engineering/imsin), the reciprocal of
+[IMTAN](/docs/engineering/imtan).
+
+export const quickAnswerFacts = [
+  { text: 'IMCOT(z) = IMCOS(z) / IMSIN(z) = 1 / IMTAN(z)', type: 'check' },
+  { text: 'For a purely real input, IMCOT gives the exact same result as COT', type: 'check' },
+  { text: 'IMCOT("0") is undefined (division by zero) and returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMCOT(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMCOT(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the cotangent of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cotangent of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMCOT divides the complex cosine of `inumber` by its complex sine —
+equivalently, `1 / IMTAN(inumber)`. Since both
+[IMCOS](/docs/engineering/imcos) and
+[IMSIN](/docs/engineering/imsin) reduce to their ordinary real
+versions on a purely real input, IMCOT does too — `IMCOT(1)` and
+`COT(1)` agree exactly.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-0.0002-1.0006i', 'i': '-1.313i', '1+i': '0.2176-0.868i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMCOT("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMCOT("3+4i")` returns `-0.0002-1.0006i` — the reciprocal-ish
+relationship with `IMTAN("3+4i")` (`-0.0002+0.9994i`) is visible in
+how close both values sit to `±i`. The pure imaginary unit `"i"` gives
+exactly `-coth(1)i` (`-1.313i`).
+
+## Common errors
+
+### #NUM! — inumber is exactly zero
+
+<ExcelCode>{`IMCOT("0") → #NUM!`}</ExcelCode>
+
+At `0`, the complex sine (IMCOT's denominator) is exactly `0`, making
+the division undefined — the same way ordinary `COT(0)` also returns
+`#DIV/0!`. Since `0` (unlike an irrational value such as `π`) can be
+entered exactly, this case genuinely comes up in practice, unlike the
+similar-sounding undefined point for [IMTAN](/docs/engineering/imtan).
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMCOT(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMCOT("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+export const faqs = [
+  {
+    question: 'Why does IMCOT("0") return #NUM! but IMTAN never seems to error at a similar point?',
+    answer: "IMCOT's undefined point is at exactly 0, a value that can be typed precisely — so Excel genuinely hits the zero-denominator case. IMTAN's undefined points are at irrational multiples of π, which floating-point math can only ever approximate, so that exact-zero denominator essentially never actually occurs in a real spreadsheet.",
+  },
+  {
+    question: 'Does IMCOT give the same answer as COT for a real number?',
+    answer: 'Yes — since both IMCOS and IMSIN reduce to their ordinary real versions on a real input, their ratio (IMCOT) reduces to ordinary COT as well.',
+  },
+  {
+    question: 'How is IMCOT related to IMTAN?',
+    answer: 'IMCOT is the reciprocal of IMTAN — IMCOT(z) always equals 1/IMTAN(z), the same relationship that holds between ordinary cotangent and tangent.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMCOT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMCOT("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imcot("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    z = complex(3, 4)
+    result = cmath.cos(z) / cmath.sin(z)  # Python's cmath has no direct cot()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMTAN](/docs/engineering/imtan) — the reciprocal of IMCOT.
+- [IMSIN](/docs/engineering/imsin) and
+  [IMCOS](/docs/engineering/imcos) — the two functions IMCOT divides
+  to get its result.
+- [IMSEC](/docs/engineering/imsec) and
+  [IMCSC](/docs/engineering/imcsc) — the other two reciprocal
+  trigonometric functions in this family.

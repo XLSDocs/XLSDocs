@@ -1,0 +1,154 @@
+---
+title: IMSINH
+description: The hyperbolic sine of a complex number, swapping which parts use ordinary vs. hyperbolic trig compared to IMSIN.
+---
+
+Compute the hyperbolic sine of a complex number — closely related to
+[IMSIN](/docs/engineering/imsin), but with the roles of ordinary and
+hyperbolic trigonometry swapped between the real and imaginary parts.
+
+export const quickAnswerFacts = [
+  { text: 'IMSINH(x + yi) = sinh(x)cos(y) + i·cosh(x)sin(y)', type: 'check' },
+  { text: 'For a purely real input, IMSINH gives the exact same result as SINH', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or TRUE/FALSE returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMSINH(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMSINH(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the hyperbolic sine of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic sine of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+For a complex number `x + yi`, IMSINH computes `sinh(x)cos(y) +
+i·cosh(x)sin(y)`. Compare this to
+[IMSIN](/docs/engineering/imsin)'s formula, `sin(x)cosh(y) +
+i·cos(x)sinh(y)` — the ordinary and hyperbolic trig functions swap
+places between the two. This mirrors the identity `sinh(iz) = i·sin(z)`
+that connects hyperbolic and ordinary sine in general. When `y` is `0`
+(a purely real input), the formula collapses to exactly `sinh(x)`, so
+IMSINH never disagrees with the ordinary `SINH` function on a real
+input.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-6.5481-7.6192i', 'i': '0.8415i', '1+i': '0.635+1.2985i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMSINH("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMSINH("3+4i")` returns `-6.5481-7.6192i`. The pure imaginary unit
+`"i"` gives exactly `sin(1)i` (`0.8415i`) — a clean illustration of
+the identity `sinh(iy) = i·sin(y)`, the mirror image of
+[IMSIN](/docs/engineering/imsin)'s own `sin(iy) = i·sinh(y)`.
+
+## Common errors
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMSINH(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMSINH("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Mixing up which terms are hyperbolic vs. ordinary
+
+<ExcelCode>{`IMSINH(x + yi) = sinh(x)cos(y) + i·cosh(x)sin(y) — hyperbolic terms apply to x, ordinary terms apply to y`}</ExcelCode>
+
+It's easy to expect IMSINH's formula to just be "the hyperbolic
+version" of IMSIN's straight across. In fact the two formulas use
+sinh/cosh and sin/cos in exactly swapped positions — worth
+double-checking against the formula directly rather than guessing by
+pattern-matching against IMSIN.
+
+export const faqs = [
+  {
+    question: 'Does IMSINH give the same answer as SINH for a real number?',
+    answer: 'Yes — when the imaginary part is 0, IMSINH\'s formula collapses to exactly sinh(x), the ordinary real hyperbolic sine.',
+  },
+  {
+    question: 'How is IMSINH related to IMSIN?',
+    answer: "They're connected by the identity sinh(iz) = i·sin(z) — feeding a purely imaginary number into IMSINH gives i times the ordinary sine of the real coefficient, the mirror image of what IMSIN does with a purely imaginary input.",
+  },
+  {
+    question: 'What is IMSINH used for?',
+    answer: "Hyperbolic functions of complex numbers come up in signal processing, transmission line theory, and other areas of electrical engineering — the same fields most of Excel's Engineering category functions are aimed at.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMSINH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMSINH("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imsinh("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.sinh(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMCOSH](/docs/engineering/imcosh) — the complex hyperbolic cosine,
+  computed with the same underlying identity.
+- [IMCSCH](/docs/engineering/imcsch) — the reciprocal of IMSINH.
+- [IMSIN](/docs/engineering/imsin) — the ordinary counterpart, related
+  by the identity `sinh(iz) = i·sin(z)`.

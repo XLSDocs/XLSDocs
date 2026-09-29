@@ -1,0 +1,168 @@
+---
+title: IMEXP
+description: The exponential of a complex number, computed via Euler's formula — the identity every complex trig function on this site builds on.
+---
+
+Compute the exponential of a complex number — `e` raised to a complex
+power, using Euler's formula. This is the identity that
+[IMSIN](/docs/engineering/imsin), [IMCOS](/docs/engineering/imcos),
+and every other complex trigonometric function on this site is
+ultimately built from.
+
+export const quickAnswerFacts = [
+  { text: 'IMEXP(x + yi) = e^x · (cos(y) + i·sin(y)) — Euler\'s formula', type: 'check' },
+  { text: 'For a purely real input, IMEXP gives the exact same result as EXP', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or TRUE/FALSE returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMEXP(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMEXP(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the exponential of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The exponential of `inumber` (that is, `e` raised to `inumber`), as
+text in `x + yi`/`x + yj` form.
+
+## Description
+
+For a complex number `x + yi`, IMEXP computes `e^x · (cos(y) +
+i·sin(y))` — Euler's formula, one of the most-cited identities in all
+of mathematics. The real part `x` scales the result's overall size
+(via the ordinary real exponential `e^x`), while the imaginary part
+`y` determines its direction, rotating it around the origin by `y`
+radians. When `y` is `0` (a purely real input), `cos(0)=1` and
+`sin(0)=0`, so the formula collapses to exactly `e^x`, matching the
+ordinary `EXP` function.
+
+<Callout type="check">
+  Setting `x=0` and `y=π` in Euler's formula gives the single most
+  famous identity in mathematics: `e^(iπ) = -1`. Try
+  `IMEXP("3.14159265358979i")` — it returns very nearly `-1`, with only
+  a tiny nonzero imaginary residue from `π` being impossible to enter
+  exactly as a decimal.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-13.1288-15.2008i', 'i': '0.5403+0.8415i', '1+i': '1.4687+2.2874i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMEXP("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMEXP("3+4i")` returns `-13.1288-15.2008i` — its magnitude is exactly
+`e^3` (about `20.09`), just rotated to point in the direction given by
+4 radians. The pure imaginary unit `"i"` gives `cos(1)+sin(1)i`
+(`0.5403+0.8415i`), a point exactly 1 unit from the origin, since
+`e^0 = 1` scales nothing.
+
+## Common errors
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMEXP(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMEXP("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting the imaginary part to affect the result's size
+
+<ExcelCode>{`IMEXP("3+4i") and IMEXP("3+100i") have the EXACT SAME magnitude (e^3 ≈ 20.09) — only the direction differs`}</ExcelCode>
+
+Only the real part of `inumber` affects how large the result is —
+`e^x` is the sole scaling factor. The imaginary part only rotates the
+result around the origin; no matter how large it is, it never makes
+the answer bigger or smaller, only spins it in a circle (since sine
+and cosine are always between -1 and 1).
+
+export const faqs = [
+  {
+    question: 'Does IMEXP give the same answer as EXP for a real number?',
+    answer: 'Yes — when the imaginary part is 0, IMEXP\'s formula collapses to exactly e^x, the ordinary real exponential.',
+  },
+  {
+    question: 'What is Euler\'s formula, and why does it matter here?',
+    answer: "Euler's formula, e^(iy) = cos(y) + i·sin(y), is the identity IMEXP directly implements. It's also the mathematical foundation for IMSIN, IMCOS, IMSINH, IMCOSH, and every other complex trigonometric function on this site — all of their formulas can be derived from this one relationship.",
+  },
+  {
+    question: 'Does a larger imaginary part make IMEXP\'s result bigger?',
+    answer: "No — only the real part scales the magnitude (via e^x). The imaginary part only controls the angle/direction of the result on the complex plane, since it only ever appears inside a sine or cosine, both bounded between -1 and 1.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMEXP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMEXP("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imexp("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.exp(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMLN](/docs/engineering/imln) — the inverse operation, the natural
+  logarithm of a complex number.
+- [IMSIN](/docs/engineering/imsin) and
+  [IMCOS](/docs/engineering/imcos) — both derived from the same
+  Euler's-formula identity IMEXP implements directly.
+- [IMPOWER](/docs/engineering/impower) — raises a complex number to a
+  power, a related but distinct operation from raising `e` to a
+  complex power.

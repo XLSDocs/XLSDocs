@@ -1,0 +1,154 @@
+---
+title: IMCOSH
+description: The hyperbolic cosine of a complex number, swapping which parts use ordinary vs. hyperbolic trig compared to IMCOS.
+---
+
+Compute the hyperbolic cosine of a complex number — closely related
+to [IMCOS](/docs/engineering/imcos), but with the roles of ordinary
+and hyperbolic trigonometry swapped between the real and imaginary
+parts.
+
+export const quickAnswerFacts = [
+  { text: 'IMCOSH(x + yi) = cosh(x)cos(y) + i·sinh(x)sin(y)', type: 'check' },
+  { text: 'For a purely real input, IMCOSH gives the exact same result as COSH', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or TRUE/FALSE returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMCOSH(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMCOSH(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the hyperbolic cosine of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic cosine of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+For a complex number `x + yi`, IMCOSH computes `cosh(x)cos(y) +
+i·sinh(x)sin(y)`. Compare this to
+[IMCOS](/docs/engineering/imcos)'s formula, `cos(x)cosh(y) −
+i·sin(x)sinh(y)` — the ordinary and hyperbolic trig functions swap
+places between the two (and note the sign on the imaginary term also
+flips). When `y` is `0` (a purely real input), the formula collapses
+to exactly `cosh(x)`, so IMCOSH never disagrees with the ordinary
+`COSH` function on a real input.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-6.5807-7.5816i', 'i': '0.5403', '1+i': '0.8337+0.9889i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMCOSH("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMCOSH("3+4i")` returns `-6.5807-7.5816i`. The pure imaginary unit
+`"i"` gives exactly `cos(1)` (`0.5403`) — a plain real number with no
+imaginary component, following the identity `cosh(iy) = cos(y)`.
+
+## Common errors
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMCOSH(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMCOSH("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Mixing up which terms are hyperbolic vs. ordinary
+
+<ExcelCode>{`IMCOSH(x + yi) = cosh(x)cos(y) + i·sinh(x)sin(y) — hyperbolic terms apply to x, ordinary terms apply to y`}</ExcelCode>
+
+It's easy to expect IMCOSH's formula to just be "the hyperbolic
+version" of IMCOS's straight across. In fact the two formulas use
+cosh/sinh and cos/sin in exactly swapped positions (and IMCOSH's
+imaginary term is positive, while IMCOS's is negative) — worth
+double-checking against the formula directly rather than guessing by
+pattern-matching against IMCOS.
+
+export const faqs = [
+  {
+    question: 'Does IMCOSH give the same answer as COSH for a real number?',
+    answer: 'Yes — when the imaginary part is 0, IMCOSH\'s formula collapses to exactly cosh(x), the ordinary real hyperbolic cosine.',
+  },
+  {
+    question: 'How is IMCOSH related to IMCOS?',
+    answer: "They're connected by the identity cosh(iz) = cos(z) — feeding a purely imaginary number into IMCOSH gives exactly the ordinary cosine of the real coefficient, always a plain real result.",
+  },
+  {
+    question: 'Why does IMCOSH("i") return a plain real number?',
+    answer: 'Because cosh(iy) = cos(y) is always purely real, the same way IMCOS("i") is also purely real (cos(iy) = cosh(y)) — both hyperbolic and ordinary cosine of a purely imaginary input land back on the real axis.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMCOSH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMCOSH("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imcosh("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.cosh(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMSINH](/docs/engineering/imsinh) — the complex hyperbolic sine,
+  computed with the same underlying identity.
+- [IMSECH](/docs/engineering/imsech) — the reciprocal of IMCOSH.
+- [IMCOS](/docs/engineering/imcos) — the ordinary counterpart, related
+  by the identity `cosh(iz) = cos(z)`.

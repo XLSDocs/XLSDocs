@@ -1,0 +1,155 @@
+---
+title: IMSIN
+description: The sine of a complex number, extending Excel's ordinary SIN function into the complex plane.
+---
+
+Compute the sine of a complex number — the same trigonometric sine
+function used everywhere else in Excel, extended so it also accepts
+(and returns) complex numbers instead of just real ones.
+
+export const quickAnswerFacts = [
+  { text: 'IMSIN(x + yi) = sin(x)cosh(y) + i·cos(x)sinh(y) — real and imaginary parts computed separately', type: 'check' },
+  { text: 'For a purely real input, IMSIN gives the exact same result as SIN', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or TRUE/FALSE returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMSIN(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMSIN(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the sine of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sine of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+For a complex number `x + yi`, IMSIN computes `sin(x)cosh(y) +
+i·cos(x)sinh(y)` — the ordinary sine and cosine of the real part `x`,
+combined with the hyperbolic cosine and sine of the imaginary part
+`y`. This formula falls directly out of Euler's identity, the same
+relationship [IMEXP](/docs/engineering/imexp) is built on. When `y` is
+`0` (a purely real input), `cosh(0)=1` and `sinh(0)=0`, so the formula
+collapses to exactly `sin(x)` — IMSIN never disagrees with the
+ordinary `SIN` function on a real input.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '3.8537-27.0168i', 'i': '1.1752i', '1+i': '1.2985+0.635i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMSIN("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMSIN("3+4i")` returns `3.8537-27.0168i` — a much larger magnitude
+than any real sine could produce, since the imaginary part grows with
+`sinh`, which isn't bounded like the real sine wave is. The pure
+imaginary unit `"i"` gives exactly `sinh(1)i` (`1.1752i`), a clean
+illustration of the identity `sin(iy) = i·sinh(y)`.
+
+## Common errors
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMSIN(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMSIN("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting the result to stay bounded like real SIN does
+
+<ExcelCode>{`IMSIN("3+4i") → 3.8537-27.0168i, nowhere near the [-1, 1] range real SIN is limited to`}</ExcelCode>
+
+Ordinary `SIN` always returns a value between -1 and 1. IMSIN has no
+such ceiling — the `sinh`/`cosh` terms grow rapidly with the size of
+the imaginary part, so a complex sine can be an arbitrarily large
+number.
+
+export const faqs = [
+  {
+    question: 'Does IMSIN give the same answer as SIN for a real number?',
+    answer: 'Yes — when the imaginary part is 0, IMSIN\'s formula collapses to exactly sin(x), the ordinary real sine. IMSIN(4) and SIN(4) agree exactly.',
+  },
+  {
+    question: 'Why can IMSIN return a huge number, unlike ordinary SIN?',
+    answer: "Because its imaginary part depends on sinh(y), which grows exponentially with y rather than staying bounded the way real sine/cosine do. Real SIN is a bounded wave; complex sine is not.",
+  },
+  {
+    question: 'What is the relationship between IMSIN and IMEXP?',
+    answer: "IMSIN's formula comes directly from Euler's formula, the same identity IMEXP is built on (e^(iy) = cos(y) + i·sin(y)). Sine and cosine of a complex number can both be derived from complex exponentials.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMSIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMSIN("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imsin("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.sin(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMCOS](/docs/engineering/imcos) — the complex cosine, computed with
+  the same underlying identity.
+- [IMCSC](/docs/engineering/imcsc) — the reciprocal of IMSIN.
+- [IMSINH](/docs/engineering/imsinh) — the hyperbolic counterpart,
+  swapping which parts use ordinary vs. hyperbolic trig.
+- [IMEXP](/docs/engineering/imexp) — the complex exponential that
+  IMSIN's formula is derived from.

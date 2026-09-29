@@ -1,0 +1,162 @@
+---
+title: IMSQRT
+description: The square root of a complex number — the special case of IMPOWER with an exponent of exactly 0.5.
+---
+
+Compute the square root of a complex number — mathematically identical
+to [IMPOWER](/docs/engineering/impower) with an exponent of exactly
+`0.5`, but as its own dedicated, simpler-to-write function.
+
+export const quickAnswerFacts = [
+  { text: 'IMSQRT(z) always equals IMPOWER(z, 0.5) — the same operation, dedicated shorthand', type: 'check' },
+  { text: 'Unlike ordinary SQRT, IMSQRT handles negative real numbers too, returning a genuine complex result', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or #NUM! results', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMSQRT(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMSQRT(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the square root of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The square root of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMSQRT converts `inumber` to polar form (a magnitude via
+[IMABS](/docs/engineering/imabs) and an angle via
+[IMARGUMENT](/docs/engineering/imargument)), takes the square root of
+the magnitude and halves the angle, then converts back — exactly the
+same computation [IMPOWER](/docs/engineering/impower) would do with a
+`number` argument of `0.5`. IMSQRT exists as its own function purely
+for convenience, the same way [SQRT](/docs/math/sqrt) is a dedicated
+shorthand for `POWER(n, 0.5)`.
+
+<Callout type="check">
+  `3+4i` has an exact, whole-number square root: `2+i`. This isn't a
+  coincidence — `3+4i` and `2+i` are related the same way a
+  Pythagorean triple like `3-4-5` is: `(2+i)² = 4 + 4i + i² = 3 + 4i`,
+  since `i² = -1` turns the `4` into a `3`. Most complex square roots
+  come out messy; this input was picked because it doesn't.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '2+i', 'i': '0.7071+0.7071i', '1+i': '1.0987+0.4551i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMSQRT("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMSQRT("3+4i")` returns exactly `2+i` — squaring `2+i` gives back
+`3+4i` exactly, confirming the round trip. The pure imaginary unit
+`"i"` gives `0.7071+0.7071i` (that is, `√2/2` in both parts) — squaring
+this also returns exactly to `i`.
+
+## Common errors
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMSQRT("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting a negative real input to error, the way SQRT does
+
+<ExcelCode>{`IMSQRT(-4) → 2i, NOT #NUM! — unlike ordinary SQRT(-4)`}</ExcelCode>
+
+Ordinary `SQRT` can't handle negative numbers and returns `#NUM!`
+instead. IMSQRT has no such restriction — a negative real number's
+square root is a purely imaginary number (`√-4 = 2i`), which IMSQRT
+computes directly instead of erroring.
+
+### Forgetting IMSQRT and IMPOWER(z, 0.5) are the exact same operation
+
+<ExcelCode>{`IMSQRT("3+4i") and IMPOWER("3+4i", 0.5) both return exactly 2+i`}</ExcelCode>
+
+There's no mathematical difference between the two — IMSQRT is purely
+a shorter way to write the specific case of IMPOWER where the exponent
+is `0.5`, not a separately-computed operation.
+
+export const faqs = [
+  {
+    question: 'Why does IMSQRT("3+4i") come out to a clean 2+i instead of a messy decimal?',
+    answer: '3+4i was specifically chosen because it has a whole-number square root: (2+i)² expands to 4 + 4i + i², and since i² = -1, that simplifies exactly to 3+4i. Most complex numbers don\'t have such a clean square root.',
+  },
+  {
+    question: 'Does IMSQRT handle negative real numbers, unlike ordinary SQRT?',
+    answer: 'Yes — IMSQRT(-4) returns 2i (a purely imaginary result) rather than erroring, since a negative real number is simply a complex number with an argument of π, and IMSQRT\'s polar-form approach handles that case the same as any other.',
+  },
+  {
+    question: 'Is IMSQRT(z) the same as IMPOWER(z, 0.5)?',
+    answer: 'Yes, exactly — they compute the identical result. IMSQRT exists purely as more convenient, readable shorthand for that one specific exponent.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMSQRT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMSQRT("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imsqrt("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = complex(3, 4) ** 0.5  # (2+1j)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMPOWER](/docs/engineering/impower) — the general case IMSQRT is a
+  shorthand for, with exponent `0.5`.
+- [IMABS](/docs/engineering/imabs) and
+  [IMARGUMENT](/docs/engineering/imargument) — the polar-form
+  magnitude and angle IMSQRT computes internally.
+- [SQRT](/docs/math/sqrt) — the real-number-only counterpart, which
+  errors on a negative input instead of returning a complex result.

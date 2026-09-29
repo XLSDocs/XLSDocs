@@ -1,0 +1,160 @@
+---
+title: IMLN
+description: The natural logarithm of a complex number, built directly from its magnitude (IMABS) and angle (IMARGUMENT).
+---
+
+Compute the natural logarithm of a complex number — built directly
+from two functions already covered elsewhere on this site:
+[IMABS](/docs/engineering/imabs) (the magnitude) and
+[IMARGUMENT](/docs/engineering/imargument) (the angle).
+
+export const quickAnswerFacts = [
+  { text: 'IMLN(z) = ln(IMABS(z)) + i·IMARGUMENT(z)', type: 'check' },
+  { text: 'For a positive real input, IMLN gives the exact same result as LN', type: 'check' },
+  { text: 'IMLN("0") is undefined (the natural log of 0) and returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMLN(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMLN(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the natural logarithm of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The natural logarithm of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMLN's result is built directly from two other functions already
+covered on this site: its real part is `ln(|inumber|)` — the ordinary
+natural log of [IMABS](/docs/engineering/imabs)'s result — and its
+imaginary part is exactly [IMARGUMENT](/docs/engineering/imargument)'s
+result. This is the standard definition of a complex natural
+logarithm: `ln(z) = ln(|z|) + i·arg(z)`. For a **positive real**
+input, the argument is `0`, so the formula collapses to `ln(x)`,
+matching the ordinary `LN` function exactly. Unlike `LN`, however,
+IMLN accepts negative real numbers too — real `LN` returns `#NUM!` for
+those, while IMLN treats a negative real as a complex number with an
+argument of `π` and returns a genuine complex answer.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '1.6094+0.9273i', 'i': '1.5708i', '1+i': '0.3466+0.7854i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMLN("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMLN("3+4i")` returns `1.6094+0.9273i` — and both pieces should look
+familiar: `1.6094` is `ln(5)`, since `IMABS("3+4i")` is `5`, and
+`0.9273` is exactly `IMARGUMENT("3+4i")`'s own result. The pure
+imaginary unit `"i"` gives `ln(1) + iπ/2`, or `1.5708i` — a magnitude
+of exactly `1` contributes nothing to the real part.
+
+## Common errors
+
+### #NUM! — inumber is exactly zero
+
+<ExcelCode>{`IMLN("0") → #NUM!`}</ExcelCode>
+
+The natural logarithm of `0` is undefined (it approaches negative
+infinity) — the same reason plain `LN(0)` also returns `#NUM!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMLN("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Expecting a negative real input to error, the way LN does
+
+<ExcelCode>{`IMLN(-4) → 1.3863+3.1416i, NOT #NUM! — unlike ordinary LN(-4)`}</ExcelCode>
+
+Ordinary `LN` can't handle negative numbers and errors instead.
+IMLN doesn't have that restriction — a negative real number is just a
+complex number with an argument of `π`, so IMLN happily returns a
+genuine (complex) answer instead of erroring.
+
+export const faqs = [
+  {
+    question: 'Does IMLN give the same answer as LN for a real number?',
+    answer: 'For a positive real number, yes — the argument is 0, so IMLN\'s formula collapses to exactly ln(x). For a negative real number, IMLN still works (returning a complex result), while ordinary LN would return #NUM!.',
+  },
+  {
+    question: 'How is IMLN built from IMABS and IMARGUMENT?',
+    answer: "IMLN's real part is always ln(IMABS(z)), and its imaginary part is always exactly IMARGUMENT(z) — the two functions this site already covers separately combine directly into IMLN's definition, ln(z) = ln(|z|) + i·arg(z).",
+  },
+  {
+    question: 'What is IMLN used for?',
+    answer: "Complex logarithms come up wherever complex exponentials and complex powers are used — for instance, IMPOWER's formula for raising a complex number to an arbitrary (including fractional) power relies on the same ln(|z|) + i·arg(z) machinery internally.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMLN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMLN("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imln("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = cmath.log(complex(3, 4))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMABS](/docs/engineering/imabs) and
+  [IMARGUMENT](/docs/engineering/imargument) — the magnitude and angle
+  IMLN's result is built directly from.
+- [IMEXP](/docs/engineering/imexp) — the inverse operation, the
+  exponential of a complex number.
+- [IMLOG10](/docs/engineering/imlog10) and
+  [IMLOG2](/docs/engineering/imlog2) — the same logarithm rescaled to
+  base 10 or base 2.

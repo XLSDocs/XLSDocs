@@ -1,0 +1,155 @@
+---
+title: IMCSCH
+description: The hyperbolic cosecant of a complex number, the reciprocal of its complex hyperbolic sine.
+---
+
+Compute the hyperbolic cosecant of a complex number — the reciprocal
+of its [complex hyperbolic sine](/docs/engineering/imsinh), the same
+relationship that defines ordinary hyperbolic cosecant for real
+numbers.
+
+export const quickAnswerFacts = [
+  { text: 'IMCSCH(z) = 1 / IMSINH(z)', type: 'check' },
+  { text: 'For a purely real input, IMCSCH gives the exact same result as CSCH', type: 'check' },
+  { text: 'IMCSCH("0") is undefined (division by zero) and returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMCSCH(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMCSCH(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the hyperbolic cosecant of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic cosecant of `inumber`, as text in `x + yi`/`x + yj`
+form.
+
+## Description
+
+IMCSCH is the reciprocal of [IMSINH](/docs/engineering/imsinh) — `1 /
+IMSINH(inumber)` — the same relationship real hyperbolic cosecant has
+to real hyperbolic sine. Since IMSINH reduces to ordinary `SINH` on a
+purely real input, IMCSCH reduces to ordinary `CSCH` there too.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-0.0649+0.0755i', 'i': '-1.1884i', '1+i': '0.3039-0.6215i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMCSCH("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMCSCH("3+4i")` returns `-0.0649+0.0755i`. The pure imaginary unit
+`"i"` gives exactly `-1/sin(1)` in the imaginary slot (`-1.1884i`),
+since IMSINH itself returns a purely imaginary value for a purely
+imaginary input.
+
+## Common errors
+
+### #NUM! — inumber is exactly zero
+
+<ExcelCode>{`IMCSCH("0") → #NUM!`}</ExcelCode>
+
+At `0`, the complex hyperbolic sine (IMCSCH's denominator) is exactly
+`0`, making the reciprocal undefined — the same way ordinary
+`CSCH(0)` also returns `#DIV/0!`. Since `0` can be entered exactly,
+this case genuinely comes up in practice.
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMCSCH(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### Confusing IMCSCH with IMSECH
+
+<ExcelCode>{`IMCSCH(z) = 1/IMSINH(z), NOT 1/IMCOSH(z) — that reciprocal is IMSECH instead`}</ExcelCode>
+
+Hyperbolic cosecant is the reciprocal of *hyperbolic sine*, not
+hyperbolic cosine — the same naming mix-up that trips people up with
+[IMCSC](/docs/engineering/imcsc) and
+[IMSEC](/docs/engineering/imsec). The reciprocal of
+[IMCOSH](/docs/engineering/imcosh) is
+[IMSECH](/docs/engineering/imsech), a different function entirely.
+
+export const faqs = [
+  {
+    question: 'Does IMCSCH give the same answer as CSCH for a real number?',
+    answer: 'Yes — since IMSINH reduces to ordinary SINH on a real input, its reciprocal (IMCSCH) reduces to ordinary CSCH there too.',
+  },
+  {
+    question: 'Is IMCSCH the reciprocal of IMSINH or IMCOSH?',
+    answer: 'IMSINH — IMCSCH(z) always equals 1/IMSINH(z). The reciprocal of IMCOSH is a separate function, IMSECH.',
+  },
+  {
+    question: 'Why does IMCSCH("0") return #NUM!?',
+    answer: 'Because IMSINH(0) is exactly 0, and dividing 1 by 0 is undefined — the same reason ordinary CSCH(0) also errors.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMCSCH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMCSCH("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imcsch("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = 1 / cmath.sinh(complex(3, 4))  # Python's cmath has no direct csch()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMSINH](/docs/engineering/imsinh) — the function IMCSCH takes the
+  reciprocal of.
+- [IMSECH](/docs/engineering/imsech) — the reciprocal of IMCOSH, easy
+  to confuse with IMCSCH by name.
+- [IMCSC](/docs/engineering/imcsc) — the ordinary (non-hyperbolic)
+  counterpart.

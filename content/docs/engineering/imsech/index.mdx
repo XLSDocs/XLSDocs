@@ -1,0 +1,151 @@
+---
+title: IMSECH
+description: The hyperbolic secant of a complex number, the reciprocal of its complex hyperbolic cosine.
+---
+
+Compute the hyperbolic secant of a complex number — the reciprocal of
+its [complex hyperbolic cosine](/docs/engineering/imcosh), the same
+relationship that defines ordinary hyperbolic secant for real numbers.
+
+export const quickAnswerFacts = [
+  { text: 'IMSECH(z) = 1 / IMCOSH(z)', type: 'check' },
+  { text: 'For a purely real input, IMSECH gives the exact same result as SECH', type: 'check' },
+  { text: 'inumber must be text in x + yi/x + yj format or TRUE/FALSE returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMSECH(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMSECH(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the hyperbolic secant of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic secant of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMSECH is the reciprocal of [IMCOSH](/docs/engineering/imcosh) — `1 /
+IMCOSH(inumber)` — the same relationship real hyperbolic secant has to
+real hyperbolic cosine. Since IMCOSH reduces to ordinary `COSH` on a
+purely real input, IMSECH reduces to ordinary `SECH` there too.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '-0.0653+0.0752i', 'i': '1.8508', '1+i': '0.4983-0.5911i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMSECH("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMSECH("3+4i")` returns `-0.0653+0.0752i`. The pure imaginary unit
+`"i"` gives exactly `1/cos(1)` (`1.8508`) — a plain real number, since
+IMCOSH itself returns a purely real value for a purely imaginary
+input.
+
+## Common errors
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMSECH(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### #NUM! — text that isn't a valid complex number
+
+<ExcelCode>{`IMSECH("hello") → #NUM!`}</ExcelCode>
+
+`inumber` has to be parseable as `x + yi`/`x + yj` text (or a plain
+number). Text that doesn't match that pattern at all returns `#NUM!`.
+
+### Confusing IMSECH with IMCSCH
+
+<ExcelCode>{`IMSECH(z) = 1/IMCOSH(z), NOT 1/IMSINH(z) — that reciprocal is IMCSCH instead`}</ExcelCode>
+
+Hyperbolic secant is the reciprocal of *hyperbolic cosine*, not
+hyperbolic sine — the same naming mix-up that trips people up with
+[IMSEC](/docs/engineering/imsec) and
+[IMCSC](/docs/engineering/imcsc). The reciprocal of
+[IMSINH](/docs/engineering/imsinh) is
+[IMCSCH](/docs/engineering/imcsch), a different function entirely.
+
+export const faqs = [
+  {
+    question: 'Does IMSECH give the same answer as SECH for a real number?',
+    answer: 'Yes — since IMCOSH reduces to ordinary COSH on a real input, its reciprocal (IMSECH) reduces to ordinary SECH there too.',
+  },
+  {
+    question: 'Is IMSECH the reciprocal of IMSINH or IMCOSH?',
+    answer: 'IMCOSH — IMSECH(z) always equals 1/IMCOSH(z). The reciprocal of IMSINH is a separate function, IMCSCH.',
+  },
+  {
+    question: 'Why does IMSECH("i") return a plain real number?',
+    answer: 'Because IMCOSH itself returns a purely real value for a purely imaginary input (cosh(iy) = cos(y)), and 1 divided by a real number is still real.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMSECH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMSECH("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imsech("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = 1 / cmath.cosh(complex(3, 4))  # Python's cmath has no direct sech()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMCOSH](/docs/engineering/imcosh) — the function IMSECH takes the
+  reciprocal of.
+- [IMCSCH](/docs/engineering/imcsch) — the reciprocal of IMSINH, easy
+  to confuse with IMSECH by name.
+- [IMSEC](/docs/engineering/imsec) — the ordinary (non-hyperbolic)
+  counterpart.

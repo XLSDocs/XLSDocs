@@ -1,0 +1,154 @@
+---
+title: IMCSC
+description: The cosecant of a complex number, the reciprocal of its complex sine.
+---
+
+Compute the cosecant of a complex number — the reciprocal of its
+[complex sine](/docs/engineering/imsin), the same relationship that
+defines ordinary cosecant for real numbers.
+
+export const quickAnswerFacts = [
+  { text: 'IMCSC(z) = 1 / IMSIN(z)', type: 'check' },
+  { text: 'For a purely real input, IMCSC gives the exact same result as CSC', type: 'check' },
+  { text: 'IMCSC("0") is undefined (division by zero) and returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMCSC(inumber)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMCSC(inumber)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'inumber',
+    type: 'text',
+    required: true,
+    description: 'A complex number, as text in x + yi or x + yj form, to find the cosecant of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cosecant of `inumber`, as text in `x + yi`/`x + yj` form.
+
+## Description
+
+IMCSC is the reciprocal of [IMSIN](/docs/engineering/imsin) — `1 /
+IMSIN(inumber)` — the same relationship real cosecant has to real
+sine. Since IMSIN reduces to ordinary `SIN` on a purely real input,
+IMCSC reduces to ordinary `CSC` there too.
+
+## Try it
+
+<TryIt
+  data={{ '3+4i': '0.0052+0.0363i', 'i': '-0.8509i', '1+i': '0.6215-0.3039i' }}
+  defaultValue="3+4i"
+  label={'Live preview — =IMCSC("{value}")'}
+  fieldLabel="inumber"
+/>
+
+`IMCSC("3+4i")` returns `0.0052+0.0363i`. The pure imaginary unit
+`"i"` gives exactly `-1/sinh(1)` in the imaginary slot (`-0.8509i`),
+since IMSIN itself returns a purely imaginary value for a purely
+imaginary input, and dividing `1` by a purely imaginary number gives
+another purely imaginary result.
+
+## Common errors
+
+### #NUM! — inumber is exactly zero
+
+<ExcelCode>{`IMCSC("0") → #NUM!`}</ExcelCode>
+
+At `0`, the complex sine (IMCSC's denominator) is exactly `0`, making
+the reciprocal undefined — the same way ordinary `CSC(0)` also returns
+`#DIV/0!`. Since `0` can be entered exactly, this case genuinely comes
+up in practice.
+
+### #VALUE! — inumber is a logical value
+
+<ExcelCode>{`IMCSC(TRUE) → #VALUE!`}</ExcelCode>
+
+Passing `TRUE` or `FALSE` directly (rather than complex-number text)
+returns `#VALUE!`.
+
+### Confusing IMCSC with IMSEC
+
+<ExcelCode>{`IMCSC(z) = 1/IMSIN(z), NOT 1/IMCOS(z) — that reciprocal is IMSEC instead`}</ExcelCode>
+
+Cosecant is the reciprocal of *sine*, not cosine — a common mix-up
+given how similar the names "cosecant" and "secant" look at a glance.
+The reciprocal of [IMCOS](/docs/engineering/imcos) is
+[IMSEC](/docs/engineering/imsec), a different function entirely.
+
+export const faqs = [
+  {
+    question: 'Does IMCSC give the same answer as CSC for a real number?',
+    answer: 'Yes — since IMSIN reduces to ordinary SIN on a real input, its reciprocal (IMCSC) reduces to ordinary CSC there too.',
+  },
+  {
+    question: 'Is IMCSC the reciprocal of IMSIN or IMCOS?',
+    answer: 'IMSIN — IMCSC(z) always equals 1/IMSIN(z). The reciprocal of IMCOS is a separate function, IMSEC.',
+  },
+  {
+    question: 'Why does IMCSC("0") return #NUM!?',
+    answer: 'Because IMSIN(0) is exactly 0, and dividing 1 by 0 is undefined — the same reason ordinary CSC(0) also errors.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMCSC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMCSC("3+4i")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Imcsc("3+4i")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import cmath
+    result = 1 / cmath.sin(complex(3, 4))  # Python's cmath has no direct csc()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IMSIN](/docs/engineering/imsin) — the function IMCSC takes the
+  reciprocal of.
+- [IMSEC](/docs/engineering/imsec) — the reciprocal of IMCOS, easy to
+  confuse with IMCSC by name.
+- [IMCSCH](/docs/engineering/imcsch) — the hyperbolic counterpart.
+- [IMTAN](/docs/engineering/imtan) and
+  [IMCOT](/docs/engineering/imcot) — the other two functions in this
+  reciprocal trigonometric family.
