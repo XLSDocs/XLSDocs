@@ -1,0 +1,170 @@
+---
+title: BESSELI
+description: The modified Bessel function of the first kind — BESSELJ's non-oscillating counterpart, growing exponentially instead of decaying.
+---
+
+Evaluate the modified Bessel function of the first kind, order `N`, at
+`X` — equivalent to [BESSELJ](/docs/engineering/besselj) evaluated for
+a purely imaginary argument, which flips its oscillating behavior into
+exponential growth instead.
+
+export const quickAnswerFacts = [
+  { text: 'X can be any real number — positive, negative, or zero', type: 'check' },
+  { text: 'N (the order) must be a non-negative integer — a fractional N is truncated, not rounded', type: 'warn' },
+  { text: 'N < 0 returns #NUM!; a non-numeric X or N returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BESSELI(X, N)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BESSELI(X, N)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'X',
+    type: 'number',
+    required: true,
+    description: 'The value at which to evaluate the function. Any real number.',
+  },
+  {
+    name: 'N',
+    type: 'number',
+    required: true,
+    description: 'The order of the Bessel function. Truncated to an integer if not already one; must be 0 or greater.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of the order-`N` modified Bessel function of the first kind,
+evaluated at `X`.
+
+## Description
+
+BESSELI is what you get from
+[BESSELJ](/docs/engineering/besselj)'s formula if `x` is replaced with
+a purely imaginary number — the alternating signs in BESSELJ's
+underlying series cancel out, turning oscillation into steady
+exponential growth. Where `J_n(x)` bounces between positive and
+negative like a decaying wave, `I_n(x)` only ever grows larger as `x`
+increases (for `x > 0`), the same qualitative difference `cosh`/`sinh`
+have from `cos`/`sin`.
+
+<Callout type="check">
+  Bessel functions of different orders aren't independent — they
+  satisfy the recurrence `I_{n-1}(x) − I_{n+1}(x) = (2n/x)·I_n(x)`. At
+  `x=1.9, n=1`: `I_0(1.9) − I_2(1.9) = 2.1277 − 0.6033 = 1.5244`, and
+  `(2/1.9)·I_1(1.9) = (2/1.9)×1.4482 = 1.5245` (small rounding from
+  the 4-decimal display) — the same value either way, a genuine
+  mathematical identity.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '2.1277', '1': '1.4482', '2': '0.6033' }}
+  defaultValue="0"
+  label={'Live preview — =BESSELI(1.9, {value})'}
+  fieldLabel="N"
+/>
+
+At a fixed `X` of `1.9`, notice every value is comfortably larger than
+the equivalent [BESSELJ](/docs/engineering/besselj) result at the same
+`X` and order — `BESSELI(1.9, 0)` is `2.1277` versus
+`BESSELJ(1.9, 0)`'s `0.2818` — a direct consequence of growing
+exponentially rather than oscillating.
+
+## Common errors
+
+### #NUM! — N is negative
+
+<ExcelCode>{`BESSELI(1.9, -1) → #NUM!`}</ExcelCode>
+
+The order `N` must be `0` or greater. A negative order returns
+`#NUM!`.
+
+### #VALUE! — X or N is nonnumeric
+
+<ExcelCode>{`BESSELI("x", 2) → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+### Expecting BESSELI to oscillate like BESSELJ does
+
+<ExcelCode>{`BESSELI(5, 0) is a large positive number (~27.24), not a value between -1 and 1`}</ExcelCode>
+
+It's easy to expect any "Bessel function" to behave like BESSELJ —
+bounded and wave-like. BESSELI grows without bound as `X` increases;
+don't be surprised by a large result.
+
+export const faqs = [
+  {
+    question: 'How is BESSELI related to BESSELJ?',
+    answer: "BESSELI is what BESSELJ's series becomes when evaluated at a purely imaginary input — the alternating minus signs in BESSELJ's series vanish, turning the oscillating behavior into steady exponential growth instead.",
+  },
+  {
+    question: 'Why does BESSELI grow so much larger than BESSELJ for the same X?',
+    answer: "Because BESSELJ's terms alternate in sign (partial cancellation, keeping the result bounded), while BESSELI's terms are all positive and add up directly — the same underlying reason cosh(x) grows much faster than cos(x) stays bounded.",
+  },
+  {
+    question: 'What is BESSELI used for?',
+    answer: 'It comes up in heat conduction and diffusion problems with cylindrical symmetry, and — paired with BESSELK — in modeling steady-state (rather than oscillating/wave) behavior in circular or cylindrical geometries.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BESSELI from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BESSELI(1.9, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.BesselI(1.9, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.special import iv
+    result = iv(0, 1.9)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BESSELK](/docs/engineering/besselk) — the modified Bessel function
+  of the second kind, BESSELI's other independent counterpart.
+- [BESSELJ](/docs/engineering/besselj) — the ordinary (oscillating)
+  version BESSELI is derived from.
+- [BESSELY](/docs/engineering/bessely) — the ordinary counterpart to
+  BESSELK.

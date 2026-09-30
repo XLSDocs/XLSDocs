@@ -1,0 +1,171 @@
+---
+title: BESSELY
+description: The Bessel function of the second kind (also called the Weber or Neumann function) — BESSELJ's independent partner solution.
+---
+
+Evaluate the Bessel function of the second kind, order `N`, at `X` —
+also called the Weber function or Neumann function, and the second
+independent solution to the same differential equation
+[BESSELJ](/docs/engineering/besselj) solves.
+
+export const quickAnswerFacts = [
+  { text: 'X must be greater than 0 — zero or a negative X returns #NUM!', type: 'warn' },
+  { text: 'N (the order) must be a non-negative integer — a fractional N is truncated, not rounded', type: 'warn' },
+  { text: 'Like BESSELJ, BESSELY oscillates and decays — but is undefined at X = 0, unlike BESSELJ', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BESSELY(X, N)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BESSELY(X, N)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'X',
+    type: 'number',
+    required: true,
+    description: 'The value at which to evaluate the function. Must be greater than 0.',
+  },
+  {
+    name: 'N',
+    type: 'number',
+    required: true,
+    description: 'The order of the Bessel function. Truncated to an integer if not already one; must be 0 or greater.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of the order-`N` Bessel function of the second kind,
+evaluated at `X`.
+
+## Description
+
+Bessel's differential equation, like most second-order differential
+equations, has **two** independent solutions —
+[BESSELJ](/docs/engineering/besselj) is one, and BESSELY is the other.
+Both oscillate and decay in amplitude as `X` grows, similar in overall
+shape, but they're out of step with each other (analogous to how sine
+and cosine both oscillate but are offset from one another). Unlike
+BESSELJ, BESSELY's formula includes a logarithm term, which is why it
+diverges to negative infinity as `X` approaches `0` — a full physical
+solution generally needs a specific *mix* of both BESSELJ and BESSELY
+to match whatever boundary conditions the actual problem has.
+
+<Callout type="check">
+  Bessel functions of different orders aren't independent — they
+  satisfy the recurrence `Y_{n-1}(x) + Y_{n+1}(x) = (2n/x)·Y_n(x)`. At
+  `x=1.9, n=1`: `Y_0(1.9) + Y_2(1.9) = 0.4968 + (-0.6699) = -0.1731`,
+  and `(2/1.9)·Y_1(1.9) = (2/1.9)×(-0.1644) = -0.1731` — the same value
+  either way, the same identity BESSELJ satisfies.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.4968', '1': '-0.1644', '2': '-0.6699' }}
+  defaultValue="0"
+  label={'Live preview — =BESSELY(1.9, {value})'}
+  fieldLabel="N"
+/>
+
+At a fixed `X` of `1.9`, BESSELY's values swing between positive and
+negative across orders, similar in spirit to
+[BESSELJ](/docs/engineering/besselj)'s own oscillation — but the
+specific values are different, since BESSELY and BESSELJ are
+genuinely independent solutions, not scaled copies of each other.
+
+## Common errors
+
+### #NUM! — X is zero or negative
+
+<ExcelCode>{`BESSELY(0, 1) → #NUM!`}</ExcelCode>
+
+Unlike BESSELJ, BESSELY requires `X` to be strictly greater than `0` —
+its formula includes a logarithm term that diverges at `X = 0` and is
+undefined for negative `X`.
+
+### #NUM! — N is negative
+
+<ExcelCode>{`BESSELY(1.9, -1) → #NUM!`}</ExcelCode>
+
+The order `N` must be `0` or greater. A negative order returns
+`#NUM!`.
+
+### #VALUE! — X or N is nonnumeric
+
+<ExcelCode>{`BESSELY("x", 2) → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Why does BESSELY require a positive X, unlike BESSELJ?',
+    answer: "BESSELY's formula includes a logarithm term (log(x/2)) as part of its definition, which diverges to negative infinity at x=0 and is undefined for negative x — the same domain restriction ordinary LN and LOG have.",
+  },
+  {
+    question: 'How is BESSELY related to BESSELJ?',
+    answer: "They're the two independent solutions to the same Bessel differential equation — similar in that both oscillate and decay as X grows, but genuinely distinct functions, not scaled or shifted versions of each other, the same way sine and cosine are both trigonometric but distinct.",
+  },
+  {
+    question: 'Why would a real problem need both BESSELJ and BESSELY?',
+    answer: "A general solution to Bessel's equation is a combination of both — which specific mix is needed depends on the boundary conditions of the actual physical problem, similar to how a general solution to a simple vibration equation is a mix of sine and cosine, with the exact mix determined by the initial conditions.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BESSELY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BESSELY(1.9, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.BesselY(1.9, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.special import yv
+    result = yv(0, 1.9)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BESSELJ](/docs/engineering/besselj) — the other independent
+  solution to the same differential equation.
+- [BESSELK](/docs/engineering/besselk) — the modified (non-oscillating)
+  version of BESSELY, for imaginary arguments.
+- [BESSELI](/docs/engineering/besseli) — the modified counterpart to
+  BESSELJ.

@@ -1,0 +1,171 @@
+---
+title: BESSELJ
+description: The Bessel function of the first kind — an oscillating, decaying wave that shows up wherever a problem has circular or cylindrical symmetry.
+---
+
+Evaluate the Bessel function of the first kind, order `N`, at `X` — a
+family of oscillating functions that show up naturally whenever a
+physical problem (vibration, heat, waves) has circular or cylindrical
+symmetry, the way sine and cosine show up for problems with straight-line
+symmetry.
+
+export const quickAnswerFacts = [
+  { text: 'X can be any real number — positive, negative, or zero', type: 'check' },
+  { text: 'N (the order) must be a non-negative integer — a fractional N is truncated, not rounded', type: 'warn' },
+  { text: 'N < 0 returns #NUM!; a non-numeric X or N returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=BESSELJ(X, N)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BESSELJ(X, N)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'X',
+    type: 'number',
+    required: true,
+    description: 'The value at which to evaluate the function. Any real number.',
+  },
+  {
+    name: 'N',
+    type: 'number',
+    required: true,
+    description: 'The order of the Bessel function. Truncated to an integer if not already one; must be 0 or greater.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of the order-`N` Bessel function of the first kind, evaluated
+at `X`.
+
+## Description
+
+BESSELJ solves a specific second-order differential equation (Bessel's
+equation) that turns up repeatedly in physics and engineering problems
+with cylindrical or circular symmetry — the vibration modes of a
+circular drumhead, heat flow through a cylindrical rod, and signal
+propagation in a circular waveguide all involve Bessel functions of
+the first kind. Like sine and cosine, `J_n(x)` oscillates as `x`
+increases — but unlike sine and cosine, its amplitude gradually decays
+rather than staying constant.
+
+<Callout type="check">
+  Bessel functions of different orders aren't independent — they
+  satisfy the recurrence `J_{n-1}(x) + J_{n+1}(x) = (2n/x)·J_n(x)`. At
+  `x=1.9, n=1`: `J_0(1.9) + J_2(1.9) = 0.2818 + 0.3299 = 0.6117`, and
+  `(2/1.9)·J_1(1.9) = (2/1.9)×0.5812 = 0.6117` — the same value either
+  way, a genuine mathematical identity rather than a coincidence.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.2818', '1': '0.5812', '2': '0.3299' }}
+  defaultValue="0"
+  label={'Live preview — =BESSELJ(1.9, {value})'}
+  fieldLabel="N"
+/>
+
+At a fixed `X` of `1.9`, the three lowest orders give noticeably
+different values — `0.2818`, `0.5812`, and `0.3299` — since each order
+solves a different version of Bessel's equation, not just a scaled
+copy of the others.
+
+## Common errors
+
+### #NUM! — N is negative
+
+<ExcelCode>{`BESSELJ(1.9, -1) → #NUM!`}</ExcelCode>
+
+The order `N` must be `0` or greater. A negative order returns
+`#NUM!`.
+
+### #VALUE! — X or N is nonnumeric
+
+<ExcelCode>{`BESSELJ("x", 2) → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+### Expecting N to round instead of truncate
+
+<ExcelCode>{`BESSELJ(1.9, 2.7) → 0.3299, using order 2 — NOT rounded up to order 3`}</ExcelCode>
+
+A fractional `N` is **truncated** toward zero, the same way `INT`
+would handle it, not rounded to the nearest whole number. `2.7`
+becomes order `2`, not order `3` — using order `3` instead would give
+a noticeably different result (`0.1134` rather than `0.3299`).
+
+export const faqs = [
+  {
+    question: 'What is the Bessel function of the first kind actually used for?',
+    answer: 'It solves Bessel\'s differential equation, which turns up in any physics problem with cylindrical or circular symmetry — the vibration modes of a circular drum, heat conduction through a cylindrical rod, and electromagnetic wave propagation in a circular waveguide are all classic examples.',
+  },
+  {
+    question: 'Does BESSELJ round or truncate a fractional order?',
+    answer: 'It truncates toward zero, the same way INT does — BESSELJ(x, 2.7) uses order 2, not order 3.',
+  },
+  {
+    question: 'What happens with a negative X?',
+    answer: 'It works fine for BESSELJ (unlike BESSELK and BESSELY, which require a positive X) — for an even order, BESSELJ(-x, n) equals BESSELJ(x, n); for an odd order, it equals -BESSELJ(x, n).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BESSELJ from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BESSELJ(1.9, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.BesselJ(1.9, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.special import jv
+    result = jv(2, 1.9)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BESSELY](/docs/engineering/bessely) — the Bessel function of the
+  second kind, the other independent solution to the same differential
+  equation.
+- [BESSELI](/docs/engineering/besseli) — the modified (non-oscillating)
+  version of BESSELJ, for imaginary arguments.
+- [BESSELK](/docs/engineering/besselk) — the modified counterpart to
+  BESSELY.

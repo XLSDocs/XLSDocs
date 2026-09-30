@@ -1,0 +1,171 @@
+---
+title: BESSELK
+description: The modified Bessel function of the second kind — BESSELY's non-oscillating counterpart, decaying exponentially instead of oscillating.
+---
+
+Evaluate the modified Bessel function of the second kind, order `N`,
+at `X` — equivalent to [BESSELY](/docs/engineering/bessely) evaluated
+for a purely imaginary argument, and the natural pair to
+[BESSELI](/docs/engineering/besseli) the same way BESSELY pairs with
+[BESSELJ](/docs/engineering/besselj).
+
+export const quickAnswerFacts = [
+  { text: 'X must be greater than 0 — zero or a negative X returns #NUM!', type: 'warn' },
+  { text: 'N (the order) must be a non-negative integer — a fractional N is truncated, not rounded', type: 'warn' },
+  { text: 'BESSELK always decreases toward 0 as X grows — the opposite of BESSELI, which grows without bound', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BESSELK(X, N)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BESSELK(X, N)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'X',
+    type: 'number',
+    required: true,
+    description: 'The value at which to evaluate the function. Must be greater than 0.',
+  },
+  {
+    name: 'N',
+    type: 'number',
+    required: true,
+    description: 'The order of the Bessel function. Truncated to an integer if not already one; must be 0 or greater.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of the order-`N` modified Bessel function of the second
+kind, evaluated at `X`.
+
+## Description
+
+BESSELK is [BESSELI](/docs/engineering/besseli)'s independent
+counterpart — together they form the two solutions to the modified
+Bessel differential equation, the same way
+[BESSELJ](/docs/engineering/besselj) and
+[BESSELY](/docs/engineering/bessely) form the two solutions to the
+ordinary Bessel equation. Where BESSELI grows exponentially larger as
+`X` increases, BESSELK does the opposite — it decays exponentially
+toward `0`, making the pair a natural fit for physical problems with
+one solution that grows and one that decays (steady-state heat
+conduction outward from a cylindrical source, for instance).
+
+<Callout type="warn">
+  BESSELK is undefined at `X = 0` (it diverges to infinity there) and
+  for any negative `X` — unlike
+  [BESSELI](/docs/engineering/besseli) and
+  [BESSELJ](/docs/engineering/besselj), which both accept zero or
+  negative `X` without complaint.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.1288', '1': '0.1597', '2': '0.2969' }}
+  defaultValue="0"
+  label={'Live preview — =BESSELK(1.9, {value})'}
+  fieldLabel="N"
+/>
+
+At a fixed `X` of `1.9`, BESSELK's values across the first few orders
+are all fairly close together and small — a much gentler spread than
+[BESSELI](/docs/engineering/besseli)'s at the same `X`, since BESSELK
+is the decaying (not growing) half of the modified pair.
+
+## Common errors
+
+### #NUM! — X is zero or negative
+
+<ExcelCode>{`BESSELK(0, 1) → #NUM!`}</ExcelCode>
+
+Unlike BESSELI and BESSELJ, BESSELK requires `X` to be strictly
+greater than `0` — it's mathematically undefined (diverging to
+infinity) at `X = 0`, and undefined entirely for negative `X`.
+
+### #NUM! — N is negative
+
+<ExcelCode>{`BESSELK(1.9, -1) → #NUM!`}</ExcelCode>
+
+The order `N` must be `0` or greater. A negative order returns
+`#NUM!`.
+
+### #VALUE! — X or N is nonnumeric
+
+<ExcelCode>{`BESSELK("x", 2) → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Why does BESSELK require a positive X, unlike BESSELI or BESSELJ?',
+    answer: "BESSELK's formula includes a logarithm term (log(x/2)) as part of its definition, which is undefined at x=0 and for negative x — the same domain restriction ordinary LN and LOG have.",
+  },
+  {
+    question: 'How is BESSELK related to BESSELI?',
+    answer: "They're the two independent solutions to the modified Bessel equation — BESSELI grows exponentially as X increases, while BESSELK decays exponentially toward 0, the same complementary growing/decaying relationship as e^x and e^(-x).",
+  },
+  {
+    question: 'What is BESSELK used for?',
+    answer: 'It shows up in steady-state heat conduction and electrostatics problems with cylindrical symmetry — often paired with BESSELI, where BESSELI describes behavior that stays bounded near the center of a cylinder and BESSELK describes behavior that decays away from it.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BESSELK from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BESSELK(1.9, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.BesselK(1.9, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.special import kv
+    result = kv(0, 1.9)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BESSELI](/docs/engineering/besseli) — the modified Bessel function
+  of the first kind, BESSELK's other independent counterpart.
+- [BESSELY](/docs/engineering/bessely) — the ordinary (oscillating)
+  version BESSELK is derived from.
+- [BESSELJ](/docs/engineering/besselj) — the ordinary counterpart to
+  BESSELI.
