@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-03',
+    title: '42 more Engineering functions — bit operations, complex numbers, Bessel functions, error functions, DELTA, GESTEP, and CONVERT — the Engineering+Cube audit is complete',
+    description:
+      "Six more rounds closing out the 8-round project that started with Cube: BITAND/BITOR/BITXOR/BITLSHIFT/BITRSHIFT; the full 26-function complex-number family (COMPLEX, IMREAL/IMAGINARY/IMABS/IMARGUMENT/IMCONJUGATE, IMSUM/IMSUB/IMPRODUCT/IMDIV, and all 16 trig/hyperbolic/exp/log/power variants); BESSELJ/BESSELI/BESSELK/BESSELY; ERF/ERF.PRECISE/ERFC/ERFC.PRECISE; and DELTA, GESTEP, and CONVERT. Along the way: a from-scratch Bessel implementation needed to Richardson-extrapolate a removable 0/0 singularity, catching a likely typo in Microsoft's own BESSELJ documentation in the process, and a real divergence between Microsoft's VBA reference docs and actual cell-formula behavior for negative ERF inputs.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-09-24',
     title: 'A new Engineering category: all 12 number-base conversion functions',
     description:

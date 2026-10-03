@@ -237,6 +237,11 @@ const CATEGORIES: PlaygroundCategory[] = [
         href: '/docs/engineering/bin2dec#try-it',
         teaser: "Switch to a full 10-digit binary number starting with 1 and watch the result flip to -5 instead of a huge positive number — two's complement in action.",
       },
+      {
+        fn: 'CONVERT',
+        href: '/docs/engineering/convert#try-it',
+        teaser: 'Switch the target unit between km, m, and ft and watch one mile come out as three very different-looking numbers for the same real distance.',
+      },
     ],
   },
 ];
