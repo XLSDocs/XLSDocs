@@ -1,0 +1,158 @@
+---
+title: DELTA
+description: Test whether two numbers are exactly equal, returning 1 or 0 — the Kronecker delta function.
+---
+
+Test whether two numbers are exactly equal, returning `1` if they
+match and `0` if they don't — a plain numeric 1-or-0 flag, rather than
+the `TRUE`/`FALSE` an ordinary `=` comparison would give.
+
+export const quickAnswerFacts = [
+  { text: 'DELTA(a, b) returns 1 if a equals b, and 0 otherwise', type: 'check' },
+  { text: 'If number2 is omitted, it\'s treated as 0 — DELTA(x) tests whether x equals 0', type: 'check' },
+  { text: 'A nonnumeric number1 or number2 returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DELTA(number1, [number2])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DELTA(number1, [number2])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first number to compare.',
+  },
+  {
+    name: 'number2',
+    type: 'number',
+    required: false,
+    description: 'The second number to compare. If omitted, treated as 0.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`1` if `number1` equals `number2`; `0` otherwise.
+
+## Description
+
+DELTA — also known as the Kronecker delta function in math and
+physics — does exactly what the ordinary `=` comparison operator does,
+except it returns a genuine **number** (`1` or `0`) instead of a
+boolean (`TRUE`/`FALSE`). That makes it directly usable in arithmetic:
+summing `DELTA` across a range of pairs counts how many of them are
+equal, without needing `SUMPRODUCT` or an extra numeric coercion (like
+multiplying a `TRUE`/`FALSE` result by `1`) to make an equality test
+addable.
+
+## Try it
+
+<TryIt
+  data={{ '4': '0', '5': '1', '0': '0' }}
+  defaultValue="5"
+  label={'Live preview — =DELTA(5, {value})'}
+  fieldLabel="number2"
+/>
+
+`DELTA(5, 5)` returns `1` — the two numbers match exactly. Anything
+else, like `DELTA(5, 4)` or `DELTA(5, 0)`, returns `0`, since DELTA
+only ever checks for exact equality, not closeness.
+
+## Common errors
+
+### #VALUE! — number1 or number2 is nonnumeric
+
+<ExcelCode>{`DELTA("x", 5) → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+### Expecting DELTA to test "close enough" rather than exact equality
+
+<ExcelCode>{`DELTA(5, 5.0001) → 0, not 1 — DELTA requires EXACT equality`}</ExcelCode>
+
+DELTA doesn't do any rounding or tolerance — even a tiny difference
+means `0`. This matters especially for values computed through a chain
+of floating-point arithmetic, where two numbers that look identical
+when displayed can differ by a tiny, invisible amount underneath.
+
+### Forgetting number2 defaults to 0, not to number1
+
+<ExcelCode>{`DELTA(0.5) → 0, the same as DELTA(0.5, 0) — NOT automatically 1`}</ExcelCode>
+
+Omitting the second argument doesn't skip the comparison — it compares
+`number1` against `0`. `DELTA(0.5)` checks whether `0.5` equals `0`,
+which it doesn't, so the result is `0`.
+
+export const faqs = [
+  {
+    question: 'Why use DELTA instead of just number1=number2?',
+    answer: 'DELTA returns an actual number (1 or 0), while = returns a boolean (TRUE/FALSE). That makes DELTA directly summable across a range — SUM(DELTA(range1, range2)) counts matching pairs, where summing a range of TRUE/FALSE values directly would need an extra coercion step.',
+  },
+  {
+    question: 'Does DELTA allow for a small tolerance, the way visually "equal" numbers sometimes need?',
+    answer: 'No — DELTA tests for exact equality only. Two numbers that differ by even a tiny floating-point rounding error will return 0, not 1, even if they display identically.',
+  },
+  {
+    question: 'What is DELTA used for in practice?',
+    answer: 'Counting or flagging exact matches across a dataset — for example, summing DELTA across two columns to count how many rows have identical values in both, or using it inside a larger formula wherever a 1-or-0 numeric flag is more convenient than a TRUE/FALSE boolean.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DELTA from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DELTA(5, 5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Integer
+    result = Application.WorksheetFunction.Delta(5, 5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = int(5 == 5)  # 1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GESTEP](/docs/engineering/gestep) — the same 1-or-0 flag pattern,
+  testing "greater than or equal to" instead of "equal to."
+- [IF](/docs/logical/if) — returns custom values based on a condition,
+  rather than always returning 1 or 0.
+- [SUMPRODUCT](/docs/math/sumproduct) — another common way to count
+  matching pairs across two ranges, without DELTA.

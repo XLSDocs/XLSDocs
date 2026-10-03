@@ -1,0 +1,177 @@
+---
+title: CONVERT
+description: Convert a number from one unit of measurement to another — weight, distance, temperature, volume, and dozens more.
+---
+
+Convert a number from one unit of measurement to another — distances,
+weights, temperatures, volumes, pressures, and dozens of other unit
+families, all through a single function instead of memorizing
+conversion factors.
+
+export const quickAnswerFacts = [
+  { text: 'from_unit and to_unit must belong to the SAME measurement category — mixing categories returns #N/A', type: 'warn' },
+  { text: 'Unit abbreviations are case-sensitive — "M" (mega) and "m" (milli or meters) are completely different', type: 'warn' },
+  { text: 'Metric prefixes (k, M, c, m, etc.) combine with most metric units — but not with temperature units', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CONVERT(number, from_unit, to_unit)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CONVERT(number, from_unit, to_unit)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value, in from_unit, to convert.',
+  },
+  {
+    name: 'from_unit',
+    type: 'text',
+    required: true,
+    description: 'The unit abbreviation number is currently expressed in.',
+  },
+  {
+    name: 'to_unit',
+    type: 'text',
+    required: true,
+    description: 'The unit abbreviation to convert number into. Must be from the same measurement category as from_unit.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number`, converted from `from_unit` to `to_unit`.
+
+## Description
+
+CONVERT covers around a dozen measurement categories — weight/mass,
+distance, time, pressure, force, energy, power, magnetism,
+temperature, volume, area, and speed — each with its own set of unit
+abbreviations (`"kg"`, `"mi"`, `"hr"`, `"Pa"`, `"N"`, `"J"`, `"HP"`,
+`"T"`, `"C"`, `"l"`, `"m2"`, `"mph"`, and many more). A conversion only
+works between two units in the **same** category — converting a
+distance into a weight, for instance, is meaningless and returns
+`#N/A` rather than a number.
+
+<Callout type="warn">
+  Most metric unit abbreviations can be prefixed with a standard metric
+  (or binary) scale prefix — `"k"` for kilo (`×1000`), `"c"` for centi
+  (`×0.01`), `"M"` for mega (`×1,000,000`), and so on. **Temperature
+  units and non-metric units can't take a prefix at all** — there's no
+  such thing as `"kC"` (kilo-Celsius) or `"kmi"` (kilo-miles).
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'km': '1.609344', 'm': '1609.344', 'ft': '5280' }}
+  defaultValue="km"
+  label={'Live preview — =CONVERT(1, "mi", "{value}")'}
+  fieldLabel="to_unit"
+/>
+
+One mile converts to `1.609344` kilometers, `1609.344` meters, or
+exactly `5280` feet — three different units, all within the same
+"distance" category, so all three conversions succeed.
+
+## Common errors
+
+### #N/A — from_unit and to_unit are in different categories
+
+<ExcelCode>{`CONVERT(2.5, "ft", "sec") → #N/A — feet (distance) and seconds (time) aren't compatible`}</ExcelCode>
+
+A conversion only makes sense within a single measurement category.
+Trying to convert a distance into a time (or any other mismatched
+pairing) returns `#N/A`, the same error Excel uses for "this lookup
+doesn't exist" elsewhere.
+
+### #N/A — a mistyped or wrong-case unit abbreviation
+
+<ExcelCode>{`CONVERT(1, "KG", "g") → #N/A — unit abbreviations are case-sensitive; "kg" works, "KG" doesn't`}</ExcelCode>
+
+Every unit and prefix abbreviation has one specific, exact casing.
+`"kg"` (kilogram) and `"KG"` are not the same thing as far as CONVERT
+is concerned — the uppercase version simply isn't a recognized unit,
+so it errors instead of guessing what was meant.
+
+### Silently getting a wildly wrong answer from a case mix-up
+
+<ExcelCode>{`CONVERT(1, "Mg", "g") → 1,000,000, but CONVERT(1, "mg", "g") → 0.001 — a billion-fold difference from one letter's case`}</ExcelCode>
+
+Unlike a flat-out typo (which at least errors loudly), swapping the
+case of a *valid* prefix doesn't error at all — it just silently
+computes the wrong unit's conversion. `"M"` is the mega prefix
+(`×1,000,000`); `"m"` is the milli prefix (`×0.001`) when used as a
+prefix, or plain meters when used as a whole unit. Double-check
+capitalization carefully, especially for one-letter prefixes.
+
+export const faqs = [
+  {
+    question: 'Why does CONVERT(2.5, "ft", "sec") return #N/A instead of a number?',
+    answer: '"ft" (feet) is a distance unit and "sec" (seconds) is a time unit — they belong to different measurement categories, so there\'s no meaningful conversion factor between them. CONVERT only works within a single category.',
+  },
+  {
+    question: 'Can I combine a metric prefix with any unit?',
+    answer: 'Only with metric units — temperature units (C, F, K) and non-metric units (like miles or pounds) can\'t take a prefix at all. A metric unit like grams or meters can combine with most of the standard prefixes, from yotta (10^24) down to yocto (10^-24), plus binary prefixes like kibi (2^10) for information units.',
+  },
+  {
+    question: 'Why are unit abbreviations case-sensitive?',
+    answer: 'Because case is often the only thing distinguishing two completely different prefixes or units — "M" (mega, ×1,000,000) and "m" (milli, ×0.001) differ by a factor of a billion, so treating the two cases as interchangeable would make a huge class of conversions ambiguous.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CONVERT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CONVERT(1, "mi", "km")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Convert(1, "mi", "km")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = 1 * 1.609344  # 1 mile in km (no built-in unit-conversion function)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DELTA](/docs/engineering/delta) and
+  [GESTEP](/docs/engineering/gestep) — the other two functions
+  rounding out this final batch of Engineering functions.
+- [TEXT](/docs/text/text) — often paired with CONVERT to format a
+  converted value with a unit label for display.

@@ -1,0 +1,158 @@
+---
+title: GESTEP
+description: Test whether a number is greater than or equal to a threshold, returning 1 or 0 — a numeric step function.
+---
+
+Test whether `number` is greater than or equal to `step`, returning
+`1` if so and `0` if not — a plain numeric 1-or-0 flag, rather than
+the `TRUE`/`FALSE` an ordinary `>=` comparison would give.
+
+export const quickAnswerFacts = [
+  { text: 'GESTEP(number, step) returns 1 if number >= step, and 0 otherwise', type: 'check' },
+  { text: 'If step is omitted, it\'s treated as 0 — GESTEP(x) tests whether x is non-negative', type: 'check' },
+  { text: 'A nonnumeric number or step returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GESTEP(number, [step])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GESTEP(number, [step])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to test against step.',
+  },
+  {
+    name: 'step',
+    type: 'number',
+    required: false,
+    description: 'The threshold value. If omitted, treated as 0.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`1` if `number` is greater than or equal to `step`; `0` otherwise.
+
+## Description
+
+GESTEP does exactly what the ordinary `>=` comparison operator does,
+except it returns a genuine **number** (`1` or `0`) instead of a
+boolean (`TRUE`/`FALSE`) — the same relationship
+[DELTA](/docs/engineering/delta) has to a plain `=` comparison. That
+makes it directly usable in arithmetic: summing `GESTEP` across a
+range counts how many values clear a given threshold, without an
+extra step to coerce `TRUE`/`FALSE` into addable numbers.
+
+## Try it
+
+<TryIt
+  data={{ '4': '1', '5': '1', '6': '0' }}
+  defaultValue="4"
+  label={'Live preview — =GESTEP(5, {value})'}
+  fieldLabel="step"
+/>
+
+`GESTEP(5, 4)` returns `1` — `5` clears the threshold of `4`.
+`GESTEP(5, 5)` also returns `1`, since "greater than or **equal to**"
+includes an exact match. Only `GESTEP(5, 6)` returns `0`, since `5`
+falls short of `6`.
+
+## Common errors
+
+### #VALUE! — number or step is nonnumeric
+
+<ExcelCode>{`GESTEP("x", 5) → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+### Forgetting step defaults to 0, not to number
+
+<ExcelCode>{`GESTEP(-1) → 0, the same as GESTEP(-1, 0) — testing against zero, not against itself`}</ExcelCode>
+
+Omitting `step` doesn't skip the comparison — it compares `number`
+against `0`. `GESTEP(-1)` checks whether `-1` is non-negative, which
+it isn't, so the result is `0`.
+
+### Expecting a strict "greater than," not "greater than or equal to"
+
+<ExcelCode>{`GESTEP(5, 5) → 1, not 0 — an exact match still counts`}</ExcelCode>
+
+The "GE" in GESTEP stands for "greater than or **equal to**" — a value
+exactly at the threshold still returns `1`, not `0`. A strict
+greater-than test would need an extra adjustment, like comparing
+against a step value nudged slightly higher.
+
+export const faqs = [
+  {
+    question: 'Why use GESTEP instead of just number >= step?',
+    answer: 'GESTEP returns an actual number (1 or 0), while >= returns a boolean (TRUE/FALSE). That makes GESTEP directly summable across a range — SUM(GESTEP(range, threshold)) counts how many values clear the threshold, where summing TRUE/FALSE values directly would need an extra coercion step.',
+  },
+  {
+    question: 'Does GESTEP count an exact match as passing the threshold?',
+    answer: 'Yes — "greater than or equal to" includes equality, so GESTEP(5, 5) returns 1, not 0.',
+  },
+  {
+    question: 'What is GESTEP used for in practice?',
+    answer: 'Counting or flagging values that clear a threshold — for example, summing GESTEP across a column of measurements to count how many meet or exceed a minimum requirement, or using it as a numeric step-function switch inside a larger formula.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GESTEP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GESTEP(5, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Integer
+    result = Application.WorksheetFunction.GeStep(5, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = int(5 >= 4)  # 1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DELTA](/docs/engineering/delta) — the same 1-or-0 flag pattern,
+  testing exact equality instead of "greater than or equal to."
+- [IF](/docs/logical/if) — returns custom values based on a condition,
+  rather than always returning 1 or 0.
+- [COUNTIF](/docs/math/countif) — a more common way to count values
+  clearing a threshold across a range, without GESTEP.
