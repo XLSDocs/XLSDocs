@@ -1,0 +1,155 @@
+---
+title: ERFC.PRECISE
+description: The complementary error function — identical to ERFC, offered under a naming-consistency alias alongside ERF.PRECISE.
+---
+
+Compute the complementary error function integrated from `x` to
+infinity — identical to [ERFC](/docs/engineering/erfc), offered as a
+naming-pattern sibling to [ERF.PRECISE](/docs/engineering/erf-precise).
+
+export const quickAnswerFacts = [
+  { text: 'ERFC.PRECISE(x) always equals ERFC(x) — the two are identical', type: 'check' },
+  { text: 'ERFC.PRECISE(x) = 1 - ERF.PRECISE(x)', type: 'check' },
+  { text: 'A nonnumeric x returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ERFC.PRECISE(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ERFC.PRECISE(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The lower bound for integrating the complementary error function (integrated from x to infinity).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The complementary error function integrated between `x` and infinity.
+
+## Description
+
+ERFC.PRECISE computes exactly the same value as
+[ERFC](/docs/engineering/erfc) — the two functions are interchangeable
+for every input. Unlike the relationship between
+[ERF](/docs/engineering/erf) and
+[ERF.PRECISE](/docs/engineering/erf-precise) (where ERF has a genuine
+extra capability, its optional `upper_limit` argument), ERFC never had
+a two-argument form to begin with — both ERFC and ERFC.PRECISE always
+integrate from `x` to infinity. ERFC.PRECISE exists purely to match
+ERF.PRECISE's naming pattern.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.4795', '1': '0.1573', '1.5': '0.0339' }}
+  defaultValue="1"
+  label={'Live preview — =ERFC.PRECISE({value})'}
+  fieldLabel="x"
+/>
+
+`ERFC.PRECISE(1)` returns `0.1573` — identical to
+[ERFC](/docs/engineering/erfc)(1)'s own result, since the two compute
+exactly the same thing.
+
+## Common errors
+
+### #VALUE! — x is nonnumeric
+
+<ExcelCode>{`ERFC.PRECISE("x") → #VALUE!`}</ExcelCode>
+
+`x` must be an actual number — text that can't be interpreted as one
+returns `#VALUE!`.
+
+### Assuming ERFC.PRECISE adds some capability ERFC lacks
+
+<ExcelCode>{`ERFC.PRECISE(1) and ERFC(1) both return 0.1573 — truly interchangeable, unlike ERF vs ERF.PRECISE`}</ExcelCode>
+
+Unlike [ERF](/docs/engineering/erf), which gains a genuinely useful
+optional second argument over
+[ERF.PRECISE](/docs/engineering/erf-precise), ERFC never had anything
+analogous — ERFC and ERFC.PRECISE have always behaved identically,
+with no functional difference to look for.
+
+### Looking for an "ERFC with two arguments" form
+
+<ExcelCode>{`ERFC(a, b) → #VALUE! (too many arguments) — ERFC only ever takes one argument`}</ExcelCode>
+
+Neither `ERFC` nor `ERFC.PRECISE` has an `upper_limit`-style second
+argument — they always integrate out to infinity, so there's no
+"other end" to specify.
+
+export const faqs = [
+  {
+    question: 'What is the difference between ERFC and ERFC.PRECISE?',
+    answer: "There isn't one — the two functions are fully interchangeable, computing the identical value for any input. ERFC.PRECISE exists purely as a naming-pattern companion to ERF.PRECISE, introduced alongside it.",
+  },
+  {
+    question: 'Does ERFC.PRECISE have a two-argument form like ERF does?',
+    answer: 'No — neither ERFC nor ERFC.PRECISE ever had an optional upper_limit argument. Both always integrate from x out to infinity.',
+  },
+  {
+    question: 'Is there any reason to prefer ERFC.PRECISE over ERFC, or vice versa?',
+    answer: 'Not functionally — pick whichever reads more naturally in context, or matches whatever naming convention the rest of a given workbook already uses for its ERF-family calls.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ERFC.PRECISE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ERFC.PRECISE(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.ErfC_Precise(1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import erfc
+    result = erfc(1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ERFC](/docs/engineering/erfc) — the identical calculation, under
+  the older function name.
+- [ERF.PRECISE](/docs/engineering/erf-precise) — the naming-pattern
+  sibling this function was introduced alongside.
+- [ERF](/docs/engineering/erf) — the function ERFC.PRECISE's result
+  is the complement of (`1 - ERF(x)`).

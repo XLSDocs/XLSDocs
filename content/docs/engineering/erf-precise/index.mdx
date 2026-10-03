@@ -1,0 +1,168 @@
+---
+title: ERF.PRECISE
+description: The error function integrated from 0 — ERF's single-argument form as its own dedicated function.
+---
+
+Compute the error function integrated from `0` to `x` — the same
+calculation as [ERF](/docs/engineering/erf) called with a single
+argument, offered as its own dedicated function.
+
+export const quickAnswerFacts = [
+  { text: 'ERF.PRECISE(x) always equals ERF(x) — identical to ERF\'s one-argument form', type: 'check' },
+  { text: 'Unlike ERF, there is no optional second argument — ERF.PRECISE only ever integrates from 0', type: 'warn' },
+  { text: 'A nonnumeric x returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ERF.PRECISE(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ERF.PRECISE(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The lower bound for integrating the error function (always integrated from 0 up to this value).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The error function integrated between `0` and `x`.
+
+## Description
+
+ERF.PRECISE computes exactly the same value as
+[ERF](/docs/engineering/erf)'s one-argument form — `ERF.PRECISE(x)`
+and `ERF(x)` always agree. The only real difference between the two
+functions is that ERF.PRECISE has no optional second argument: it
+always integrates from `0`, while ERF can additionally integrate
+between two arbitrary bounds via its optional `upper_limit` argument.
+ERF.PRECISE exists mainly as a naming-consistency sibling to
+[ERFC.PRECISE](/docs/engineering/erfc-precise), both added to Excel
+alongside each other.
+
+<Callout type="warn">
+  Microsoft's own VBA reference documentation for the
+  `WorksheetFunction.Erf_Precise` method states that a negative `x`
+  "generates an error" — but this appears to describe the older VBA
+  automation wrapper specifically, not the `=ERF.PRECISE()` cell
+  formula itself, which multiple independent sources confirm returns a
+  correctly-signed negative result for a negative `x` (consistent with
+  erf being an odd function). If a formula seems to behave differently
+  than VBA code calling the same function, this kind of
+  automation-layer-vs-worksheet-formula mismatch is worth keeping in
+  mind.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.5205', '1': '0.8427', '1.5': '0.9661' }}
+  defaultValue="1"
+  label={'Live preview — =ERF.PRECISE({value})'}
+  fieldLabel="x"
+/>
+
+`ERF.PRECISE(1)` returns `0.8427` — identical to
+[ERF](/docs/engineering/erf)(1)'s own result, since both compute
+exactly the same integral from `0` to `1`.
+
+## Common errors
+
+### #VALUE! — x is nonnumeric
+
+<ExcelCode>{`ERF.PRECISE("x") → #VALUE!`}</ExcelCode>
+
+`x` must be an actual number — text that can't be interpreted as one
+returns `#VALUE!`.
+
+### Expecting a two-argument form, like ERF has
+
+<ExcelCode>{`ERF.PRECISE(0.5, 1) → #VALUE! (too many arguments) — use ERF(0.5, 1) instead`}</ExcelCode>
+
+ERF.PRECISE only ever takes one argument. To integrate between two
+arbitrary bounds rather than from `0`, use
+[ERF](/docs/engineering/erf)'s two-argument form instead.
+
+### Assuming ERF.PRECISE is more accurate than ERF
+
+<ExcelCode>{`ERF.PRECISE(1) and ERF(1) return the exact same value, 0.8427 — "PRECISE" isn't describing extra precision`}</ExcelCode>
+
+Despite the name, ERF.PRECISE doesn't compute a more accurate result
+than ERF — the two agree exactly for the same input. The "newer
+function, clearer name" naming pattern (seen elsewhere in Excel, like
+`CEILING.PRECISE`) doesn't always mean a precision improvement; here
+it's purely a naming-consistency addition.
+
+export const faqs = [
+  {
+    question: 'Is ERF.PRECISE more accurate than ERF?',
+    answer: "No — for the same input, ERF.PRECISE(x) and ERF(x) return identical values. The name doesn't indicate a precision improvement; it mainly exists as a naming-consistency companion to ERFC.PRECISE.",
+  },
+  {
+    question: 'Can ERF.PRECISE integrate between two arbitrary bounds, like ERF can?',
+    answer: 'No — ERF.PRECISE always integrates from 0. For an arbitrary lower and upper bound, use ERF\'s two-argument form instead: ERF(a, b).',
+  },
+  {
+    question: 'Why might ERF.PRECISE behave differently in a VBA macro than in a worksheet cell?',
+    answer: "Microsoft's VBA documentation for the WorksheetFunction.Erf_Precise method notes it errors on a negative input, which appears to reflect the older automation-layer wrapper rather than the cell formula — worth checking directly if a VBA macro's result for a negative input doesn't match what a plain worksheet formula shows.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ERF.PRECISE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ERF.PRECISE(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Erf_Precise(1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import erf
+    result = erf(1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ERF](/docs/engineering/erf) — the same calculation, plus an
+  optional second argument for integrating between two arbitrary
+  bounds.
+- [ERFC.PRECISE](/docs/engineering/erfc-precise) — the complementary
+  version (`1 - ERF.PRECISE(x)`), ERF.PRECISE's naming-pattern sibling.
+- [ERFC](/docs/engineering/erfc) — the complementary version of ERF.

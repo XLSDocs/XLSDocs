@@ -1,0 +1,170 @@
+---
+title: ERF
+description: The error function, integrated between two bounds — the function behind the normal distribution's cumulative probability.
+---
+
+Compute the error function integrated between `lower_limit` and
+`upper_limit` — a curve that shows up constantly in probability and
+statistics, most directly as the building block behind the normal
+distribution's cumulative probability.
+
+export const quickAnswerFacts = [
+  { text: 'ERF(x) without upper_limit integrates from 0 to x — ERF(a, b) integrates from a to b', type: 'check' },
+  { text: 'ERF is an odd function: ERF(-x) = -ERF(x)', type: 'check' },
+  { text: 'A nonnumeric lower_limit or upper_limit returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ERF(lower_limit, [upper_limit])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ERF(lower_limit, [upper_limit])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'lower_limit',
+    type: 'number',
+    required: true,
+    description: 'The lower bound for integrating the error function.',
+  },
+  {
+    name: 'upper_limit',
+    type: 'number',
+    required: false,
+    description: 'The upper bound for integrating the error function. If omitted, ERF integrates between 0 and lower_limit.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The error function integrated between `lower_limit` and `upper_limit`
+(or between `0` and `lower_limit`, if `upper_limit` is omitted).
+
+## Description
+
+The error function, `erf(x)`, is defined as `(2/√π) ∫₀ˣ e^(-t²) dt` —
+the integral of a (scaled) Gaussian bell curve from `0` out to `x`.
+It's directly related to the normal distribution's cumulative
+probability: the area under a standard normal curve between `-x` and
+`x` is exactly `erf(x/√2)`. ERF's two-argument form additionally
+allows integrating between **any** two bounds, not just from `0` —
+`ERF(a, b)` is equivalent to `ERF(b) − ERF(a)`.
+
+<Callout type="check">
+  Erf is an **odd function**: `ERF(-x)` always equals `-ERF(x)`. This
+  follows directly from `e^(-t²)` being symmetric around `0` — the
+  area accumulated going right from `0` exactly mirrors the area
+  accumulated going left.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.5205', '1': '0.8427', '1.5': '0.9661' }}
+  defaultValue="1"
+  label={'Live preview — =ERF({value})'}
+  fieldLabel="lower_limit"
+/>
+
+`ERF(1)` returns `0.8427` — about 84% of the total area under the
+curve has accumulated by `x=1`. Calling `ERF(0.5, 1)` instead (the
+two-argument form) returns `0.3222` — exactly `ERF(1) − ERF(0.5)`
+(`0.8427 − 0.5205`), the area between those two points rather than
+from `0`.
+
+## Common errors
+
+### #VALUE! — lower_limit or upper_limit is nonnumeric
+
+<ExcelCode>{`ERF("x") → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+### Forgetting ERF(a, b) means "from a to b," not "from 0 to b minus from 0 to a stated separately"
+
+<ExcelCode>{`ERF(0.5, 1) → 0.3222, the SAME as ERF(1)-ERF(0.5) — a single call already does the subtraction`}</ExcelCode>
+
+It's easy to reach for `ERF(1) - ERF(0.5)` out of habit, not realizing
+the two-argument form already does exactly that in one call. Both
+produce the identical result — the two-argument form is just more
+direct.
+
+### Expecting an error from a negative input
+
+<ExcelCode>{`ERF(-1) → -0.8427, a valid result — not an error`}</ExcelCode>
+
+Since erf is mathematically defined for every real number (and is an
+odd function), a negative `lower_limit` or `upper_limit` returns a
+valid, correctly-signed result rather than erroring.
+
+export const faqs = [
+  {
+    question: 'How is ERF related to the normal distribution?',
+    answer: 'The area under a standard normal curve between -x and x is exactly ERF(x/√2) — the error function is the mathematical building block the normal distribution\'s cumulative probability is built from.',
+  },
+  {
+    question: 'What is the difference between ERF and ERF.PRECISE?',
+    answer: 'ERF.PRECISE always integrates from 0 — it has no optional upper_limit argument. ERF(x) with a single argument and ERF.PRECISE(x) compute the identical value; ERF\'s only added capability is its optional second argument, letting it integrate between two arbitrary bounds in one call.',
+  },
+  {
+    question: 'Why does ERF(-1) return a negative number instead of erroring?',
+    answer: 'The error function is odd (ERF(-x) = -ERF(x)) and mathematically well-defined for every real number, so Excel returns the correctly-signed result rather than treating a negative input as invalid.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ERF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ERF(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Erf(1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import erf
+    result = erf(1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ERF.PRECISE](/docs/engineering/erf-precise) — the same calculation,
+  always integrated from 0, without the optional second argument.
+- [ERFC](/docs/engineering/erfc) — the complementary error function
+  (`1 - ERF(x)`), integrated from `x` to infinity instead.
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the standard normal
+  cumulative distribution, directly related to ERF by a change of
+  variables.

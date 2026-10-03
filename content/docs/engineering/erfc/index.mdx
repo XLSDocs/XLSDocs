@@ -1,0 +1,153 @@
+---
+title: ERFC
+description: The complementary error function — 1 minus ERF, integrated from x all the way to infinity.
+---
+
+Compute the complementary error function integrated from `x` to
+infinity — simply `1 - ERF(x)`, useful for working directly with the
+"tail" probability beyond a point instead of the area up to it.
+
+export const quickAnswerFacts = [
+  { text: 'ERFC(x) = 1 - ERF(x)', type: 'check' },
+  { text: 'ERFC always returns a value between 0 and 2 (both ends approached, never exactly reached, for real inputs)', type: 'check' },
+  { text: 'A nonnumeric x returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ERFC(x)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ERFC(x)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The lower bound for integrating the complementary error function (integrated from x to infinity).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The complementary error function integrated between `x` and infinity.
+
+## Description
+
+ERFC is defined as `1 - ERF(x)` — where
+[ERF](/docs/engineering/erf) measures the area under the Gaussian
+curve from `0` out to `x`, ERFC measures everything **left over**,
+from `x` all the way out to infinity. The two functions are two ways
+of describing the same underlying curve: whatever fraction ERF hasn't
+yet accumulated by `x`, ERFC reports directly, without needing a
+separate subtraction step.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.4795', '1': '0.1573', '1.5': '0.0339' }}
+  defaultValue="1"
+  label={'Live preview — =ERFC({value})'}
+  fieldLabel="x"
+/>
+
+`ERFC(1)` returns `0.1573` — exactly `1 - ERF(1)` (`1 - 0.8427`). As
+`x` increases, ERFC shrinks toward `0` (`0.0339` at `x=1.5`), since
+there's less and less of the curve left beyond an ever-larger cutoff
+point.
+
+## Common errors
+
+### #VALUE! — x is nonnumeric
+
+<ExcelCode>{`ERFC("x") → #VALUE!`}</ExcelCode>
+
+`x` must be an actual number — text that can't be interpreted as one
+returns `#VALUE!`.
+
+### Computing 1-ERF(x) manually instead of using ERFC
+
+<ExcelCode>{`ERFC(1) and 1-ERF(1) both return 0.1573 — ERFC just saves writing the subtraction`}</ExcelCode>
+
+There's nothing wrong with `1-ERF(x)` directly — it gives the identical
+answer — but `ERFC(x)` reads more clearly wherever the "tail past x"
+framing is the natural way to think about the calculation.
+
+### Expecting ERFC to approach 2, not 1, for a very negative x
+
+<ExcelCode>{`ERFC(-3) is close to 2, not close to 1 — since ERF(-3) is close to -1`}</ExcelCode>
+
+Because `ERF(x)` ranges from `-1` to `1` (not `0` to `1`), `ERFC(x) =
+1 - ERF(x)` actually ranges from `0` to `2` — a very negative `x`
+pushes `ERF(x)` close to `-1`, which makes `ERFC(x)` close to `2`, not
+`1`.
+
+export const faqs = [
+  {
+    question: 'How is ERFC related to ERF?',
+    answer: 'ERFC(x) is always exactly 1 - ERF(x) — the two functions describe complementary halves of the same curve\'s total area.',
+  },
+  {
+    question: 'What is the range of possible values ERFC can return?',
+    answer: 'From 0 (as x grows very large) up to 2 (as x becomes very negative), since ERF itself ranges from -1 to 1 and ERFC is defined as 1 minus that.',
+  },
+  {
+    question: 'What is ERFC used for in practice?',
+    answer: 'It comes up anywhere a "tail probability past a threshold" framing is more natural than an "accumulated probability up to a threshold" one — common in signal processing and communications engineering when estimating the probability of an error exceeding some noise threshold.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ERFC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ERFC(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.ErfC(1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from math import erfc
+    result = erfc(1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ERF](/docs/engineering/erf) — the function ERFC is defined in terms
+  of (`1 - ERF(x)`).
+- [ERFC.PRECISE](/docs/engineering/erfc-precise) — the identical
+  calculation, under a naming-consistency alias.
+- [ERF.PRECISE](/docs/engineering/erf-precise) — ERF's own
+  single-argument-only counterpart.
