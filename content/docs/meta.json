@@ -1,6 +1,7 @@
 {
   "pages": [
     "arrays",
+    "compatibility",
     "cube",
     "custom-functions",
     "database",

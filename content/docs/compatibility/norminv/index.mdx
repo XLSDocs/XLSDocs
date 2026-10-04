@@ -1,0 +1,130 @@
+---
+title: NORMINV
+description: The pre-2010 name for NORM.INV — identical syntax and behavior, kept for backward compatibility.
+---
+
+NORMINV is the original name for what's now called
+[NORM.INV](/docs/statistical/norm-inv) — Excel 2010 renamed it to
+match [NORM.DIST](/docs/statistical/norm-dist)'s own rename. The two
+functions are otherwise **identical**: same arguments, same order,
+same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says NORMINV "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [NORM.INV](/docs/statistical/norm-inv) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'NORMINV(probability, mean, sd) and NORM.INV(probability, mean, sd) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use NORM.INV instead', type: 'warn' },
+  { text: 'probability must be strictly between 0 and 1, or NORMINV returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORMINV(probability, mean, standard_dev)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORMINV(probability, mean, standard_dev)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability, strictly between 0 and 1, corresponding to the normal distribution.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: 'The arithmetic mean of the distribution.',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The standard deviation of the distribution. Must be greater than 0.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value `x` such that `NORMDIST(x, mean, standard_dev, TRUE)` would
+return `probability` — exactly what
+[NORM.INV](/docs/statistical/norm-inv) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '100.00', '0.8413': '115.00', '0.975': '129.40' }}
+  defaultValue="0.975"
+  label={'Live preview — =NORMINV({value}, 100, 15)'}
+  fieldLabel="probability"
+/>
+
+The same IQ-score scenario (mean `100`, standard deviation `15`) used
+on [NORM.INV](/docs/statistical/norm-inv)'s own page, returning the
+identical values — `NORMINV(0.975, 100, 15)` and
+`NORM.INV(0.975, 100, 15)` both return about `129.4`.
+
+## Common errors
+
+### #NUM! — probability is 0, 1, or outside that range
+
+<ExcelCode>{`NORMINV(1, 100, 15) → #NUM!`}</ExcelCode>
+
+`probability` must be strictly between `0` and `1` (not including
+either endpoint) — the same restriction NORM.INV has.
+
+### #NUM! — standard_dev is 0 or negative
+
+<ExcelCode>{`NORMINV(0.5, 100, 0) → #NUM!`}</ExcelCode>
+
+A standard deviation of `0` or less isn't mathematically valid.
+
+export const faqs = [
+  {
+    question: 'Should I use NORMINV or NORM.INV in a new formula?',
+    answer: 'NORM.INV — it computes the exact same thing, but NORMINV is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses NORMINV?',
+    answer: 'No — NORMINV still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between NORMINV and NORM.INV?',
+    answer: 'None — same argument order, same required arguments, same results for every input.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.INV](/docs/statistical/norm-inv) — the modern replacement;
+  use this in any new formula.
+- [NORMDIST](/docs/compatibility/normdist) — this function's inverse,
+  also kept for backward compatibility.
+- [NORM.S.INV](/docs/statistical/norm-s-inv) — the standard
+  (mean 0, standard deviation 1) version.

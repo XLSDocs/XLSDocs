@@ -1,0 +1,120 @@
+---
+title: NORMSINV
+description: The pre-2010 name for NORM.S.INV — identical syntax and behavior, kept for backward compatibility.
+---
+
+NORMSINV is the original name for what's now called
+[NORM.S.INV](/docs/statistical/norm-s-inv) — Excel 2010 renamed it to
+match [NORM.S.DIST](/docs/statistical/norm-s-dist)'s own rename. Unlike
+[NORMSDIST](/docs/compatibility/normsdist), this one IS a pure rename:
+same single argument, same result.
+
+<Callout type="warn">
+  Microsoft's own documentation says NORMSINV "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [NORM.S.INV](/docs/statistical/norm-s-inv)
+  instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'NORMSINV(probability) and NORM.S.INV(probability) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use NORM.S.INV instead', type: 'warn' },
+  { text: 'probability must be strictly between 0 and 1, or NORMSINV returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORMSINV(probability)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORMSINV(probability)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability, strictly between 0 and 1, corresponding to the standard normal distribution.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The z-score such that `NORMSDIST(z)` would return `probability` —
+exactly what [NORM.S.INV](/docs/statistical/norm-s-inv) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.0000', '0.9': '1.2816', '0.95': '1.6449', '0.975': '1.9600' }}
+  defaultValue="0.975"
+  label={'Live preview — =NORMSINV({value})'}
+  fieldLabel="probability"
+/>
+
+The same probability scenario used on
+[NORM.S.INV](/docs/statistical/norm-s-inv)'s own page, returning the
+identical values — `NORMSINV(0.975)` and `NORM.S.INV(0.975)` both
+return `1.96`, the critical z-value behind a 95% two-tailed confidence
+interval.
+
+## Common errors
+
+### #NUM! — probability is 0, 1, or outside that range
+
+<ExcelCode>{`NORMSINV(1) → #NUM!`}</ExcelCode>
+
+`probability` must be strictly between `0` and `1` (not including
+either endpoint) — the same restriction NORM.S.INV has.
+
+### #VALUE! — probability is nonnumeric
+
+<ExcelCode>{`NORMSINV("x") → #VALUE!`}</ExcelCode>
+
+`probability` must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use NORMSINV or NORM.S.INV in a new formula?',
+    answer: 'NORM.S.INV — it computes the exact same thing, but NORMSINV is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Is this a pure rename, or did the arguments change (like NORMSDIST did)?',
+    answer: "A pure rename — NORMSINV(probability) and NORM.S.INV(probability) take the exact same single argument and return the exact same result. Only NORMSDIST gained a new required argument when it was renamed; its inverse, NORMSINV, didn't.",
+  },
+  {
+    question: 'Will my existing workbook break if it uses NORMSINV?',
+    answer: 'No — NORMSINV still works in every current version of Excel, including Excel for the web.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.S.INV](/docs/statistical/norm-s-inv) — the modern replacement;
+  use this in any new formula.
+- [NORMSDIST](/docs/compatibility/normsdist) — this function's
+  inverse, which (unlike this function) gained a new required argument
+  when renamed.
+- [NORMINV](/docs/compatibility/norminv) — the non-standard version.

@@ -1,0 +1,137 @@
+---
+title: NORMDIST
+description: The pre-2010 name for NORM.DIST — identical syntax and behavior, kept for backward compatibility.
+---
+
+NORMDIST is the original name for what's now called
+[NORM.DIST](/docs/statistical/norm-dist) — Excel 2010 renamed it to
+make the connection to its "standard" counterpart,
+[NORM.S.DIST](/docs/statistical/norm-s-dist), more obvious. The two
+functions are otherwise **identical**: same arguments, same order,
+same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says NORMDIST "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [NORM.DIST](/docs/statistical/norm-dist) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'NORMDIST(x, mean, sd, cumulative) and NORM.DIST(x, mean, sd, cumulative) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use NORM.DIST instead', type: 'warn' },
+  { text: 'standard_dev must be greater than 0, or NORMDIST returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORMDIST(x, mean, standard_dev, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORMDIST(x, mean, standard_dev, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: 'The arithmetic mean of the distribution.',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The standard deviation of the distribution. Must be greater than 0.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The normal distribution's cumulative probability or density at `x`,
+exactly as [NORM.DIST](/docs/statistical/norm-dist) would return.
+
+## Try it
+
+<TryIt
+  data={{ '85': '0.1587', '100': '0.5000', '115': '0.8413', '130': '0.9772' }}
+  defaultValue="115"
+  label={'Live preview — =NORMDIST({value}, 100, 15, TRUE)'}
+  fieldLabel="x"
+/>
+
+The same IQ-score scenario (mean `100`, standard deviation `15`) used
+on [NORM.DIST](/docs/statistical/norm-dist)'s own page, returning the
+identical values — `NORMDIST(115, 100, 15, TRUE)` and
+`NORM.DIST(115, 100, 15, TRUE)` both return `0.8413`.
+
+## Common errors
+
+### #NUM! — standard_dev is 0 or negative
+
+<ExcelCode>{`NORMDIST(42, 40, 0, TRUE) → #NUM!`}</ExcelCode>
+
+A standard deviation of `0` or less isn't mathematically valid — the
+same restriction NORM.DIST has.
+
+### #VALUE! — mean or standard_dev is nonnumeric
+
+<ExcelCode>{`NORMDIST(42, "x", 1.5, TRUE) → #VALUE!`}</ExcelCode>
+
+Both arguments must be actual numbers — text that can't be interpreted
+as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use NORMDIST or NORM.DIST in a new formula?',
+    answer: 'NORM.DIST — it computes the exact same thing, but NORMDIST is the older name Microsoft says may be removed in a future Excel version. NORMDIST only matters now for reading or maintaining a workbook that already uses it.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses NORMDIST?',
+    answer: "No — NORMDIST still works in every current version of Excel, including Excel for the web. Microsoft's warning is about possible future removal, not a current problem.",
+  },
+  {
+    question: 'Is there any behavioral difference at all between NORMDIST and NORM.DIST?',
+    answer: 'None — same argument order, same required arguments, same results for every input. This is a pure rename, unlike NORMSDIST (which gained a required cumulative argument when it became NORM.S.DIST).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.DIST](/docs/statistical/norm-dist) — the modern replacement;
+  use this in any new formula.
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the standard
+  (mean 0, standard deviation 1) version.
+- [NORMINV](/docs/compatibility/norminv) — this function's inverse,
+  also kept for backward compatibility.

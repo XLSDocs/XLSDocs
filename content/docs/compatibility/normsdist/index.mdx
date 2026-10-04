@@ -1,0 +1,126 @@
+---
+title: NORMSDIST
+description: The pre-2010 name for NORM.S.DIST — but NOT a pure rename, since the modern version added a required cumulative argument.
+---
+
+NORMSDIST is the original name for what's now called
+[NORM.S.DIST](/docs/statistical/norm-s-dist) — but unlike
+[NORMDIST](/docs/compatibility/normdist)'s relationship to
+[NORM.DIST](/docs/statistical/norm-dist), this isn't a pure rename.
+NORMSDIST always computed the cumulative probability only; NORM.S.DIST
+added a **required** `cumulative` argument, letting it also return the
+distribution's raw density.
+
+<Callout type="warn">
+  `NORMSDIST(z)` is equivalent to `NORM.S.DIST(z, TRUE)` — **not**
+  `NORM.S.DIST(z)` on its own, which actually returns `#VALUE!` since
+  `cumulative` is required. This is the one function in this
+  Compatibility batch where swapping in the modern name isn't a
+  drop-in replacement without also adding the second argument.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'NORMSDIST(z) always equals NORM.S.DIST(z, TRUE) — not NORM.S.DIST(z) alone', type: 'warn' },
+  { text: 'Unlike NORM.S.DIST, NORMSDIST has no way to get the probability density — only the cumulative probability', type: 'warn' },
+  { text: 'A nonnumeric z returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NORMSDIST(z)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NORMSDIST(z)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'z',
+    type: 'number',
+    required: true,
+    description: 'The z-score (number of standard deviations from the mean) to evaluate.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The standard normal distribution's cumulative probability at `z` —
+always the cumulative form, with no way to request the density
+instead.
+
+## Try it
+
+<TryIt
+  data={{ '-1': '0.1587', '0': '0.5000', '1': '0.8413', '1.96': '0.9750' }}
+  defaultValue="0"
+  label={'Live preview — =NORMSDIST({value})'}
+  fieldLabel="z"
+/>
+
+The same z-score scenario used on
+[NORM.S.DIST](/docs/statistical/norm-s-dist)'s own page, returning the
+identical values — `NORMSDIST(1.96)` and
+`NORM.S.DIST(1.96, TRUE)` both return `0.9750`.
+
+## Common errors
+
+### #VALUE! — z is nonnumeric
+
+<ExcelCode>{`NORMSDIST("x") → #VALUE!`}</ExcelCode>
+
+`z` must be an actual number — text that can't be interpreted as one
+returns `#VALUE!`.
+
+### Assuming NORM.S.DIST(z) alone works as the direct replacement
+
+<ExcelCode>{`NORM.S.DIST(1.96) → #VALUE! (missing the required cumulative argument) — use NORM.S.DIST(1.96, TRUE) instead`}</ExcelCode>
+
+Every other function in this Compatibility batch is a pure rename, so
+it's natural to expect dropping in the new name alone to just work
+here too. NORM.S.DIST specifically requires a second `cumulative`
+argument that NORMSDIST never had — forgetting to add `TRUE` breaks
+the formula instead of fixing it.
+
+export const faqs = [
+  {
+    question: 'Should I use NORMSDIST or NORM.S.DIST in a new formula?',
+    answer: 'NORM.S.DIST(z, TRUE) — it computes the exact same thing as NORMSDIST(z), but NORMSDIST is the older name Microsoft says may be removed in a future Excel version. Remember to add the TRUE argument; NORM.S.DIST alone is not equivalent.',
+  },
+  {
+    question: 'Can NORMSDIST return the probability density instead of the cumulative probability?',
+    answer: 'No — NORMSDIST only ever computes the cumulative form. Getting the density at a z-score requires the modern NORM.S.DIST(z, FALSE), which has no NORMSDIST equivalent at all.',
+  },
+  {
+    question: 'Why did Excel add a cumulative argument when renaming this function?',
+    answer: "To bring it in line with NORM.DIST, which already had a cumulative argument, and to let one function serve both the cumulative-probability and probability-density use cases instead of needing two separate functions.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NORM.S.DIST](/docs/statistical/norm-s-dist) — the modern
+  replacement; use `NORM.S.DIST(z, TRUE)` in any new formula.
+- [NORMDIST](/docs/compatibility/normdist) — the non-standard version,
+  which (unlike this function) renamed as a pure drop-in with no
+  argument changes.
+- [NORMSINV](/docs/compatibility/normsinv) — this function's inverse,
+  also kept for backward compatibility.
