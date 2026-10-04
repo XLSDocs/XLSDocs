@@ -1,0 +1,74 @@
+---
+title: "ERF vs ERF.PRECISE: A Name That Promises Something It Doesn't Deliver"
+description: One of these two sounds like the more accurate choice. For the same input, they return the identical number — the real difference is somewhere else entirely.
+date: "2026-10-04"
+category: Tutorials
+readTime: 3 min read
+---
+
+`ERF.PRECISE` reads like an upgrade — a more accurate version of
+`ERF`, the way `ATAN2` is a more careful version of a plain arctangent.
+That's not what's going on here. For the same input, the two functions
+return a bit-for-bit identical number.
+
+## What "PRECISE" actually means in this pair
+
+<Callout type="idea">
+  `ERF.PRECISE(x)` and `ERF(x)` — the one-argument form — compute the
+  exact same value. The "PRECISE" suffix isn't describing extra
+  accuracy; it's just matching a naming pattern Excel 2010 introduced
+  alongside a handful of other functions (`ERFC`/`ERFC.PRECISE` being
+  the direct sibling pair).
+</Callout>
+
+<ExcelCode>{`=ERF(1)           → 0.8427
+=ERF.PRECISE(1)   → 0.8427`}</ExcelCode>
+
+If there's no accuracy difference, what's actually different? `ERF`
+has a **second, optional argument** `ERF.PRECISE` doesn't: an
+`upper_limit`. Plain `ERF(x)` integrates from `0` to `x`; `ERF(a, b)`
+integrates between any two bounds directly, in one call.
+
+<ExcelCode>{`=ERF(0.5, 1)       → 0.3222   ' integrates from 0.5 to 1 directly
+=ERF(1) - ERF(0.5) → 0.3222   ' the same answer, computed manually`}</ExcelCode>
+
+That's the entire distinction. `ERF.PRECISE` is `ERF` with that
+optional second argument removed — a narrower function, not a more
+accurate one.
+
+## The sibling pair makes it even less intuitive
+
+`ERFC` and `ERFC.PRECISE` — the complementary versions, each equal to
+`1 - ERF(x)` — don't even have that much of a difference between them.
+Neither one ever had a two-argument form to begin with, so there's
+nothing `ERFC` can do that `ERFC.PRECISE` can't, or the other way
+around. They're fully interchangeable, full stop.
+
+<ExcelCode>{`=ERFC(1)          → 0.1573
+=ERFC.PRECISE(1)  → 0.1573`}</ExcelCode>
+
+Unlike `ERF`/`ERF.PRECISE`, where at least one of the pair has a real
+extra capability, `ERFC`/`ERFC.PRECISE` is a naming-consistency
+addition with literally nothing functional attached to it.
+
+export const faqs = [
+  {
+    question: 'Should I use ERF or ERF.PRECISE in a new formula?',
+    answer: "Either works identically for a single-argument call. Use ERF if there's any chance you'll want to integrate between two arbitrary bounds later (its optional second argument), since you'd otherwise have to rewrite the formula to switch.",
+  },
+  {
+    question: 'Is there any input where ERF and ERF.PRECISE actually disagree?',
+    answer: "Not for the one-argument form — they're defined to compute the same thing. The only way ERF behaves differently is by supplying its optional second argument, which ERF.PRECISE simply doesn't have the option to do.",
+  },
+  {
+    question: 'Does the same "PRECISE doesn\'t mean more precise" pattern show up anywhere else in Excel?',
+    answer: 'Yes — CEILING.PRECISE and FLOOR.PRECISE follow a similar naming convention, though those two do have real behavioral differences in how they handle negative numbers, unlike ERF.PRECISE and ERFC.PRECISE, which are purely naming additions.',
+  },
+];
+
+See the full reference for [ERF](/docs/engineering/erf),
+[ERF.PRECISE](/docs/engineering/erf-precise),
+[ERFC](/docs/engineering/erfc), and
+[ERFC.PRECISE](/docs/engineering/erfc-precise) for the complete
+argument lists, common errors, and a live example you can edit
+yourself.

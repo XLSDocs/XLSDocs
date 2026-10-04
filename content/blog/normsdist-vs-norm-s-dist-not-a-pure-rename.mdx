@@ -1,0 +1,72 @@
+---
+title: "NORMSDIST vs NORM.S.DIST: Why Swapping the Name Alone Breaks the Formula"
+description: Most of Excel's 2010 statistical renames were purely cosmetic. This one quietly added a required argument — and the old name doesn't warn you.
+date: "2026-10-04"
+category: Tutorials
+readTime: 3 min read
+---
+
+Excel 2010 renamed a batch of statistical functions to make their
+names clearer — `TTEST` became `T.TEST`, `NORMDIST` became
+`NORM.DIST`, and so on. For almost every one of these pairs, the old
+and new names are **completely interchangeable**: same arguments, same
+order, same results. `NORMSDIST` and `NORM.S.DIST` look like just
+another pair in that batch. They aren't.
+
+## The assumption that breaks here
+
+<Callout type="warn">
+  `NORM.S.DIST` requires a **second argument**, `cumulative`, that
+  `NORMSDIST` never had. Typing `=NORM.S.DIST(1.96)` — swapping in the
+  new name with the same one argument the old function took — returns
+  `#VALUE!`, not the probability you expected.
+</Callout>
+
+<ExcelCode>{`=NORMSDIST(1.96)          → 0.9750
+=NORM.S.DIST(1.96)        → #VALUE!
+=NORM.S.DIST(1.96, TRUE)  → 0.9750`}</ExcelCode>
+
+The fix is simple once you know it's needed — add `TRUE` as the second
+argument. But nothing about the error message points you there, and
+the natural instinct (since every *other* renamed statistical function
+really is a drop-in swap) is to assume the same is true here.
+
+## Why this one function got an extra argument
+
+`NORMDIST` already had a `cumulative` argument before the 2010 rename
+— `TRUE` for the cumulative probability, `FALSE` for the raw
+probability density. `NORMSDIST`, its "standard" sibling (mean 0,
+standard deviation 1), never got that same flexibility — it only ever
+computed the cumulative form. When Microsoft renamed it to
+`NORM.S.DIST`, they used the opportunity to bring it in line with
+`NORM.DIST` and add the density option it had been missing. The
+rename and the new capability happened in the same release, which is
+exactly why it's easy to assume the rename was the *only* change.
+
+<ExcelCode>{`=NORM.S.DIST(1.96, TRUE)   → 0.9750  ' cumulative — same as NORMSDIST(1.96)
+=NORM.S.DIST(1.96, FALSE)  → 0.0584  ' density — NORMSDIST has no equivalent`}</ExcelCode>
+
+There's no way to get that second line's result out of `NORMSDIST` at
+all — not a different argument, not a workaround. The density option
+genuinely didn't exist before the rename.
+
+export const faqs = [
+  {
+    question: 'Is NORMSDIST(z) exactly the same as NORM.S.DIST(z, TRUE)?',
+    answer: 'Yes — the two always return identical results. NORM.S.DIST(z, TRUE) is the direct equivalent; just NORM.S.DIST(z) alone, missing the second argument, is not.',
+  },
+  {
+    question: 'Do any of the other 2010 statistical renames have this same gotcha?',
+    answer: "No — NORMDIST, NORMINV, and NORMSINV all renamed as pure drop-in swaps with no argument changes (to NORM.DIST, NORM.INV, and NORM.S.INV respectively). NORMSDIST is the one exception in this family, specifically because it gained a capability (the density option) it never had before.",
+  },
+  {
+    question: 'How can I tell in general whether a legacy-to-modern Excel function rename changed the arguments?',
+    answer: "Check the modern function's own syntax directly rather than assuming from the name — a quick way is comparing the argument count. If the new name takes more required arguments than the old one did, it's not a pure rename.",
+  },
+];
+
+See the full reference for
+[NORMSDIST](/docs/compatibility/normsdist) and
+[NORM.S.DIST](/docs/statistical/norm-s-dist) for the complete
+argument list, common errors, and a live example you can edit
+yourself.
