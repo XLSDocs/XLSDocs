@@ -1,0 +1,132 @@
+---
+title: CRITBINOM
+description: The pre-2010 name for BINOM.INV — identical syntax and behavior, kept for backward compatibility.
+---
+
+CRITBINOM is the original name for what's now called
+[BINOM.INV](/docs/statistical/binom-inv) — part of the same 2010
+renaming wave as [NORMINV](/docs/compatibility/norminv). Unlike
+[NEGBINOMDIST](/docs/compatibility/negbinomdist), this one IS a pure
+rename: same three arguments, same order, same result.
+
+<Callout type="warn">
+  Microsoft's own documentation says CRITBINOM "may not be available
+  in future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [BINOM.INV](/docs/statistical/binom-inv) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'CRITBINOM(trials, probability_s, alpha) and BINOM.INV(trials, probability_s, alpha) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use BINOM.INV instead', type: 'warn' },
+  { text: 'probability_s and alpha must each be strictly between 0 and 1, or CRITBINOM returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CRITBINOM(trials, probability_s, alpha)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CRITBINOM(trials, probability_s, alpha)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'trials',
+    type: 'number',
+    required: true,
+    description: 'The number of independent (Bernoulli) trials.',
+  },
+  {
+    name: 'probability_s',
+    type: 'number',
+    required: true,
+    description: 'The probability of success on each individual trial.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The criterion (target cumulative probability) value, strictly between 0 and 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The smallest number of successes for which the cumulative binomial
+distribution is greater than or equal to `alpha` — exactly what
+[BINOM.INV](/docs/statistical/binom-inv) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '6', '0.8': '8', '0.9': '9', '0.95': '9' }}
+  defaultValue="0.9"
+  label={'Live preview — =CRITBINOM(20, 0.3, {value})'}
+  fieldLabel="alpha"
+/>
+
+The same 20-trial, 30%-success scenario used on
+[BINOM.INV](/docs/statistical/binom-inv)'s own page, returning the
+identical values — `CRITBINOM(20, 0.3, 0.9)` and
+`BINOM.INV(20, 0.3, 0.9)` both return `9`.
+
+## Common errors
+
+### #NUM! — alpha or probability_s is outside (0, 1)
+
+<ExcelCode>{`CRITBINOM(20, 0.3, 1) → #NUM!`}</ExcelCode>
+
+Both `probability_s` and `alpha` must be strictly between `0` and `1`
+— neither endpoint is valid.
+
+### #VALUE! — any argument is nonnumeric
+
+<ExcelCode>{`CRITBINOM(20, 0.3, "x") → #VALUE!`}</ExcelCode>
+
+Every argument must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use CRITBINOM or BINOM.INV in a new formula?',
+    answer: 'BINOM.INV — it computes the exact same thing, but CRITBINOM is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses CRITBINOM?',
+    answer: 'No — CRITBINOM still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between CRITBINOM and BINOM.INV?',
+    answer: 'None — same argument order, same required arguments, same results for every input. This is a pure rename, like NORMINV and NORMSINV, not like the NORMSDIST/NEGBINOMDIST pairs that gained a new argument.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BINOM.INV](/docs/statistical/binom-inv) — the modern replacement;
+  use this in any new formula.
+- [BINOMDIST](/docs/compatibility/binomdist) — this function's
+  inverse, also kept for backward compatibility.
+- [NEGBINOMDIST](/docs/compatibility/negbinomdist) — a related
+  distribution function in this same batch, missing an argument its
+  modern replacement has.

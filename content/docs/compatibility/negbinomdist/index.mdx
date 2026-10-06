@@ -1,0 +1,152 @@
+---
+title: NEGBINOMDIST
+description: The pre-2010 name for NEGBINOM.DIST — but NOT a pure rename, since the modern version added a required cumulative argument.
+---
+
+NEGBINOMDIST is the original name for what's now called
+[NEGBINOM.DIST](/docs/statistical/negbinom-dist) — but like
+[NORMSDIST](/docs/compatibility/normsdist), this isn't a pure rename.
+NEGBINOMDIST always computed a single exact probability; NEGBINOM.DIST
+added a **required** `cumulative` argument, letting it also return the
+running total probability.
+
+<Callout type="warn">
+  `NEGBINOMDIST(number_f, number_s, probability_s)` is equivalent to
+  `NEGBINOM.DIST(number_f, number_s, probability_s, FALSE)` — **not**
+  `TRUE`. This is the opposite of
+  [NORMSDIST](/docs/compatibility/normsdist)'s relationship to
+  `NORM.S.DIST`, where the missing argument defaults to `TRUE`.
+  There's no shortcut here — always check which cumulative value a
+  legacy function's old behavior actually matches, rather than
+  guessing from a different function's pattern.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'NEGBINOMDIST(f, s, p) always equals NEGBINOM.DIST(f, s, p, FALSE) — not TRUE', type: 'warn' },
+  { text: 'Unlike NEGBINOM.DIST, NEGBINOMDIST has no way to get the cumulative (running total) probability', type: 'warn' },
+  { text: 'number_f must be 0 or greater, and number_s must be 1 or greater, or NEGBINOMDIST returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=NEGBINOMDIST(number_f, number_s, probability_s)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=NEGBINOMDIST(number_f, number_s, probability_s)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number_f',
+    type: 'number',
+    required: true,
+    description: 'The number of failures to evaluate. Must be 0 or greater.',
+  },
+  {
+    name: 'number_s',
+    type: 'number',
+    required: true,
+    description: 'The target (fixed) number of successes required. Must be 1 or greater.',
+  },
+  {
+    name: 'probability_s',
+    type: 'number',
+    required: true,
+    description: 'The probability of success on each individual trial.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The exact probability of precisely `number_f` failures occurring
+before the `number_s`-th success — always the single-point form, with
+no way to request the running total instead.
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.1250', '2': '0.1875', '4': '0.1172', '6': '0.0547' }}
+  defaultValue="2"
+  label={'Live preview — =NEGBINOMDIST({value}, 3, 0.5)'}
+  fieldLabel="number_f"
+/>
+
+The same "3 successes needed, 50% success rate" scenario used on
+[NEGBINOM.DIST](/docs/statistical/negbinom-dist)'s own page, but with
+exact (not cumulative) values — `NEGBINOMDIST(2, 3, 0.5)` and
+`NEGBINOM.DIST(2, 3, 0.5, FALSE)` both return `0.1875`. Note this
+does **not** match that page's own Try-It numbers directly, since
+those use `cumulative = TRUE`.
+
+## Common errors
+
+### #NUM! — number_f is negative or number_s is less than 1
+
+<ExcelCode>{`NEGBINOMDIST(-1, 3, 0.5) → #NUM!`}</ExcelCode>
+
+`number_f` must be `0` or greater, and `number_s` must be `1` or
+greater — a target of "0 successes needed" doesn't make sense for this
+distribution.
+
+### Assuming NEGBINOM.DIST(f, s, p) alone works as the direct replacement
+
+<ExcelCode>{`NEGBINOM.DIST(2, 3, 0.5) → #VALUE! (missing the required cumulative argument) — use NEGBINOM.DIST(2, 3, 0.5, FALSE) instead`}</ExcelCode>
+
+Dropping in the new name alone doesn't work — `cumulative` is
+required. And unlike NORMSDIST (which needs `TRUE`), this one
+specifically needs `FALSE` to match the legacy behavior.
+
+### Assuming the missing argument defaults to TRUE, by analogy with NORMSDIST
+
+<ExcelCode>{`NEGBINOMDIST(2, 3, 0.5) matches NEGBINOM.DIST(2, 3, 0.5, FALSE) = 0.1875, NOT NEGBINOM.DIST(2, 3, 0.5, TRUE) = 0.5000`}</ExcelCode>
+
+Two different legacy functions in this Compatibility category are both
+missing a `cumulative` argument their modern replacement requires —
+but they don't default to the same value. Always verify which one
+applies with an actual calculation; don't assume consistency across
+functions just because the missing-argument shape looks the same.
+
+export const faqs = [
+  {
+    question: 'Should I use NEGBINOMDIST or NEGBINOM.DIST in a new formula?',
+    answer: 'NEGBINOM.DIST(number_f, number_s, probability_s, FALSE) — it computes the exact same thing as NEGBINOMDIST, but remember the FALSE; NEGBINOM.DIST alone, or with TRUE, gives a different answer.',
+  },
+  {
+    question: 'Can NEGBINOMDIST return the cumulative (running total) probability instead?',
+    answer: 'No — NEGBINOMDIST only ever computes the exact single-point probability. Getting the cumulative probability requires the modern NEGBINOM.DIST(..., TRUE), which has no NEGBINOMDIST equivalent at all.',
+  },
+  {
+    question: 'Does NORMSDIST default to TRUE and NEGBINOMDIST default to FALSE for the same reason?',
+    answer: "No shared reason — each legacy function's missing cumulative argument simply matches whichever single mode that specific function always computed before the rename. They need to be checked individually rather than assumed from each other.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NEGBINOM.DIST](/docs/statistical/negbinom-dist) — the modern
+  replacement; use `NEGBINOM.DIST(f, s, p, FALSE)` in any new formula.
+- [BINOMDIST](/docs/compatibility/binomdist) — the "successes in N
+  trials" counterpart, which (unlike this function) renamed as a pure
+  drop-in.
+- [NORMSDIST](/docs/compatibility/normsdist) — another function
+  missing a required `cumulative` argument, but defaulting to the
+  opposite value (`TRUE`).
