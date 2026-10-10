@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit } from '@/lib/rate-limit';
-import { checkSubscriber } from '@/lib/subscription';
+import type { Env } from '../_lib/types';
+import { json } from '../_lib/json';
+import { checkRateLimit } from '../_lib/rate-limit';
+import { checkSubscriber } from '../_lib/subscription';
 import {
   AI_TOOLS_ROUTE_KEY,
   AI_TOOLS_ROUTE_KEY_SUB,
@@ -9,7 +10,7 @@ import {
   AI_TOOLS_WINDOW_SECONDS,
   AI_TOOLS_FREE_LIMIT_MESSAGE,
   AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE,
-} from '@/lib/ai-rate-limit';
+} from '../_lib/ai-rate-limit';
 
 const SYSTEM_PROMPT = `You are an Excel formula expert. The user will describe, in plain English, a spreadsheet task. Respond with the exact Excel formula that accomplishes it, plus a breakdown of each part.
 
@@ -33,33 +34,32 @@ interface AnthropicMessagesResponse {
   content?: { type: string; text: string }[];
 }
 
-export async function POST(req: NextRequest) {
-  const subscriber = await checkSubscriber(req);
+export async function onRequestPost({
+  request,
+  env,
+}: {
+  request: Request;
+  env: Env;
+}): Promise<Response> {
+  const subscriber = await checkSubscriber(request, env.FEEDBACK, env.COOKIE_SIGNING_SECRET);
   const { allowed } = subscriber.isSubscriber
-    ? await checkRateLimit(req, AI_TOOLS_ROUTE_KEY_SUB, AI_TOOLS_SUBSCRIBER_LIMIT, subscriber.customerId)
-    : await checkRateLimit(req, AI_TOOLS_ROUTE_KEY, AI_TOOLS_FREE_LIMIT, undefined, AI_TOOLS_WINDOW_SECONDS);
+    ? await checkRateLimit(request, env.FEEDBACK, AI_TOOLS_ROUTE_KEY_SUB, AI_TOOLS_SUBSCRIBER_LIMIT, subscriber.customerId)
+    : await checkRateLimit(request, env.FEEDBACK, AI_TOOLS_ROUTE_KEY, AI_TOOLS_FREE_LIMIT, undefined, AI_TOOLS_WINDOW_SECONDS);
 
   if (!allowed) {
-    const message = subscriber.isSubscriber
-      ? AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE
-      : AI_TOOLS_FREE_LIMIT_MESSAGE;
-    const res = NextResponse.json({ error: message }, { status: 429 });
-    if (subscriber.setCookieHeader) res.headers.append('Set-Cookie', subscriber.setCookieHeader);
-    return res;
+    const message = subscriber.isSubscriber ? AI_TOOLS_SUBSCRIBER_LIMIT_MESSAGE : AI_TOOLS_FREE_LIMIT_MESSAGE;
+    return json({ error: message }, 429, subscriber.setCookieHeader);
   }
 
-  const { prompt } = (await req.json()) as FormulaBuilderRequestBody;
+  const { prompt } = (await request.json()) as FormulaBuilderRequestBody;
 
   if (typeof prompt !== 'string' || !prompt.trim()) {
-    return NextResponse.json({ error: 'A prompt is required.' }, { status: 400 });
+    return json({ error: 'A prompt is required.' }, 400);
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return NextResponse.json(
-      { error: 'ANTHROPIC_API_KEY is not configured on the server.' },
-      { status: 500 },
-    );
+    return json({ error: 'ANTHROPIC_API_KEY is not configured on the server.' }, 500);
   }
 
   try {
@@ -80,28 +80,30 @@ export async function POST(req: NextRequest) {
 
     const data = (await res.json()) as AnthropicMessagesResponse;
     if (data.error) {
-      return NextResponse.json({ error: data.error.message }, { status: 500 });
+      return json({ error: data.error.message }, 500);
     }
 
-    const text = data.content?.find((b: { type: string }) => b.type === 'text')?.text ?? '';
+    const text = data.content?.find((b) => b.type === 'text')?.text ?? '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return NextResponse.json({ error: 'Could not parse a formula from the response.' }, { status: 500 });
+      return json({ error: 'Could not parse a formula from the response.' }, 500);
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
     if (typeof parsed.formula !== 'string' || !Array.isArray(parsed.breakdown)) {
-      return NextResponse.json({ error: 'Malformed response from the AI.' }, { status: 500 });
+      return json({ error: 'Malformed response from the AI.' }, 500);
     }
 
-    const successRes = NextResponse.json({
-      formula: parsed.formula,
-      explanation: parsed.explanation ?? '',
-      breakdown: parsed.breakdown,
-    });
-    if (subscriber.setCookieHeader) successRes.headers.append('Set-Cookie', subscriber.setCookieHeader);
-    return successRes;
+    return json(
+      {
+        formula: parsed.formula,
+        explanation: parsed.explanation ?? '',
+        breakdown: parsed.breakdown,
+      },
+      200,
+      subscriber.setCookieHeader,
+    );
   } catch {
-    return NextResponse.json({ error: 'Failed to reach the AI service.' }, { status: 500 });
+    return json({ error: 'Failed to reach the AI service.' }, 500);
   }
 }

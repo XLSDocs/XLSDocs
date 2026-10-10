@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import type { Env } from '../_lib/types';
+import { json } from '../_lib/json';
 
 interface FeedbackRequestBody {
   path: string;
@@ -11,14 +11,19 @@ interface FeedbackCounts {
   down: number;
 }
 
-export async function POST(req: NextRequest) {
-  const { path, vote } = (await req.json()) as FeedbackRequestBody;
+export async function onRequestPost({
+  request,
+  env,
+}: {
+  request: Request;
+  env: Env;
+}): Promise<Response> {
+  const { path, vote } = (await request.json()) as FeedbackRequestBody;
 
   if (typeof path !== 'string' || !path.startsWith('/') || (vote !== 'up' && vote !== 'down')) {
-    return NextResponse.json({ error: 'Invalid feedback payload.' }, { status: 400 });
+    return json({ error: 'Invalid feedback payload.' }, 400);
   }
 
-  const { env } = await getCloudflareContext({ async: true });
   const key = `feedback:${path}`;
 
   const existing = (await env.FEEDBACK.get(key, 'json')) as FeedbackCounts | null;
@@ -27,5 +32,5 @@ export async function POST(req: NextRequest) {
 
   await env.FEEDBACK.put(key, JSON.stringify(counts));
 
-  return NextResponse.json(counts);
+  return json(counts, 200);
 }

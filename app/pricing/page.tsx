@@ -1,11 +1,9 @@
-import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
 import { Check } from 'lucide-react';
 import { HomeNav } from '@/components/home/nav';
 import { Footer } from '@/components/home/footer';
 import { PricingButtons } from '@/components/pricing-buttons';
 import { Faq, type FaqItem } from '@/components/faq';
-import { SUBSCRIBER_COOKIE, verifySubscriberCookie } from '@/lib/subscriber-cookie';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -54,12 +52,7 @@ const PRICING_FAQS: FaqItem[] = [
   },
 ];
 
-export default async function PricingPage() {
-  const secret = process.env.COOKIE_SIGNING_SECRET;
-  const raw = (await cookies()).get(SUBSCRIBER_COOKIE)?.value;
-  const isSubscriber = Boolean(raw && secret && (await verifySubscriberCookie(raw, secret)));
-  const billingEnabled = Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_ID);
-
+export default function PricingPage() {
   const faqJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -116,11 +109,6 @@ export default async function PricingPage() {
             <div className="gradient-border-card rounded-xl p-6">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-medium">Pro</h2>
-                {isSubscriber && (
-                  <span className="rounded-full border border-fd-primary/30 bg-fd-primary/10 px-2 py-0.5 font-mono text-[10px] text-fd-primary">
-                    Current plan
-                  </span>
-                )}
               </div>
               <p className="mt-1 text-3xl font-normal">
                 $5<span className="text-sm text-fd-muted-foreground"> /month</span>
@@ -134,7 +122,7 @@ export default async function PricingPage() {
                 ))}
               </ul>
               <div className="mt-6">
-                <PricingButtons isSubscriber={isSubscriber} billingEnabled={billingEnabled} />
+                <PricingButtons />
               </div>
             </div>
           </div>

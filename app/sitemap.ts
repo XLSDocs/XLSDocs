@@ -3,6 +3,8 @@ import { source } from '@/lib/source';
 import { getBlogPosts } from '@/lib/blog-source';
 import { siteUrl } from '@/lib/shared';
 
+export const dynamic = 'force-static';
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteUrl, changeFrequency: 'weekly', priority: 1 },

@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Wrench, Loader2, Sparkle } from 'lucide-react';
 import { ExcelCode } from '@/components/excel-code';
@@ -48,13 +49,7 @@ interface Fix {
   breakdown: BreakdownItem[];
 }
 
-interface QuickFixProps {
-  initialIsSubscriber: boolean;
-  billingEnabled: boolean;
-  checkoutStatus: 'upgraded' | 'canceled' | null;
-}
-
-export function QuickFix({ initialIsSubscriber, billingEnabled, checkoutStatus }: QuickFixProps) {
+export function QuickFix() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -64,9 +59,26 @@ export function QuickFix({ initialIsSubscriber, billingEnabled, checkoutStatus }
   const [upgrading, setUpgrading] = useState(false);
   const [billingError, setBillingError] = useState('');
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [isSubscriber, setIsSubscriber] = useState(false);
+  const [billingEnabled, setBillingEnabled] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  const isSubscriber = initialIsSubscriber;
+  const searchParams = useSearchParams();
+  const checkoutStatus = searchParams.get('upgraded')
+    ? 'upgraded'
+    : searchParams.get('canceled')
+      ? 'canceled'
+      : null;
+
+  useEffect(() => {
+    fetch('/api/me')
+      .then(async (res) => {
+        const data = (await res.json()) as { isSubscriber: boolean; billingEnabled: boolean };
+        setIsSubscriber(data.isSubscriber);
+        setBillingEnabled(data.billingEnabled);
+      })
+      .catch(() => {});
+  }, []);
 
   async function fix(text: string) {
     const trimmed = text.trim();

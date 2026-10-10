@@ -1,5 +1,3 @@
-import type { NextRequest } from 'next/server';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
 import {
   SUBSCRIBER_COOKIE,
   signSubscriberCookie,
@@ -23,9 +21,19 @@ export interface SubscriberCheck {
   setCookieHeader?: string;
 }
 
-export async function checkSubscriber(request: NextRequest): Promise<SubscriberCheck> {
-  const secret = process.env.COOKIE_SIGNING_SECRET;
-  const raw = request.cookies.get(SUBSCRIBER_COOKIE)?.value;
+function getCookieValue(request: Request, name: string): string | undefined {
+  const header = request.headers.get('Cookie') ?? '';
+  const match = header.match(new RegExp(`(?:^|; )${name}=([^;]+)`));
+  return match?.[1];
+}
+
+export async function checkSubscriber(
+  request: Request,
+  feedbackKv: KVNamespace,
+  cookieSigningSecret: string | undefined,
+): Promise<SubscriberCheck> {
+  const secret = cookieSigningSecret;
+  const raw = getCookieValue(request, SUBSCRIBER_COOKIE);
   if (!secret || !raw) return { isSubscriber: false };
 
   const payload = await verifySubscriberCookie(raw, secret);
@@ -37,8 +45,7 @@ export async function checkSubscriber(request: NextRequest): Promise<SubscriberC
   }
 
   try {
-    const { env } = await getCloudflareContext({ async: true });
-    const kvValue = await env.FEEDBACK.get(`sub:${payload.cid}`);
+    const kvValue = await feedbackKv.get(`sub:${payload.cid}`);
     const record = kvValue ? (JSON.parse(kvValue) as SubscriptionRecord) : null;
 
     if (record && ENTITLED_STATUSES.has(record.status)) {

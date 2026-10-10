@@ -82,7 +82,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           showSpinner={false}
           shadow="0 0 10px var(--color-fd-primary), 0 0 5px var(--color-fd-primary)"
         />
-        <RootProvider>{children}</RootProvider>
+        <RootProvider search={{ options: { type: 'static' } }}>{children}</RootProvider>
         <Script
           type="module"
           src="https://static.cloudflareinsights.com/beacon.min.js"

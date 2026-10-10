@@ -3,6 +3,8 @@ import type { StructuredData } from 'fumadocs-core/mdx-plugins/remark-structure'
 import { source } from '@/lib/source';
 import { getBlogPosts } from '@/lib/blog-source';
 
+export const revalidate = false;
+
 function textIndex(content: string): StructuredData {
   return { headings: [], contents: [{ heading: undefined, content }] };
 }
@@ -67,7 +69,7 @@ const marketingPages = [
   },
 ];
 
-export const { GET } = createSearchAPI('advanced', {
+export const { staticGET: GET } = createSearchAPI('advanced', {
   indexes: () => {
     const docsIndexes = source.getPages().map((page) => ({
       id: page.url,

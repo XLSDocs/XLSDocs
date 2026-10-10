@@ -1,37 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
   "name": "xlsdocs",
-  "workers_dev": true,
+  "pages_build_output_dir": "out",
   "compatibility_date": "2026-08-03",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "limits": { "cpu_ms": 50000 },
-  "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS",
-    "html_handling": "none"
-  },
-  "services": [
-    {
-      "binding": "WORKER_SELF_REFERENCE",
-      "service": "xlsdocs"
-    }
-  ],
-  "images": {
-    "binding": "IMAGES"
-  },
   "kv_namespaces": [
-    {
-      "binding": "FEEDBACK",
-      "id": "925daacb91134dfa9c6835a256e52e08"
-    },
-    {
-      "binding": "NEXT_INC_CACHE_KV",
-      "id": "a2cca9814afd42e78db8b5c9ea871ad9"
-    }
-  ],
-  "routes": [
-    { "pattern": "xlsdocs.com", "custom_domain": true },
-    { "pattern": "www.xlsdocs.com", "custom_domain": true }
+    { "binding": "FEEDBACK", "id": "925daacb91134dfa9c6835a256e52e08" }
   ]
 }

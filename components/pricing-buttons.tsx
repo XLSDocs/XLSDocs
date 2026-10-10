@@ -1,17 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2, Sparkle } from 'lucide-react';
 
-export function PricingButtons({
-  isSubscriber,
-  billingEnabled,
-}: {
-  isSubscriber: boolean;
-  billingEnabled: boolean;
-}) {
+export function PricingButtons() {
+  const [isSubscriber, setIsSubscriber] = useState(false);
+  const [billingEnabled, setBillingEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/me')
+      .then(async (res) => {
+        const data = (await res.json()) as { isSubscriber: boolean; billingEnabled: boolean };
+        setIsSubscriber(data.isSubscriber);
+        setBillingEnabled(data.billingEnabled);
+      })
+      .catch(() => {});
+  }, []);
 
   async function startCheckout() {
     if (loading) return;
@@ -64,6 +70,11 @@ export function PricingButtons({
 
   return (
     <div>
+      {isSubscriber && (
+        <span className="mb-2 inline-block rounded-full border border-fd-primary/30 bg-fd-primary/10 px-2 py-0.5 font-mono text-[10px] text-fd-primary">
+          Current plan
+        </span>
+      )}
       <button
         onClick={isSubscriber ? openBillingPortal : startCheckout}
         disabled={loading}

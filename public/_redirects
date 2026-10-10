@@ -1,0 +1,5 @@
+# Every function's old standalone /examples page was merged into its parent
+# page as a "## Examples" section (2026-09) — send any remaining external
+# links/bookmarks straight to that anchor. Lives here (not next.config.mjs
+# redirects()) because output: 'export' doesn't support that API.
+/docs/:category/:fn/examples /docs/:category/:fn#examples 301

@@ -8,8 +8,10 @@ index.
 **Live site:** [xlsdocs.com](https://xlsdocs.com)
 
 Built with [Next.js](https://nextjs.org) and
-[Fumadocs](https://fumadocs.dev), deployed to Cloudflare Workers via
-[OpenNext](https://opennext.js.org/cloudflare).
+[Fumadocs](https://fumadocs.dev), statically exported
+(`output: 'export'`) and deployed to Cloudflare Pages. The handful of
+dynamic features (AI tools, Stripe billing, feedback) run as
+Cloudflare Pages Functions under `functions/`.
 
 ## Development
 
@@ -27,12 +29,11 @@ npm run build          # production Next.js build
 
 ## Deploying
 
-Deployed to Cloudflare Workers, not a Node server — the build and
-deploy steps go through `@opennextjs/cloudflare`:
+Deployed to Cloudflare Pages, not a Node server:
 
 ```bash
-npm run deploy    # build + deploy to Cloudflare Workers
-npm run preview    # build + run the Workers build locally
+npm run deploy    # next build (static export) + wrangler pages deploy
+npm run preview    # next build + run the Pages build locally via wrangler
 ```
 
 ## Content structure
@@ -61,8 +62,8 @@ ticker.
 | `app/(home)`                | Landing page, functions catalog, formula builder tool.    |
 | `app/docs`                  | Documentation layout and function/category pages.         |
 | `app/blog`                  | Blog layout and post pages.                                |
-| `app/api/search/route.ts`   | Route handler for site search.                             |
-| `app/api/formula-builder`   | Route handler for the AI formula builder.                  |
+| `app/api/search/route.ts`   | Static search index route (Fumadocs `staticGET`).          |
+| `functions/api/`            | Cloudflare Pages Functions — AI tools, Stripe billing, feedback. |
 | `content/docs`               | Function reference content (MDX).                          |
 | `content/blog`               | Blog post content (MDX).                                   |
 | `lib/source.ts`              | Content source adapter — [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access content. |

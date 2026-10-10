@@ -1,32 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { getStripe } from '@/lib/stripe';
+import type { Env } from '../../_lib/types';
+import { json } from '../../_lib/json';
+import { getStripe } from '../../_lib/stripe';
 
 // Only the subscription lifecycle events — Stripe already folds payment
 // failures/retries into the subscription's own `status` field, so there's
 // no need to separately handle invoice/payment events too.
 const HANDLED_PREFIX = 'customer.subscription.';
 
-export async function POST(req: NextRequest) {
-  const stripe = getStripe();
+export async function onRequestPost({
+  request,
+  env,
+}: {
+  request: Request;
+  env: Env;
+}): Promise<Response> {
+  const stripe = getStripe(env.STRIPE_SECRET_KEY);
   // Live and test mode each sign with their own secret, even for the same
   // endpoint URL — try both rather than forcing a single mode to work.
-  const webhookSecrets = [process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_WEBHOOK_SECRET_TEST].filter(
+  const webhookSecrets = [env.STRIPE_WEBHOOK_SECRET, env.STRIPE_WEBHOOK_SECRET_TEST].filter(
     (secret): secret is string => !!secret,
   );
   if (!stripe || webhookSecrets.length === 0) {
-    return NextResponse.json({ error: 'Webhook not configured.' }, { status: 503 });
+    return json({ error: 'Webhook not configured.' }, 503);
   }
 
-  const signature = req.headers.get('stripe-signature');
+  const signature = request.headers.get('stripe-signature');
   if (!signature) {
-    return NextResponse.json({ error: 'Missing signature.' }, { status: 400 });
+    return json({ error: 'Missing signature.' }, 400);
   }
 
   // Signature verification needs the raw, untouched body — must not call
-  // req.json() first.
-  const payload = await req.text();
+  // request.json() first.
+  const payload = await request.text();
 
   let event: Stripe.Event | undefined;
   for (const webhookSecret of webhookSecrets) {
@@ -44,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
   }
   if (!event) {
-    return NextResponse.json({ error: 'Invalid signature.' }, { status: 400 });
+    return json({ error: 'Invalid signature.' }, 400);
   }
 
   if (event.type.startsWith(HANDLED_PREFIX)) {
@@ -54,7 +60,6 @@ export async function POST(req: NextRequest) {
       : subscription.customer.id;
 
     try {
-      const { env } = await getCloudflareContext({ async: true });
       await env.FEEDBACK.put(
         `sub:${customerId}`,
         JSON.stringify({
@@ -68,9 +73,9 @@ export async function POST(req: NextRequest) {
     } catch {
       // Non-2xx here is deliberate — it tells Stripe to retry with backoff,
       // covering a transient KV error without us building retry logic.
-      return NextResponse.json({ error: 'Failed to record subscription state.' }, { status: 500 });
+      return json({ error: 'Failed to record subscription state.' }, 500);
     }
   }
 
-  return NextResponse.json({ received: true });
+  return json({ received: true }, 200);
 }

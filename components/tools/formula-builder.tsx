@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles, Loader2, Sparkle } from 'lucide-react';
 import { ExcelCode } from '@/components/excel-code';
@@ -29,13 +30,7 @@ interface Build {
   breakdown: BreakdownItem[];
 }
 
-interface FormulaBuilderProps {
-  initialIsSubscriber: boolean;
-  billingEnabled: boolean;
-  checkoutStatus: 'upgraded' | 'canceled' | null;
-}
-
-export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutStatus }: FormulaBuilderProps) {
+export function FormulaBuilder() {
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,9 +40,26 @@ export function FormulaBuilder({ initialIsSubscriber, billingEnabled, checkoutSt
   const [upgrading, setUpgrading] = useState(false);
   const [billingError, setBillingError] = useState('');
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [isSubscriber, setIsSubscriber] = useState(false);
+  const [billingEnabled, setBillingEnabled] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
 
-  const isSubscriber = initialIsSubscriber;
+  const searchParams = useSearchParams();
+  const checkoutStatus = searchParams.get('upgraded')
+    ? 'upgraded'
+    : searchParams.get('canceled')
+      ? 'canceled'
+      : null;
+
+  useEffect(() => {
+    fetch('/api/me')
+      .then(async (res) => {
+        const data = (await res.json()) as { isSubscriber: boolean; billingEnabled: boolean };
+        setIsSubscriber(data.isSubscriber);
+        setBillingEnabled(data.billingEnabled);
+      })
+      .catch(() => {});
+  }, []);
 
   async function build(text: string) {
     const trimmed = text.trim();
