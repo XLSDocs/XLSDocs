@@ -1,0 +1,84 @@
+---
+title: "NEGBINOMDIST vs NEGBINOM.DIST: The Same Gotcha, the Opposite Default"
+description: NORMSDIST's missing argument defaults to TRUE. This function's twin gotcha defaults to FALSE — assuming the two behave the same way gives you the wrong answer.
+date: "2026-10-11"
+category: Tutorials
+readTime: 3 min read
+---
+
+Excel's 2010 renaming wave left a small cluster of legacy statistical
+functions missing an argument their modern replacement requires. We
+[wrote about the first one](/blog/normsdist-vs-norm-s-dist-not-a-pure-rename):
+`NORMSDIST` → `NORM.S.DIST` needs a `cumulative` argument tacked on,
+and the missing value defaults to `TRUE`. `NEGBINOMDIST` →
+`NEGBINOM.DIST` has the exact same shape of problem — a required
+`cumulative` argument the old function never took — except here the
+missing value defaults to `FALSE`.
+
+## The assumption that breaks here
+
+<Callout type="warn">
+  `NEGBINOMDIST(number_f, number_s, probability_s)` is equivalent to
+  `NEGBINOM.DIST(number_f, number_s, probability_s, FALSE)` — not
+  `TRUE`. If you've already run into the NORMSDIST gotcha and assume
+  every missing `cumulative` argument in this family defaults the same
+  way, you'll get a different number than the one the legacy formula
+  actually produced.
+</Callout>
+
+<ExcelCode>{`=NEGBINOMDIST(2, 3, 0.5)             → 0.1875
+=NEGBINOM.DIST(2, 3, 0.5)            → #VALUE! (missing argument)
+=NEGBINOM.DIST(2, 3, 0.5, FALSE)     → 0.1875  ' matches NEGBINOMDIST
+=NEGBINOM.DIST(2, 3, 0.5, TRUE)      → 0.5000  ' does NOT match`}</ExcelCode>
+
+That last line is the trap. `TRUE` isn't just "also wrong" in some
+abstract sense — it's a real, plausible-looking number that silently
+replaces a cumulative probability for an exact one, with nothing in
+Excel to flag the swap.
+
+## Why the defaults point in opposite directions
+
+It isn't arbitrary, and it isn't inconsistent for its own sake — each
+legacy function's missing argument defaults to whichever single mode
+*that specific function* always computed before 2010:
+
+- `NORMSDIST` only ever computed the **cumulative** probability, so
+  `NORM.S.DIST`'s missing argument defaults to `TRUE`.
+- `NEGBINOMDIST` only ever computed the **exact, single-point**
+  probability, so `NEGBINOM.DIST`'s missing argument defaults to
+  `FALSE`.
+
+Both modern functions gained the *other* mode as a genuinely new
+capability in the rename — `NORM.S.DIST(z, FALSE)` (density) has no
+`NORMSDIST` equivalent at all, and neither does
+`NEGBINOM.DIST(f, s, p, TRUE)` (running total):
+
+<ExcelCode>{`=NEGBINOM.DIST(2, 3, 0.5, TRUE)   → 0.5000  ' cumulative — NEGBINOMDIST has no equivalent
+=NEGBINOM.DIST(2, 3, 0.5, FALSE)  → 0.1875  ' exact — matches NEGBINOMDIST(2, 3, 0.5)`}</ExcelCode>
+
+The rule that actually holds across this whole family: the default
+always matches the legacy function's own prior behavior, never a
+fixed `TRUE` or `FALSE` you can assume in advance.
+
+export const faqs = [
+  {
+    question: 'Does NEGBINOMDIST(f, s, p) always equal NEGBINOM.DIST(f, s, p, FALSE)?',
+    answer: 'Yes, exactly and always. NEGBINOM.DIST(f, s, p, TRUE) returns a different value — the cumulative probability, which NEGBINOMDIST never computed.',
+  },
+  {
+    question: "Why does NORMSDIST's missing argument default to TRUE but NEGBINOMDIST's defaults to FALSE?",
+    answer: "Each one matches whichever single calculation that specific legacy function always performed before the 2010 rename — NORMSDIST only ever computed cumulative probability, NEGBINOMDIST only ever computed the exact single-point probability. There's no shared rule to guess from; check each function individually.",
+  },
+  {
+    question: 'Is there a general way to know if a legacy Excel function rename added a required argument?',
+    answer: "Compare the argument counts directly on each function's own syntax rather than assuming from a similar-looking pair — a pure rename (like BINOMDIST to BINOM.DIST) keeps the exact same argument list; one that gained a capability (like NORMSDIST or NEGBINOMDIST) adds a required argument the old name never had.",
+  },
+];
+
+<Faq items={faqs} />
+
+See the full reference for
+[NEGBINOMDIST](/docs/compatibility/negbinomdist) and
+[NEGBINOM.DIST](/docs/statistical/negbinom-dist) for the complete
+argument list, common errors, and a live example you can edit
+yourself.
