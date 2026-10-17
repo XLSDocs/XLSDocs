@@ -1,0 +1,146 @@
+---
+title: BETADIST
+description: The pre-2010 name for BETA.DIST — but NOT a pure rename, since the modern version added a required cumulative argument.
+---
+
+BETADIST is the original name for what's now called
+[BETA.DIST](/docs/statistical/beta-dist) — but like
+[NORMSDIST](/docs/compatibility/normsdist), this isn't a pure rename.
+BETADIST always computed the cumulative beta probability; BETA.DIST
+added a **required** `cumulative` argument, letting it also return the
+probability density instead.
+
+<Callout type="warn">
+  `BETADIST(x, alpha, beta, [A], [B])` is equivalent to
+  `BETA.DIST(x, alpha, beta, TRUE, [A], [B])` — dropping in the new
+  name alone, without adding `TRUE`, returns `#VALUE!` instead of the
+  probability you expected.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'BETADIST(x, alpha, beta, A, B) always equals BETA.DIST(x, alpha, beta, TRUE, A, B)', type: 'warn' },
+  { text: 'Unlike BETA.DIST, BETADIST has no way to get the probability density instead of the cumulative probability', type: 'warn' },
+  { text: 'A and B default to 0 and 1 if omitted, same as BETA.DIST', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BETADIST(x, alpha, beta, [A], [B])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BETADIST(x, alpha, beta, [A], [B])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at — between A and B.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The first shape parameter — must be positive.',
+  },
+  {
+    name: 'beta',
+    type: 'number',
+    required: true,
+    description: 'The second shape parameter — must be positive.',
+  },
+  {
+    name: 'A',
+    type: 'number',
+    required: false,
+    description: 'The lower bound of x\'s interval. Defaults to 0.',
+  },
+  {
+    name: 'B',
+    type: 'number',
+    required: false,
+    description: 'The upper bound of x\'s interval. Defaults to 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cumulative beta probability — the probability that a
+beta-distributed random variable is less than or equal to `x` —
+always the cumulative form, with no way to request the density
+instead.
+
+## Try it
+
+<TryIt
+  data={{ '0.1': '0.1143', '0.3': '0.5798', '0.5': '0.8906', '0.7': '0.9891' }}
+  defaultValue="0.3"
+  label={'Live preview — =BETADIST({x}, 2, 5)'}
+  fieldLabel="x"
+/>
+
+The same `alpha = 2`, `beta = 5` scenario used on
+[BETA.DIST](/docs/statistical/beta-dist)'s own page, returning
+identical values — `BETADIST(0.3, 2, 5)` and
+`BETA.DIST(0.3, 2, 5, TRUE)` both return `0.5798`.
+
+## Common errors
+
+### #NUM! — x is outside the [A, B] interval, or alpha/beta isn't positive
+
+<ExcelCode>{`BETADIST(1.5, 2, 5) → #NUM!, since 1.5 is outside the default [0,1] range`}</ExcelCode>
+
+`x` must fall between `A` and `B` (0 and 1 by default), and both
+`alpha` and `beta` must be strictly positive.
+
+### Assuming BETA.DIST(x, alpha, beta) alone works as the direct replacement
+
+<ExcelCode>{`BETA.DIST(0.3, 2, 5) → #VALUE! (missing the required cumulative argument) — use BETA.DIST(0.3, 2, 5, TRUE) instead`}</ExcelCode>
+
+Dropping in the new name alone doesn't work — `cumulative` is
+required, and must be `TRUE` to match BETADIST's legacy behavior.
+
+export const faqs = [
+  {
+    question: 'Should I use BETADIST or BETA.DIST in a new formula?',
+    answer: 'BETA.DIST(x, alpha, beta, TRUE, A, B) — it computes the exact same thing as BETADIST, but remember the TRUE; BETA.DIST alone, with no cumulative argument, returns #VALUE!.',
+  },
+  {
+    question: 'Can BETADIST return the probability density instead of the cumulative probability?',
+    answer: 'No — BETADIST only ever computes the cumulative probability. Getting the density requires the modern BETA.DIST(..., FALSE), which has no BETADIST equivalent at all.',
+  },
+  {
+    question: 'Does BETADIST default to TRUE for the same reason as NORMSDIST?',
+    answer: "Yes, the same underlying reason: each legacy function's missing cumulative argument matches whichever single mode that specific function always computed before the rename. BETADIST and NORMSDIST both only ever computed the cumulative form, so both default to TRUE — unlike NEGBINOMDIST, which only ever computed an exact single-point probability and defaults to FALSE.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BETA.DIST](/docs/statistical/beta-dist) — the modern replacement;
+  use `BETA.DIST(x, alpha, beta, TRUE, A, B)` in any new formula.
+- [BETAINV](/docs/compatibility/betainv) — this function's inverse,
+  which (unlike this function) renamed as a pure drop-in.
+- [NORMSDIST](/docs/compatibility/normsdist) — another function
+  missing a required `cumulative` argument, defaulting to the same
+  value (`TRUE`) for the same underlying reason.
