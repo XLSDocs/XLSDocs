@@ -55,6 +55,20 @@ export async function onRequestPost({
 
   if (event.type.startsWith(HANDLED_PREFIX)) {
     const subscription = event.data.object as Stripe.Subscription;
+
+    // This Stripe account is shared across multiple sites (xlsdocs,
+    // pbidocs, fabdocs, tsqldocs) — webhook destinations receive every
+    // matching event on the account regardless of which site's product
+    // triggered it. Without this check, a different site's subscriber
+    // would silently get written into xlsdocs' own KV and granted
+    // unlimited access here too.
+    const belongsToXlsdocs = subscription.items.data.some(
+      (item) => item.price?.id === env.STRIPE_PRICE_ID,
+    );
+    if (!belongsToXlsdocs) {
+      return json({ received: true }, 200);
+    }
+
     const customerId = typeof subscription.customer === 'string'
       ? subscription.customer
       : subscription.customer.id;
