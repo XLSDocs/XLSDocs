@@ -1,0 +1,147 @@
+---
+title: CHITEST
+description: The pre-2010 name for CHISQ.TEST — identical syntax and behavior, kept for backward compatibility.
+---
+
+CHITEST is the original name for what's now called
+[CHISQ.TEST](/docs/statistical/chisq-test) — the standard
+goodness-of-fit test for categorical data. The two functions are
+otherwise **identical**: same arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says CHITEST "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [CHISQ.TEST](/docs/statistical/chisq-test)
+  instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'CHITEST(actual_range, expected_range) and CHISQ.TEST(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use CHISQ.TEST instead', type: 'warn' },
+  { text: 'actual_range and expected_range must be the same size and shape', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHITEST(actual_range, expected_range)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHITEST(actual_range, expected_range)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'actual_range',
+    type: 'range',
+    required: true,
+    description: 'The observed counts for each category.',
+  },
+  {
+    name: 'expected_range',
+    type: 'range',
+    required: true,
+    description: 'The expected counts for each category, based on the hypothesis being tested — must match actual_range in size and shape.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A probability between 0 and 1 — the likelihood of seeing a deviation
+between observed and expected counts at least this large by chance
+alone — exactly what [CHISQ.TEST](/docs/statistical/chisq-test) would
+return.
+
+## Try it
+
+<TryIt
+  data={{ close: '0.8521', moderate: '0.0087', 'strongly skewed': '0.0009' }}
+  defaultValue="moderate"
+  label={'Live preview — =CHITEST({scenario} counts, expected)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    rowsByInput: {
+      close: {
+        a1: 'Actual', b1: 'Expected',
+        a2: '36', b2: '33.33', a3: '32', b3: '33.33', a4: '32', b4: '33.33',
+      },
+      moderate: {
+        a1: 'Actual', b1: 'Expected',
+        a2: '45', b2: '33.33', a3: '35', b3: '33.33', a4: '20', b4: '33.33',
+      },
+      'strongly skewed': {
+        a1: 'Actual', b1: 'Expected',
+        a2: '50', b2: '33.33', a3: '30', b3: '33.33', a4: '20', b4: '33.33',
+      },
+    },
+  }}
+/>
+
+The same 100-observations-across-3-categories scenario used on
+[CHISQ.TEST](/docs/statistical/chisq-test)'s own page, returning the
+identical values at every step — `CHITEST` and `CHISQ.TEST` agree
+exactly, from `0.8521` when the counts are close to expectation down
+to `0.0009` when they're strongly skewed.
+
+## Common errors
+
+### #N/A — actual_range and expected_range are different sizes
+
+<ExcelCode>{`CHITEST(A2:A4, B2:B5) → #N/A`}</ExcelCode>
+
+Every category in `actual_range` needs a matching expected value in
+`expected_range` — the two ranges must be the same size and shape.
+
+### #DIV/0! — an expected value is zero
+
+<ExcelCode>{`CHITEST(A2:A4, B2:B4) → #DIV/0! when any value in B2:B4 is 0`}</ExcelCode>
+
+Each term in the chi-square statistic divides by the expected count
+for that category, so no expected value can be zero.
+
+export const faqs = [
+  {
+    question: 'Should I use CHITEST or CHISQ.TEST in a new formula?',
+    answer: 'CHISQ.TEST — it computes the exact same thing, but CHITEST is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses CHITEST?',
+    answer: 'No — CHITEST still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between CHITEST and CHISQ.TEST?',
+    answer: 'None — same argument order, same required arguments, same results for every input, including on multi-row/multi-column contingency tables.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHISQ.TEST](/docs/statistical/chisq-test) — the modern replacement;
+  use this in any new formula.
+- [CHIDIST](/docs/compatibility/chidist) — the right-tailed probability
+  this function reports directly, computable separately from a
+  pre-calculated chi-square statistic.
+- [CHIINV](/docs/compatibility/chiinv) — looks up the critical value
+  for a given significance level, usable to check this function's
+  result against a threshold.

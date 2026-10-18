@@ -1,0 +1,127 @@
+---
+title: CHIDIST
+description: The pre-2010 name for CHISQ.DIST.RT — identical syntax and behavior, kept for backward compatibility.
+---
+
+CHIDIST is the original name for what's now called
+[CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt) — the right-tailed
+chi-square distribution, same shape of probability `CHISQ.TEST`
+reports internally. The two functions are otherwise **identical**:
+same arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says CHIDIST "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use
+  [CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'CHIDIST(x, deg_freedom) and CHISQ.DIST.RT(x, deg_freedom) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use CHISQ.DIST.RT instead', type: 'warn' },
+  { text: 'x must be non-negative and deg_freedom must be at least 1, or CHIDIST returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHIDIST(x, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHIDIST(x, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The chi-square value to evaluate — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically the number of categories minus 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The right-tailed probability of the chi-square distribution — the
+area under the curve to the right of `x` — exactly what
+[CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt) would return.
+
+## Try it
+
+<TryIt
+  data={{ '2': '0.7358', '5': '0.2873', '9.488': '0.0500', '13': '0.0113' }}
+  defaultValue="9.488"
+  label={'Live preview — =CHIDIST({x}, 4)'}
+  fieldLabel="x"
+/>
+
+The same 4-degrees-of-freedom scenario used on
+[CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt)'s own page, returning
+the identical values — `CHIDIST(9.488, 4)` and
+`CHISQ.DIST.RT(9.488, 4)` both return `0.0500`, the standard 5%
+significance threshold at this degree of freedom.
+
+## Common errors
+
+### #NUM! — x is negative, or deg_freedom is less than 1
+
+<ExcelCode>{`CHIDIST(2, 0) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative and `deg_freedom` must be at least 1.
+
+### #VALUE! — any argument is nonnumeric
+
+<ExcelCode>{`CHIDIST(2, "x") → #VALUE!`}</ExcelCode>
+
+Every argument must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use CHIDIST or CHISQ.DIST.RT in a new formula?',
+    answer: 'CHISQ.DIST.RT — it computes the exact same thing, but CHIDIST is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses CHIDIST?',
+    answer: 'No — CHIDIST still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between CHIDIST and CHISQ.DIST.RT?',
+    answer: 'None — same argument order, same required arguments, same results for every input. Both are the right-tailed chi-square probability; Microsoft also offers left-tailed CHISQ.DIST as a separate modern function, but CHIDIST has no left-tailed equivalent of its own.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt) — the modern
+  replacement; use this in any new formula.
+- [CHIINV](/docs/compatibility/chiinv) — this function's inverse, also
+  kept for backward compatibility.
+- [CHITEST](/docs/compatibility/chitest) — computes a chi-square
+  statistic from raw counts and reports this same right-tailed
+  probability directly.
