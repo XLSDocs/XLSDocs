@@ -1,0 +1,132 @@
+---
+title: FDIST
+description: The pre-2010 name for F.DIST.RT — identical syntax and behavior, kept for backward compatibility.
+---
+
+FDIST is the original name for what's now called
+[F.DIST.RT](/docs/statistical/f-dist-rt) — the right-tailed
+F-distribution, the shape behind one-tailed variance comparisons and
+ANOVA p-values. The two functions are otherwise **identical**: same
+arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says FDIST "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [F.DIST.RT](/docs/statistical/f-dist-rt) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'FDIST(x, df1, df2) and F.DIST.RT(x, df1, df2) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use F.DIST.RT instead', type: 'warn' },
+  { text: 'x must be non-negative and both degrees of freedom must be at least 1, or FDIST returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FDIST(x, deg_freedom1, deg_freedom2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FDIST(x, deg_freedom1, deg_freedom2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The F-value to evaluate — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom1',
+    type: 'number',
+    required: true,
+    description: 'The numerator degrees of freedom.',
+  },
+  {
+    name: 'deg_freedom2',
+    type: 'number',
+    required: true,
+    description: 'The denominator degrees of freedom.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The right-tailed probability of the F-distribution — the area under
+the curve to the right of `x` — exactly what
+[F.DIST.RT](/docs/statistical/f-dist-rt) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.6906', '1': '0.4323', '2': '0.1780', '3.71': '0.0499' }}
+  defaultValue="1"
+  label={'Live preview — =FDIST({x}, 3, 10)'}
+  fieldLabel="x"
+/>
+
+The same 3-and-10-degrees-of-freedom scenario used on
+[F.DIST.RT](/docs/statistical/f-dist-rt)'s own page, returning the
+identical values — `FDIST(3.71, 3, 10)` and `F.DIST.RT(3.71, 3, 10)`
+both return almost exactly `0.0499`, the standard 5% significance
+threshold for this pair of degrees of freedom.
+
+## Common errors
+
+### #NUM! — x is negative, or either deg_freedom is less than 1
+
+<ExcelCode>{`FDIST(-1, 3, 10) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative, and both degrees-of-freedom arguments must
+be at least `1`.
+
+### #VALUE! — any argument is nonnumeric
+
+<ExcelCode>{`FDIST(1, 3, "x") → #VALUE!`}</ExcelCode>
+
+Every argument must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use FDIST or F.DIST.RT in a new formula?',
+    answer: 'F.DIST.RT — it computes the exact same thing, but FDIST is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses FDIST?',
+    answer: 'No — FDIST still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between FDIST and F.DIST.RT?',
+    answer: 'None — same argument order, same required arguments, same results for every input. Both are the right-tailed F probability; Microsoft also offers left-tailed F.DIST as a separate modern function, but FDIST has no left-tailed equivalent of its own.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [F.DIST.RT](/docs/statistical/f-dist-rt) — the modern replacement;
+  use this in any new formula.
+- [FINV](/docs/compatibility/finv) — this function's inverse, also
+  kept for backward compatibility.
+- [FTEST](/docs/compatibility/ftest) — the two-tailed variance test
+  built from this same right-tailed distribution.

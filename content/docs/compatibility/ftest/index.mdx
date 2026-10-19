@@ -1,0 +1,144 @@
+---
+title: FTEST
+description: The pre-2010 name for F.TEST — identical syntax and behavior, kept for backward compatibility.
+---
+
+FTEST is the original name for what's now called
+[F.TEST](/docs/statistical/f-test) — the standard way to check whether
+two samples likely come from populations with the same variance. The
+two functions are otherwise **identical**: same arguments, same
+order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says FTEST "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [F.TEST](/docs/statistical/f-test) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'FTEST(array1, array2) and F.TEST(array1, array2) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use F.TEST instead', type: 'warn' },
+  { text: 'Both arrays need at least 2 numeric values, or FTEST returns #N/A', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FTEST(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FTEST(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first sample of data — at least 2 numeric values.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second sample of data — at least 2 numeric values.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A two-tailed probability between 0 and 1 — the likelihood of seeing a
+ratio of variances at least this extreme by chance alone — exactly
+what [F.TEST](/docs/statistical/f-test) would return.
+
+## Try it
+
+<TryIt
+  data={{ similar: '0.7888', wide: '0.0111', tight: '0.0062' }}
+  defaultValue="similar"
+  label={'Live preview — =FTEST(typical, {comparison})'}
+  fieldLabel="comparison"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 6,
+    rowsByInput: {
+      similar: {
+        a1: 'Typical', b1: 'Similar',
+        a2: '40', b2: '38', a3: '55', b3: '52', a4: '48', b4: '46', a5: '62', b5: '58', a6: '45', b6: '51',
+      },
+      wide: {
+        a1: 'Typical', b1: 'Wide',
+        a2: '40', b2: '10', a3: '55', b3: '80', a4: '48', b4: '45', a5: '62', b5: '5', a6: '45', b6: '95',
+      },
+      tight: {
+        a1: 'Typical', b1: 'Tight',
+        a2: '40', b2: '48', a3: '55', b3: '50', a4: '48', b4: '49', a5: '62', b5: '51', a6: '45', b6: '52',
+      },
+    },
+  }}
+/>
+
+The same groups used on [F.TEST](/docs/statistical/f-test)'s own
+page, returning the identical values at every step — `FTEST` and
+`F.TEST` agree exactly, from `0.7888` against a similarly-spread
+group down to `0.0062` against a much tighter one.
+
+## Common errors
+
+### #DIV/0! — array2's variance is zero
+
+<ExcelCode>{`FTEST(A2:A6, B2:B6) → #DIV/0! when every value in B2:B6 is identical`}</ExcelCode>
+
+A variance of zero can't appear in the denominator of the F-statistic
+— `array2` needs at least some spread in its values.
+
+### #N/A — fewer than 2 numeric values in either array
+
+<ExcelCode>{`FTEST(A1, B2:B6) → #N/A`}</ExcelCode>
+
+Sample variance is undefined with fewer than 2 numbers — both arrays
+need at least 2 numeric values each.
+
+export const faqs = [
+  {
+    question: 'Should I use FTEST or F.TEST in a new formula?',
+    answer: 'F.TEST — it computes the exact same thing, but FTEST is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses FTEST?',
+    answer: 'No — FTEST still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between FTEST and F.TEST?',
+    answer: 'None — same argument order, same required arguments, same results for every input, including which array is passed first.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [F.TEST](/docs/statistical/f-test) — the modern replacement; use
+  this in any new formula.
+- [FDIST](/docs/compatibility/fdist) — the right-tailed probability
+  this function's underlying F-statistic is evaluated against.
+- [FINV](/docs/compatibility/finv) — looks up the critical value for a
+  given significance level, usable to check this function's result
+  against a threshold.

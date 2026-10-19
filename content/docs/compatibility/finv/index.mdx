@@ -1,0 +1,132 @@
+---
+title: FINV
+description: The pre-2010 name for F.INV.RT — identical syntax and behavior, kept for backward compatibility.
+---
+
+FINV is the original name for what's now called
+[F.INV.RT](/docs/statistical/f-inv-rt) — the inverse of the
+right-tailed F-distribution, matching the convention most printed
+F-tables and Excel's own ANOVA output use. The two functions are
+otherwise **identical**: same arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says FINV "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [F.INV.RT](/docs/statistical/f-inv-rt) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'FINV(probability, df1, df2) and F.INV.RT(probability, df1, df2) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use F.INV.RT instead', type: 'warn' },
+  { text: 'probability must be strictly between 0 and 1, or FINV returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FINV(probability, deg_freedom1, deg_freedom2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FINV(probability, deg_freedom1, deg_freedom2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A right-tailed probability between 0 and 1, exclusive.',
+  },
+  {
+    name: 'deg_freedom1',
+    type: 'number',
+    required: true,
+    description: 'The numerator degrees of freedom.',
+  },
+  {
+    name: 'deg_freedom2',
+    type: 'number',
+    required: true,
+    description: 'The denominator degrees of freedom.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The F-value `x` such that `FDIST(x, deg_freedom1, deg_freedom2)`
+equals `probability` — exactly what
+[F.INV.RT](/docs/statistical/f-inv-rt) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.8451', '0.1': '2.7277', '0.05': '3.7083', '0.01': '6.5523' }}
+  defaultValue="0.05"
+  label={'Live preview — =FINV({probability}, 3, 10)'}
+  fieldLabel="probability"
+/>
+
+The same 3-and-10-degrees-of-freedom scenario used on
+[F.INV.RT](/docs/statistical/f-inv-rt)'s own page, returning the
+identical values — `FINV(0.05, 3, 10)` and `F.INV.RT(0.05, 3, 10)`
+both return `3.7083`, the critical value for a 5% significance level.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`FINV(0, 3, 10) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than `0` and less than `1`, and both
+degrees-of-freedom arguments must be at least `1`.
+
+### #VALUE! — any argument is nonnumeric
+
+<ExcelCode>{`FINV(0.05, 3, "x") → #VALUE!`}</ExcelCode>
+
+Every argument must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use FINV or F.INV.RT in a new formula?',
+    answer: 'F.INV.RT — it computes the exact same thing, but FINV is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses FINV?',
+    answer: 'No — FINV still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between FINV and F.INV.RT?',
+    answer: 'None — same argument order, same required arguments, same results for every input. Both use the right-tailed convention; Microsoft also offers left-tailed F.INV as a separate modern function, but FINV has no left-tailed equivalent of its own.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [F.INV.RT](/docs/statistical/f-inv-rt) — the modern replacement;
+  use this in any new formula.
+- [FDIST](/docs/compatibility/fdist) — this function's inverse, also
+  kept for backward compatibility.
+- [FTEST](/docs/compatibility/ftest) — computes a two-tailed variance
+  test, usable alongside this function to check significance against
+  a critical value.
