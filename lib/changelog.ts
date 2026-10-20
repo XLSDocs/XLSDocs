@@ -12,6 +12,20 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-19',
+    title: 'A new Compatibility category: 15 pre-2010 function names, each mapped to its modern replacement',
+    description:
+      "BETADIST, BETAINV, BINOMDIST, CHIDIST, CHIINV, CHITEST, CRITBINOM, FDIST, FINV, FTEST, NEGBINOMDIST, NORMDIST, NORMINV, NORMSDIST, and NORMSINV — the old names Excel renamed in 2010 and later, kept working for old workbooks but superseded by clearer modern equivalents. Several aren't pure renames: NORMSDIST, NEGBINOMDIST, and BETADIST are each missing a required argument their replacement added, and CHIDIST/CHIINV/FDIST/FINV map to the right-tailed .RT variant specifically, not the same-named modern function.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-10-11',
+    title: 'The site runs on a lighter, faster architecture',
+    description:
+      "Every page now serves as a static file straight from Cloudflare's edge instead of round-tripping through a server on every request — noticeably faster page loads across the board. The AI tools, search, feedback, and billing all work exactly the same as before.",
+    tags: ['Improvement'],
+  },
+  {
     date: '2026-10-03',
     title: '42 more Engineering functions — bit operations, complex numbers, Bessel functions, error functions, DELTA, GESTEP, and CONVERT — the Engineering+Cube audit is complete',
     description:
