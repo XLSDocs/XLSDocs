@@ -1,0 +1,84 @@
+---
+title: "CHIDIST vs CHISQ.DIST: The Modern Name That Isn't the Replacement"
+description: Renaming CHIDIST to CHISQ.DIST looks like the obvious fix. It compiles, it returns a number, and that number is wrong — the real replacement is CHISQ.DIST.RT.
+date: "2026-10-20"
+category: Tutorials
+readTime: 3 min read
+---
+
+Every legacy-to-modern pair we've covered so far in the
+[Compatibility category](/docs/compatibility) has had the same shape
+of trap: the modern function needs one more argument than the legacy
+one did. `CHIDIST` has a different trap entirely — one that's easier
+to hit by accident, because it doesn't throw an error at all.
+
+## The assumption that breaks here
+
+<Callout type="warn">
+  `CHIDIST(x, deg_freedom)` is equivalent to
+  `CHISQ.DIST.RT(x, deg_freedom)` — **not** `CHISQ.DIST`. The
+  same-named function looks like the obvious replacement, takes the
+  same two arguments, and returns a perfectly plausible number. That
+  number is just the probability of the *opposite* tail.
+</Callout>
+
+<ExcelCode>{`=CHIDIST(9.488, 4)           → 0.0500
+=CHISQ.DIST(9.488, 4, TRUE)  → 0.9500  ' wrong — looks fine, isn't
+=CHISQ.DIST.RT(9.488, 4)     → 0.0500  ' matches CHIDIST`}</ExcelCode>
+
+Neither wrong result is an error value. `CHISQ.DIST(9.488, 4, TRUE)`
+runs cleanly and returns `0.9500` — a totally ordinary-looking
+probability. If `0.0500` was the actual p-value from a goodness-of-fit
+test, swapping in `0.9500` doesn't just shift the number, it flips the
+conclusion: "statistically significant at the 5% level" silently
+becomes "not even close."
+
+## Why there are two modern functions, not one
+
+Legacy `CHIDIST` only ever computed the **right-tailed** probability —
+the area under the chi-square curve to the right of `x`, which is the
+direction a goodness-of-fit test actually needs (a large chi-square
+statistic is the evidence a real difference exists). When Excel 2010
+split the chi-square functions apart, it kept that same right-tailed
+behavior in a new function with `.RT` on the end, and separately added
+a genuinely new left-tailed `CHISQ.DIST` that `CHIDIST` never had an
+equivalent for:
+
+<ExcelCode>{`=CHISQ.DIST(9.488, 4, TRUE)    → 0.9500  ' left tail — new, no CHIDIST equivalent
+=CHISQ.DIST.RT(9.488, 4)      → 0.0500  ' right tail — matches CHIDIST exactly`}</ExcelCode>
+
+Both are legitimate functions computing legitimate numbers. The
+problem is purely that the obvious-looking rename —
+`CHIDIST` → `CHISQ.DIST` — picks the wrong one of the two.
+
+`CHIINV` has the identical trap with its own inverse pair: the
+correct replacement is [`CHISQ.INV.RT`](/docs/statistical/chisq-inv-rt),
+not `CHISQ.INV`. And it isn't unique to the chi-square family —
+[`FDIST`](/docs/compatibility/fdist) and
+[`FINV`](/docs/compatibility/finv) map to `F.DIST.RT` and `F.INV.RT`
+for the exact same reason, since Excel's F-distribution went through
+the identical left/right split in the same 2010 release.
+
+export const faqs = [
+  {
+    question: 'How can I tell whether a legacy Excel function\'s modern replacement needs an .RT suffix?',
+    answer: "Check what the legacy function actually computed — if it only ever returned a right-tailed (upper-tail) probability, like CHIDIST and FDIST did, the matching modern function is the one with .RT on the end, not the same-named one without it.",
+  },
+  {
+    question: 'Does CHISQ.DIST(x, df, TRUE) ever equal CHIDIST(x, df)?',
+    answer: 'Only when x sits exactly at the median of the distribution, where both tails happen to be 0.5 — for every other input they\'re different numbers, often very different ones.',
+  },
+  {
+    question: 'Is there a quick way to convert a CHISQ.DIST result into what CHIDIST would have returned?',
+    answer: 'Yes — 1 - CHISQ.DIST(x, df, TRUE) always equals CHISQ.DIST.RT(x, df), which is what CHIDIST(x, df) returns. But using CHISQ.DIST.RT directly is simpler and less error-prone than remembering to subtract from 1.',
+  },
+];
+
+<Faq items={faqs} />
+
+See the full reference for
+[CHIDIST](/docs/compatibility/chidist),
+[CHISQ.DIST](/docs/statistical/chisq-dist), and
+[CHISQ.DIST.RT](/docs/statistical/chisq-dist-rt) for the complete
+argument lists, common errors, and live examples you can edit
+yourself.
