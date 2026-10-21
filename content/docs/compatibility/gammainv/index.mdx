@@ -1,0 +1,131 @@
+---
+title: GAMMAINV
+description: The pre-2010 name for GAMMA.INV — identical syntax and behavior, kept for backward compatibility.
+---
+
+GAMMAINV is the original name for what's now called
+[GAMMA.INV](/docs/statistical/gamma-inv) — part of the same 2010
+renaming wave as [BETAINV](/docs/compatibility/betainv). The two
+functions are **identical**: same arguments, same order, same
+results.
+
+<Callout type="warn">
+  Microsoft's own documentation says GAMMAINV "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [GAMMA.INV](/docs/statistical/gamma-inv) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'GAMMAINV(probability, alpha, beta) and GAMMA.INV(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use GAMMA.INV instead', type: 'warn' },
+  { text: 'probability must be strictly between 0 and 1, or GAMMAINV returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GAMMAINV(probability, alpha, beta)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GAMMAINV(probability, alpha, beta)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The shape parameter — must be positive.',
+  },
+  {
+    name: 'beta',
+    type: 'number',
+    required: true,
+    description: 'The scale parameter — must be positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value `x` such that `GAMMADIST(x, alpha, beta, TRUE)` equals
+`probability` — exactly what
+[GAMMA.INV](/docs/statistical/gamma-inv) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.25': '2.8838', '0.5': '5.0350', '0.75': '8.0779', '0.9': '11.6692' }}
+  defaultValue="0.5"
+  label={'Live preview — =GAMMAINV({probability}, 2, 3)'}
+  fieldLabel="probability"
+/>
+
+The same shape-2, scale-3 scenario used on
+[GAMMA.INV](/docs/statistical/gamma-inv)'s own page, returning the
+identical values — `GAMMAINV(0.5, 2, 3)` and `GAMMA.INV(0.5, 2, 3)`
+both return `5.0350`, the distribution's true median.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`GAMMAINV(1, 2, 3) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than `0` and less than `1`, and both
+`alpha` and `beta` must be strictly positive.
+
+### #VALUE! — any argument is nonnumeric
+
+<ExcelCode>{`GAMMAINV(0.5, 2, "x") → #VALUE!`}</ExcelCode>
+
+Every argument must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use GAMMAINV or GAMMA.INV in a new formula?',
+    answer: 'GAMMA.INV — it computes the exact same thing, but GAMMAINV is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses GAMMAINV?',
+    answer: 'No — GAMMAINV still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between GAMMAINV and GAMMA.INV?',
+    answer: 'None — same argument order, same required arguments, same results for every input.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GAMMA.INV](/docs/statistical/gamma-inv) — the modern replacement;
+  use this in any new formula.
+- [GAMMADIST](/docs/compatibility/gammadist) — this function's
+  inverse, also kept for backward compatibility.
+- [BETAINV](/docs/compatibility/betainv) — the equivalent inverse
+  lookup for the beta distribution, from the same 2010 wave.

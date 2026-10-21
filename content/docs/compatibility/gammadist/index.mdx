@@ -1,0 +1,142 @@
+---
+title: GAMMADIST
+description: The pre-2010 name for GAMMA.DIST — identical syntax and behavior, kept for backward compatibility.
+---
+
+GAMMADIST is the original name for what's now called
+[GAMMA.DIST](/docs/statistical/gamma-dist) — part of the same 2010
+renaming wave as [BETADIST](/docs/compatibility/betadist). Unlike
+BETADIST, this one **is** a pure rename: the legacy function already
+required a `cumulative` argument, so the two functions are otherwise
+identical — same arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says GAMMADIST "may not be available
+  in future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [GAMMA.DIST](/docs/statistical/gamma-dist)
+  instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'GAMMADIST(x, alpha, beta, cumulative) and GAMMA.DIST(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use GAMMA.DIST instead', type: 'warn' },
+  { text: 'x must be non-negative and alpha/beta must be positive, or GAMMADIST returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GAMMADIST(x, alpha, beta, cumulative)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GAMMADIST(x, alpha, beta, cumulative)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at — must be non-negative.',
+  },
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The shape parameter — must be positive.',
+  },
+  {
+    name: 'beta',
+    type: 'number',
+    required: true,
+    description: 'The scale parameter — must be positive.',
+  },
+  {
+    name: 'cumulative',
+    type: 'boolean',
+    required: true,
+    description: 'TRUE for the cumulative distribution (a probability); FALSE for the probability density (the curve\'s height at x).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `cumulative` `TRUE`: the probability that a gamma-distributed
+random variable with shape `alpha` and scale `beta` is less than or
+equal to `x`. With `cumulative` `FALSE`: the density of that curve at
+`x` — exactly what [GAMMA.DIST](/docs/statistical/gamma-dist) would
+return.
+
+## Try it
+
+<TryIt
+  data={{ '2': '0.1443', '4': '0.3849', '6': '0.5940', '10': '0.8454' }}
+  defaultValue="6"
+  label={'Live preview — =GAMMADIST({x}, 2, 3, TRUE)'}
+  fieldLabel="x"
+/>
+
+The same shape-2, scale-3 scenario used on
+[GAMMA.DIST](/docs/statistical/gamma-dist)'s own page, returning the
+identical values — `GAMMADIST(6, 2, 3, TRUE)` and
+`GAMMA.DIST(6, 2, 3, TRUE)` both return `0.5940`.
+
+## Common errors
+
+### #NUM! — x is negative, or alpha/beta isn't positive
+
+<ExcelCode>{`GAMMADIST(-1, 2, 3, TRUE) → #NUM!`}</ExcelCode>
+
+`x` must be non-negative, and both `alpha` and `beta` must be
+strictly positive.
+
+### #VALUE! — any argument is nonnumeric
+
+<ExcelCode>{`GAMMADIST(6, 2, 3, "x") → #VALUE!`}</ExcelCode>
+
+Every numeric argument must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use GAMMADIST or GAMMA.DIST in a new formula?',
+    answer: 'GAMMA.DIST — it computes the exact same thing, but GAMMADIST is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses GAMMADIST?',
+    answer: 'No — GAMMADIST still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is GAMMADIST missing an argument the way BETADIST and NORMSDIST are?',
+    answer: 'No — GAMMADIST already required a cumulative argument before the 2010 rename, so it\'s a pure drop-in replacement for GAMMA.DIST, same argument order and same results for every input.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GAMMA.DIST](/docs/statistical/gamma-dist) — the modern replacement;
+  use this in any new formula.
+- [GAMMAINV](/docs/compatibility/gammainv) — this function's inverse,
+  also kept for backward compatibility.
+- [BETADIST](/docs/compatibility/betadist) — a related distribution
+  from the same 2010 wave that, unlike this function, is missing an
+  argument its modern replacement has.
