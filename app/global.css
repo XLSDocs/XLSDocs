@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+@import '../components/function-diagram/function-diagram.css';
 
 /*
  * ExcelCode token colors — matched to Shiki's github-light/github-dark

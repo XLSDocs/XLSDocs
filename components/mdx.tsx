@@ -13,6 +13,7 @@ import { QuickAnswer } from './quick-answer';
 import { ParametersTable } from './parameters-table';
 import { CodeWrapToggle } from './code-wrap-toggle';
 import { CategoryCards } from './category-cards';
+import { FunctionDiagram } from './function-diagram/function-diagram';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -53,6 +54,7 @@ export function getMDXComponents(components?: MDXComponents) {
     QuickAnswer,
     ParametersTable,
     CategoryCards,
+    FunctionDiagram,
     ...components,
   } satisfies MDXComponents;
 }

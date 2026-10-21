@@ -1,0 +1,22 @@
+/* Argument colors for <FunctionDiagram />. Import once from app/global.css. */
+.fn-diagram {
+  --diag-blue: #2563eb;
+  --diag-red: #dc2626;
+  --diag-purple: #9333ea;
+  --diag-amber: #d97706;
+  --diag-teal: #0d9488;
+  --diag-pink: #db2777;
+  --diag-match: #f59e0b;
+  --diag-match-strength: 38%;
+}
+
+.dark .fn-diagram {
+  --diag-blue: #60a5fa;
+  --diag-red: #f87171;
+  --diag-purple: #c084fc;
+  --diag-amber: #fbbf24;
+  --diag-teal: #2dd4bf;
+  --diag-pink: #f472b6;
+  --diag-match: #d97706;
+  --diag-match-strength: 24%;
+}
