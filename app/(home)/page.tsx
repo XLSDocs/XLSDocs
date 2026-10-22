@@ -5,6 +5,7 @@ import { Categories } from '@/components/home/categories';
 import { AskClaudeShowcase } from '@/components/home/ask-claude-showcase';
 import { QuickFixShowcase } from '@/components/home/quick-fix-showcase';
 import { TryItShowcase } from '@/components/home/try-it-showcase';
+import { FunctionDiagramShowcase } from '@/components/home/function-diagram-showcase';
 import { LlmsShowcase } from '@/components/home/llms-showcase';
 import { ClosingCta } from '@/components/home/closing-cta';
 import { AskClaude } from '@/components/ask-claude';
@@ -31,6 +32,7 @@ export default function HomePage() {
       <Categories categories={categories} />
       <CodeWriterSection />
       <TryItShowcase />
+      <FunctionDiagramShowcase />
       <AskClaudeShowcase />
       <QuickFixShowcase />
       <LlmsShowcase />
