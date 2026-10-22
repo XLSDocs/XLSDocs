@@ -1,0 +1,134 @@
+---
+title: LOGNORMDIST
+description: The pre-2010 name for LOGNORM.DIST — but NOT a pure rename, since the modern version added a required cumulative argument.
+---
+
+LOGNORMDIST is the original name for what's now called
+[LOGNORM.DIST](/docs/statistical/lognorm-dist) — but like
+[BETADIST](/docs/compatibility/betadist), this isn't a pure rename.
+LOGNORMDIST always computed the cumulative lognormal probability;
+LOGNORM.DIST added a **required** `cumulative` argument, letting it
+also return the probability density instead.
+
+<Callout type="warn">
+  `LOGNORMDIST(x, mean, standard_dev)` is equivalent to
+  `LOGNORM.DIST(x, mean, standard_dev, TRUE)` — dropping in the new
+  name alone, without adding `TRUE`, returns `#VALUE!` instead of the
+  probability you expected.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'LOGNORMDIST(x, mean, standard_dev) always equals LOGNORM.DIST(x, mean, standard_dev, TRUE)', type: 'warn' },
+  { text: 'Unlike LOGNORM.DIST, LOGNORMDIST has no way to get the probability density instead of the cumulative probability', type: 'warn' },
+  { text: 'mean and standard_dev describe LN(x), not x itself', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LOGNORMDIST(x, mean, standard_dev)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOGNORMDIST(x, mean, standard_dev)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The value to evaluate the distribution at — must be positive.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: 'The mean of LN(x) — not the mean of x itself.',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The standard deviation of LN(x). Must be positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cumulative lognormal probability — the probability that a
+lognormally-distributed random variable is less than or equal to
+`x` — always the cumulative form, with no way to request the density
+instead.
+
+## Try it
+
+<TryIt
+  data={{ '0.5': '0.0828', '1': '0.5000', '2': '0.9172', '4': '0.9972' }}
+  defaultValue="1"
+  label={'Live preview — =LOGNORMDIST({x}, 0, 0.5)'}
+  fieldLabel="x"
+/>
+
+The same `mean = 0`, `standard_dev = 0.5` scenario used on
+[LOGNORM.DIST](/docs/statistical/lognorm-dist)'s own page, returning
+identical values — `LOGNORMDIST(1, 0, 0.5)` and
+`LOGNORM.DIST(1, 0, 0.5, TRUE)` both return `0.5000`.
+
+## Common errors
+
+### #NUM! — x or standard_dev is not positive
+
+<ExcelCode>{`LOGNORMDIST(-1, 0, 0.5) → #NUM!`}</ExcelCode>
+
+`x` must be greater than `0`, and `standard_dev` must be positive.
+
+### Assuming LOGNORM.DIST(x, mean, standard_dev) alone works as the direct replacement
+
+<ExcelCode>{`LOGNORM.DIST(1, 0, 0.5) → #VALUE! (missing the required cumulative argument) — use LOGNORM.DIST(1, 0, 0.5, TRUE) instead`}</ExcelCode>
+
+Dropping in the new name alone doesn't work — `cumulative` is
+required, and must be `TRUE` to match LOGNORMDIST's legacy behavior.
+
+export const faqs = [
+  {
+    question: 'Should I use LOGNORMDIST or LOGNORM.DIST in a new formula?',
+    answer: 'LOGNORM.DIST(x, mean, standard_dev, TRUE) — it computes the exact same thing as LOGNORMDIST, but remember the TRUE; LOGNORM.DIST alone, with no cumulative argument, returns #VALUE!.',
+  },
+  {
+    question: 'Can LOGNORMDIST return the probability density instead of the cumulative probability?',
+    answer: 'No — LOGNORMDIST only ever computes the cumulative probability. Getting the density requires the modern LOGNORM.DIST(..., FALSE), which has no LOGNORMDIST equivalent at all.',
+  },
+  {
+    question: 'Does LOGNORMDIST default to TRUE for the same reason as BETADIST and NORMSDIST?',
+    answer: "Yes, the same underlying reason: each legacy function's missing cumulative argument matches whichever single mode that specific function always computed before the rename. LOGNORMDIST, BETADIST, and NORMSDIST all only ever computed the cumulative form, so all three default to TRUE — unlike NEGBINOMDIST, which defaults to FALSE because it only ever computed an exact single-point probability.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LOGNORM.DIST](/docs/statistical/lognorm-dist) — the modern
+  replacement; use `LOGNORM.DIST(x, mean, standard_dev, TRUE)` in any
+  new formula.
+- [LOGINV](/docs/compatibility/loginv) — this function's inverse,
+  which (unlike this function) renamed as a pure drop-in.
+- [BETADIST](/docs/compatibility/betadist) — another function missing
+  a required `cumulative` argument, defaulting to the same value
+  (`TRUE`) for the same underlying reason.

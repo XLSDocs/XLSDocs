@@ -1,0 +1,133 @@
+---
+title: LOGINV
+description: The pre-2010 name for LOGNORM.INV — identical syntax and behavior, kept for backward compatibility.
+---
+
+LOGINV is the original name for what's now called
+[LOGNORM.INV](/docs/statistical/lognorm-inv) — part of the same 2010
+renaming wave as [NORMSINV](/docs/compatibility/normsinv). The two
+functions are **identical**: same arguments, same order, same
+results.
+
+<Callout type="warn">
+  Microsoft's own documentation says LOGINV "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [LOGNORM.INV](/docs/statistical/lognorm-inv)
+  instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'LOGINV(probability, mean, standard_dev) and LOGNORM.INV(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use LOGNORM.INV instead', type: 'warn' },
+  { text: 'probability must be strictly between 0 and 1, or LOGINV returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LOGINV(probability, mean, standard_dev)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOGINV(probability, mean, standard_dev)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive.',
+  },
+  {
+    name: 'mean',
+    type: 'number',
+    required: true,
+    description: 'The mean of LN(x) — not the mean of x itself.',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The standard deviation of LN(x). Must be positive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value `x` such that `LOGNORMDIST(x, mean, standard_dev)` equals
+`probability` — exactly what
+[LOGNORM.INV](/docs/statistical/lognorm-inv) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.1': '0.5269', '0.5': '1.0000', '0.9': '1.8980', '0.95': '2.2760' }}
+  defaultValue="0.5"
+  label={'Live preview — =LOGINV({probability}, 0, 0.5)'}
+  fieldLabel="probability"
+/>
+
+The same `mean = 0`, `standard_dev = 0.5` scenario used on
+[LOGNORM.INV](/docs/statistical/lognorm-inv)'s own page, returning
+the identical values — `LOGINV(0.5, 0, 0.5)` and
+`LOGNORM.INV(0.5, 0, 0.5)` both return exactly `1.0000`.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`LOGINV(1, 0, 0.5) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than `0` and less than `1`, and
+`standard_dev` must be positive.
+
+### #VALUE! — any argument is nonnumeric
+
+<ExcelCode>{`LOGINV(0.5, 0, "x") → #VALUE!`}</ExcelCode>
+
+Every argument must be an actual number — text that can't be
+interpreted as one returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Should I use LOGINV or LOGNORM.INV in a new formula?',
+    answer: 'LOGNORM.INV — it computes the exact same thing, but LOGINV is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses LOGINV?',
+    answer: 'No — LOGINV still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between LOGINV and LOGNORM.INV?',
+    answer: 'None — same argument order, same required arguments, same results for every input. Unlike LOGNORMDIST (which is missing an argument its modern replacement has), this is a pure rename.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LOGNORM.INV](/docs/statistical/lognorm-inv) — the modern
+  replacement; use this in any new formula.
+- [LOGNORMDIST](/docs/compatibility/lognormdist) — this function's
+  inverse, which (unlike this function) is missing an argument its
+  modern replacement has.
+- [NORMSINV](/docs/compatibility/normsinv) — another pure-rename
+  legacy function from the same 2010 wave.
