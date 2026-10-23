@@ -29,7 +29,7 @@ export function FunctionDiagramShowcase() {
           </Link>
         </div>
 
-        <div className="order-2 lg:order-1">
+        <div className="order-2 min-w-0 lg:order-1">
           <FunctionDiagram fn="xlookup" />
         </div>
       </div>
