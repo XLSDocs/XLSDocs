@@ -1,0 +1,127 @@
+---
+title: TINV
+description: The pre-2010 name for T.INV.2T — not T.INV, despite the closer-looking name. Identical syntax and behavior to T.INV.2T.
+---
+
+TINV is the original name for what's now called
+[T.INV.2T](/docs/statistical/t-inv-2t) — **not**
+[T.INV](/docs/statistical/t-inv), despite the name looking like a
+closer match. Legacy TINV was always the two-tailed inverse; it never
+had a one-tailed mode the way [TDIST](/docs/compatibility/tdist) did.
+
+<Callout type="warn">
+  `TINV(probability, deg_freedom)` is equivalent to
+  `T.INV.2T(probability, deg_freedom)` — plain `T.INV` is a different
+  function (the one-tailed inverse) and returns a different value for
+  the same inputs.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'TINV(probability, deg_freedom) and T.INV.2T(probability, deg_freedom) take identical arguments and return identical results', type: 'check' },
+  { text: 'Maps to T.INV.2T, NOT T.INV — the two-tailed version, despite the shorter name', type: 'warn' },
+  { text: 'probability is the total split across both tails, same convention as T.INV.2T', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TINV(probability, deg_freedom)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TINV(probability, deg_freedom)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'probability',
+    type: 'number',
+    required: true,
+    description: 'A probability between 0 and 1, exclusive — the total two-tailed probability (split evenly across both tails).',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically sample size minus 1 (or minus 2 for a two-sample test).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The positive t-value `x` such that `TDIST(x, deg_freedom, 2)` equals
+`probability` — exactly what
+[T.INV.2T](/docs/statistical/t-inv-2t) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0.1': '1.7823', '0.05': '2.1788', '0.01': '3.0545' }}
+  defaultValue="0.05"
+  label={'Live preview — =TINV({probability}, 12)'}
+  fieldLabel="probability"
+/>
+
+The same 12-degrees-of-freedom scenario used on
+[T.INV.2T](/docs/statistical/t-inv-2t)'s own page, returning the
+identical values — `TINV(0.05, 12)` and `T.INV.2T(0.05, 12)` both
+return `2.1788`, independently confirmed here by direct computation
+of the t-distribution's inverse CDF rather than taken on faith.
+
+## Common errors
+
+### #NUM! — probability is not strictly between 0 and 1
+
+<ExcelCode>{`TINV(0, 12) → #NUM!`}</ExcelCode>
+
+`probability` must be greater than `0` and less than `1`.
+
+### Assuming TINV maps to T.INV
+
+<ExcelCode>{`TINV(0.05, 12) → 2.1788, matching T.INV.2T(0.05, 12) — NOT T.INV(0.05, 12), which returns 1.7823`}</ExcelCode>
+
+The shorter modern name (`T.INV`) is the one-tailed version, not the
+direct replacement for TINV. Use `T.INV.2T` to match TINV's actual
+legacy behavior.
+
+export const faqs = [
+  {
+    question: 'Is TINV the same as T.INV?',
+    answer: 'No — TINV matches T.INV.2T, the two-tailed inverse. T.INV is the one-tailed version and returns a different value for the same inputs (T.INV(0.05, 12) = 1.7823, versus TINV(0.05, 12) = 2.1788).',
+  },
+  {
+    question: 'Did legacy TINV ever support a one-tailed mode?',
+    answer: 'No — unlike TDIST, which took a tails argument, TINV was always exclusively two-tailed. There was no legacy one-tailed inverse function at all; that capability only arrived with T.INV in the 2010 rename.',
+  },
+  {
+    question: 'Should I use TINV or T.INV.2T in a new formula?',
+    answer: 'T.INV.2T — it computes the exact same thing, but TINV is the older name Microsoft says may be removed in a future Excel version.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.INV.2T](/docs/statistical/t-inv-2t) — the modern replacement;
+  use this in any new formula.
+- [TDIST](/docs/compatibility/tdist) — the legacy forward lookup,
+  which splits across two different modern functions depending on its
+  `tails` argument.
+- [T.INV](/docs/statistical/t-inv) — a different modern function
+  (one-tailed), easy to confuse with this one by name alone.

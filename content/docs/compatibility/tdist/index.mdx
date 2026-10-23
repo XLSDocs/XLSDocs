@@ -1,0 +1,144 @@
+---
+title: TDIST
+description: The pre-2010 name that splits across TWO modern functions — T.DIST.RT or T.DIST.2T, depending on the tails argument.
+---
+
+TDIST is the original name covering what are now two separate
+functions: [T.DIST.RT](/docs/statistical/t-dist-rt) and
+[T.DIST.2T](/docs/statistical/t-dist-2t). Unlike every other function
+in this category, TDIST doesn't map to a single modern replacement —
+which one it matches depends entirely on its `tails` argument.
+
+<Callout type="warn">
+  `TDIST(x, deg_freedom, 1)` equals `T.DIST.RT(x, deg_freedom)`.
+  `TDIST(x, deg_freedom, 2)` equals `T.DIST.2T(x, deg_freedom)`. Same
+  legacy function, same two arguments `x` and `deg_freedom` — but
+  `tails` silently picks between two genuinely different modern
+  functions, not just two modes of one function.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'tails = 1 maps to T.DIST.RT; tails = 2 maps to T.DIST.2T', type: 'warn' },
+  { text: 'x must be non-negative, even when tails = 1 (T.DIST.RT itself has no such restriction)', type: 'warn' },
+  { text: 'deg_freedom must be at least 1', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TDIST(x, deg_freedom, tails)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TDIST(x, deg_freedom, tails)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The t-value to evaluate — must be non-negative.',
+  },
+  {
+    name: 'deg_freedom',
+    type: 'number',
+    required: true,
+    description: 'The degrees of freedom — typically sample size minus 1 (or minus 2 for a two-sample test).',
+  },
+  {
+    name: 'tails',
+    type: 'number',
+    required: true,
+    description: '1 for the one-tailed probability (matches T.DIST.RT); 2 for the two-tailed probability (matches T.DIST.2T).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+With `tails = 1`: the right-tailed probability — the area under the
+curve to the right of `x`. With `tails = 2`: the combined two-tailed
+probability — the area under both tails beyond `x` and `-x`.
+
+## Try it
+
+<TryIt
+  data={{ '1': '0.0343', '2': '0.0687' }}
+  defaultValue="1"
+  label={'Live preview — =TDIST(2, 12, {value})'}
+  fieldLabel="tails"
+/>
+
+The same `x = 2`, `deg_freedom = 12` input used on both
+[T.DIST.RT](/docs/statistical/t-dist-rt)'s and
+[T.DIST.2T](/docs/statistical/t-dist-2t)'s own pages. Switching
+`tails` from `1` to `2` doesn't adjust the result slightly — it
+exactly **doubles** it, from `0.0343` to `0.0687`, because it's
+routing to an entirely different modern function underneath.
+
+## Common errors
+
+### #NUM! — x is negative
+
+<ExcelCode>{`TDIST(-2, 12, 1) → #NUM!`}</ExcelCode>
+
+TDIST rejects negative `x` for **either** `tails` value — even
+`tails = 1`, where the modern `T.DIST.RT` it maps to actually accepts
+negative `x` just fine (returning a probability above 0.5). Microsoft's
+own documentation gives the workaround:
+`TDIST(-x, df, 1)` is equivalent to `1 - TDIST(x, df, 1)`, and
+`TDIST(-x, df, 2)` is equivalent to `TDIST(x, df, 2)` — compute it by
+hand rather than passing the negative value directly.
+
+### #NUM! — tails is not 1 or 2
+
+<ExcelCode>{`TDIST(2, 12, 3) → #NUM!`}</ExcelCode>
+
+`tails` only accepts `1` or `2` — any other value is invalid.
+
+### #NUM! — deg_freedom is less than 1
+
+<ExcelCode>{`TDIST(2, 0, 1) → #NUM!`}</ExcelCode>
+
+`deg_freedom` must be at least `1`.
+
+export const faqs = [
+  {
+    question: 'Does TDIST map to T.DIST, the way most legacy functions map to their same-shaped modern name?',
+    answer: 'No — T.DIST is a different function entirely (the left-tailed version, with its own cumulative argument). TDIST maps to T.DIST.RT when tails is 1, and T.DIST.2T when tails is 2. Neither case matches plain T.DIST.',
+  },
+  {
+    question: 'Why does TDIST reject negative x even when tails = 1, if T.DIST.RT itself accepts it?',
+    answer: "That's simply how the legacy function was originally built — its domain was restricted to non-negative x regardless of tails, and Excel never changed that behavior for backward compatibility. T.DIST.RT, introduced later as a separate function, doesn't carry the same restriction.",
+  },
+  {
+    question: 'Should I use TDIST in a new formula?',
+    answer: "No — pick T.DIST.RT or T.DIST.2T directly based on which one-tailed or two-tailed probability you actually need. Both are clearer about what they return than TDIST's tails argument, and T.DIST.RT also accepts negative x without needing a workaround.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [T.DIST.RT](/docs/statistical/t-dist-rt) — the modern replacement
+  when `tails = 1`.
+- [T.DIST.2T](/docs/statistical/t-dist-2t) — the modern replacement
+  when `tails = 2`.
+- [TINV](/docs/compatibility/tinv) — the legacy inverse lookup, always
+  two-tailed (matches T.INV.2T, not T.INV).
