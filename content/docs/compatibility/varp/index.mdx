@@ -1,0 +1,134 @@
+---
+title: VARP
+description: The pre-2010 name for VAR.P — identical syntax and behavior, kept for backward compatibility.
+---
+
+VARP is the original name for what's now called
+[VAR.P](/docs/statistical/var-p) — the variance of an entire
+population, not a sample. The two functions are **identical**: same
+arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says VARP "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [VAR.P](/docs/statistical/var-p) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'VARP(number1, [number2], ...) and VAR.P(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use VAR.P instead', type: 'warn' },
+  { text: 'Assumes the data is the whole population, not a sample', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VARP(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VARP(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing the entire population.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population variance of the supplied numbers — exactly what
+[VAR.P](/docs/statistical/var-p) would return. Text and blank cells
+within a range are ignored.
+
+## Try it
+
+<TryIt
+  data={{ 'tight cluster': '2.00', 'typical spread': '59.60', 'wide spread': '1306.00' }}
+  defaultValue="typical spread"
+  label={'Live preview — =VARP({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'tight cluster': { a1: 'Value', a2: '48', a3: '50', a4: '49', a5: '51', a6: '52' },
+      'typical spread': { a1: 'Value', a2: '40', a3: '55', a4: '48', a5: '62', a6: '45' },
+      'wide spread': { a1: 'Value', a2: '10', a3: '80', a4: '45', a5: '5', a6: '95' },
+    },
+  }}
+/>
+
+The same three scenarios used on [VAR.P](/docs/statistical/var-p)'s
+own page, returning the identical values — `VARP` and `VAR.P` agree
+exactly, from `2.00` on the tight cluster up to `1306.00` on the
+widely-spread data.
+
+## Common errors
+
+### Treating a sample as a population
+
+<ExcelCode>{`VARP(SurveyResponses) → understated spread if respondents are a sample, not everyone`}</ExcelCode>
+
+Not an error, but a common source of subtly wrong statistics — most
+real-world datasets are samples of a larger group, which calls for
+`VAR` (or modern `VAR.S`), not VARP.
+
+### Misinterpreting the units
+
+<ExcelCode>{`VARP(Prices) → a number in "dollars squared," not dollars`}</ExcelCode>
+
+Variance is always in squared units of the original data. Use
+`STDEVP` for a directly interpretable number.
+
+export const faqs = [
+  {
+    question: 'Should I use VARP or VAR.P in a new formula?',
+    answer: 'VAR.P — it computes the exact same thing, but VARP is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses VARP?',
+    answer: 'No — VARP still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'How does VARP relate to STDEVP?',
+    answer: 'STDEVP is the square root of VARP — VARP is the squared, intermediate form, while STDEVP is the more directly interpretable number in the original data\'s units.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VAR.P](/docs/statistical/var-p) — the modern replacement; use this
+  in any new formula.
+- [STDEVP](/docs/compatibility/stdevp) — the square root of this
+  function, in the same units as the original data.
+- [VAR](/docs/statistical/var) — the legacy sample version, for data
+  that represents a subset of a larger group.

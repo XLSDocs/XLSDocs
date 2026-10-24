@@ -1,0 +1,134 @@
+---
+title: STDEVP
+description: The pre-2010 name for STDEV.P — identical syntax and behavior, kept for backward compatibility.
+---
+
+STDEVP is the original name for what's now called
+[STDEV.P](/docs/statistical/stdev-p) — the standard deviation of an
+entire population, not a sample. The two functions are **identical**:
+same arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says STDEVP "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [STDEV.P](/docs/statistical/stdev-p) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'STDEVP(number1, [number2], ...) and STDEV.P(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use STDEV.P instead', type: 'warn' },
+  { text: 'Assumes the data is the whole population, not a sample', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=STDEVP(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STDEVP(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number, range',
+    required: true,
+    description: 'A number, cell reference, or range representing the entire population.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number, range',
+    required: false,
+    description: 'Up to 255 total arguments — more numbers, references, or ranges.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population standard deviation of the supplied numbers — exactly
+what [STDEV.P](/docs/statistical/stdev-p) would return. Text and
+blank cells within a range are ignored.
+
+## Try it
+
+<TryIt
+  data={{ 'tight cluster': '1.41', 'typical spread': '7.72', 'wide spread': '36.14' }}
+  defaultValue="typical spread"
+  label={'Live preview — =STDEVP({value} scenario values)'}
+  fieldLabel="scenario"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    rowsByInput: {
+      'tight cluster': { a1: 'Value', a2: '48', a3: '50', a4: '49', a5: '51', a6: '52' },
+      'typical spread': { a1: 'Value', a2: '40', a3: '55', a4: '48', a5: '62', a6: '45' },
+      'wide spread': { a1: 'Value', a2: '10', a3: '80', a4: '45', a5: '5', a6: '95' },
+    },
+  }}
+/>
+
+The same three scenarios used on
+[STDEV.P](/docs/statistical/stdev-p)'s own page, returning the
+identical values — `STDEVP` and `STDEV.P` agree exactly, from `1.41`
+on the tight cluster up to `36.14` on the widely-spread data.
+
+## Common errors
+
+### Treating a sample as a population
+
+<ExcelCode>{`STDEVP(SurveyResponses) → understated spread if respondents are a sample, not everyone`}</ExcelCode>
+
+Not an error, but a common source of subtly wrong statistics — most
+real-world datasets are samples of a larger group, which calls for
+`STDEV` (or modern `STDEV.S`), not STDEVP.
+
+### Empty range
+
+<ExcelCode>{`STDEVP(A1:A1) → #DIV/0! if the range has no numeric values`}</ExcelCode>
+
+STDEVP needs at least one numeric value to compute against; a fully
+blank or text-only range returns an error.
+
+export const faqs = [
+  {
+    question: 'Should I use STDEVP or STDEV.P in a new formula?',
+    answer: 'STDEV.P — it computes the exact same thing, but STDEVP is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses STDEVP?',
+    answer: 'No — STDEVP still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between STDEVP and STDEV.P?',
+    answer: 'None — same argument list, same results for every input, including how text and blank cells are ignored.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [STDEV.P](/docs/statistical/stdev-p) — the modern replacement; use
+  this in any new formula.
+- [VARP](/docs/compatibility/varp) — the squared, intermediate form
+  this function takes the square root of.
+- [STDEV](/docs/statistical/stdev) — the legacy sample version, for
+  data that represents a subset of a larger group.
