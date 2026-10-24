@@ -14,6 +14,7 @@ import { ParametersTable } from './parameters-table';
 import { CodeWrapToggle } from './code-wrap-toggle';
 import { CategoryCards } from './category-cards';
 import { FunctionDiagram } from './function-diagram/function-diagram';
+import { ShortcutTable } from './shortcut-table';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -55,6 +56,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ParametersTable,
     CategoryCards,
     FunctionDiagram,
+    ShortcutTable,
     ...components,
   } satisfies MDXComponents;
 }

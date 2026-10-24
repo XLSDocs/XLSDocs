@@ -1,0 +1,115 @@
+---
+title: "32 Excel Keyboard Shortcuts Worth Actually Memorizing"
+description: The shortcuts that save real time every day — navigation, selection, editing, and formatting — for Windows and Mac side by side.
+date: "2026-10-24"
+category: Tutorials
+readTime: 4 min read
+---
+
+Excel has several hundred keyboard shortcuts, and memorizing all of
+them isn't the point — a small, well-chosen set covers almost
+everything you'll actually reach for. These 32 are the ones worth
+burning into muscle memory, grouped by what they're for, Windows and
+Mac side by side.
+
+export const groups = [
+  {
+    category: 'Essentials',
+    shortcuts: [
+      { action: 'Save', win: 'Ctrl+S', mac: '⌘+S' },
+      { action: 'Copy', win: 'Ctrl+C', mac: '⌘+C' },
+      { action: 'Paste', win: 'Ctrl+V', mac: '⌘+V' },
+      { action: 'Cut', win: 'Ctrl+X', mac: '⌘+X' },
+      { action: 'Undo', win: 'Ctrl+Z', mac: '⌘+Z' },
+      { action: 'Redo', win: 'Ctrl+Y', mac: '⌘+Y' },
+      { action: 'Find', win: 'Ctrl+F', mac: '⌘+F' },
+      { action: 'Replace', win: 'Ctrl+H', mac: '⌘+Shift+H' },
+      { action: 'Print', win: 'Ctrl+P', mac: '⌘+P' },
+      { action: 'New workbook', win: 'Ctrl+N', mac: '⌘+N' },
+    ],
+  },
+  {
+    category: 'Navigation',
+    shortcuts: [
+      { action: 'Move to last used cell', win: 'Ctrl+End', mac: 'Ctrl+End' },
+      { action: 'Move to beginning of worksheet', win: 'Ctrl+Home', mac: 'Ctrl+Home' },
+      { action: 'Jump to edge of data region', win: 'Ctrl+Arrow key', mac: '⌘+Arrow key' },
+      { action: 'Next worksheet', win: 'Ctrl+Page Down', mac: 'Ctrl+Page Down' },
+      { action: 'Previous worksheet', win: 'Ctrl+Page Up', mac: 'Ctrl+Page Up' },
+      { action: 'Open Go To dialog', win: 'Ctrl+G', mac: 'Ctrl+G' },
+    ],
+  },
+  {
+    category: 'Selection',
+    shortcuts: [
+      { action: 'Select entire column', win: 'Ctrl+Space', mac: 'Ctrl+Space' },
+      { action: 'Select entire row', win: 'Shift+Space', mac: 'Shift+Space' },
+      { action: 'Select all / current region', win: 'Ctrl+A', mac: '⌘+A' },
+      { action: 'Extend selection to last used cell', win: 'Ctrl+Shift+End', mac: 'Ctrl+Shift+End' },
+      { action: 'Extend selection by one cell', win: 'Shift+Arrow key', mac: 'Shift+Arrow key' },
+    ],
+  },
+  {
+    category: 'Editing & formulas',
+    shortcuts: [
+      { action: 'Fill down', win: 'Ctrl+D', mac: '⌘+D' },
+      { action: 'Fill right', win: 'Ctrl+R', mac: '⌘+R' },
+      { action: 'Toggle absolute/relative reference', win: 'F4', mac: '⌘+T' },
+      { action: 'Insert cells/rows/columns', win: 'Ctrl+Shift+=', mac: 'Ctrl+Shift+=' },
+      { action: 'Delete cells/rows/columns', win: 'Ctrl+-', mac: '⌘+-' },
+      { action: 'Calculate all open workbooks', win: 'F9', mac: 'F9' },
+    ],
+  },
+  {
+    category: 'Formatting',
+    shortcuts: [
+      { action: 'Bold', win: 'Ctrl+B', mac: '⌘+B' },
+      { action: 'Italic', win: 'Ctrl+I', mac: '⌘+I' },
+      { action: 'Underline', win: 'Ctrl+U', mac: '⌘+U' },
+      { action: 'Open Format Cells dialog', win: 'Ctrl+1', mac: '⌘+1' },
+      { action: 'Apply/remove filter', win: 'Ctrl+Shift+L', mac: '⌘+Shift+F' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  `F4` to cycle a cell reference through `A1` → `$A$1` → `A$1` →
+  `$A1` → back to `A1` is the single highest-value shortcut on this
+  list if you write formulas by hand — no more manually typing dollar
+  signs. On Mac, `⌘+T` does the same job (`Fn+F4` also works in
+  current versions).
+</Callout>
+
+A few worth calling out specifically:
+
+- **Ctrl+Shift+End / Ctrl+Shift+End** extends the current selection
+  all the way to the last cell with data — the fastest way to select
+  an entire table without knowing exactly how many rows it has.
+- **Ctrl+Arrow key / ⌘+Arrow key** jumps to the edge of the current
+  block of data in that direction, stopping at the first gap — the
+  same movement double-clicking a cell's border performs, just from
+  the keyboard.
+- **Ctrl+Space** and **Shift+Space** select an entire column or row
+  respectively, on both platforms — worth knowing since they're easy
+  to mix up with each other.
+
+export const faqs = [
+  {
+    question: 'Are Excel keyboard shortcuts the same on Windows and Mac?',
+    answer: 'Many are close, usually swapping Ctrl for ⌘ (Command) — but not all. Some, like Toggle absolute/relative reference, use genuinely different keys (F4 on Windows, ⌘+T on Mac) rather than a straight substitution, so it\'s worth checking rather than assuming.',
+  },
+  {
+    question: 'Does pressing F4 always toggle absolute/relative references in Excel?',
+    answer: "Only while actively editing a formula and the cursor is in or next to a cell reference. Outside of that context, F4 instead repeats the last action or command — the same role Ctrl+Y plays.",
+  },
+  {
+    question: 'What\'s the fastest way to select an entire data table without a defined Table object?',
+    answer: 'Click any cell inside the data, then press Ctrl+Shift+* (or just Ctrl+A on Windows) to select the whole contiguous block automatically — no need to know the exact row or column count in advance.',
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.
