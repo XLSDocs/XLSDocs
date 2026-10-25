@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-25',
+    title: 'COVAR, HYPGEOMDIST, PERCENTRANK, and QUARTILE — the Compatibility category is complete',
+    description:
+      "The final round of a 13-round project that started 2026-10-04 and covers all 33 pre-2010 Excel function names, each mapped to its modern replacement with the exact argument differences spelled out. Several aren't pure renames: NORMSDIST, NEGBINOMDIST, BETADIST, LOGNORMDIST, and HYPGEOMDIST are each missing a required argument their replacement added; TDIST splits across two different modern functions depending on its tails argument; TINV and CONFIDENCE map to the .2T/.NORM variant specifically rather than the same-named modern function.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-10-19',
     title: 'A new Compatibility category: 15 pre-2010 function names, each mapped to its modern replacement',
     description:
