@@ -1,0 +1,143 @@
+---
+title: CONFIDENCE
+description: The pre-2010 name for CONFIDENCE.NORM — identical syntax and behavior, kept for backward compatibility.
+---
+
+CONFIDENCE is the original name for what's now called
+[CONFIDENCE.NORM](/docs/statistical/confidence-norm) — the margin of
+error for a population mean, using a normal distribution. The two
+functions are **identical**: same arguments, same order, same
+results.
+
+<Callout type="warn">
+  Microsoft's own documentation says CONFIDENCE "may not be available
+  in future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use
+  [CONFIDENCE.NORM](/docs/statistical/confidence-norm) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'CONFIDENCE(alpha, standard_dev, size) and CONFIDENCE.NORM(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use CONFIDENCE.NORM instead', type: 'warn' },
+  { text: 'Requires knowing the population standard deviation, not just the sample\'s', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CONFIDENCE(alpha, standard_dev, size)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CONFIDENCE(alpha, standard_dev, size)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'alpha',
+    type: 'number',
+    required: true,
+    description: 'The significance level, between 0 and 1 — 1 minus the confidence level (e.g. 0.05 for a 95% confidence interval).',
+  },
+  {
+    name: 'standard_dev',
+    type: 'number',
+    required: true,
+    description: 'The known population standard deviation, assumed to be already known rather than estimated.',
+  },
+  {
+    name: 'size',
+    type: 'number',
+    required: true,
+    description: 'The sample size (an integer of at least 1).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The margin of error — a single number — exactly what
+[CONFIDENCE.NORM](/docs/statistical/confidence-norm) would return.
+The full confidence interval is the sample mean plus or minus this
+value.
+
+## Try it
+
+<TryIt
+  data={{ '0.05': '1.55', '0.01': '2.04', '0.1': '1.30' }}
+  defaultValue="0.05"
+  label={'Live preview — =CONFIDENCE({alpha}, 5, 40)'}
+  fieldLabel="alpha"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 3,
+    values: {
+      a1: 'Std Dev', b1: 'Sample Size',
+      a2: '5', b2: '40',
+    },
+    highlightMap: { '0.05': 'A2:B2', '0.01': 'A2:B2', '0.1': 'A2:B2' },
+  }}
+/>
+
+The same scenario used on
+[CONFIDENCE.NORM](/docs/statistical/confidence-norm)'s own page,
+returning identical values — `CONFIDENCE(0.05, 5, 40)` and
+`CONFIDENCE.NORM(0.05, 5, 40)` both return `1.55`.
+
+## Common errors
+
+### #NUM! — alpha is outside the 0–1 range, or size is less than 1
+
+<ExcelCode>{`CONFIDENCE(1.5, 5, 40) → #NUM!`}</ExcelCode>
+
+`alpha` must be strictly between `0` and `1`, and `size` must be at
+least `1`.
+
+### #VALUE! — any argument is non-numeric
+
+<ExcelCode>{`CONFIDENCE("high", 5, 40) → #VALUE!`}</ExcelCode>
+
+All three arguments need to be numbers — a text significance level
+can't be evaluated.
+
+export const faqs = [
+  {
+    question: 'Should I use CONFIDENCE or CONFIDENCE.NORM in a new formula?',
+    answer: 'CONFIDENCE.NORM — it computes the exact same thing, but CONFIDENCE is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses CONFIDENCE?',
+    answer: 'No — CONFIDENCE still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is CONFIDENCE the same as CONFIDENCE.T?',
+    answer: 'No — CONFIDENCE always matches CONFIDENCE.NORM, the normal-distribution version. CONFIDENCE.T is a separate, newer function using the Student\'s t-distribution instead, better suited to small samples — legacy CONFIDENCE has no t-distribution equivalent of its own.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CONFIDENCE.NORM](/docs/statistical/confidence-norm) — the modern
+  replacement; use this in any new formula.
+- [CONFIDENCE.T](/docs/statistical/confidence-t) — a different,
+  newer function for small samples, not a replacement for this one.
+- [ZTEST](/docs/compatibility/ztest) — another legacy normal-
+  distribution function, testing a sample mean instead of estimating
+  a margin of error.

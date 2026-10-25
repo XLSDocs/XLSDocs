@@ -1,0 +1,141 @@
+---
+title: ZTEST
+description: The pre-2010 name for Z.TEST — identical syntax and behavior, kept for backward compatibility.
+---
+
+ZTEST is the original name for what's now called
+[Z.TEST](/docs/statistical/z-test) — a one-tailed test of whether a
+sample's mean is significantly different from a hypothesized value,
+when the population standard deviation is known. The two functions
+are **identical**: same arguments, same order, same results.
+
+<Callout type="warn">
+  Microsoft's own documentation says ZTEST "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [Z.TEST](/docs/statistical/z-test) instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'ZTEST(array, x, [sigma]) and Z.TEST(...) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use Z.TEST instead', type: 'warn' },
+  { text: 'Returns a one-tailed probability, not the z-score itself', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ZTEST(array, x, [sigma])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ZTEST(array, x, [sigma])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The sample of data being tested against the hypothesized value.',
+  },
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The hypothesized population mean to test the sample against.',
+  },
+  {
+    name: 'sigma',
+    type: 'number',
+    required: false,
+    description: 'The known population standard deviation. If omitted, the sample standard deviation of array is used instead.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A probability between 0 and 1 — the one-tailed likelihood of
+observing a sample mean at least this far above `x` by chance alone —
+exactly what [Z.TEST](/docs/statistical/z-test) would return.
+
+## Try it
+
+<TryIt
+  data={{ '85': '0.0100', '90': '0.4644', '92': '0.7896' }}
+  defaultValue="90"
+  label={'Live preview — =ZTEST(scores, {x}, 5)'}
+  fieldLabel="x"
+  grid={{
+    cols: ['A'],
+    rowCount: 6,
+    values: {
+      a1: 'Score', a2: '95', a3: '88', a4: '91', a5: '87', a6: '90',
+    },
+    highlightMap: { '85': 'A2:A6', '90': 'A2:A6', '92': 'A2:A6' },
+  }}
+/>
+
+The same five test scores used on
+[Z.TEST](/docs/statistical/z-test)'s own page, returning the
+identical values — `ZTEST(scores, 85, 5)` and
+`Z.TEST(scores, 85, 5)` both return `0.0100`.
+
+## Common errors
+
+### #N/A — array contains no numeric values
+
+<ExcelCode>{`ZTEST(A1:A5, 90) → #N/A when A1:A5 has no numbers`}</ExcelCode>
+
+`array` needs at least one numeric value to compute a mean and
+standard deviation from.
+
+### Misreading the result as a two-tailed p-value
+
+<ExcelCode>{`ZTEST(array, x, sigma) → one-tailed only, not directly comparable to a two-tailed TTEST result`}</ExcelCode>
+
+ZTEST's raw output answers "is the mean greater than x," not "is the
+mean different from x." Double the smaller tail — `=2 * MIN(ZTEST(array, x, sigma), 1 - ZTEST(array, x, sigma))`
+— before comparing it to a two-tailed significance threshold.
+
+export const faqs = [
+  {
+    question: 'Should I use ZTEST or Z.TEST in a new formula?',
+    answer: 'Z.TEST — it computes the exact same thing, but ZTEST is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses ZTEST?',
+    answer: 'No — ZTEST still works in every current version of Excel, including Excel for the web.',
+  },
+  {
+    question: 'Is there any behavioral difference at all between ZTEST and Z.TEST?',
+    answer: 'None — same argument order, same required and optional arguments, same results for every input.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [Z.TEST](/docs/statistical/z-test) — the modern replacement; use
+  this in any new formula.
+- [CONFIDENCE](/docs/compatibility/confidence) — another legacy
+  normal-distribution function, for a margin of error instead of a
+  hypothesis test.
+- [TTEST](/docs/compatibility/ttest) — the more common choice when
+  the population standard deviation isn't actually known.
