@@ -39,11 +39,12 @@ npm run preview    # next build + run the Pages build locally via wrangler
 ## Content structure
 
 Every function page lives under `content/docs/<category>/<function>/`
-as three files:
+as two files:
 
-- `index.mdx` — syntax, parameters, description, common errors, FAQ,
+- `index.mdx` — syntax, parameters, description, common errors,
+  worked examples (a "## Examples" section — each function's old
+  standalone `/examples` page was merged in here in 2026-09), FAQ,
   code examples, compatibility, and related functions
-- `examples.mdx` — five worked examples
 - `meta.json` — `{ "title": "<FUNCTION NAME>", "pages": [] }`
 
 A new top-level category needs its own `meta.json` with
@@ -68,4 +69,5 @@ ticker.
 | `content/blog`               | Blog post content (MDX).                                   |
 | `lib/source.ts`              | Content source adapter — [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access content. |
 | `lib/changelog.ts`           | Changelog entries shown on `/changelog` and the homepage.  |
-| `components/`                | Shared function-page components (`QuickAnswer`, `ParametersTable`, `TryIt`, `Compatibility`, etc.). |
+| `lib/diagrams/`               | `DiagramSpec` data for `<FunctionDiagram />` — one file per function, registered in `lib/diagrams/index.ts`. |
+| `components/`                | Shared function-page components (`QuickAnswer`, `ParametersTable`, `TryIt`, `Compatibility`, `FunctionDiagram`, etc.). |
