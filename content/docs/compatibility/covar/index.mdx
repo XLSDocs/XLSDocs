@@ -1,0 +1,136 @@
+---
+title: COVAR
+description: The pre-2010 name for COVARIANCE.P — identical syntax and behavior, kept for backward compatibility.
+---
+
+COVAR is the original name for what's now called
+[COVARIANCE.P](/docs/statistical/covariance-p) — the population
+covariance between two datasets. The two functions are **identical**:
+same arguments, same order, same results.
+
+<Callout type="warn">
+  `COVAR(array1, array2)` is equivalent to
+  `COVARIANCE.P(array1, array2)` — **not**
+  [COVARIANCE.S](/docs/statistical/covariance-s). Legacy COVAR always
+  divided by `n` (treating the data as a complete population), the
+  same convention COVARIANCE.P uses; it has no sample-covariance
+  equivalent of its own.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'COVAR(array1, array2) and COVARIANCE.P(array1, array2) take identical arguments and return identical results', type: 'check' },
+  { text: 'Maps to COVARIANCE.P, NOT COVARIANCE.S — legacy COVAR always divided by n', type: 'warn' },
+  { text: 'No reason to use this in a new formula — use COVARIANCE.P instead', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COVAR(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COVAR(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first set of values.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second set of values, same size as array1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The population covariance between `array1` and `array2` — exactly
+what [COVARIANCE.P](/docs/statistical/covariance-p) would return.
+
+## Try it
+
+<TryIt
+  data={{ '5': '-0.5556', '25': '10.5556', '15': '5.0000' }}
+  defaultValue="25"
+  label={'Live preview — =COVAR(hours, sales) with the third value adjusted'}
+  fieldLabel="hour 3 value"
+  grid={{
+    cols: ['A', 'B'],
+    rowCount: 4,
+    values: {
+      a1: 'Ad Hours', b1: 'Sales',
+      a2: '1', b2: '5',
+      a3: '2', b3: '10',
+      a4: '4', b4: '20',
+    },
+    highlightMap: { '5': 'A2:B4', '25': 'A2:B4', '15': 'A2:B4' },
+  }}
+/>
+
+The same advertising-hours-vs-sales scenario used on
+[COVARIANCE.P](/docs/statistical/covariance-p)'s own page, returning
+identical values — `COVAR` and `COVARIANCE.P` agree exactly, flipping
+sign to negative when sales drops low enough to move opposite the ad
+hours.
+
+## Common errors
+
+### #N/A — array1 and array2 are different sizes
+
+<ExcelCode>{`COVAR(A2:A5, B2:B4) → #N/A`}</ExcelCode>
+
+Both arrays must contain the same number of data points.
+
+### #DIV/0! — either array is empty
+
+<ExcelCode>{`COVAR(A1:A1, B2:B5) → #DIV/0! if A1:A1 has no numeric values`}</ExcelCode>
+
+COVAR needs at least one numeric pair to compute against.
+
+export const faqs = [
+  {
+    question: 'Should I use COVAR or COVARIANCE.P in a new formula?',
+    answer: 'COVARIANCE.P — it computes the exact same thing, but COVAR is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Is COVAR the same as COVARIANCE.S?',
+    answer: 'No — COVAR always matches COVARIANCE.P, dividing by n. COVARIANCE.S is a separate, newer function dividing by n-1 for sample data — legacy COVAR has no sample-covariance equivalent of its own.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses COVAR?',
+    answer: 'No — COVAR still works in every current version of Excel, including Excel for the web.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COVARIANCE.P](/docs/statistical/covariance-p) — the modern
+  replacement; use this in any new formula.
+- [COVARIANCE.S](/docs/statistical/covariance-s) — a different,
+  newer function for sample data, not a replacement for this one.
+- [HYPGEOMDIST](/docs/compatibility/hypgeomdist) — another legacy
+  function from this round, missing an argument its modern
+  replacement has.

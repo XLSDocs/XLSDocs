@@ -1,0 +1,135 @@
+---
+title: QUARTILE
+description: The pre-2010 name for QUARTILE.INC — identical syntax and behavior, kept for backward compatibility.
+---
+
+QUARTILE is the original name for what's now called
+[QUARTILE.INC](/docs/statistical/quartile-inc) — the minimum, 25th
+percentile, median, 75th percentile, or maximum of a dataset. The two
+functions are **identical**: same arguments, same order, same
+results.
+
+<Callout type="warn">
+  Microsoft's own documentation says QUARTILE "may not be available in
+  future versions of Excel." It still works today, and existing
+  workbooks that use it aren't at any immediate risk — but any new
+  formula should use [QUARTILE.INC](/docs/statistical/quartile-inc)
+  instead.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'QUARTILE(array, quart) and QUARTILE.INC(array, quart) take identical arguments and return identical results', type: 'check' },
+  { text: 'No reason to use this in a new formula — use QUARTILE.INC instead', type: 'warn' },
+  { text: 'quart is a whole number from 0 to 4, not a fraction', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=QUARTILE(array, quart)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=QUARTILE(array, quart)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The range or array of numbers to find a quartile within.',
+  },
+  {
+    name: 'quart',
+    type: 'number',
+    required: true,
+    description: 'Which quartile to return: 0 (minimum), 1 (25th percentile), 2 (median), 3 (75th percentile), or 4 (maximum).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value at the requested quartile of `array` — exactly what
+[QUARTILE.INC](/docs/statistical/quartile-inc) would return.
+
+## Try it
+
+<TryIt
+  data={{ '0': '10', '1': '17.5', '2': '25', '3': '32.5', '4': '40' }}
+  defaultValue="1"
+  label={'Live preview — =QUARTILE(scores, {quart})'}
+  fieldLabel="quart"
+  grid={{
+    cols: ['A'],
+    rowCount: 5,
+    values: {
+      a1: 'Score',
+      a2: '10', a3: '20', a4: '30', a5: '40',
+    },
+    highlightMap: { '0': 'A2:A5', '1': 'A2:A5', '2': 'A2:A5', '3': 'A2:A5', '4': 'A2:A5' },
+  }}
+/>
+
+The same four evenly-spaced scores used on
+[QUARTILE.INC](/docs/statistical/quartile-inc)'s own page, returning
+the identical values — `QUARTILE` and `QUARTILE.INC` agree exactly at
+every `quart` value from 0 to 4.
+
+## Common errors
+
+### #NUM! — quart is outside the 0–4 range
+
+<ExcelCode>{`QUARTILE({10,20,30,40}, 5) → #NUM!`}</ExcelCode>
+
+`quart` must be a whole number from 0 to 4 — there's no fifth
+quartile.
+
+### #VALUE! — array contains no numeric values
+
+<ExcelCode>{`QUARTILE({"a","b","c"}, 2) → #VALUE!`}</ExcelCode>
+
+QUARTILE needs numbers to work with; text-only ranges have no
+quartiles to calculate.
+
+export const faqs = [
+  {
+    question: 'Should I use QUARTILE or QUARTILE.INC in a new formula?',
+    answer: 'QUARTILE.INC — it computes the exact same thing, but QUARTILE is the older name Microsoft says may be removed in a future Excel version.',
+  },
+  {
+    question: 'Is QUARTILE the same as QUARTILE.EXC?',
+    answer: 'No — QUARTILE always matches QUARTILE.INC, which returns the true minimum and maximum at quart=0 and quart=4. QUARTILE.EXC is a separate, newer function using a stricter method that excludes the dataset\'s endpoints — legacy QUARTILE has no exclusive-method equivalent of its own.',
+  },
+  {
+    question: 'Will my existing workbook break if it uses QUARTILE?',
+    answer: 'No — QUARTILE still works in every current version of Excel, including Excel for the web.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [QUARTILE.INC](/docs/statistical/quartile-inc) — the modern
+  replacement; use this in any new formula.
+- [QUARTILE.EXC](/docs/statistical/quartile-exc) — a different,
+  newer function using a stricter method, not a replacement for this
+  one.
+- [PERCENTRANK](/docs/compatibility/percentrank) — the reverse
+  operation: finds a value's rank instead of the value at a rank.

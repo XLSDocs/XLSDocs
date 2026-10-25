@@ -1,0 +1,145 @@
+---
+title: HYPGEOMDIST
+description: The pre-2010 name for HYPGEOM.DIST — but NOT a pure rename, since the modern version added a required cumulative argument.
+---
+
+HYPGEOMDIST is the original name for what's now called
+[HYPGEOM.DIST](/docs/statistical/hypgeom-dist) — but like
+[NEGBINOMDIST](/docs/compatibility/negbinomdist), this isn't a pure
+rename. HYPGEOMDIST always computed a single exact probability;
+HYPGEOM.DIST added a **required** `cumulative` argument, letting it
+also return the running total probability.
+
+<Callout type="warn">
+  `HYPGEOMDIST(sample_s, number_sample, population_s, number_pop)` is
+  equivalent to
+  `HYPGEOM.DIST(sample_s, number_sample, population_s, number_pop, FALSE)`
+  — **not** `TRUE`, the same default direction as NEGBINOMDIST, not
+  NORMSDIST. There's no shortcut here — always check which cumulative
+  value a legacy function's old behavior actually matches.
+</Callout>
+
+export const quickAnswerFacts = [
+  { text: 'HYPGEOMDIST(...) always equals HYPGEOM.DIST(..., FALSE) — not TRUE', type: 'warn' },
+  { text: 'Unlike HYPGEOM.DIST, HYPGEOMDIST has no way to get the cumulative (running total) probability', type: 'warn' },
+  { text: 'sample_s can\'t exceed what\'s mathematically possible given the other arguments, or HYPGEOMDIST returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=HYPGEOMDIST(sample_s, number_sample, population_s, number_pop)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=HYPGEOMDIST(sample_s, number_sample, population_s, number_pop)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'sample_s',
+    type: 'number',
+    required: true,
+    description: 'The number of successes to evaluate within the sample.',
+  },
+  {
+    name: 'number_sample',
+    type: 'number',
+    required: true,
+    description: 'The size of the sample drawn.',
+  },
+  {
+    name: 'population_s',
+    type: 'number',
+    required: true,
+    description: 'The total number of successes in the full population.',
+  },
+  {
+    name: 'number_pop',
+    type: 'number',
+    required: true,
+    description: 'The size of the full population.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The exact probability of precisely `sample_s` successes appearing in
+the sample — always the single-point form, with no way to request the
+running total instead.
+
+## Try it
+
+<TryIt
+  data={{ '0': '0.1291', '1': '0.3874', '2': '0.3522', '3': '0.1174' }}
+  defaultValue="2"
+  label={'Live preview — =HYPGEOMDIST({sample_s}, 5, 6, 20)'}
+  fieldLabel="sample_s"
+/>
+
+The same 20-item, 6-success population used on
+[HYPGEOM.DIST](/docs/statistical/hypgeom-dist)'s own page, sampling 5
+without replacement — but with exact (not cumulative) values.
+`HYPGEOMDIST(2, 5, 6, 20)` and `HYPGEOM.DIST(2, 5, 6, 20, FALSE)` both
+return `0.3522`. Note this does **not** match that page's own Try-It
+numbers directly, since those use `cumulative = TRUE`.
+
+## Common errors
+
+### #NUM! — sample_s exceeds what's possible given the other arguments
+
+<ExcelCode>{`HYPGEOMDIST(6, 5, 6, 20) → #NUM!, since a 5-item sample can't contain 6 successes`}</ExcelCode>
+
+`sample_s` can't exceed `number_sample`, `population_s`, or what's
+mathematically reachable given how many failures exist in the
+population.
+
+### Assuming HYPGEOM.DIST(sample_s, number_sample, population_s, number_pop) alone works as the direct replacement
+
+<ExcelCode>{`HYPGEOM.DIST(2, 5, 6, 20) → #VALUE! (missing the required cumulative argument) — use HYPGEOM.DIST(2, 5, 6, 20, FALSE) instead`}</ExcelCode>
+
+Dropping in the new name alone doesn't work — `cumulative` is
+required, and must be `FALSE` to match HYPGEOMDIST's legacy behavior.
+
+export const faqs = [
+  {
+    question: 'Should I use HYPGEOMDIST or HYPGEOM.DIST in a new formula?',
+    answer: 'HYPGEOM.DIST(sample_s, number_sample, population_s, number_pop, FALSE) — it computes the exact same thing as HYPGEOMDIST, but remember the FALSE; HYPGEOM.DIST alone, with no cumulative argument, returns #VALUE!.',
+  },
+  {
+    question: 'Can HYPGEOMDIST return the cumulative (running total) probability instead?',
+    answer: 'No — HYPGEOMDIST only ever computes the exact single-point probability. Getting the cumulative probability requires the modern HYPGEOM.DIST(..., TRUE), which has no HYPGEOMDIST equivalent at all.',
+  },
+  {
+    question: 'Does HYPGEOMDIST default to FALSE for the same reason as NEGBINOMDIST?',
+    answer: "Yes — the same underlying reason: each legacy function's missing cumulative argument matches whichever single mode that specific function always computed before the rename. HYPGEOMDIST and NEGBINOMDIST both only ever computed the exact single-point probability, so both default to FALSE — unlike NORMSDIST or BETADIST, which default to TRUE.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HYPGEOM.DIST](/docs/statistical/hypgeom-dist) — the modern
+  replacement; use `HYPGEOM.DIST(..., FALSE)` in any new formula.
+- [NEGBINOMDIST](/docs/compatibility/negbinomdist) — another function
+  missing a required `cumulative` argument, defaulting to the same
+  value (`FALSE`) for the same underlying reason.
+- [BINOMDIST](/docs/compatibility/binomdist) — the equivalent legacy
+  function for sampling with replacement, which (unlike this one)
+  renamed as a pure drop-in.
