@@ -1,0 +1,169 @@
+---
+title: ATAN2
+description: Return the arctangent of a point's x and y coordinates, correctly resolving all four quadrants.
+---
+
+Return the **arctangent of a point's x and y coordinates**, taken
+together — the angle from the x-axis to the line through the origin
+and that point. Because it sees both coordinates separately (not
+just their ratio), ATAN2 can resolve the correct angle in **all four
+quadrants**, something [ATAN](/docs/math/atan) can't do.
+
+export const quickAnswerFacts = [
+  { text: 'Argument order is ATAN2(x_num, y_num) — x comes FIRST, the reverse of most programming languages', type: 'warn' },
+  { text: 'The result is in radians, from -π to π — wrap in DEGREES for degrees', type: 'warn' },
+  { text: 'ATAN2(0, 0) returns #DIV/0! — there is no angle at the origin itself', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ATAN2(x_num, y_num)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ATAN2(x_num, y_num)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x_num',
+    type: 'number',
+    required: true,
+    description: "The point's x-coordinate.",
+  },
+  {
+    name: 'y_num',
+    type: 'number',
+    required: true,
+    description: "The point's y-coordinate.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The angle, in radians, between the x-axis and the line from the
+origin to `(x_num, y_num)`, between `-π` and `π` (exclusive of `-π`
+itself) — covering the full circle, unlike ATAN's half-circle range.
+Wrap the result in [DEGREES](/docs/math/degrees) to convert it to
+degrees.
+
+## Description
+
+ATAN2 is what ATAN can't be: because it receives the x and y
+components of a point separately, rather than collapsing them into a
+single ratio first, it can tell which of two opposite quadrants a
+point is actually in. `ATAN2(x, y)` and `ATAN(y/x)` agree whenever
+`x` is positive, but `ATAN2` also handles `x` being zero or negative
+— cases plain division can't represent at all, or represents
+ambiguously.
+
+<Callout type="warn">
+  **ATAN2's argument order is x first, then y** — `ATAN2(x_num,
+  y_num)`. This is the opposite of the `atan2(y, x)` convention used
+  by most programming languages (JavaScript's `Math.atan2`, Python's
+  `math.atan2`, C's `atan2`), so porting a formula from code into
+  Excel (or back) by matching argument *position* instead of
+  *meaning* silently swaps the result to its complementary angle.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-1': '135', '0': '180', '1': '-135' }}
+  defaultValue="1"
+  label={'Live preview — =DEGREES(ATAN2(-1, {value}))'}
+  fieldLabel="y_num"
+/>
+
+`x_num` stays fixed at `-1` (negative) while `y_num` varies — exactly
+the case a plain ratio can't represent correctly, and where ATAN2's
+quadrant-awareness shows: the result swings across `135°`, `180°`,
+and `-135°`, well outside the `-90°` to `90°` range ATAN alone could
+ever return.
+
+## Common errors
+
+### #DIV/0! — both coordinates are zero
+
+<ExcelCode>{`ATAN2(0, 0) → #DIV/0! (the origin has no defined angle)`}</ExcelCode>
+
+A point at the origin has no direction, so ATAN2 raises `#DIV/0!`
+rather than returning an arbitrary angle.
+
+### Swapping the argument order
+
+<ExcelCode>{`ATAN2(1, 0) → 0, but ATAN2(0, 1) → 90 — not the same, despite looking like a simple swap`}</ExcelCode>
+
+`x_num` comes first, `y_num` second — the reverse of the `atan2(y,
+x)` order most programming languages use. Double-check argument
+order explicitly when translating a formula between Excel and code.
+
+export const faqs = [
+  {
+    question: 'Which argument comes first in ATAN2 — x or y?',
+    answer: 'x_num comes first: ATAN2(x_num, y_num). This is the reverse of the atan2(y, x) convention used by JavaScript, Python, and C, so a formula ported between Excel and code needs its argument order swapped, not just copied directly.',
+  },
+  {
+    question: "What's the difference between ATAN2 and ATAN?",
+    answer: "ATAN takes a single ratio (y/x) and only ever returns an angle between -90° and 90°. ATAN2 takes x and y separately, so it can tell which of two opposite quadrants the point is really in, covering the full -180° to 180° range.",
+  },
+  {
+    question: 'Why does ATAN2(0, 0) return an error?',
+    answer: "A point sitting exactly at the origin has no direction to measure an angle from, so there's no valid result — Excel returns #DIV/0! rather than an arbitrary angle like 0.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ATAN2 from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEGREES(ATAN2(1, 1))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Atan2(1, 1) ' VBA itself has no built-in Atan2 — use the worksheet function
+    result = result * 180 / Application.Pi ' convert to degrees
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    # Python's math.atan2 takes (y, x) — the reverse of Excel's ATAN2(x_num, y_num)
+    result = math.degrees(math.atan2(1, 1))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ATAN](/docs/math/atan) — the simpler, single-ratio version that
+  can't distinguish all four quadrants.
+- [DEGREES](/docs/math/degrees) — converts ATAN2's radians result to
+  degrees.
+- [SIN](/docs/math/sin) and [COS](/docs/math/cos) — the forward
+  functions that produce the coordinates ATAN2 reads.

@@ -1,0 +1,152 @@
+---
+title: ACOS
+description: Return the arccosine (inverse cosine) of a number, as an angle in radians.
+---
+
+Return the **arccosine** — the angle whose cosine is the given
+number. The input must be between `-1` and `1` (cosine never exceeds
+that range), and the result comes back in **radians**, between `0`
+and `π`.
+
+export const quickAnswerFacts = [
+  { text: 'number must be between -1 and 1 — anything outside that returns #NUM!', type: 'warn' },
+  { text: 'The result is in radians, between 0 and π — wrap in DEGREES for degrees', type: 'warn' },
+  { text: 'ACOS(COS(x)) only returns x itself for x already inside 0 to π', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ACOS(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ACOS(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The cosine of the angle you want — must be between -1 and 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The angle, in radians, whose cosine is `number`, always between `0`
+and `π` (0° to 180°). Wrap the result in
+[DEGREES](/docs/math/degrees) to convert it to degrees.
+
+## Description
+
+ACOS is the inverse of [COS](/docs/math/cos) — given a cosine ratio,
+it finds the angle. Because cosine repeats itself (many different
+angles share the same cosine value), ACOS can only ever return one
+answer per input, so Excel always returns the result in the `0` to
+`π` range — the *principal* value, not necessarily the specific angle
+a real-world problem has in mind.
+
+<Callout type="warn">
+  **ACOS(COS(x)) does not always return x back.** It only round-trips
+  correctly when `x` is already inside `0` to `π`. `COS(RADIANS(-60))`
+  is `0.5`, the same as `COS(RADIANS(60))` — so `ACOS` of either one
+  returns the angle for 60°, never -60°, because 60° is the principal
+  value cosine can't distinguish -60° from.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-1': '180', '-0.5': '120', '0.5': '60', '1': '0' }}
+  defaultValue="0.5"
+  label={'Live preview — =DEGREES(ACOS({value}))'}
+  fieldLabel="cosine value"
+/>
+
+Wrapping ACOS in DEGREES converts its radians result to the more
+familiar degree values shown here.
+
+## Common errors
+
+### #NUM! — an argument outside -1 to 1
+
+<ExcelCode>{`ACOS(1.5) → #NUM! (no angle has a cosine greater than 1)`}</ExcelCode>
+
+Cosine never exceeds `-1` to `1`, so any `number` outside that range
+has no valid angle and ACOS returns `#NUM!`.
+
+### Forgetting to convert the result to degrees
+
+<ExcelCode>{`ACOS(0.5) → 1.0472 (radians, not the 60 degrees someone may expect)`}</ExcelCode>
+
+ACOS's result is always in radians. Wrap it in `DEGREES()`, or
+multiply by `180/PI()`, to get a degree value.
+
+export const faqs = [
+  {
+    question: 'What values can I pass into ACOS?',
+    answer: 'Only numbers between -1 and 1 — the valid range for a cosine value. Anything outside that range returns #NUM! because no real angle has a cosine outside that range.',
+  },
+  {
+    question: 'Why does ACOS return radians instead of degrees?',
+    answer: "Radians are the unit every Excel trig function uses internally. Wrap the result in DEGREES(), or multiply by 180/PI(), to get it in degrees — DEGREES(ACOS(0.5)) returns 60.",
+  },
+  {
+    question: 'Does ACOS(COS(x)) always return x?',
+    answer: "No — only when x is already between 0 and 180 degrees. Cosine is symmetric around 0 (COS(-60°) equals COS(60°)), so ACOS can only ever return the one angle in that 0-to-180 principal range, regardless of which other angle the original x came from.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ACOS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEGREES(ACOS(0.5))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Acos(0.5) ' VBA itself has no built-in Acos — use the worksheet function
+    result = result * 180 / Application.Pi ' convert to degrees
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.degrees(math.acos(0.5))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COS](/docs/math/cos) — the forward function ACOS inverts.
+- [ASIN](/docs/math/asin) and [ATAN](/docs/math/atan) — the other
+  two inverse trig functions, same radians-only return value.
+- [DEGREES](/docs/math/degrees) — converts ACOS's radians result to
+  degrees.

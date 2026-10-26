@@ -1,0 +1,154 @@
+---
+title: ATAN
+description: Return the arctangent (inverse tangent) of a number, as an angle in radians.
+---
+
+Return the **arctangent** — the angle whose tangent is the given
+number. Unlike [ASIN](/docs/math/asin) and [ACOS](/docs/math/acos),
+`number` can be any real value, and the result comes back in
+**radians**, strictly between `-π/2` and `π/2`.
+
+export const quickAnswerFacts = [
+  { text: 'number can be any real value — no -1 to 1 restriction', type: 'check' },
+  { text: 'The result is in radians, between -π/2 and π/2 — wrap in DEGREES for degrees', type: 'warn' },
+  { text: 'Only covers angles in quadrants 1 and 4 — use ATAN2 for all four quadrants', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ATAN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ATAN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The tangent of the angle you want — any real number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The angle, in radians, whose tangent is `number`, always strictly
+between `-π/2` and `π/2` (-90° to 90°, exclusive). Wrap the result in
+[DEGREES](/docs/math/degrees) to convert it to degrees.
+
+## Description
+
+ATAN is the inverse of [TAN](/docs/math/tan) — given a tangent ratio,
+it finds the angle. Because a single tangent ratio can describe an
+angle in either of two opposite quadrants, ATAN always resolves to
+the *principal* value between `-90°` and `90°` — it has no way to
+know whether the real-world angle behind the ratio was actually in
+the opposite quadrant instead.
+
+<Callout type="warn">
+  **ATAN can't tell quadrants 1 and 4 apart from 2 and 3.** A ratio of
+  `1` could come from a 45° angle or a 225° angle (opposite
+  direction, same ratio) — ATAN always returns 45°. If the x and y
+  components of the original point are both known, use
+  [ATAN2](/docs/math/atan2) instead — it uses both to get the correct
+  quadrant.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0', '0.5774': '30', '1': '45', '1.7321': '60' }}
+  defaultValue="1"
+  label={'Live preview — =DEGREES(ATAN({value}))'}
+  fieldLabel="tangent value"
+/>
+
+Wrapping ATAN in DEGREES converts its radians result to the more
+familiar degree values shown here.
+
+## Common errors
+
+### Expecting an angle outside -90° to 90°
+
+<ExcelCode>{`DEGREES(ATAN(1)) → 45 (never 225, even if that's the real-world angle)`}</ExcelCode>
+
+ATAN always returns a value in the `-90°` to `90°` range, regardless
+of which quadrant the original angle actually came from. When the
+quadrant matters, use ATAN2 with the original x/y coordinates
+instead of ATAN with their ratio.
+
+### Forgetting to convert the result to degrees
+
+<ExcelCode>{`ATAN(1) → 0.7854 (radians, not the 45 degrees someone may expect)`}</ExcelCode>
+
+ATAN's result is always in radians. Wrap it in `DEGREES()`, or
+multiply by `180/PI()`, to get a degree value.
+
+export const faqs = [
+  {
+    question: 'Why does ATAN return radians instead of degrees?',
+    answer: "Radians are the unit every Excel trig function uses internally. Wrap the result in DEGREES(), or multiply by 180/PI(), to get it in degrees — DEGREES(ATAN(1)) returns 45.",
+  },
+  {
+    question: "What's the difference between ATAN and ATAN2?",
+    answer: "ATAN takes a single ratio and always returns an angle between -90° and 90°, unable to tell quadrants 1/4 apart from 2/3. ATAN2 takes the x and y coordinates separately, so it can resolve the correct angle across all four quadrants, from -180° to 180°.",
+  },
+  {
+    question: 'Does ATAN accept any number, unlike ASIN and ACOS?',
+    answer: "Yes — tangent has no fixed range the way sine and cosine do, so ATAN never returns #NUM! for an out-of-range argument the way ASIN and ACOS do for a number outside -1 to 1.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ATAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEGREES(ATAN(1))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Atn(1) * 180 / Application.Pi ' VBA's native Atn, converted to degrees
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.degrees(math.atan(1))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ATAN2](/docs/math/atan2) — the quadrant-aware version, taking x
+  and y coordinates separately instead of their ratio.
+- [TAN](/docs/math/tan) — the forward function ATAN inverts.
+- [ASIN](/docs/math/asin) and [ACOS](/docs/math/acos) — the other
+  two inverse trig functions, same radians-only return value.

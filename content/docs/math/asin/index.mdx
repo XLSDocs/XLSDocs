@@ -1,0 +1,152 @@
+---
+title: ASIN
+description: Return the arcsine (inverse sine) of a number, as an angle in radians.
+---
+
+Return the **arcsine** — the angle whose sine is the given number.
+The input must be between `-1` and `1` (sine never exceeds that
+range), and the result comes back in **radians**, between `-π/2`
+and `π/2`.
+
+export const quickAnswerFacts = [
+  { text: 'number must be between -1 and 1 — anything outside that returns #NUM!', type: 'warn' },
+  { text: 'The result is in radians, between -π/2 and π/2 — wrap in DEGREES for degrees', type: 'warn' },
+  { text: 'ASIN(SIN(x)) only returns x itself for x already inside -π/2 to π/2', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ASIN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ASIN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The sine of the angle you want — must be between -1 and 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The angle, in radians, whose sine is `number`, always between `-π/2`
+and `π/2` (-90° to 90°). Wrap the result in
+[DEGREES](/docs/math/degrees) to convert it to degrees.
+
+## Description
+
+ASIN is the inverse of [SIN](/docs/math/sin) — given a sine ratio, it
+finds the angle. Because sine repeats itself (many different angles
+share the same sine value), ASIN can only ever return one answer per
+input, so Excel always returns the result in the `-π/2` to `π/2`
+range — the *principal* value, not necessarily the specific angle a
+real-world problem has in mind.
+
+<Callout type="warn">
+  **ASIN(SIN(x)) does not always return x back.** It only round-trips
+  correctly when `x` is already inside `-π/2` to `π/2`. `SIN(RADIANS(150))`
+  is `0.5`, the same as `SIN(RADIANS(30))` — so `ASIN` of either one
+  returns the angle for 30°, never 150°, because 30° is the principal
+  value sine can't distinguish 150° from.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '-1': '-90', '-0.5': '-30', '0.5': '30', '1': '90' }}
+  defaultValue="0.5"
+  label={'Live preview — =DEGREES(ASIN({value}))'}
+  fieldLabel="sine value"
+/>
+
+Wrapping ASIN in DEGREES converts its radians result to the more
+familiar degree values shown here.
+
+## Common errors
+
+### #NUM! — an argument outside -1 to 1
+
+<ExcelCode>{`ASIN(1.5) → #NUM! (no angle has a sine greater than 1)`}</ExcelCode>
+
+Sine never exceeds `-1` to `1`, so any `number` outside that range
+has no valid angle and ASIN returns `#NUM!`.
+
+### Forgetting to convert the result to degrees
+
+<ExcelCode>{`ASIN(0.5) → 0.5236 (radians, not the 30 degrees someone may expect)`}</ExcelCode>
+
+ASIN's result is always in radians. Wrap it in `DEGREES()`, or
+multiply by `180/PI()`, to get a degree value.
+
+export const faqs = [
+  {
+    question: 'What values can I pass into ASIN?',
+    answer: 'Only numbers between -1 and 1 — the valid range for a sine value. Anything outside that range returns #NUM! because no real angle has a sine outside that range.',
+  },
+  {
+    question: 'Why does ASIN return radians instead of degrees?',
+    answer: "Radians are the unit every Excel trig function uses internally. Wrap the result in DEGREES(), or multiply by 180/PI(), to get it in degrees — DEGREES(ASIN(0.5)) returns 30.",
+  },
+  {
+    question: 'Does ASIN(SIN(x)) always return x?',
+    answer: "No — only when x is already between -90 and 90 degrees. Sine repeats its values outside that range (SIN(150°) equals SIN(30°)), so ASIN can only ever return the one angle in that principal range, regardless of which other angle the original x came from.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ASIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEGREES(ASIN(0.5))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Asin(0.5) ' VBA itself has no built-in Asin — use the worksheet function
+    result = result * 180 / Application.Pi ' convert to degrees
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.degrees(math.asin(0.5))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SIN](/docs/math/sin) — the forward function ASIN inverts.
+- [ACOS](/docs/math/acos) and [ATAN](/docs/math/atan) — the other
+  two inverse trig functions, same radians-only return value.
+- [DEGREES](/docs/math/degrees) — converts ASIN's radians result to
+  degrees.
