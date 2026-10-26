@@ -1,0 +1,150 @@
+---
+title: ATANH
+description: Return the inverse hyperbolic tangent of a number.
+---
+
+Return the **inverse hyperbolic tangent** — given a hyperbolic
+tangent value, find the number that produced it. The input must be
+strictly between `-1` and `1` (hyperbolic tangent never reaches
+those edges), and unlike [ATAN](/docs/math/atan), the *result* is
+unbounded rather than capped.
+
+export const quickAnswerFacts = [
+  { text: 'number must be strictly between -1 and 1 — ±1 itself returns #NUM!', type: 'warn' },
+  { text: 'The result is unbounded — unlike ATAN, which caps at ±90°', type: 'check' },
+  { text: 'ATANH(TANH(x)) always returns x exactly, for every real x', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ATANH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ATANH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number strictly between -1 and 1 — the hyperbolic tangent value to invert.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number whose hyperbolic tangent is `number`. Unbounded — as
+`number` approaches `1` or `-1`, the result grows without limit in
+that direction.
+
+## Description
+
+ATANH inverts [TANH](/docs/math/tanh). Because TANH is strictly
+increasing and maps every real number onto the open interval between
+`-1` and `1` without ever repeating a value, ATANH has no
+principal-value complication: `ATANH(TANH(x))` returns exactly `x`
+back, for every `x` — the same clean round trip ASINH has with SINH.
+
+<Callout type="warn">
+  **ATANH's domain is the opposite shape of ATAN's.** ATAN accepts
+  any number and returns a *bounded* angle; ATANH only accepts a
+  *bounded* input (strictly between -1 and 1) and can return an
+  unbounded result. Passing exactly `1` or `-1` — TANH's own
+  unreachable limits — raises `#NUM!`, since no finite `x` produces
+  exactly those values.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0', '0.5': '0.5493', '-0.1': '-0.1003', '0.9': '1.4722' }}
+  defaultValue="0.5"
+  label={'Live preview — =ATANH({value})'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #NUM! — an argument of exactly -1 or 1
+
+<ExcelCode>{`ATANH(1) → #NUM! (hyperbolic tangent only approaches, never reaches, 1)`}</ExcelCode>
+
+TANH never actually produces `1` or `-1` for any finite input — it
+only approaches them — so ATANH has no finite answer for either edge
+value and returns `#NUM!`.
+
+### #NUM! — an argument outside -1 to 1
+
+<ExcelCode>{`ATANH(1.5) → #NUM! (outside the valid -1 to 1 range entirely)`}</ExcelCode>
+
+Hyperbolic tangent never exceeds `-1` to `1`, so any `number` outside
+that range has no valid input to invert.
+
+export const faqs = [
+  {
+    question: 'Why does ATANH reject exactly 1 or -1, not just values outside that range?',
+    answer: "TANH's output only ever approaches 1 and -1 as its input grows toward infinity — it never actually reaches either value for any finite real number. Since there's no finite x that produces exactly 1 or -1, ATANH has no answer to give for those inputs either.",
+  },
+  {
+    question: 'Does ATANH(TANH(x)) always return x exactly?',
+    answer: "Yes, for every real x — TANH never repeats a value the way ordinary tangent does, so there's no principal-value restriction for ATANH to resolve, unlike ATAN which only round-trips within a limited angle range.",
+  },
+  {
+    question: 'Is the result of ATANH an angle, like ATAN returns?',
+    answer: 'No — ATANH returns a plain, potentially very large number, not an angle. There is nothing to convert with DEGREES; that conversion only applies to the ordinary (non-hyperbolic) inverse trig functions.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ATANH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ATANH(0.5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Atanh(0.5) ' VBA itself has no built-in Atanh — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.atanh(0.5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TANH](/docs/math/tanh) — the forward function ATANH inverts.
+- [ASINH](/docs/math/asinh) and [ACOSH](/docs/math/acosh) — the
+  other two inverse hyperbolic functions.
+- [ATAN](/docs/math/atan) — the angle-based inverse function ATANH
+  is named after, but with the bounded/unbounded roles reversed.

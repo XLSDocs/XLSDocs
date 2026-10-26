@@ -1,0 +1,151 @@
+---
+title: COSH
+description: Return the hyperbolic cosine of a number.
+---
+
+Return the **hyperbolic cosine** of a number — the exponential-based
+analogue of ordinary cosine, best known for describing the shape of
+a hanging cable or chain (a catenary curve) rather than anything to
+do with triangles or angles.
+
+export const quickAnswerFacts = [
+  { text: 'number is a plain real value — not an angle, no radians/degrees involved', type: 'check' },
+  { text: 'COSH(x) = (e^x + e^-x) / 2', type: 'check' },
+  { text: 'Always ≥ 1 — COSH(0) is the minimum, exactly 1', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COSH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COSH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic cosine of `number` — always `1` or greater, regardless
+of whether `number` is positive or negative, with the minimum value
+of exactly `1` occurring at `number = 0`.
+
+## Description
+
+COSH is defined by the formula `(e^x + e^-x) / 2`, built from the
+exponential function rather than from a circle the way ordinary
+cosine is. It's most famous as the shape of a catenary curve — the
+natural curve a chain or cable forms when hanging freely under its
+own weight, which is literally a graph of COSH. It's also an even
+function (symmetric around zero): `COSH(x)` and `COSH(-x)` always
+give the same result.
+
+<Callout type="idea">
+  **COSH has nothing to do with angles.** Unlike COS, there's no
+  radians-vs-degrees conversion to worry about — `number` is just an
+  ordinary real value, plugged directly into the exponential formula
+  above.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '1', '1': '1.5431', '-1': '1.5431', '4': '27.3082' }}
+  defaultValue="1"
+  label={'Live preview — =COSH({value})'}
+  fieldLabel="number"
+/>
+
+Notice `COSH(1)` and `COSH(-1)` give the identical result — COSH is
+an even function, symmetric around zero, unlike SINH and TANH.
+
+## Common errors
+
+### Assuming COSH needs an angle in radians
+
+<ExcelCode>{`COSH(RADIANS(60)) → not what you want — COSH takes a plain number, not an angle`}</ExcelCode>
+
+COSH's argument is an ordinary number, not an angle — converting it
+with RADIANS first (a habit carried over from COS) changes the input
+to something unrelated to what was intended.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`COSH("four") → #VALUE!`}</ExcelCode>
+
+`number` must be a value Excel can read as numeric.
+
+export const faqs = [
+  {
+    question: 'Does COSH take an angle, like COS does?',
+    answer: 'No — COSH takes a plain real number, not an angle. There is no radians-or-degrees question with any hyperbolic function; the "hyperbolic" name refers to the hyperbola these functions parametrize, not to angle measurement.',
+  },
+  {
+    question: 'Why is COSH always 1 or greater, never negative or zero?',
+    answer: "COSH(x) = (e^x + e^-x) / 2 — both exponential terms are always positive, and by the AM-GM inequality their average is always at least 1, hitting exactly 1 only when x is 0.",
+  },
+  {
+    question: 'What is COSH used for in practice?',
+    answer: "Its best-known real-world use is describing a catenary curve — the shape a chain or cable naturally forms when hanging freely under gravity. It also appears in some engineering stress/strain and signal-processing formulas.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COSH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COSH(4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Cosh(4) ' VBA itself has no built-in Cosh — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.cosh(4)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ACOSH](/docs/math/acosh) — the inverse of COSH.
+- [SINH](/docs/math/sinh) and [TANH](/docs/math/tanh) — the other
+  two core hyperbolic functions.
+- [COS](/docs/math/cos) — the angle-based function COSH is named
+  after, but otherwise unrelated in how it's used.

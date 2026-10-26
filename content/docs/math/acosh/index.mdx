@@ -1,0 +1,148 @@
+---
+title: ACOSH
+description: Return the inverse hyperbolic cosine of a number.
+---
+
+Return the **inverse hyperbolic cosine** — given a hyperbolic cosine
+value, find the number that produced it. The input must be `1` or
+greater (hyperbolic cosine never goes below `1`), and like
+[ACOS](/docs/math/acos), the round trip with
+[COSH](/docs/math/cosh) doesn't always recover the original sign.
+
+export const quickAnswerFacts = [
+  { text: 'number must be 1 or greater — anything below that returns #NUM!', type: 'warn' },
+  { text: 'The result is always ≥ 0 — ACOSH never returns a negative number', type: 'check' },
+  { text: 'ACOSH(COSH(x)) only returns x itself when x is already ≥ 0', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ACOSH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ACOSH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number 1 or greater — the hyperbolic cosine value to invert.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The non-negative number whose hyperbolic cosine is `number`. Always
+`0` or greater, with `ACOSH(1)` returning exactly `0`.
+
+## Description
+
+ACOSH inverts [COSH](/docs/math/cosh). Just like ordinary cosine,
+COSH is an *even* function — `COSH(x)` and `COSH(-x)` always give
+the same result — so a single hyperbolic cosine value can't reveal
+which of the two possible signs its original input had. ACOSH
+always resolves this by returning the non-negative answer.
+
+<Callout type="warn">
+  **ACOSH(COSH(x)) does not always return x back.** It only
+  round-trips correctly when `x` is already `0` or greater.
+  `COSH(-2)` is `3.7622`, the same as `COSH(2)` — so `ACOSH(3.7622)`
+  returns `2`, never `-2`, because COSH can't be told apart by sign
+  alone.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '0', '2': '1.3170', '10': '2.9932', '27.308': '4.0000' }}
+  defaultValue="10"
+  label={'Live preview — =ACOSH({value})'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #NUM! — an argument below 1
+
+<ExcelCode>{`ACOSH(0.5) → #NUM! (hyperbolic cosine never produces a value below 1)`}</ExcelCode>
+
+COSH's output never drops below `1`, so any `number` below that has
+no valid input and ACOSH returns `#NUM!`.
+
+### Expecting ACOSH to recover a negative original value
+
+<ExcelCode>{`ACOSH(COSH(-5)) → 5, not -5`}</ExcelCode>
+
+COSH treats `-5` and `5` identically, so there's no way for ACOSH to
+know which one was the real original — it always returns the
+non-negative option.
+
+export const faqs = [
+  {
+    question: 'Why must the argument to ACOSH be 1 or greater?',
+    answer: "Because COSH(x) = (e^x + e^-x) / 2 never produces a value below 1 for any real x — by the AM-GM inequality, the average of e^x and e^-x is always at least 1. A number below 1 has no real x that could have produced it.",
+  },
+  {
+    question: 'Does ACOSH(COSH(x)) always return x?',
+    answer: "No — only when x is already 0 or greater. COSH is an even function (COSH(-2) equals COSH(2)), so a single hyperbolic cosine value can't reveal the original sign; ACOSH always resolves to the non-negative answer.",
+  },
+  {
+    question: 'Is the result of ACOSH an angle, like ACOS returns?',
+    answer: 'No — ACOSH returns a plain non-negative number, not an angle. There is nothing to convert with DEGREES; that conversion only applies to the ordinary (non-hyperbolic) inverse trig functions.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ACOSH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ACOSH(10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Acosh(10) ' VBA itself has no built-in Acosh — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.acosh(10)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COSH](/docs/math/cosh) — the forward function ACOSH inverts.
+- [ASINH](/docs/math/asinh) and [ATANH](/docs/math/atanh) — the
+  other two inverse hyperbolic functions.
+- [ACOS](/docs/math/acos) — the angle-based inverse function ACOSH
+  is named after, with the same even-function sign ambiguity.

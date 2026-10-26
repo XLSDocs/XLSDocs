@@ -1,0 +1,152 @@
+---
+title: TANH
+description: Return the hyperbolic tangent of a number.
+---
+
+Return the **hyperbolic tangent** of a number — the exponential-based
+analogue of ordinary tangent, used in statistics, machine learning
+(it's a classic neural-network activation function), and engineering
+formulas rather than anything to do with triangles or angles.
+
+export const quickAnswerFacts = [
+  { text: 'number is a plain real value — not an angle, no radians/degrees involved', type: 'check' },
+  { text: 'TANH(x) = SINH(x) / COSH(x)', type: 'check' },
+  { text: 'Bounded between -1 and 1, approaching (but never reaching) either edge', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TANH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TANH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic tangent of `number`, always strictly between `-1` and
+`1` — it approaches those edges as `number` grows large in either
+direction, but never actually reaches them.
+
+## Description
+
+TANH is defined as `SINH(x) / COSH(x)`, the hyperbolic equivalent of
+tangent being sine over cosine. Unlike ordinary TAN, which is
+unbounded and periodic, TANH flattens out toward `-1` and `1` as its
+input grows — an S-shaped curve that makes it a popular "squashing"
+function wherever an unbounded value needs compressing into a fixed
+range, most notably as an activation function in neural networks.
+
+<Callout type="idea">
+  **TANH has nothing to do with angles.** Unlike TAN, there's no
+  radians-vs-degrees conversion to worry about, and TANH never
+  blows up the way TAN does near 90° — it smoothly approaches `1`
+  instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0', '0.5': '0.4621', '-2': '-0.964', '3': '0.995' }}
+  defaultValue="0.5"
+  label={'Live preview — =TANH({value})'}
+  fieldLabel="number"
+/>
+
+Notice how quickly the result approaches `1` (or `-1`) — by `x = 3`,
+TANH is already at `0.995`, most of the way to its asymptote.
+
+## Common errors
+
+### Assuming TANH needs an angle in radians
+
+<ExcelCode>{`TANH(RADIANS(45)) → not what you want — TANH takes a plain number, not an angle`}</ExcelCode>
+
+TANH's argument is an ordinary number, not an angle — converting it
+with RADIANS first (a habit carried over from TAN) changes the input
+to something unrelated to what was intended.
+
+### Expecting TANH to blow up like TAN does
+
+<ExcelCode>{`TANH(100) → 1 (rounded; never actually reaches 1, and never spikes the way TAN does near 90°)`}</ExcelCode>
+
+TAN grows without bound near its undefined points; TANH does the
+opposite — it flattens out, asymptotically approaching but never
+touching `1` or `-1`.
+
+export const faqs = [
+  {
+    question: 'Does TANH take an angle, like TAN does?',
+    answer: 'No — TANH takes a plain real number, not an angle. There is no radians-or-degrees question with any hyperbolic function; the "hyperbolic" name refers to the hyperbola these functions parametrize, not to angle measurement.',
+  },
+  {
+    question: 'Why is TANH bounded between -1 and 1 when TAN is unbounded?',
+    answer: "TANH(x) = SINH(x)/COSH(x), and as x grows, both SINH(x) and COSH(x) approach the same exponential growth rate (e^x / 2), so their ratio approaches exactly 1 (or -1 for large negative x) instead of diverging the way ordinary TAN does near its undefined points.",
+  },
+  {
+    question: 'Where is TANH actually used?',
+    answer: "Beyond engineering and statistics formulas, TANH is a classic activation function in neural networks and machine learning — its S-shaped curve smoothly compresses any real number into the -1 to 1 range, which is useful whenever a bounded, smoothly-varying output is needed from an unbounded input.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TANH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TANH(0.5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Tanh(0.5) ' VBA itself has no built-in Tanh — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.tanh(0.5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ATANH](/docs/math/atanh) — the inverse of TANH.
+- [SINH](/docs/math/sinh) and [COSH](/docs/math/cosh) — the other
+  two core hyperbolic functions; TANH is their ratio.
+- [TAN](/docs/math/tan) — the angle-based function TANH is named
+  after, but otherwise unrelated in how it's used.

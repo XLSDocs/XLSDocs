@@ -1,0 +1,142 @@
+---
+title: ASINH
+description: Return the inverse hyperbolic sine of a number.
+---
+
+Return the **inverse hyperbolic sine** — given a hyperbolic sine
+value, find the number that produced it. Unlike
+[ASIN](/docs/math/asin), there's no restricted input range: `number`
+can be anything, and the round trip with
+[SINH](/docs/math/sinh) always works perfectly in both directions.
+
+export const quickAnswerFacts = [
+  { text: 'number can be any real value — no restricted range, unlike ASIN', type: 'check' },
+  { text: 'ASINH(SINH(x)) always returns x exactly, with no principal-value caveat', type: 'check' },
+  { text: 'Not an angle — the result is a plain number, nothing to convert with DEGREES', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ASINH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ASINH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number — the hyperbolic sine value to invert.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number whose hyperbolic sine is `number`. Same sign as `number`,
+unbounded, with no restriction on the input at all.
+
+## Description
+
+ASINH inverts [SINH](/docs/math/sinh). Because SINH is a strictly
+increasing function across every real number — it never repeats a
+value the way ordinary sine does — ASINH has no "principal value"
+complication to worry about: `ASINH(SINH(x))` returns exactly `x`
+back, for every `x`, with none of the range restriction ASIN needs
+to deal with.
+
+<Callout type="idea">
+  **ASINH round-trips perfectly with SINH — always.** This is the
+  one place a hyperbolic inverse function is actually *simpler* than
+  its ordinary-trig counterpart: ASIN can only recover angles in a
+  narrow `-90°` to `90°` window, but ASINH recovers every possible
+  input, no exceptions.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0', '1': '0.8814', '-2.5': '-1.6472', '10': '2.9982' }}
+  defaultValue="1"
+  label={'Live preview — =ASINH({value})'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`ASINH("ten") → #VALUE!`}</ExcelCode>
+
+`number` must be a value Excel can read as numeric — otherwise this
+is the rare trig-family function with no domain restriction to worry
+about at all.
+
+export const faqs = [
+  {
+    question: 'Does ASINH have a restricted input range, like ASIN does?',
+    answer: "No — ASINH accepts any real number. ASIN is restricted to -1 to 1 because sine itself never exceeds that range, but SINH is unbounded, so there's no equivalent restriction for its inverse.",
+  },
+  {
+    question: 'Does ASINH(SINH(x)) always return x exactly?',
+    answer: "Yes, for every real x — unlike ASIN(SIN(x)), which only round-trips correctly when x is already between -90° and 90°. SINH never repeats a value the way ordinary sine does, so there's no principal-value ambiguity for ASINH to resolve.",
+  },
+  {
+    question: 'Is the result of ASINH an angle, like ASIN returns?',
+    answer: 'No — ASINH returns a plain number, not an angle. There is nothing to convert with DEGREES; that conversion only applies to the ordinary (non-hyperbolic) inverse trig functions.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ASINH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ASINH(10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Asinh(10) ' VBA itself has no built-in Asinh — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.asinh(10)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SINH](/docs/math/sinh) — the forward function ASINH inverts.
+- [ACOSH](/docs/math/acosh) and [ATANH](/docs/math/atanh) — the
+  other two inverse hyperbolic functions.
+- [ASIN](/docs/math/asin) — the angle-based inverse function ASINH
+  is named after, but with no range restriction to worry about.

@@ -1,0 +1,154 @@
+---
+title: SINH
+description: Return the hyperbolic sine of a number.
+---
+
+Return the **hyperbolic sine** of a number — the exponential-based
+analogue of ordinary sine, used in engineering and physics formulas
+(catenary curves, hyperbolic motion, some probability distributions)
+rather than anything to do with triangles or angles.
+
+export const quickAnswerFacts = [
+  { text: 'number is a plain real value — not an angle, no radians/degrees involved', type: 'check' },
+  { text: 'SINH(x) = (e^x − e^-x) / 2', type: 'check' },
+  { text: 'Unbounded — the result grows without limit as x grows', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SINH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SINH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic sine of `number` — unbounded, and the same sign as
+`number` (negative input gives a negative result, `SINH(0)` is
+exactly `0`).
+
+## Description
+
+SINH is defined by the formula `(e^x − e^-x) / 2`, built from the
+exponential function rather than from a circle the way ordinary sine
+is. The "hyperbolic" name comes from how it parametrizes a hyperbola
+the same way sine and cosine parametrize a circle — it shows up in
+catenary-curve formulas (the shape of a hanging cable), certain
+probability and signal-processing calculations, and anywhere else
+that exponential growth needs an odd (symmetric-around-zero)
+function.
+
+<Callout type="idea">
+  **SINH has nothing to do with angles.** Unlike SIN, there's no
+  radians-vs-degrees conversion to worry about — `number` is just an
+  ordinary real value, plugged directly into the exponential formula
+  above.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0', '1': '1.1752', '-1': '-1.1752', '2': '3.6269' }}
+  defaultValue="1"
+  label={'Live preview — =SINH({value})'}
+  fieldLabel="number"
+/>
+
+Notice the result grows much faster than the input itself — SINH's
+exponential basis means it accelerates quickly compared to ordinary
+sine, which stays capped between -1 and 1 no matter how large the
+input gets.
+
+## Common errors
+
+### Assuming SINH needs an angle in radians
+
+<ExcelCode>{`SINH(RADIANS(30)) → not what you want — SINH takes a plain number, not an angle`}</ExcelCode>
+
+SINH's argument is an ordinary number, not an angle — converting it
+with RADIANS first (a habit carried over from SIN) changes the input
+to something unrelated to what was intended.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`SINH("one") → #VALUE!`}</ExcelCode>
+
+`number` must be a value Excel can read as numeric.
+
+export const faqs = [
+  {
+    question: 'Does SINH take an angle, like SIN does?',
+    answer: 'No — SINH takes a plain real number, not an angle. There is no radians-or-degrees question with any hyperbolic function; the "hyperbolic" name refers to the hyperbola these functions parametrize, not to angle measurement.',
+  },
+  {
+    question: 'What is SINH actually computing?',
+    answer: 'SINH(x) = (e^x − e^-x) / 2, built directly from the exponential function. It behaves like an odd, ever-steepening curve — SINH(0) is 0, and it grows rapidly as x moves away from 0 in either direction.',
+  },
+  {
+    question: 'How do I get the inverse — find x from a hyperbolic sine value?',
+    answer: 'Use ASINH, which accepts any real number (unlike ASIN, which is restricted to -1 to 1) and returns the x that produced it.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SINH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SINH(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Sinh(1) ' VBA itself has no built-in Sinh — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.sinh(1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ASINH](/docs/math/asinh) — the inverse of SINH.
+- [COSH](/docs/math/cosh) and [TANH](/docs/math/tanh) — the other
+  two core hyperbolic functions.
+- [SIN](/docs/math/sin) — the angle-based function SINH is named
+  after, but otherwise unrelated in how it's used.
