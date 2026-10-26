@@ -1,0 +1,147 @@
+---
+title: COS
+description: Return the cosine of an angle given in radians.
+---
+
+Return the **cosine** of an angle. Like every Excel trig function,
+the angle must be supplied in **radians** — a degree value needs
+converting first, either with [RADIANS](/docs/math/radians) or by
+multiplying by `PI()/180`.
+
+export const quickAnswerFacts = [
+  { text: 'The angle argument must be in radians, not degrees', type: 'warn' },
+  { text: 'Convert degrees first: COS(RADIANS(60)) or COS(60*PI()/180)', type: 'check' },
+  { text: 'Always returns a value between -1 and 1', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COS(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COS(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The angle, in radians, to find the cosine of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cosine of `number`, always between `-1` and `1`.
+
+## Description
+
+COS expects its argument in radians. A degree value has to be
+converted before it's passed in — wrap it in
+[RADIANS](/docs/math/radians), or multiply it by `PI()/180` directly.
+
+<Callout type="warn">
+  Passing a **degree value directly** is the same trap every Excel
+  trig function has — `COS(60)` treats `60` as *60 radians*, not 60
+  degrees, and returns `-0.952`, nothing like the `0.5` someone
+  expecting degree behavior would want. `COS(RADIANS(60))` returns
+  the expected `0.5`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '1', '60': '0.5', '90': '0', '180': '-1' }}
+  defaultValue="60"
+  label={'Live preview — =COS(RADIANS({value}))'}
+  fieldLabel="degrees"
+/>
+
+The input here is treated as degrees and converted with RADIANS
+before COS sees it — the way most real-world angle values start out.
+
+## Common errors
+
+### Wrong result from passing degrees directly
+
+<ExcelCode>{`COS(60) → -0.952 (60 is read as 60 radians, not 60 degrees)`}</ExcelCode>
+
+Excel has no way to tell a bare number is meant as degrees — it's
+always radians. Wrap any degree value in `RADIANS()` first.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`COS("sixty") → #VALUE!`}</ExcelCode>
+
+`number` must be a value Excel can read as numeric — text that
+doesn't look like a number raises `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Does COS take degrees or radians?',
+    answer: 'Radians. To use a degree value, convert it first with RADIANS(degrees) or by multiplying by PI()/180 — COS(RADIANS(60)) returns 0.5, while COS(60) alone returns -0.952 because 60 is read as 60 radians.',
+  },
+  {
+    question: 'What range of values can COS return?',
+    answer: 'Always a number between -1 and 1 inclusive, regardless of how large the input angle is — cosine is periodic and never exceeds that range.',
+  },
+  {
+    question: 'How do I get the inverse — find the angle from a cosine value?',
+    answer: 'Use ACOS, which takes a ratio between -1 and 1 and returns the angle in radians. Wrap it in DEGREES if the angle is needed in degrees instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COS(RADIANS(60))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Cos(60 * Application.Pi / 180) ' VBA's Cos also expects radians
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.cos(math.radians(60))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ACOS](/docs/math/acos) — the inverse: finds the angle from a
+  cosine value.
+- [SIN](/docs/math/sin) and [TAN](/docs/math/tan) — the other two
+  core trig functions, same radians-only convention.
+- [RADIANS](/docs/math/radians) and [DEGREES](/docs/math/degrees) —
+  convert between the two angle units COS and its inverse use.

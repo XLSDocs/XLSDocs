@@ -1,0 +1,149 @@
+---
+title: SIN
+description: Return the sine of an angle given in radians.
+---
+
+Return the **sine** of an angle. The angle must be supplied in
+**radians** — not degrees — so a degree value needs converting first,
+either with [RADIANS](/docs/math/radians) or by multiplying by
+`PI()/180`.
+
+export const quickAnswerFacts = [
+  { text: 'The angle argument must be in radians, not degrees', type: 'warn' },
+  { text: 'Convert degrees first: SIN(RADIANS(30)) or SIN(30*PI()/180)', type: 'check' },
+  { text: 'Always returns a value between -1 and 1', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SIN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SIN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The angle, in radians, to find the sine of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sine of `number`, always between `-1` and `1`.
+
+## Description
+
+SIN expects its argument in radians, the same unit used throughout
+Excel's trig functions. A degree value has to be converted before
+it's passed in — wrap it in [RADIANS](/docs/math/radians), or
+multiply it by `PI()/180` directly, which does the same conversion
+inline.
+
+<Callout type="warn">
+  Passing a **degree value directly** is the single most common
+  mistake with SIN — `SIN(30)` treats `30` as *30 radians* (roughly
+  4.77 full rotations), not 30 degrees, and returns `-0.988`, nothing
+  like the `0.5` someone expecting degree behavior would want.
+  `SIN(RADIANS(30))` returns the expected `0.5`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0', '30': '0.5', '90': '1', '180': '0' }}
+  defaultValue="30"
+  label={'Live preview — =SIN(RADIANS({value}))'}
+  fieldLabel="degrees"
+/>
+
+The input here is treated as degrees and converted with RADIANS
+before SIN sees it — the way most real-world angle values start out.
+
+## Common errors
+
+### Wrong result from passing degrees directly
+
+<ExcelCode>{`SIN(30) → -0.988 (30 is read as 30 radians, not 30 degrees)`}</ExcelCode>
+
+Excel has no way to tell a bare number is meant as degrees — it's
+always radians. Wrap any degree value in `RADIANS()` first.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`SIN("thirty") → #VALUE!`}</ExcelCode>
+
+`number` must be a value Excel can read as numeric — text that
+doesn't look like a number raises `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'Does SIN take degrees or radians?',
+    answer: 'Radians. To use a degree value, convert it first with RADIANS(degrees) or by multiplying by PI()/180 — SIN(RADIANS(30)) returns 0.5, while SIN(30) alone returns -0.988 because 30 is read as 30 radians.',
+  },
+  {
+    question: 'What range of values can SIN return?',
+    answer: 'Always a number between -1 and 1 inclusive, regardless of how large the input angle is — sine is periodic and never exceeds that range.',
+  },
+  {
+    question: 'How do I get the inverse — find the angle from a sine value?',
+    answer: 'Use ASIN, which takes a ratio between -1 and 1 and returns the angle in radians. Wrap it in DEGREES if the angle is needed in degrees instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SIN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SIN(RADIANS(30))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Sin(30 * Application.Pi / 180) ' VBA's Sin also expects radians
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.sin(math.radians(30))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ASIN](/docs/math/asin) — the inverse: finds the angle from a sine
+  value.
+- [COS](/docs/math/cos) and [TAN](/docs/math/tan) — the other two
+  core trig functions, same radians-only convention.
+- [RADIANS](/docs/math/radians) and [DEGREES](/docs/math/degrees) —
+  convert between the two angle units SIN and its inverse use.

@@ -1,0 +1,156 @@
+---
+title: TAN
+description: Return the tangent of an angle given in radians.
+---
+
+Return the **tangent** of an angle. Like every Excel trig function,
+the angle must be supplied in **radians** — a degree value needs
+converting first, either with [RADIANS](/docs/math/radians) or by
+multiplying by `PI()/180`.
+
+export const quickAnswerFacts = [
+  { text: 'The angle argument must be in radians, not degrees', type: 'warn' },
+  { text: 'Convert degrees first: TAN(RADIANS(45)) or TAN(45*PI()/180)', type: 'check' },
+  { text: 'Unlike SIN/COS, the result is unbounded — it can be any number', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TAN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TAN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The angle, in radians, to find the tangent of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The tangent of `number`. Unlike SIN or COS, this isn't bounded to
+`-1`–`1` — it can be any number, and grows without limit as the
+angle approaches 90° (`PI()/2` radians) plus any multiple of 180°.
+
+## Description
+
+TAN expects its argument in radians. A degree value has to be
+converted before it's passed in — wrap it in
+[RADIANS](/docs/math/radians), or multiply it by `PI()/180` directly.
+Mathematically, tangent is sine divided by cosine, which is why it's
+undefined at angles where cosine is zero — Excel doesn't return an
+error there, though; see below.
+
+<Callout type="warn">
+  Passing a **degree value directly** is the same trap every Excel
+  trig function has — `TAN(45)` treats `45` as *45 radians*, not 45
+  degrees, and returns `1.619`, nothing like the `1` someone
+  expecting degree behavior would want. `TAN(RADIANS(45))` returns
+  the expected `1`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '0', '45': '1', '60': '1.732', '89': '57.29' }}
+  defaultValue="45"
+  label={'Live preview — =TAN(RADIANS({value}))'}
+  fieldLabel="degrees"
+/>
+
+The input here is treated as degrees and converted with RADIANS
+before TAN sees it. Notice how fast the result grows as the angle
+approaches 90° — that's tangent's defining behavior near its
+undefined points.
+
+## Common errors
+
+### Wrong result from passing degrees directly
+
+<ExcelCode>{`TAN(45) → 1.619 (45 is read as 45 radians, not 45 degrees)`}</ExcelCode>
+
+Excel has no way to tell a bare number is meant as degrees — it's
+always radians. Wrap any degree value in `RADIANS()` first.
+
+### A very large (not an error) result near 90°
+
+<ExcelCode>{`TAN(RADIANS(89.99999)) → 5729577.95 (approaching, but never reaching, an undefined point)`}</ExcelCode>
+
+Mathematically, tangent is undefined at exactly 90°, 270°, and so on
+— but floating-point rounding means Excel's `RADIANS(90)` is never
+*exactly* `PI()/2`, so `TAN(RADIANS(90))` returns an enormous but
+finite number instead of an error.
+
+export const faqs = [
+  {
+    question: 'Does TAN take degrees or radians?',
+    answer: 'Radians. To use a degree value, convert it first with RADIANS(degrees) or by multiplying by PI()/180 — TAN(RADIANS(45)) returns 1, while TAN(45) alone returns 1.619 because 45 is read as 45 radians.',
+  },
+  {
+    question: 'Why doesn\'t TAN(90 degrees) return an error, since tangent is undefined there?',
+    answer: "Tangent is mathematically undefined at exactly 90 degrees, but Excel's floating-point RADIANS(90) is a tiny amount off from the true value of PI()/2, so TAN never actually hits the undefined point — it returns an extremely large finite number instead of an error.",
+  },
+  {
+    question: 'How do I get the inverse — find the angle from a tangent value?',
+    answer: 'Use ATAN for a ratio, or ATAN2 when both the x and y components are known separately (ATAN2 also gets the correct quadrant right, which ATAN alone cannot). Wrap either in DEGREES if the angle is needed in degrees.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TAN(RADIANS(45))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Tan(45 * Application.Pi / 180) ' VBA's Tan also expects radians
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.tan(math.radians(45))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ATAN](/docs/math/atan) and [ATAN2](/docs/math/atan2) — the
+  inverse: find the angle from a tangent value.
+- [SIN](/docs/math/sin) and [COS](/docs/math/cos) — the other two
+  core trig functions; tangent is their ratio.
+- [RADIANS](/docs/math/radians) and [DEGREES](/docs/math/degrees) —
+  convert between the two angle units TAN and its inverse use.
