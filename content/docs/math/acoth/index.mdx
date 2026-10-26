@@ -1,0 +1,151 @@
+---
+title: ACOTH
+description: Return the inverse hyperbolic cotangent of a number.
+---
+
+Return the **inverse hyperbolic cotangent** — given a hyperbolic
+cotangent value, find the number that produced it. The input must
+have an absolute value **greater than 1** — the opposite restriction
+from [ATANH](/docs/math/atanh), which requires an input *less than*
+1 in absolute value.
+
+export const quickAnswerFacts = [
+  { text: 'number must have an absolute value greater than 1 — anything from -1 to 1 returns #NUM!', type: 'warn' },
+  { text: 'Not an angle — the result is a plain number, nothing to convert with DEGREES', type: 'check' },
+  { text: 'ACOTH(COTH(x)) always returns x exactly, for every nonzero real x', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ACOTH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ACOTH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number with an absolute value greater than 1 — the hyperbolic cotangent value to invert.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number whose hyperbolic cotangent is `number`. Same sign as
+`number`, approaching `0` as `|number|` grows large, and growing
+without bound as `|number|` approaches `1` from either side.
+
+## Description
+
+ACOTH inverts [COTH](/docs/math/coth). Because `COTH(x)` never
+produces a value between `-1` and `1` for any real nonzero `x`, its
+inverse ACOTH only accepts inputs outside that same range — mirroring
+exactly how [ACOSH](/docs/math/acosh) only accepts `COSH`'s own
+output range (`1` or greater), rather than ACOSH's actual input rule.
+
+<Callout type="warn">
+  **ACOTH's domain is the complement of ATANH's.** ATANH requires
+  `-1 < number < 1`; ACOTH requires `number < -1` or `number > 1` —
+  together, every real number except exactly `-1`, `1`, and the
+  interval between them is covered by one function or the other,
+  with no overlap.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '2': '0.5493', '6': '0.1682', '-2': '-0.5493', '10': '0.1003' }}
+  defaultValue="2"
+  label={'Live preview — =ACOTH({value})'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #NUM! — an argument between -1 and 1
+
+<ExcelCode>{`ACOTH(0.5) → #NUM! (hyperbolic cotangent never produces a value strictly between -1 and 1)`}</ExcelCode>
+
+`number` must fall outside `-1` to `1` entirely (not even touching
+the endpoints) — a value in that range has no real input that
+could have produced it.
+
+### Confusing ACOTH's domain with ATANH's
+
+<ExcelCode>{`ACOTH(0.9) → #NUM!, while ATANH(0.9) works fine — opposite domains`}</ExcelCode>
+
+ACOTH and ATANH split the real number line into complementary
+halves — a value that works for one is exactly the kind of value
+that fails for the other.
+
+export const faqs = [
+  {
+    question: 'Why must the argument to ACOTH have an absolute value greater than 1?',
+    answer: "Because COTH(x) = 1/TANH(x), and TANH(x) never reaches -1 or 1, COTH's output never falls between -1 and 1 for any nonzero real x. A number inside that range has no real input that could have produced it as a hyperbolic cotangent.",
+  },
+  {
+    question: "What's the difference between ACOTH and ATANH?",
+    answer: 'They invert complementary functions over complementary domains: ATANH requires its input strictly between -1 and 1; ACOTH requires its input to have an absolute value strictly greater than 1. Between them, every real number except -1, 1, and the open interval between them is covered.',
+  },
+  {
+    question: 'Is the result of ACOTH an angle, like ACOT returns?',
+    answer: 'No — ACOTH returns a plain number, not an angle. There is nothing to convert with DEGREES; that conversion only applies to the ordinary (non-hyperbolic) inverse trig functions.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ACOTH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ACOTH(6)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Acoth(6) ' VBA has no built-in Acoth — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    # Python's math module has no direct acoth — use the identity acoth(x) = atanh(1/x)
+    result = math.atanh(1 / 6)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COTH](/docs/math/coth) — the forward function ACOTH inverts.
+- [ATANH](/docs/math/atanh) — the complementary-domain hyperbolic
+  inverse function.
+- [ACOT](/docs/math/acot) — the angle-based inverse function ACOTH
+  is named after.

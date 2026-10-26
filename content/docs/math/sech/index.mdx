@@ -1,0 +1,148 @@
+---
+title: SECH
+description: Return the hyperbolic secant of a number — the reciprocal of COSH.
+---
+
+Return the **hyperbolic secant** of a number — the reciprocal of
+[COSH](/docs/math/cosh), equal to `1/COSH(number)`. Like every
+hyperbolic function, `number` is a plain real value, not an angle.
+
+export const quickAnswerFacts = [
+  { text: 'SECH(number) is the reciprocal of COSH(number) — 1/COSH(number)', type: 'check' },
+  { text: 'number is a plain real value — not an angle, no radians/degrees involved', type: 'check' },
+  { text: 'Defined for every real number — unlike SEC, SECH never raises #DIV/0!', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SECH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SECH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number. Must have an absolute value less than 2^27.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic secant of `number` — equal to `1/COSH(number)`,
+always strictly between `0` and `1`, with the maximum of exactly `1`
+occurring at `number = 0`.
+
+## Description
+
+SECH is one of the three "reciprocal" hyperbolic functions (alongside
+[CSCH](/docs/math/csch) and [COTH](/docs/math/coth)), each defined
+as 1 divided by one of the three core hyperbolic functions. SECH
+specifically inverts COSH: `SECH(x) = 1/COSH(x)`.
+
+<Callout type="idea">
+  **SECH is the one reciprocal hyperbolic function with no undefined
+  point at all.** COSH never equals `0` for any real input (it's
+  always `1` or greater), so unlike COTH and CSCH, SECH never raises
+  `#DIV/0!` — it's defined for every real number.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '1', '1': '0.6481', '4': '0.0366', '-2': '0.2658' }}
+  defaultValue="1"
+  label={'Live preview — =SECH({value})'}
+  fieldLabel="number"
+/>
+
+Notice the result only ever shrinks as `number` moves away from `0`
+in either direction — `1` is SECH's maximum, never its minimum.
+
+## Common errors
+
+### Assuming SECH needs an angle in radians
+
+<ExcelCode>{`SECH(RADIANS(45)) → not what you want — SECH takes a plain number, not an angle`}</ExcelCode>
+
+SECH's argument is an ordinary number, not an angle — converting it
+with RADIANS first (a habit carried over from SEC) changes the input
+to something unrelated to what was intended.
+
+### Expecting SECH to ever raise #DIV/0!
+
+<ExcelCode>{`SECH(0) → 1 (never an error — unlike SEC(RADIANS(90)), which does raise #DIV/0!)`}</ExcelCode>
+
+Since COSH is never zero, SECH has no undefined point anywhere —
+copying the "watch for #DIV/0!" habit from SEC or COT doesn't apply
+here.
+
+export const faqs = [
+  {
+    question: 'How is SECH different from 1/COSH?',
+    answer: "They're mathematically identical — SECH(x) is defined as exactly 1/COSH(x). SECH exists as its own function mainly for readability.",
+  },
+  {
+    question: 'Does SECH take an angle, like SEC does?',
+    answer: 'No — SECH takes a plain real number, not an angle. There is no radians-or-degrees question with any hyperbolic function.',
+  },
+  {
+    question: 'Can SECH ever raise a #DIV/0! error, the way SEC and COT can?',
+    answer: "No — COSH(x) never equals 0 for any real x (its minimum value is exactly 1, at x = 0), so SECH has no undefined point anywhere. It's the one reciprocal hyperbolic function without a domain restriction.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SECH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SECH(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = 1 / Application.WorksheetFunction.Cosh(1) ' VBA has no built-in Cosh/Sech — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = 1 / math.cosh(1)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COSH](/docs/math/cosh) — the function SECH inverts (reciprocal,
+  not inverse-function — see [ACOSH](/docs/math/acosh) for that).
+- [CSCH](/docs/math/csch) and [COTH](/docs/math/coth) — the other
+  two reciprocal hyperbolic functions.

@@ -1,0 +1,155 @@
+---
+title: ACOT
+description: Return the arccotangent (inverse cotangent) of a number, as an angle in radians.
+---
+
+Return the **arccotangent** — the angle whose cotangent is the given
+number. `number` can be any real value, and the result comes back
+in **radians**, strictly between `0` and `π` — a different principal
+range from [ATAN](/docs/math/atan)'s.
+
+export const quickAnswerFacts = [
+  { text: 'number can be any real value — no restricted range', type: 'check' },
+  { text: 'The result is in radians, strictly between 0 and π — not the -π/2 to π/2 range ATAN uses', type: 'warn' },
+  { text: 'ACOT is not simply ATAN(1/number) — that formula breaks for negative numbers', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ACOT(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ACOT(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The cotangent of the angle you want — any real number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The angle, in radians, whose cotangent is `number`, always strictly
+between `0` and `π` (0° to 180°, exclusive of both ends). `ACOT(0)`
+returns exactly `π/2`.
+
+## Description
+
+ACOT is the inverse of [COT](/docs/math/cot) — given a cotangent
+ratio, it finds the angle. Its principal range, `0` to `π`, is
+different from every other basic inverse trig function: ASIN and
+ATAN both use `-π/2` to `π/2`, while ACOS uses `0` to `π` — ACOT
+matches ACOS's range, not ATAN's, despite being TAN's inverse rather
+than COS's.
+
+<Callout type="warn">
+  **ACOT(number) is not the same as ATAN(1/number).** They agree for
+  positive `number`, but diverge for negative values: `ATAN(1/-2)`
+  gives a negative angle (about `-26.57°`), while `ACOT(-2)` gives a
+  positive one (about `153.43°`) to stay inside its `0`-to-`π`
+  range. Excel's ACOT applies a correction specifically to keep
+  every result in that range, regardless of sign.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '45', '-2': '153.43', '0': '90', '2': '26.57' }}
+  defaultValue="-2"
+  label={'Live preview — =DEGREES(ACOT({value}))'}
+  fieldLabel="cotangent value"
+/>
+
+Notice `ACOT(-2)` lands in the second quadrant (`153.43°`, between
+90° and 180°) rather than going negative — exactly the branch-cut
+behavior the callout above describes.
+
+## Common errors
+
+### Assuming ACOT(x) equals ATAN(1/x)
+
+<ExcelCode>{`ACOT(-2) → 153.43° in degrees, not ATAN(1/-2)'s -26.57°`}</ExcelCode>
+
+The two formulas only agree for positive `x`. For negative `x`,
+ACOT adds `π` to keep the result inside its `0`-to-`π` range, while
+a plain `ATAN(1/x)` would return a negative angle instead.
+
+### Forgetting to convert the result to degrees
+
+<ExcelCode>{`ACOT(1) → 0.7854 (radians, not the 45 degrees someone may expect)`}</ExcelCode>
+
+ACOT's result is always in radians. Wrap it in `DEGREES()`, or
+multiply by `180/PI()`, to get a degree value.
+
+export const faqs = [
+  {
+    question: "Why doesn't ACOT(x) equal ATAN(1/x) for every x?",
+    answer: "They only agree when x is positive. Excel's ACOT is defined to always return an angle between 0 and π, so for negative x it returns ATAN(1/x) + π instead of the plain (negative) ATAN(1/x) value, to stay inside that range.",
+  },
+  {
+    question: 'What does ACOT(0) return?',
+    answer: 'Exactly π/2 radians (90°) — the midpoint of its 0-to-π range, and the angle where cotangent itself is undefined in the forward direction.',
+  },
+  {
+    question: 'Why is ACOT\'s range 0 to π instead of -π/2 to π/2 like ATAN?',
+    answer: "It's a deliberate choice to keep every ACOT result positive and avoid the discontinuity that a -π/2-to-π/2 range would create around cotangent's own undefined point at 0. Other software may use a different branch-cut convention, so don't assume ACOT behaves identically everywhere.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ACOT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEGREES(ACOT(-2))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Acot(-2) ' VBA has no built-in Acot — use the worksheet function
+    result = result * 180 / Application.Pi ' convert to degrees
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    # math.atan2(1, x) reproduces Excel's 0-to-pi ACOT directly
+    result = math.degrees(math.atan2(1, -2))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COT](/docs/math/cot) — the forward function ACOT inverts.
+- [ATAN](/docs/math/atan) — the closest ordinary-trig equivalent,
+  though with a different principal range.
+- [ACOTH](/docs/math/acoth) — the hyperbolic counterpart.

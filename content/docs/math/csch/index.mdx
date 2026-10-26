@@ -1,0 +1,146 @@
+---
+title: CSCH
+description: Return the hyperbolic cosecant of a number — the reciprocal of SINH.
+---
+
+Return the **hyperbolic cosecant** of a number — the reciprocal of
+[SINH](/docs/math/sinh), equal to `1/SINH(number)`. Like every
+hyperbolic function, `number` is a plain real value, not an angle.
+
+export const quickAnswerFacts = [
+  { text: 'CSCH(number) is the reciprocal of SINH(number) — 1/SINH(number)', type: 'check' },
+  { text: 'number is a plain real value — not an angle, no radians/degrees involved', type: 'check' },
+  { text: 'CSCH(0) returns #DIV/0! — hyperbolic cosecant is undefined there', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CSCH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CSCH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number except 0. Must have an absolute value less than 2^27.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic cosecant of `number` — equal to `1/SINH(number)`.
+Unbounded near `0` (where SINH itself approaches `0`), and shrinking
+toward `0` as `number` grows large in either direction.
+
+## Description
+
+CSCH is one of the three "reciprocal" hyperbolic functions (alongside
+[SECH](/docs/math/sech) and [COTH](/docs/math/coth)), each defined
+as 1 divided by one of the three core hyperbolic functions. CSCH
+specifically inverts SINH: `CSCH(x) = 1/SINH(x)`.
+
+<Callout type="idea">
+  **CSCH has nothing to do with angles.** Unlike CSC, there's no
+  radians-vs-degrees conversion to worry about — `number` is just an
+  ordinary real value.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '0.8509', '1.5': '0.4696', '-1': '-0.8509', '3': '0.0998' }}
+  defaultValue="1.5"
+  label={'Live preview — =CSCH({value})'}
+  fieldLabel="number"
+/>
+
+Notice the result shrinks rapidly as `number` grows — the opposite
+behavior from SINH itself, which grows ever faster.
+
+## Common errors
+
+### #DIV/0! — an argument of exactly 0
+
+<ExcelCode>{`CSCH(0) → #DIV/0! (hyperbolic cosecant is undefined at 0, since SINH(0) is 0)`}</ExcelCode>
+
+Since `CSCH(x) = 1/SINH(x)`, and `SINH(0)` is exactly `0`, the
+division has no answer.
+
+### Assuming CSCH needs an angle in radians
+
+<ExcelCode>{`CSCH(RADIANS(30)) → not what you want — CSCH takes a plain number, not an angle`}</ExcelCode>
+
+CSCH's argument is an ordinary number, not an angle — converting it
+with RADIANS first (a habit carried over from CSC) changes the input
+to something unrelated to what was intended.
+
+export const faqs = [
+  {
+    question: 'How is CSCH different from 1/SINH?',
+    answer: "They're mathematically identical — CSCH(x) is defined as exactly 1/SINH(x). CSCH exists as its own function mainly for readability and to avoid a separate #DIV/0! check whenever SINH(x) itself happens to be zero.",
+  },
+  {
+    question: 'Does CSCH take an angle, like CSC does?',
+    answer: 'No — CSCH takes a plain real number, not an angle. There is no radians-or-degrees question with any hyperbolic function.',
+  },
+  {
+    question: 'Why does CSCH shrink toward 0 as the input grows, unlike CSC?',
+    answer: "SINH grows without bound as its input grows, so its reciprocal CSCH shrinks toward 0 — the opposite of CSC, which oscillates and repeatedly swings back toward its own minimum magnitude of 1 because ordinary sine is periodic and bounded.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CSCH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CSCH(1.5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = 1 / Application.WorksheetFunction.Sinh(1.5) ' VBA has no built-in Sinh/Csch — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = 1 / math.sinh(1.5)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SINH](/docs/math/sinh) — the function CSCH inverts (reciprocal,
+  not inverse-function — see [ASINH](/docs/math/asinh) for that).
+- [SECH](/docs/math/sech) and [COTH](/docs/math/coth) — the other
+  two reciprocal hyperbolic functions.

@@ -1,0 +1,153 @@
+---
+title: COT
+description: Return the cotangent of an angle given in radians — the reciprocal of TAN.
+---
+
+Return the **cotangent** of an angle — the reciprocal of
+[TAN](/docs/math/tan), equal to `1/TAN(number)` or, equivalently,
+`COS(number)/SIN(number)`. Like every Excel trig function, the angle
+must be in **radians**.
+
+export const quickAnswerFacts = [
+  { text: 'COT(number) is the reciprocal of TAN(number) — 1/TAN(number)', type: 'check' },
+  { text: 'The angle argument must be in radians, not degrees', type: 'warn' },
+  { text: 'COT(0) returns #DIV/0! — cotangent is undefined there', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COT(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COT(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The angle, in radians, to find the cotangent of. Must have an absolute value less than 2^27.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cotangent of `number` — equal to `1/TAN(number)`. Unbounded, like
+TAN itself, but flipped: COT grows large where TAN is near zero, and
+approaches zero where TAN grows large.
+
+## Description
+
+COT is one of the three "reciprocal" trig functions (alongside
+[SEC](/docs/math/sec) and [CSC](/docs/math/csc)), each defined as 1
+divided by one of the three core trig functions. COT specifically
+inverts TAN: `COT(x) = 1/TAN(x) = COS(x)/SIN(x)`. Like TAN, it
+expects `number` in radians — convert a degree value with
+[RADIANS](/docs/math/radians) first.
+
+<Callout type="warn">
+  **COT(0) is undefined and raises #DIV/0!**, the mirror image of
+  TAN's own undefined point at 90°. Since `COT(x) = COS(x)/SIN(x)`,
+  and `SIN(0)` is `0`, the division has no answer.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '30': '1.7321', '45': '1', '60': '0.5774', '90': '0' }}
+  defaultValue="45"
+  label={'Live preview — =COT(RADIANS({value}))'}
+  fieldLabel="degrees"
+/>
+
+The input here is treated as degrees and converted with RADIANS
+before COT sees it. Notice the values are each the reciprocal of the
+matching TAN result — COT(45°) is `1`, exactly where TAN(45°) is
+also `1`.
+
+## Common errors
+
+### #DIV/0! — an argument of exactly 0
+
+<ExcelCode>{`COT(0) → #DIV/0! (cotangent is undefined at 0, the mirror of TAN's undefined point at 90°)`}</ExcelCode>
+
+Any `number` whose sine is exactly zero (`0`, `π`, `2π`, and so on)
+has no defined cotangent.
+
+### #NUM! — an argument too large
+
+<ExcelCode>{`COT(200000000) → #NUM! (exceeds the 2^27 absolute-value limit)`}</ExcelCode>
+
+`number` must have an absolute value below `2^27` (about 134
+million) — an unusually specific limit that's easy to hit by
+accident with a formula that generates very large radian values.
+
+export const faqs = [
+  {
+    question: 'How is COT different from 1/TAN?',
+    answer: "They're mathematically identical — COT(x) is defined as exactly 1/TAN(x). COT exists as its own function mainly for readability and to avoid a separate #DIV/0! check whenever TAN(x) itself happens to be zero.",
+  },
+  {
+    question: 'Why does COT(0) return an error if 1/TAN(0) also would?',
+    answer: "They behave the same way — TAN(0) is 0, so 1/TAN(0) would itself raise #DIV/0! if written out manually. COT(0) raises the identical error directly, since cotangent has no defined value when its underlying sine term is zero.",
+  },
+  {
+    question: 'Does COT take degrees or radians?',
+    answer: 'Radians, the same as every other Excel trig function. Convert a degree value first with RADIANS(degrees) or by multiplying by PI()/180.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COT(RADIANS(45))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = 1 / Tan(45 * Application.Pi / 180) ' VBA has no built-in Cot — use 1 / Tan
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = 1 / math.tan(math.radians(45))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TAN](/docs/math/tan) — the function COT inverts (reciprocal, not
+  inverse-function — see [ATAN](/docs/math/atan) for that).
+- [SEC](/docs/math/sec) and [CSC](/docs/math/csc) — the other two
+  reciprocal trig functions.
+- [ACOT](/docs/math/acot) — the inverse function: finds the angle
+  from a cotangent value.

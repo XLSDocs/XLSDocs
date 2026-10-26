@@ -1,0 +1,151 @@
+---
+title: CSC
+description: Return the cosecant of an angle given in radians — the reciprocal of SIN.
+---
+
+Return the **cosecant** of an angle — the reciprocal of
+[SIN](/docs/math/sin), equal to `1/SIN(number)`. Like every Excel
+trig function, the angle must be in **radians**.
+
+export const quickAnswerFacts = [
+  { text: 'CSC(number) is the reciprocal of SIN(number) — 1/SIN(number)', type: 'check' },
+  { text: 'The angle argument must be in radians, not degrees', type: 'warn' },
+  { text: 'CSC(0) returns #DIV/0! — cosecant is undefined there', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CSC(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CSC(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The angle, in radians, to find the cosecant of. Must have an absolute value less than 2^27.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The cosecant of `number` — equal to `1/SIN(number)`. Since SIN never
+exceeds `-1` to `1`, CSC never falls between `-1` and `1` — its
+result is always `1` or greater, or `-1` or less.
+
+## Description
+
+CSC is one of the three "reciprocal" trig functions (alongside
+[SEC](/docs/math/sec) and [COT](/docs/math/cot)), each defined as 1
+divided by one of the three core trig functions. CSC specifically
+inverts SIN: `CSC(x) = 1/SIN(x)`. Like SIN, it expects `number` in
+radians — convert a degree value with [RADIANS](/docs/math/radians)
+first.
+
+<Callout type="warn">
+  **CSC never returns a result between -1 and 1**, with a visible
+  gap right across that range — since SIN itself never exceeds `-1`
+  to `1`, its reciprocal can never fall inside that band. CSC jumps
+  straight from `≥ 1` to `≤ -1` as the angle crosses SIN's zero
+  points, where CSC itself becomes undefined.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '15': '1.5378', '30': '2', '90': '1', '150': '2' }}
+  defaultValue="30"
+  label={'Live preview — =CSC(RADIANS({value}))'}
+  fieldLabel="degrees"
+/>
+
+The input here is treated as degrees and converted with RADIANS
+before CSC sees it. Notice CSC(30°) and CSC(150°) both give `2` —
+cosecant inherits sine's own symmetry.
+
+## Common errors
+
+### #DIV/0! — an argument of exactly 0
+
+<ExcelCode>{`CSC(0) → #DIV/0! (cosecant is undefined wherever sine is exactly 0)`}</ExcelCode>
+
+Any `number` whose sine is exactly zero (`0`, `π`, `2π`, and so on)
+has no defined cosecant.
+
+### Expecting a result between -1 and 1
+
+<ExcelCode>{`CSC(RADIANS(90)) → 1 (the closest CSC ever gets to 0, never any closer)`}</ExcelCode>
+
+Because CSC is sine's reciprocal, and sine itself never exceeds `-1`
+to `1`, CSC's result never lands inside that range — only at or
+beyond its edges.
+
+export const faqs = [
+  {
+    question: 'How is CSC different from 1/SIN?',
+    answer: "They're mathematically identical — CSC(x) is defined as exactly 1/SIN(x). CSC exists as its own function mainly for readability and to avoid a separate #DIV/0! check whenever SIN(x) itself happens to be zero.",
+  },
+  {
+    question: 'Why does CSC never return a value between -1 and 1?',
+    answer: "Because SIN(x) itself never exceeds the range -1 to 1, its reciprocal CSC(x) can never land strictly between -1 and 1 — the smallest possible |CSC(x)| is exactly 1, reached wherever |SIN(x)| itself reaches its own maximum of 1.",
+  },
+  {
+    question: 'Does CSC take degrees or radians?',
+    answer: 'Radians, the same as every other Excel trig function. Convert a degree value first with RADIANS(degrees) or by multiplying by PI()/180.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CSC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CSC(RADIANS(30))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = 1 / Sin(30 * Application.Pi / 180) ' VBA has no built-in Csc — use 1 / Sin
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = 1 / math.sin(math.radians(30))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SIN](/docs/math/sin) — the function CSC inverts (reciprocal, not
+  inverse-function — see [ASIN](/docs/math/asin) for that).
+- [SEC](/docs/math/sec) and [COT](/docs/math/cot) — the other two
+  reciprocal trig functions.

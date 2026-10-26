@@ -1,0 +1,155 @@
+---
+title: DEGREES
+description: Convert an angle from radians to degrees.
+---
+
+Convert an angle from **radians to degrees** — the companion
+function to [RADIANS](/docs/math/radians), used constantly alongside
+every trig function to turn their radians-only results into the
+units most people actually think in.
+
+export const quickAnswerFacts = [
+  { text: 'DEGREES(angle) = angle * 180/PI()', type: 'check' },
+  { text: 'Wraps every inverse trig function (ASIN, ACOS, ATAN, ACOT, ATAN2) to get a degree result', type: 'check' },
+  { text: 'DEGREES(PI()) returns exactly 180', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DEGREES(angle)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DEGREES(angle)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'angle',
+    type: 'number',
+    required: true,
+    description: 'The angle in radians to convert.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`angle` converted from radians to degrees — equal to
+`angle * 180/PI()`.
+
+## Description
+
+Every one of Excel's trig functions works in radians internally —
+[SIN](/docs/math/sin), [COS](/docs/math/cos), and
+[TAN](/docs/math/tan) expect a radians input, and their inverses
+([ASIN](/docs/math/asin), [ACOS](/docs/math/acos),
+[ATAN](/docs/math/atan), [ACOT](/docs/math/acot),
+[ATAN2](/docs/math/atan2)) all return a radians result. DEGREES
+exists specifically to bridge that gap at the output end — wrap any
+of those inverse functions in `DEGREES()` to get the angle in the
+unit most spreadsheets actually care about.
+
+<Callout type="idea">
+  DEGREES and `angle * 180/PI()` compute exactly the same thing —
+  DEGREES just makes the intent obvious to a reader, the same role
+  [RADIANS](/docs/math/radians) plays for the opposite conversion.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3.14159265': '180', '1.5707963': '90', '0.7853982': '45', '6.2831853': '360' }}
+  defaultValue="1.5707963"
+  label={'Live preview — =DEGREES({value})'}
+  fieldLabel="radians"
+/>
+
+## Common errors
+
+### Applying DEGREES to a value that's already in degrees
+
+<ExcelCode>{`DEGREES(90) → 5156.62 (90 is read as 90 radians, not 90 degrees already)`}</ExcelCode>
+
+DEGREES assumes its input is in radians — passing an already-degree
+value through it converts it a second time, producing a meaningless
+result.
+
+### Forgetting DEGREES is needed at all
+
+<ExcelCode>{`ASIN(0.5) → 0.5236 (radians, easy to mistake for a small degree value)`}</ExcelCode>
+
+Every inverse trig function's raw result is in radians. Without
+wrapping it in `DEGREES()`, a value like `0.5236` can look like a
+plausible (if small) degree measurement when it's actually nothing
+of the sort.
+
+export const faqs = [
+  {
+    question: 'What is DEGREES actually computing?',
+    answer: 'DEGREES(angle) = angle * 180/PI() — the standard radians-to-degrees conversion factor, applied as a function instead of writing out the formula inline each time.',
+  },
+  {
+    question: 'How do I convert the other direction, degrees to radians?',
+    answer: 'Use RADIANS(degrees), the companion function — RADIANS(180) returns PI(), the same relationship DEGREES(PI()) returning 180 demonstrates in reverse.',
+  },
+  {
+    question: 'Which functions typically get wrapped in DEGREES?',
+    answer: 'Any inverse trig function — ASIN, ACOS, ATAN, ATAN2, and ACOT all return radians by default, so wrapping the whole call in DEGREES() is the standard way to get a human-readable angle out of them.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DEGREES from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DEGREES(PI())`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    Dim radiansValue As Double
+    radiansValue = Application.Pi
+    result = radiansValue * 180 / Application.Pi ' VBA has no built-in Degrees — convert manually
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.degrees(math.pi)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RADIANS](/docs/math/radians) — the opposite conversion, degrees
+  to radians.
+- [PI](/docs/math/pi) — the constant DEGREES' own conversion factor
+  is built from.
+- [ASIN](/docs/math/asin), [ACOS](/docs/math/acos), and
+  [ATAN](/docs/math/atan) — the functions DEGREES most commonly
+  wraps.

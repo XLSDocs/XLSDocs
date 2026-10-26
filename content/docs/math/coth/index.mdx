@@ -1,0 +1,151 @@
+---
+title: COTH
+description: Return the hyperbolic cotangent of a number — the reciprocal of TANH.
+---
+
+Return the **hyperbolic cotangent** of a number — the reciprocal of
+[TANH](/docs/math/tanh), equal to `1/TANH(number)`. Like every
+hyperbolic function, `number` is a plain real value, not an angle.
+
+export const quickAnswerFacts = [
+  { text: 'COTH(number) is the reciprocal of TANH(number) — 1/TANH(number)', type: 'check' },
+  { text: 'number is a plain real value — not an angle, no radians/degrees involved', type: 'check' },
+  { text: 'COTH(0) returns #DIV/0! — hyperbolic cotangent is undefined there', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=COTH(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COTH(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'Any real number except 0. Must have an absolute value less than 2^27.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The hyperbolic cotangent of `number` — equal to `1/TANH(number)`.
+Since TANH never reaches `-1` or `1`, COTH never falls between `-1`
+and `1` — the mirror image of TANH's own bounded range.
+
+## Description
+
+COTH is one of the three "reciprocal" hyperbolic functions (alongside
+[SECH](/docs/math/sech) and [CSCH](/docs/math/csch)), each defined
+as 1 divided by one of the three core hyperbolic functions. COTH
+specifically inverts TANH: `COTH(x) = 1/TANH(x)`. As `x` grows large
+in either direction, TANH approaches `±1`, so COTH does too — but
+near `x = 0`, where TANH itself approaches `0`, COTH grows without
+bound instead.
+
+<Callout type="idea">
+  **COTH has nothing to do with angles.** Unlike COT, there's no
+  radians-vs-degrees conversion to worry about — `number` is just an
+  ordinary real value.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '1.313', '2': '1.0373', '-1': '-1.313', '5': '1.0001' }}
+  defaultValue="2"
+  label={'Live preview — =COTH({value})'}
+  fieldLabel="number"
+/>
+
+Notice how quickly COTH approaches `1` as `number` grows — by `5`,
+it's already at `1.0001`, barely distinguishable from its asymptote.
+
+## Common errors
+
+### #DIV/0! — an argument of exactly 0
+
+<ExcelCode>{`COTH(0) → #DIV/0! (hyperbolic cotangent is undefined at 0, since TANH(0) is 0)`}</ExcelCode>
+
+Since `COTH(x) = 1/TANH(x)`, and `TANH(0)` is exactly `0`, the
+division has no answer.
+
+### Assuming COTH needs an angle in radians
+
+<ExcelCode>{`COTH(RADIANS(45)) → not what you want — COTH takes a plain number, not an angle`}</ExcelCode>
+
+COTH's argument is an ordinary number, not an angle — converting it
+with RADIANS first (a habit carried over from COT) changes the input
+to something unrelated to what was intended.
+
+export const faqs = [
+  {
+    question: 'How is COTH different from 1/TANH?',
+    answer: "They're mathematically identical — COTH(x) is defined as exactly 1/TANH(x). COTH exists as its own function mainly for readability and to avoid a separate #DIV/0! check whenever TANH(x) itself happens to be zero.",
+  },
+  {
+    question: 'Does COTH take an angle, like COT does?',
+    answer: 'No — COTH takes a plain real number, not an angle. There is no radians-or-degrees question with any hyperbolic function.',
+  },
+  {
+    question: 'Why does COTH never return a value between -1 and 1?',
+    answer: "Because TANH(x) never reaches -1 or 1 (it only approaches them), its reciprocal COTH(x) can never land between -1 and 1 — the smallest possible |COTH(x)| approaches 1 only as |x| grows very large.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COTH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COTH(2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = 1 / Application.WorksheetFunction.Tanh(2) ' VBA has no built-in Tanh/Coth — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = 1 / math.tanh(2)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TANH](/docs/math/tanh) — the function COTH inverts (reciprocal,
+  not inverse-function — see [ATANH](/docs/math/atanh) for that).
+- [SECH](/docs/math/sech) and [CSCH](/docs/math/csch) — the other
+  two reciprocal hyperbolic functions.
+- [ACOTH](/docs/math/acoth) — the inverse function: finds the
+  number from a hyperbolic cotangent value.

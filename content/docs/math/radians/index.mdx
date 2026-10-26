@@ -1,0 +1,154 @@
+---
+title: RADIANS
+description: Convert an angle from degrees to radians.
+---
+
+Convert an angle from **degrees to radians** — the companion
+function to [DEGREES](/docs/math/degrees), used constantly alongside
+every trig function since Excel's trig functions all expect their
+angle input in radians, not degrees.
+
+export const quickAnswerFacts = [
+  { text: 'RADIANS(angle) = angle * PI()/180', type: 'check' },
+  { text: 'Wraps a degree value before passing it into SIN, COS, TAN, or any other forward trig function', type: 'check' },
+  { text: 'RADIANS(180) returns exactly PI()', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RADIANS(angle)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RADIANS(angle)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'angle',
+    type: 'number',
+    required: true,
+    description: 'The angle in degrees to convert.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`angle` converted from degrees to radians — equal to
+`angle * PI()/180`.
+
+## Description
+
+Every one of Excel's forward trig functions —
+[SIN](/docs/math/sin), [COS](/docs/math/cos),
+[TAN](/docs/math/tan), [COT](/docs/math/cot),
+[SEC](/docs/math/sec), [CSC](/docs/math/csc) — expects its angle
+argument in radians, not degrees. RADIANS exists specifically to
+bridge that gap at the input end — wrap any degree value in
+`RADIANS()` before passing it into one of those functions, instead
+of passing the bare degree number directly (which silently computes
+something else entirely).
+
+<Callout type="idea">
+  RADIANS and `angle * PI()/180` compute exactly the same thing —
+  RADIANS just makes the intent obvious to a reader, the same role
+  [DEGREES](/docs/math/degrees) plays for the opposite conversion.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '180': '3.1416', '90': '1.5708', '45': '0.7854', '270': '4.7124' }}
+  defaultValue="180"
+  label={'Live preview — =RADIANS({value})'}
+  fieldLabel="degrees"
+/>
+
+## Common errors
+
+### Skipping RADIANS and passing degrees directly into a trig function
+
+<ExcelCode>{`SIN(30) → -0.988, not the 0.5 you'd get from SIN(RADIANS(30))`}</ExcelCode>
+
+This is the single most common trig mistake in Excel — every forward
+trig function reads a bare number as radians, not degrees, with no
+warning when the units don't match what was intended.
+
+### Applying RADIANS to a value that's already in radians
+
+<ExcelCode>{`RADIANS(3.14159) → 0.0548 (3.14159 is read as 3.14159 degrees, not already-radians PI)`}</ExcelCode>
+
+RADIANS assumes its input is in degrees — passing an already-radians
+value through it converts it a second time, producing a meaningless
+result.
+
+export const faqs = [
+  {
+    question: 'What is RADIANS actually computing?',
+    answer: 'RADIANS(angle) = angle * PI()/180 — the standard degrees-to-radians conversion factor, applied as a function instead of writing out the formula inline each time.',
+  },
+  {
+    question: 'How do I convert the other direction, radians to degrees?',
+    answer: 'Use DEGREES(radians), the companion function — DEGREES(PI()) returns 180, the same relationship RADIANS(180) returning PI() demonstrates in reverse.',
+  },
+  {
+    question: 'Which functions typically need their input wrapped in RADIANS?',
+    answer: 'Any forward trig function — SIN, COS, TAN, COT, SEC, and CSC all expect radians, so wrapping a degree value in RADIANS() before passing it in is the standard way to get the result someone working in degrees actually expects.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RADIANS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RADIANS(180)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    Dim degreesValue As Double
+    degreesValue = 180
+    result = degreesValue * Application.Pi / 180 ' VBA has no built-in Radians — convert manually
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.radians(180)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DEGREES](/docs/math/degrees) — the opposite conversion, radians
+  to degrees.
+- [PI](/docs/math/pi) — the constant RADIANS' own conversion factor
+  is built from.
+- [SIN](/docs/math/sin), [COS](/docs/math/cos), and
+  [TAN](/docs/math/tan) — the functions RADIANS most commonly
+  prepares input for.
