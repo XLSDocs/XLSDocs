@@ -28,8 +28,8 @@ export function ChangelogList({ entries }: { entries: ChangelogEntry[] }) {
         <li key={i} className="relative">
           <span className="absolute top-1.5 -left-[calc(2rem+4.5px)] size-2 rounded-full bg-fd-primary" />
           <time className="font-mono text-xs text-fd-muted-foreground">{formatDate(entry.date)}</time>
-          <h2 className="mt-1 text-lg font-medium">{entry.title}</h2>
-          <p className="mt-1.5 text-sm text-fd-muted-foreground">{entry.description}</p>
+          <h2 className="mt-1 text-lg font-medium break-words">{entry.title}</h2>
+          <p className="mt-1.5 text-sm text-fd-muted-foreground break-words">{entry.description}</p>
           <div className="mt-3 flex flex-wrap gap-1.5">
             {entry.tags.map((tag) => (
               <span
