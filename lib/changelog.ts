@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-26',
+    title: '23 trigonometric functions, from SIN to ACOTH — the Math category finally has trig',
+    description:
+      "A fresh audit against Microsoft's own function-category listing found the Math category had zero trig functions despite 389 functions already live. Fixed in one push: the three core functions (SIN, COS, TAN) and their inverses (ASIN, ACOS, ATAN, ATAN2); the hyperbolic family (SINH, COSH, TANH) and their inverses (ASINH, ACOSH, ATANH); the three reciprocal functions (COT, CSC, SEC) and their hyperbolic counterparts (COTH, CSCH, SECH) plus COT's own inverse (ACOT, ACOTH); and the DEGREES/RADIANS conversions every one of them leans on. Every page calls out the radians-vs-degrees trap explicitly, and the hyperbolic pages flag the opposite mistake — they take a plain number, not an angle, so there's nothing to convert at all.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-10-25',
     title: 'COVAR, HYPGEOMDIST, PERCENTRANK, and QUARTILE — the Compatibility category is complete',
     description:
