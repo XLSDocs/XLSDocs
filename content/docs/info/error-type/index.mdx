@@ -1,0 +1,171 @@
+---
+title: ERROR.TYPE
+description: Return a number identifying which specific error a value is.
+---
+
+Return a number identifying **which specific error** `error_val` is
+— `1` for `#NULL!`, `2` for `#DIV/0!`, and so on through `7` for
+`#N/A`. Returns `#N/A` itself if `error_val` isn't actually an error.
+
+export const quickAnswerFacts = [
+  { text: '1=#NULL!, 2=#DIV/0!, 3=#VALUE!, 4=#REF!, 5=#NAME?, 6=#NUM!, 7=#N/A', type: 'check' },
+  { text: 'Returns #N/A if error_val is NOT an error at all', type: 'warn' },
+  { text: 'Commonly paired with CHOOSE to turn the code into a readable message', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ERROR.TYPE(error_val)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ERROR.TYPE(error_val)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'error_val',
+    type: 'any',
+    required: true,
+    description: 'The error value to identify — usually a reference to a cell containing a formula.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A number from `1` to `7` identifying which error `error_val` is:
+
+| Error | Code |
+| --- | --- |
+| `#NULL!` | 1 |
+| `#DIV/0!` | 2 |
+| `#VALUE!` | 3 |
+| `#REF!` | 4 |
+| `#NAME?` | 5 |
+| `#NUM!` | 6 |
+| `#N/A` | 7 |
+
+If `error_val` is not actually an error, ERROR.TYPE itself returns
+`#N/A`.
+
+## Description
+
+Where [ISERROR](/docs/info/iserror) only answers "is this an error"
+with `TRUE`/`FALSE`, ERROR.TYPE answers "*which* error is this"
+with a specific code. It's most useful paired with
+[CHOOSE](/docs/lookup/choose) to translate that numeric code into a
+readable message:
+`=CHOOSE(ERROR.TYPE(A2), "Null", "Divide by zero", "Wrong type", "Bad reference", "Unknown name", "Invalid number", "Not found")`.
+
+<Callout type="warn">
+  **ERROR.TYPE itself returns `#N/A` when given a non-error value**
+  — it doesn't return `0` or `FALSE` the way a boolean test would.
+  Wrap it in [IFERROR](/docs/logical/iferror) if `error_val` might
+  not actually be an error, to avoid propagating a second,
+  unrelated `#N/A`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'divide by zero': '2', 'missing lookup': '7', 'bad reference': '4', 'invalid name': '5' }}
+  defaultValue="divide by zero"
+  label={'Live preview — =ERROR.TYPE({value})'}
+  fieldLabel="error_val"
+  errorValue="(try one of the examples below)"
+/>
+
+Each error type maps to its own fixed code — `#DIV/0!` is always
+`2`, `#N/A` is always `7`, regardless of what formula produced the
+error.
+
+## Common errors
+
+### Forgetting ERROR.TYPE itself errors on non-error input
+
+<ExcelCode>{`ERROR.TYPE(42) → #N/A (42 isn't an error, so there's no code to return)`}</ExcelCode>
+
+Check with ISERROR first, or wrap the whole thing in IFERROR, if
+`error_val` isn't guaranteed to already be an error.
+
+### Memorizing the codes instead of pairing with CHOOSE
+
+<ExcelCode>{`ERROR.TYPE(A2) → 4 (meaningless on its own without looking up what "4" means)`}</ExcelCode>
+
+The raw code by itself isn't useful to a formula's end reader — pair
+it with CHOOSE to turn it into an actual message.
+
+export const faqs = [
+  {
+    question: 'ERROR.TYPE vs ISERROR — what is the difference?',
+    answer: 'ISERROR answers a yes/no question: is this value an error at all. ERROR.TYPE goes further, returning a specific numeric code (1 through 7) identifying exactly which of the seven error types it is.',
+  },
+  {
+    question: 'What happens if I run ERROR.TYPE on something that is not an error?',
+    answer: "ERROR.TYPE itself returns #N/A — it has no code to assign to a non-error value, so it produces its own error rather than a 0 or FALSE.",
+  },
+  {
+    question: 'How do I turn the numeric code into a readable message?',
+    answer: 'Pair it with CHOOSE, listing a message for each code in order: =CHOOSE(ERROR.TYPE(A2), "Null", "Divide by zero", "Wrong type", "Bad reference", "Unknown name", "Invalid number", "Not found").',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ERROR.TYPE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IFERROR(CHOOSE(ERROR.TYPE(A2), "Null", "Divide by zero", "Wrong type", "Bad reference", "Unknown name", "Invalid number", "Not found"), "No error")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If IsError(Range("A2").Value) Then
+      Dim errCode As Long
+      errCode = CLng(Range("A2").Value) ' VBA's CVErr/error codes don't map 1:1 to Excel's ERROR.TYPE numbers
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    ERROR_CODES = {
+        "#NULL!": 1, "#DIV/0!": 2, "#VALUE!": 3, "#REF!": 4,
+        "#NAME?": 5, "#NUM!": 6, "#N/A": 7,
+    }
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    error_type = df["A"].map(ERROR_CODES)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISERROR](/docs/info/iserror) — the simpler yes/no version of
+  this same question.
+- [CHOOSE](/docs/lookup/choose) — commonly pairs with ERROR.TYPE to
+  turn its numeric code into a readable message.
+- [IFERROR](/docs/logical/iferror) — guards against ERROR.TYPE's
+  own `#N/A` when `error_val` might not be an error at all.

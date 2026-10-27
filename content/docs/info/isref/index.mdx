@@ -1,0 +1,160 @@
+---
+title: ISREF
+description: Test whether a value is a valid cell or range reference.
+---
+
+Test whether a value is a valid **reference** — a cell, range, or
+named range that Excel can resolve, as opposed to a plain number,
+text string, or an invalid/broken reference.
+
+export const quickAnswerFacts = [
+  { text: 'TRUE only for an actual, resolvable reference — not for text that merely looks like one', type: 'warn' },
+  { text: 'Commonly paired with INDIRECT to validate a dynamically-built reference before using it', type: 'check' },
+  { text: 'Cannot test for external file links or hyperlinks', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISREF(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISREF(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell, range, or value to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is a reference Excel can resolve. `FALSE` for a
+plain number, text, or anything else that isn't a genuine reference.
+
+## Description
+
+ISREF checks whether `value` is structurally a reference — a cell
+(`A1`), a range (`A1:B10`), or a named range — rather than testing
+what that reference *contains*. It's most useful paired with
+`INDIRECT`, which builds a reference from a text string at
+calculation time and can fail if the text doesn't resolve to a real
+location: `ISREF(INDIRECT("A1"))` confirms the built reference is
+actually valid before relying on it further.
+
+<Callout type="warn">
+  **A text string that merely looks like a reference is still
+  `FALSE`.** `ISREF("A1")` tests the literal text `"A1"`, which is a
+  string, not a reference — it returns `FALSE`. Only an actual cell
+  reference, or a function call that resolves to one (like
+  `INDIRECT("A1")`), returns `TRUE`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'a cell reference': 'TRUE', 'the text "a1"': 'FALSE', 'a number': 'FALSE' }}
+  defaultValue="a cell reference"
+  label={'Live preview — =ISREF({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+The text string `"A1"` returns `FALSE` — it's a piece of text that
+merely resembles a reference, not an actual one.
+
+## Common errors
+
+### Confusing a reference-shaped string with a real reference
+
+<ExcelCode>{`ISREF("A1") → FALSE (this is literal text, not a reference)`}</ExcelCode>
+
+Wrap it in `INDIRECT()` to actually resolve the text into a
+reference first: `ISREF(INDIRECT("A1"))` returns `TRUE`.
+
+### Expecting ISREF to validate a hyperlink or external link
+
+<ExcelCode>{`ISREF cannot confirm whether an external workbook link or a HYPERLINK target is still valid`}</ExcelCode>
+
+ISREF only tests references within the structure Excel itself
+resolves formulas against — it's not a tool for checking external
+file links or hyperlink targets.
+
+export const faqs = [
+  {
+    question: 'Why does ISREF("A1") return FALSE?',
+    answer: 'Because "A1" in quotes is a literal text string, not an actual cell reference. ISREF tests the structural type of its argument, and text — even text shaped exactly like a cell address — is still just text.',
+  },
+  {
+    question: 'What is ISREF most commonly used for?',
+    answer: 'Validating a reference built dynamically with INDIRECT, before using it further in a formula — ISREF(INDIRECT(text)) confirms the text actually resolved to a real location rather than producing a #REF! error.',
+  },
+  {
+    question: 'Can ISREF check whether a hyperlink or external workbook link still works?',
+    answer: "No — ISREF only evaluates references within Excel's own formula-reference system. It can't confirm whether a HYPERLINK target or an external workbook link is still valid.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISREF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISREF(INDIRECT(A1)), "Valid reference", "Invalid")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no direct ISREF equivalent — test whether a Range object can be created instead
+    Dim rng As Range
+    On Error Resume Next
+    Set rng = Range(Range("A1").Value)
+    On Error GoTo 0
+    Dim isValidRef As Boolean
+    isValidRef = Not rng Is Nothing
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import re
+
+    # pandas has no reference concept — this just checks the string shape
+    is_ref_shaped = bool(re.match(r'^\$?[A-Z]+\$?\d+(:\$?[A-Z]+\$?\d+)?$', "A1"))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [INDIRECT](/docs/lookup/indirect) — builds a reference from text,
+  and the function ISREF is most commonly paired with.
+- [ISERROR](/docs/info/iserror) — a broader test that would also
+  catch a broken `INDIRECT` result, just without ISREF's specific
+  "is this actually a reference" framing.
+- [CELL](/docs/info/cell) — returns information *about* a reference,
+  once ISREF has confirmed it's valid.

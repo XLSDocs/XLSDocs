@@ -1,0 +1,155 @@
+---
+title: ISNONTEXT
+description: Test whether a value is anything other than text.
+---
+
+Test whether a value is **not** text — the logical opposite of
+[ISTEXT](/docs/info/istext), covering numbers, blanks, logical
+values, and errors in one test.
+
+export const quickAnswerFacts = [
+  { text: 'TRUE for anything that is NOT text — numbers, blanks, TRUE/FALSE, errors', type: 'check' },
+  { text: 'ISNONTEXT(value) always returns the opposite of ISTEXT(value)', type: 'check' },
+  { text: 'A genuinely blank cell is NOT text, so ISNONTEXT(blank cell) is TRUE', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISNONTEXT(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISNONTEXT(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell or value to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is anything other than text — a number, a blank
+cell, a logical value, or an error. `FALSE` only when `value` is
+genuinely text.
+
+## Description
+
+ISNONTEXT is the direct logical negation of
+[ISTEXT](/docs/info/istext): `ISNONTEXT(x)` always equals
+`NOT(ISTEXT(x))`. It exists as its own function mainly for
+readability — `IF(ISNONTEXT(A2), ...)` reads slightly more directly
+than `IF(NOT(ISTEXT(A2)), ...)` for the common case of "do something
+unless this is text."
+
+<Callout type="warn">
+  **A blank cell counts as "not text," so ISNONTEXT returns TRUE for
+  it** — the same gotcha ISTEXT has in reverse. If the goal is
+  specifically "is this a number," use
+  [ISNUMBER](/docs/info/isnumber) instead; ISNONTEXT only rules out
+  text, it doesn't require any particular other type.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'a text value': 'FALSE', 'a number': 'TRUE', 'a blank cell': 'TRUE' }}
+  defaultValue="a number"
+  label={'Live preview — =ISNONTEXT({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+A blank cell returns `TRUE` here, alongside an actual number — both
+are simply "not text," which is all ISNONTEXT actually checks.
+
+## Common errors
+
+### Assuming ISNONTEXT means "is a number"
+
+<ExcelCode>{`ISNONTEXT(blank cell) → TRUE (a blank is not text, but it's not a number either)`}</ExcelCode>
+
+ISNONTEXT only rules out text — it says nothing about what the value
+actually *is*. Use ISNUMBER for a more specific numeric test.
+
+### Reaching for NOT(ISTEXT(...)) instead
+
+<ExcelCode>{`NOT(ISTEXT(A2)) → the same result as ISNONTEXT(A2), just one function longer`}</ExcelCode>
+
+Not wrong, just redundant — ISNONTEXT already does exactly this in
+one call.
+
+export const faqs = [
+  {
+    question: 'ISNONTEXT vs ISTEXT — how do they relate?',
+    answer: 'They always return opposite results for the same input — ISNONTEXT(x) is identical to NOT(ISTEXT(x)). A cell can only ever satisfy one of the two, never both and never neither.',
+  },
+  {
+    question: 'Does ISNONTEXT return TRUE for a blank cell?',
+    answer: "Yes — a blank cell is not text, so ISNONTEXT treats it as TRUE, the same way ISTEXT treats it as FALSE. Neither function distinguishes a blank from any other non-text value on its own.",
+  },
+  {
+    question: 'Is ISNONTEXT the same as ISNUMBER?',
+    answer: "No — ISNONTEXT is TRUE for anything that isn't text, which includes blanks, logical values, and errors, not just numbers. Use ISNUMBER directly if the goal is specifically to test for a number.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISNONTEXT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISNONTEXT(A2), "Not text", "Text")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    If VarType(Range("A2").Value) <> vbString Then
+      Range("B2").Value = "Not text"
+    Else
+      Range("B2").Value = "Text"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    is_nontext = ~df["A"].apply(lambda x: isinstance(x, str))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISTEXT](/docs/info/istext) — the direct opposite test.
+- [ISNUMBER](/docs/info/isnumber) — a more specific test for
+  numeric values only.
+- [ISBLANK](/docs/info/isblank) — tests for emptiness specifically,
+  rather than "not text" generally.

@@ -1,0 +1,141 @@
+---
+title: SHEETS
+description: Return the number of sheets in a reference or the whole workbook, including hidden sheets.
+---
+
+Return the **number of sheets** in a reference — or, with no
+argument at all, the total number of sheets in the entire workbook.
+Counts every sheet, including hidden and very hidden ones.
+
+export const quickAnswerFacts = [
+  { text: 'reference is optional — omit it to count every sheet in the whole workbook', type: 'check' },
+  { text: 'Counts hidden and very hidden sheets too, not just visible ones', type: 'check' },
+  { text: 'Can count a 3D span: SHEETS(Sheet1:Sheet3!A1) returns 3', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SHEETS([reference])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SHEETS([reference])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'any',
+    required: false,
+    description: 'A reference to count sheets within. Omit it to count every sheet in the entire workbook.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of sheets in `reference` — or, if omitted, the total
+number of sheets in the whole workbook, including hidden and very
+hidden worksheets, plus macro, chart, and dialog sheets.
+
+## Description
+
+SHEETS is most useful with a **3D reference** — a span across
+multiple sheet tabs, like `Sheet1:Sheet3!A1` — where it returns how
+many sheets that span actually covers (`3`, for a `Sheet1:Sheet3`
+span). With no argument, it's a quick way to get the workbook's
+total sheet count without manually counting tabs, which is easy to
+get wrong once hidden sheets are involved.
+
+<Callout type="warn">
+  Because this result depends on the live structure of the actual
+  workbook it runs in (how many sheets exist, which are hidden), it
+  can't be demonstrated with a fixed example the way a pure
+  calculation can — the "Try it" widget used elsewhere on this site
+  doesn't apply here.
+</Callout>
+
+## Common errors
+
+### #REF! — an invalid reference
+
+<ExcelCode>{`SHEETS(NotARealReference) → #REF!`}</ExcelCode>
+
+A reference argument that doesn't resolve to anything real returns
+`#REF!`.
+
+### Expecting SHEETS to exclude hidden sheets
+
+<ExcelCode>{`SHEETS() → includes every hidden and very hidden sheet, not just the visible tabs`}</ExcelCode>
+
+If only the *visible* tab count is needed, SHEETS alone can't filter
+that out — a different approach (like VBA, since there's no
+worksheet-formula way to test visibility per sheet) is needed.
+
+export const faqs = [
+  {
+    question: 'What does SHEETS() with no argument return?',
+    answer: "The total number of sheets in the entire workbook — including hidden and very hidden worksheets, and macro, chart, and dialog sheets, not just the visible tabs.",
+  },
+  {
+    question: 'What is a 3D reference, and why does SHEETS care about it?',
+    answer: 'A 3D reference spans a range of sheet tabs, like Sheet1:Sheet3!A1. SHEETS(Sheet1:Sheet3!A1) returns 3 — the number of sheets that span covers — which is its most distinctive use beyond just counting the whole workbook.',
+  },
+  {
+    question: 'Does SHEETS count hidden sheets?',
+    answer: 'Yes — like SHEET, it counts every sheet type Excel tracks internally, whether or not it is currently visible to the user.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SHEETS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SHEETS()`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sheetCount As Long
+    sheetCount = ThisWorkbook.Sheets.Count ' VBA's own direct equivalent to SHEETS() with no argument
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import openpyxl
+
+    wb = openpyxl.load_workbook("workbook.xlsx")
+    sheet_count = len(wb.sheetnames)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SHEET](/docs/info/sheet) — finds a single sheet's position,
+  instead of counting how many there are.
+- [CELL](/docs/info/cell) — returns other information about a
+  reference.
+- [COUNTA](/docs/math/counta) — the general-purpose counting
+  function, for counting non-blank cells rather than sheets.

@@ -1,0 +1,152 @@
+---
+title: ISOMITTED
+description: Inside a LAMBDA, test whether an optional argument was left out when it was called.
+---
+
+Inside a [LAMBDA](/docs/custom-functions/lambda), test whether an
+**optional argument was left out** at call time. Pairs with
+`[brackets]` around a LAMBDA parameter name, which is how a
+parameter is marked optional in the first place.
+
+export const quickAnswerFacts = [
+  { text: 'Only makes sense inside a LAMBDA, testing one of its own parameters', type: 'warn' },
+  { text: 'The parameter being tested must be wrapped in [brackets] in the LAMBDA signature to be optional at all', type: 'warn' },
+  { text: 'Requires Excel 365 or Excel 2024 — not available in the 2016/2019/2021 perpetual releases', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISOMITTED(argument)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISOMITTED(argument)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'argument',
+    type: 'any',
+    required: true,
+    description: "The name of a parameter defined in the enclosing LAMBDA's own parameter list.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `argument` was not supplied when the enclosing LAMBDA was
+called. `FALSE` if it was supplied — even if the supplied value
+happens to be `0`, blank, or anything else that might otherwise look
+like "nothing was passed."
+
+## Description
+
+Making a LAMBDA parameter optional means wrapping its name in
+`[brackets]` in the LAMBDA's own parameter list — `LAMBDA(a, [b],
+...)` makes `b` optional while `a` stays required. ISOMITTED is the
+only way to detect, from inside the LAMBDA's own calculation, whether
+that optional `b` was actually provided on a given call:
+
+<ExcelCode>{`=LAMBDA(a, [b], IF(ISOMITTED(b), a+10, a+b))(5)    → 15
+=LAMBDA(a, [b], IF(ISOMITTED(b), a+10, a+b))(5, 20) → 25`}</ExcelCode>
+
+<Callout type="warn">
+  **ISOMITTED checks whether an argument was passed, not whether its
+  value is "empty" in some other sense.** `ISOMITTED(b)` is `FALSE`
+  if the caller explicitly passed `0`, an empty string, or `FALSE`
+  for `b` — only genuinely leaving `b` out of the call makes
+  `ISOMITTED(b)` `TRUE`.
+</Callout>
+
+## Common errors
+
+### Using ISOMITTED outside a LAMBDA
+
+<ExcelCode>{`=ISOMITTED(A1) → not meaningful outside a LAMBDA's own parameter list`}</ExcelCode>
+
+ISOMITTED is designed specifically to test a LAMBDA's own named
+parameter from inside that LAMBDA's calculation — it isn't a
+general-purpose "is this blank" test for an ordinary cell reference
+(use [ISBLANK](/docs/info/isblank) for that instead).
+
+### Forgetting to mark the parameter optional with brackets
+
+<ExcelCode>{`LAMBDA(a, b, IF(ISOMITTED(b), a+10, a+b)) → calling with just one argument fails before ISOMITTED ever runs`}</ExcelCode>
+
+Without `[b]` in brackets, `b` is a required parameter — omitting it
+at call time fails the call itself, and ISOMITTED never gets a
+chance to evaluate it.
+
+export const faqs = [
+  {
+    question: 'Does ISOMITTED(b) return TRUE if b was explicitly passed as 0?',
+    answer: "No — ISOMITTED only checks whether the argument was supplied at all, not whether its value is 0, blank, or otherwise 'empty.' An explicit 0 still counts as supplied, so ISOMITTED returns FALSE.",
+  },
+  {
+    question: 'How do I make a LAMBDA parameter optional in the first place?',
+    answer: 'Wrap its name in square brackets in the LAMBDA\'s own parameter list — LAMBDA(a, [b], calculation) makes b optional while a stays required. Without the brackets, every parameter must be supplied on every call.',
+  },
+  {
+    question: 'Can I use ISOMITTED outside of a LAMBDA?',
+    answer: "It's designed specifically to test a LAMBDA's own parameter from inside that LAMBDA's calculation. It isn't a general-purpose blank-cell test — use ISBLANK for an ordinary cell reference instead.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISOMITTED from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LAMBDA(a, [b], IF(ISOMITTED(b), a+10, a+b))(5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA's own direct equivalent: an Optional parameter, tested with IsMissing
+    Function AddOrDefault(a As Double, Optional b As Variant) As Double
+      If IsMissing(b) Then
+        AddOrDefault = a + 10
+      Else
+        AddOrDefault = a + b
+      End If
+    End Function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def add_or_default(a, b=None):
+        return a + 10 if b is None else a + b
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LAMBDA](/docs/custom-functions/lambda) — the function ISOMITTED
+  exists specifically to work inside.
+- [ISBLANK](/docs/info/isblank) — the general-purpose "is this
+  empty" test for an ordinary cell, as opposed to a LAMBDA parameter.
+- [IFERROR](/docs/logical/iferror) — another common way to supply a
+  fallback, for cases outside a LAMBDA's own optional-parameter
+  system.

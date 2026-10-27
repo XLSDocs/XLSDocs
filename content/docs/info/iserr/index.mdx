@@ -1,0 +1,159 @@
+---
+title: ISERR
+description: Test whether a value is any Excel error except #N/A.
+---
+
+Test whether a formula's result is an error — but unlike
+[ISERROR](/docs/info/iserror), **not** `#N/A` specifically. Useful
+when a missing-lookup `#N/A` should be handled separately from every
+other kind of error.
+
+export const quickAnswerFacts = [
+  { text: 'TRUE for #VALUE!, #REF!, #DIV/0!, #NAME?, #NUM!, #NULL! — but NOT #N/A', type: 'warn' },
+  { text: 'For #N/A specifically, use ISNA instead', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ISERR(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISERR(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The cell, value, or formula result to test.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`TRUE` if `value` is any error **except** `#N/A` — `#VALUE!`,
+`#REF!`, `#DIV/0!`, `#NAME?`, `#NUM!`, or `#NULL!`. `FALSE` for
+everything else, including `#N/A` itself.
+
+## Description
+
+ISERR is ISERROR's narrower sibling: it catches every error type
+*except* `#N/A`. The split exists because `#N/A` usually means
+something different from the other six errors — it's the standard
+signal for "no match found" from a lookup function, which is often
+an expected, handleable outcome, not a broken formula the way
+`#REF!` or `#DIV/0!` usually is.
+
+<Callout type="warn">
+  **ISERR(#N/A) is FALSE** — the one case it deliberately excludes.
+  If the goal is to catch every error type without exception, use
+  [ISERROR](/docs/info/iserror) instead; ISERR exists specifically
+  for when `#N/A` needs different handling from everything else.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'divide by zero': 'TRUE', 'missing lookup': 'FALSE', 'normal number': 'FALSE' }}
+  defaultValue="missing lookup"
+  label={'Live preview — =ISERR({value})'}
+  fieldLabel="value"
+  errorValue="(try one of the examples below)"
+/>
+
+"Missing lookup" (an `#N/A` error) returns `FALSE` here — the one
+scenario ISERR treats differently from ISERROR, which would return
+`TRUE` for all three.
+
+## Common errors
+
+### Expecting ISERR to catch #N/A like ISERROR does
+
+<ExcelCode>{`ISERR(NA()) → FALSE (ISERROR(NA()) would return TRUE instead)`}</ExcelCode>
+
+This is ISERR's defining behavior, not a bug — it's built to treat
+`#N/A` as a separate case from every other error type.
+
+### Using ISERR when ISNA is what's actually needed
+
+<ExcelCode>{`ISERR(VLOOKUP(...)) → FALSE even when the lookup genuinely fails with #N/A`}</ExcelCode>
+
+If the goal is specifically to detect a failed lookup, use
+[ISNA](/docs/info/isna) — ISERR will never flag it.
+
+export const faqs = [
+  {
+    question: 'ISERR vs ISERROR — what exactly is the difference?',
+    answer: 'ISERROR catches every error type, including #N/A. ISERR catches every error type except #N/A — it returns FALSE specifically for that one error, where ISERROR would return TRUE.',
+  },
+  {
+    question: 'When would I actually want ISERR instead of ISERROR?',
+    answer: "When #N/A needs to be treated as a separate, expected case (like a lookup that legitimately found no match) while every other error type (a genuine formula mistake) still gets caught. ISERROR lumps all seven error types together; ISERR deliberately leaves one out.",
+  },
+  {
+    question: 'How do I test for #N/A specifically?',
+    answer: 'Use ISNA(value) — it does the opposite split from ISERR, catching only #N/A and nothing else.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISERR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(ISERR(A2/B2), "Bad formula", A2/B2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA's IsError matches ISERROR, not ISERR — it has no built-in #N/A exclusion
+    Dim cellValue As Variant
+    cellValue = Range("A2").Value
+    If IsError(cellValue) And cellValue <> CVErr(xlErrNA) Then
+      Range("C2").Value = "Bad formula"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    # pandas reads Excel error cells as the literal error string
+    is_err = df["A"].astype(str).str.startswith("#") & (df["A"] != "#N/A")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISERROR](/docs/info/iserror) — the broader version, catches
+  every error type including `#N/A`.
+- [ISNA](/docs/info/isna) — the complementary test, catches only
+  `#N/A`.
+- [IFERROR](/docs/logical/iferror) and [IFNA](/docs/logical/ifna) —
+  the modern fallback-value shortcuts built on this same split.

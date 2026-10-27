@@ -1,0 +1,144 @@
+---
+title: INFO
+description: Return information about the current operating environment — OS, Excel version, and calculation mode.
+---
+
+Return information about the current **operating environment** —
+which OS Excel is running on, which version of Excel, and whether
+calculation is set to automatic or manual. Not available in Excel
+for the web.
+
+export const quickAnswerFacts = [
+  { text: 'Not available in Excel for the web', type: 'warn' },
+  { text: '"osversion", "release", "system", and "recalc" are the type_text values still supported', type: 'check' },
+  { text: 'The old memory-related type_text values ("memavail", "memused", "totmem") now return #N/A', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=INFO(type_text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=INFO(type_text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'type_text',
+    type: 'text',
+    required: true,
+    description: 'Which piece of environment information to return: "system", "osversion", "release", or "recalc".',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+Depends on `type_text`: `"system"` returns `"mac"` or `"pcdos"`;
+`"osversion"` returns the operating system version as text;
+`"release"` returns the Excel version as text; `"recalc"` returns
+`"Automatic"` or `"Manual"`. The retired memory-related values
+(`"memavail"`, `"memused"`, `"totmem"`) now return `#N/A`.
+
+## Description
+
+INFO exposes a handful of facts about the environment the workbook
+is currently running in — useful for a formula or diagnostic sheet
+that needs to confirm the platform, version, or calculation mode
+rather than assume one. Several `type_text` values that reported
+memory usage in much older Excel versions ("memavail", "memused",
+"totmem") are no longer supported and return `#N/A` today, even
+though they may still appear in documentation written for older
+versions.
+
+<Callout type="warn">
+  Because this result depends on the live environment it runs in
+  (which OS, which Excel version, the current calculation setting),
+  it can't be demonstrated with a fixed example the way a pure
+  calculation can — the "Try it" widget used elsewhere on this site
+  doesn't apply here.
+</Callout>
+
+## Common errors
+
+### #N/A — a retired memory-related type_text value
+
+<ExcelCode>{`INFO("memavail") → #N/A (no longer supported)`}</ExcelCode>
+
+Older documentation or workbooks built in much earlier Excel
+versions may reference `"memavail"`, `"memused"`, or `"totmem"` —
+all three now return `#N/A` in current Excel.
+
+### Expecting INFO to work in Excel for the web
+
+<ExcelCode>{`INFO is not available in Excel for the web at all`}</ExcelCode>
+
+A workbook using INFO that's opened in a browser rather than the
+desktop app will show an error wherever INFO is used.
+
+export const faqs = [
+  {
+    question: 'What type_text values does INFO still support?',
+    answer: '"system" (operating system), "osversion" (OS version text), "release" (Excel version text), and "recalc" (Automatic or Manual calculation mode). Older memory-related values are retired and return #N/A.',
+  },
+  {
+    question: 'Does INFO work in Excel for the web?',
+    answer: "No — INFO is one of the functions Microsoft explicitly documents as unavailable in Excel for the web. A workbook that uses it will error wherever it's referenced when opened in a browser.",
+  },
+  {
+    question: 'What does INFO("system") actually return?',
+    answer: '"mac" on macOS, or "pcdos" on Windows — a coarse platform check, not a detailed OS version (use "osversion" for that level of detail).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with INFO from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=INFO("system")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim osName As String
+    osName = Application.OperatingSystem ' VBA's own equivalent to INFO("system")/("osversion")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import platform
+
+    os_name = platform.system()  # the closest Python equivalent, outside of any Excel file at all
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CELL](/docs/info/cell) — returns information about a specific
+  reference, rather than the overall environment.
+- [SHEET](/docs/info/sheet) and [SHEETS](/docs/info/sheets) —
+  workbook-structure information, a narrower counterpart to INFO's
+  system-wide scope.

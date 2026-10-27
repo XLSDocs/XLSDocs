@@ -1,0 +1,143 @@
+---
+title: SHEET
+description: Return the sheet number of a named sheet or a reference, including hidden sheets.
+---
+
+Return the **sheet number** of a named sheet or a reference — or,
+with no argument at all, the number of the sheet the formula itself
+lives on. Counts every sheet in the workbook, including hidden and
+very hidden ones.
+
+export const quickAnswerFacts = [
+  { text: 'value is optional — omit it to get the current sheet\'s own number', type: 'check' },
+  { text: 'Counts hidden and very hidden sheets too, not just visible ones', type: 'check' },
+  { text: 'An invalid sheet name returns #N/A; an invalid reference returns #REF!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SHEET([value])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SHEET([value])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: false,
+    description: 'A sheet name (as text) or a reference. Omit it to get the number of the sheet the formula is on.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The 1-based position of the named sheet or referenced sheet within
+the workbook's full sheet order — including hidden and very hidden
+worksheets, and macro, chart, and dialog sheets.
+
+## Description
+
+SHEET is mainly useful for building a formula that needs to know its
+own position, or another sheet's position, within the workbook —
+for example, numbering a set of monthly tabs in the order they
+actually appear, or confirming a sheet exists before referencing it
+elsewhere. Unlike a simple visible-tab count, SHEET's numbering
+includes every sheet type Excel tracks internally, whether or not
+it's currently visible.
+
+<Callout type="warn">
+  Because this result depends on the live structure of the actual
+  workbook it runs in (which sheets exist, in what order, which are
+  hidden), it can't be demonstrated with a fixed example the way a
+  pure calculation can — the "Try it" widget used elsewhere on this
+  site doesn't apply here.
+</Callout>
+
+## Common errors
+
+### #N/A — a sheet name that doesn't exist
+
+<ExcelCode>{`SHEET("NoSuchSheet") → #N/A`}</ExcelCode>
+
+A text argument that doesn't match any real sheet name in the
+workbook returns `#N/A`, not `#REF!`.
+
+### #REF! — a broken reference
+
+<ExcelCode>{`SHEET(Sheet1!#REF) → #REF!`}</ExcelCode>
+
+An actual (not text-based) reference that's broken returns `#REF!`
+instead — the two invalid-input cases use different error types.
+
+export const faqs = [
+  {
+    question: 'What does SHEET() with no argument return?',
+    answer: "The number of the sheet containing the SHEET formula itself — useful for a formula that needs to know its own position in the workbook without hardcoding it.",
+  },
+  {
+    question: 'Does SHEET count hidden sheets?',
+    answer: 'Yes — SHEET numbers every sheet in the workbook, including hidden and very hidden worksheets, plus macro, chart, and dialog sheets, not just the visible tabs.',
+  },
+  {
+    question: 'Why do an invalid sheet name and an invalid reference return different errors?',
+    answer: "A text argument that doesn't match any sheet name returns #N/A (nothing found by that name), while an actual broken cell/range reference returns #REF! (the reference itself is invalid) — they represent different kinds of failure.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SHEET from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SHEET()`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim sheetNumber As Long
+    sheetNumber = ActiveSheet.Index ' VBA's own direct equivalent to SHEET() with no argument
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import openpyxl
+
+    wb = openpyxl.load_workbook("workbook.xlsx")
+    sheet_number = wb.sheetnames.index("Sheet1") + 1  # 1-based, matching Excel's SHEET
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SHEETS](/docs/info/sheets) — counts the total number of sheets
+  in a reference or the whole workbook, instead of finding one
+  sheet's position.
+- [CELL](/docs/info/cell) — returns other information about a
+  reference, such as its address or formatting.
+- [ISREF](/docs/info/isref) — confirms a value is a valid reference
+  before passing it into SHEET.

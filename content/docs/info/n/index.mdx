@@ -1,0 +1,153 @@
+---
+title: N
+description: Convert a value to a number, following Excel's fixed conversion rules.
+---
+
+Convert a value to a number — but not by *parsing* text the way
+[VALUE](/docs/text/value) does. N follows a fixed, narrow set of
+conversion rules: numbers pass through unchanged, `TRUE`/`FALSE`
+become `1`/`0`, dates become their serial number, and **text becomes
+`0`**, not a parsed number.
+
+export const quickAnswerFacts = [
+  { text: 'N("7") returns 0 — text is NOT parsed into a number, unlike VALUE', type: 'warn' },
+  { text: 'TRUE becomes 1, FALSE becomes 0', type: 'check' },
+  { text: 'Exists mainly for compatibility with other spreadsheet programs', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=N(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=N(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The value to convert.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A number, following these rules: a number returns unchanged; `TRUE`
+returns `1`; `FALSE` returns `0`; a date returns its serial number;
+**any text returns `0`**, regardless of whether it looks numeric; an
+error value passes through as that same error.
+
+## Description
+
+N is easy to confuse with [VALUE](/docs/text/value), but they do
+very different things with text. VALUE actually parses a numeric-
+looking string (`"7"` becomes the number `7`). N does not parse text
+at all — any text input, numeric-looking or not, simply becomes `0`.
+Microsoft documents N as existing mainly for compatibility with
+other spreadsheet programs that require an explicit conversion
+function; Excel itself usually converts values automatically where
+needed, without N being necessary.
+
+<Callout type="warn">
+  **N does not parse numeric text — it discards it.** `N("7")`
+  returns `0`, not `7`. Reaching for N expecting VALUE's behavior is
+  a common mix-up between the two; use VALUE directly whenever text
+  needs to become the number it represents.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '7': '7', 'true': '1', '"7" (text)': '0' }}
+  defaultValue="7"
+  label={'Live preview — =N({value})'}
+  fieldLabel="value"
+/>
+
+Notice the text `"7"` converts to `0`, not `7` — the key difference
+from VALUE, which would correctly parse it.
+
+## Common errors
+
+### Expecting N to parse numeric text like VALUE does
+
+<ExcelCode>{`N("42") → 0, not 42 — use VALUE("42") instead for actual parsing`}</ExcelCode>
+
+N only converts a fixed set of non-text types; text always becomes
+`0` regardless of its content.
+
+### Using N where it adds nothing
+
+<ExcelCode>{`N(A2) → the same number A2 already holds, if A2 is already numeric`}</ExcelCode>
+
+For an already-numeric cell, N is a no-op — Excel uses the number
+directly in arithmetic without needing N to convert it first.
+
+export const faqs = [
+  {
+    question: 'N vs VALUE — what is the actual difference?',
+    answer: 'VALUE parses a text string that represents a number into that actual number — VALUE("7") returns 7. N does not parse text at all — N("7") returns 0, treating any text input as non-numeric regardless of its content.',
+  },
+  {
+    question: 'Why would N(TRUE) return 1?',
+    answer: "N follows Excel's standard logical-to-number convention: TRUE converts to 1 and FALSE converts to 0, the same mapping used anywhere a logical value is coerced to a number (such as with the -- operator).",
+  },
+  {
+    question: 'Is N ever necessary in a modern formula?',
+    answer: "Rarely — Microsoft documents it as existing mainly for compatibility with other spreadsheet programs. Excel automatically converts values as needed in most formulas without N being required.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with N from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=N(TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = CDbl(True) ' VBA's own TRUE converts to -1, not 1 — a real difference from Excel's N
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = int(True)  # 1, matching Excel's N(TRUE) rather than VBA's convention
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VALUE](/docs/text/value) — actually parses numeric text into a
+  number, unlike N.
+- [ISNUMBER](/docs/info/isnumber) — tests whether a value is
+  already numeric, before deciding if a conversion is needed at all.
+- [ISTEXT](/docs/info/istext) — tests whether a value is text, the
+  type N specifically refuses to parse.
