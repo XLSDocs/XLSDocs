@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-27',
+    title: 'TRUE, FALSE, and 9 more — closing the Logical and Info category gaps',
+    description:
+      "TRUE and FALSE round out the Logical category — both take no arguments and exist mainly for compatibility with other spreadsheet programs. The Info category gets ISERR, ISNONTEXT, ISREF, N, ERROR.TYPE, SHEET, SHEETS, and INFO; ISOMITTED (for optional LAMBDA parameters) is filed under Custom Functions instead, alongside LAMBDA itself. SHEET, SHEETS, and INFO depend on the live workbook or OS, so their pages skip the usual interactive example.",
+    tags: ['New functions'],
+  },
+  {
     date: '2026-10-26',
     title: '23 trigonometric functions, from SIN to ACOTH — the Math category finally has trig',
     description:
