@@ -1,0 +1,128 @@
+---
+title: "FALSE"
+description: Return the logical value FALSE, with no arguments — kept mainly for compatibility with other spreadsheet programs.
+---
+
+Return the logical value **FALSE**, with no arguments needed. Typing
+the bare word `FALSE` directly into a cell or formula does exactly
+the same thing — this function exists mainly for compatibility with
+other spreadsheet programs that require it to be called explicitly.
+
+export const quickAnswerFacts = [
+  { text: 'FALSE() and just typing FALSE produce the identical logical value', type: 'check' },
+  { text: 'Exists mainly for compatibility with other spreadsheet programs', type: 'check' },
+  { text: 'Takes no arguments — the parentheses are still required', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FALSE()'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FALSE()`}</ExcelCode>
+
+## Parameters
+
+FALSE takes no arguments — the parentheses are still required, but
+always empty.
+
+## Return value
+
+The logical value `FALSE`.
+
+## Description
+
+FALSE() and the bare word `FALSE` typed directly into a formula are
+completely interchangeable — `=IF(A1=1,FALSE())` and
+`=IF(A1=1,FALSE)` do exactly the same thing. Microsoft documents the
+function as existing mainly for compatibility with spreadsheet files
+imported from other programs that require logical values to be
+produced by an explicit function call rather than a bare keyword.
+
+<Callout type="idea">
+  There's essentially no reason to type `FALSE()` in a new formula —
+  just type `FALSE` directly. The function form only really matters
+  when working with a file or template that already uses it, or
+  when compatibility with another spreadsheet program's stricter
+  syntax is a concern.
+</Callout>
+
+## Common errors
+
+### Assuming FALSE() behaves differently from the bare keyword
+
+<ExcelCode>{`IF(FALSE(), "yes", "no") → "no" — identical to IF(FALSE, "yes", "no")`}</ExcelCode>
+
+There's no behavioral difference between the two forms anywhere in
+Excel — one isn't more "official" or safer than the other.
+
+### Forgetting the parentheses
+
+<ExcelCode>{`=FALSE → still works, but is actually the bare keyword, not a call to this function`}</ExcelCode>
+
+Without the parentheses, `FALSE` is read as the logical constant
+directly, not as a function call — the result is the same either
+way, but it's worth knowing which one is actually being written.
+
+export const faqs = [
+  {
+    question: "What's the difference between FALSE() and just typing FALSE?",
+    answer: "There is no behavioral difference — both produce the identical logical value. FALSE() exists mainly for compatibility with other spreadsheet programs that expect logical values to come from an explicit function call.",
+  },
+  {
+    question: 'Is there any reason to use FALSE() in a new formula?',
+    answer: "Rarely — typing FALSE directly is simpler and does the same thing. FALSE() mostly matters when working with an imported file or template that already relies on the function form, or for compatibility with another spreadsheet program.",
+  },
+  {
+    question: 'Does FALSE() ever return something other than FALSE?',
+    answer: 'No — it always returns exactly the logical value FALSE, unconditionally, with no arguments that could change its result.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FALSE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IF(A1=1, TRUE(), FALSE())`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Boolean
+    result = False ' VBA's own native Boolean literal — no function call needed
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = False
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TRUE](/docs/logical/true) — the counterpart function, same
+  compatibility-only role.
+- [IF](/docs/logical/if) — the function TRUE/FALSE results most
+  commonly feed into or come out of.
+- [NOT](/docs/logical/not) — flips a FALSE to TRUE or back.
