@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-28',
+    title: 'The Lookup category is complete: AREAS, EXPAND, GROUPBY, PIVOTBY, IMAGE, and 5 more',
+    description:
+      "Ten functions across two rounds close out a fresh gap-check against Microsoft's own category listing. AREAS, EXPAND, FORMULATEXT, WRAPCOLS, WRAPROWS, and TRIMRANGE handle references and array reshaping. GROUPBY and PIVOTBY bring one- and two-dimensional PivotTable-style aggregation directly into a formula. IMAGE embeds a web image as a genuine cell value instead of a floating picture. RTD and STOCKHISTORY round it out as this site's two live-external-data lookup functions — real-time via an installed add-in, or historical stock prices built in.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-10-27',
     title: 'TRUE, FALSE, and 9 more — closing the Logical and Info category gaps',
     description:
