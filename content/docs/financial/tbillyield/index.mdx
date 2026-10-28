@@ -1,0 +1,157 @@
+---
+title: TBILLYIELD
+description: Calculate the yield of a Treasury bill from its price.
+---
+
+Calculate a Treasury bill's **yield** from its price — the reverse
+direction of [TBILLPRICE](/docs/financial/tbillprice), turning a
+known purchase price back into the investment return rate it
+implies.
+
+export const quickAnswerFacts = [
+  { text: 'pr ≤ 0 returns #NUM!; settlement on/after maturity, or maturity more than a year out, also returns #NUM!', type: 'warn' },
+  { text: 'pr is the price per $100 face value, matching TBILLPRICE\'s own output', type: 'check' },
+  { text: 'Uses a 360-day year, the standard money-market convention', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TBILLYIELD(settlement, maturity, pr)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TBILLYIELD(settlement, maturity, pr)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The purchase (settlement) date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: "The bill's maturity date. Must be within one year of settlement.",
+  },
+  {
+    name: 'pr',
+    type: 'number',
+    required: true,
+    description: 'The price per $100 face value.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The yield implied by `pr` — equal to `(100-pr)/pr * (360/DSM)`,
+where DSM is the number of days between `settlement` and `maturity`.
+
+## Description
+
+TBILLYIELD answers the question TBILLPRICE doesn't: given what was
+actually paid for a T-bill, what return does that price represent?
+It's the natural companion function — TBILLPRICE goes from a quoted
+discount rate to a price, TBILLYIELD goes from a price back to the
+investment yield that price implies (a subtly different number from
+the original discount rate, since yield is measured against the
+*price paid*, not the face value).
+
+<ExcelCode>{`=TBILLYIELD("3/31/2008", "6/1/2008", 98.45) → 0.0914, or 9.14%`}</ExcelCode>
+
+<Callout type="idea">
+  **TBILLYIELD's result isn't the same number as the discount rate
+  that produced the price.** Discount rate is calculated against
+  face value ($100); yield is calculated against the actual price
+  paid (less than $100) — since the price paid is smaller than face
+  value, the yield is always slightly *higher* than the discount
+  rate that produced it.
+</Callout>
+
+## Common errors
+
+### #NUM! — a non-positive price
+
+<ExcelCode>{`TBILLYIELD("3/31/2008", "6/1/2008", 0) → #NUM!`}</ExcelCode>
+
+`pr` must be strictly greater than `0`.
+
+### Confusing TBILLYIELD's result with the original discount rate
+
+<ExcelCode>{`A 9% discount rate produces a price that yields slightly more than 9% when run back through TBILLYIELD`}</ExcelCode>
+
+The two numbers are related but genuinely different — discount rate
+is against face value, yield is against the price actually paid.
+
+export const faqs = [
+  {
+    question: 'Why is TBILLYIELD\'s result different from the discount rate that set the price?',
+    answer: 'Discount rate is calculated as a percentage of face value ($100). Yield is calculated as a percentage of the actual (lower) price paid. Since the denominator is smaller for yield, the yield percentage always comes out a bit higher than the original discount rate.',
+  },
+  {
+    question: 'What does pr represent?',
+    answer: "The price per $100 of face value — the same number TBILLPRICE returns. If a specific holding's actual purchase price is known instead, scale it to a per-$100 basis first: pr = (price paid / face value) * 100.",
+  },
+  {
+    question: 'How is TBILLYIELD different from TBILLEQ?',
+    answer: "TBILLYIELD computes a T-bill's own money-market yield (360-day basis) from its price. TBILLEQ instead converts a T-bill's discount rate into a bond-equivalent yield (365-day basis), specifically for comparing it against a coupon-paying bond.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TBILLYIELD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TBILLYIELD("3/31/2008", "6/1/2008", 98.45)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.TBillYield(DateSerial(2008, 3, 31), DateSerial(2008, 6, 1), 98.45)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def tbillyield(settlement, maturity, pr):
+        dsm = (maturity - settlement).days
+        return (100 - pr) / pr * (360 / dsm)
+
+    result = tbillyield(date(2008, 3, 31), date(2008, 6, 1), 98.45)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TBILLPRICE](/docs/financial/tbillprice) — the inverse direction,
+  computing price from a known discount rate.
+- [TBILLEQ](/docs/financial/tbilleq) — a bond-equivalent yield
+  computed from the discount rate directly, for comparing against a
+  coupon-paying bond.

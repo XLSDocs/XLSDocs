@@ -1,0 +1,154 @@
+---
+title: TBILLPRICE
+description: Calculate the price per $100 face value of a Treasury bill, from its discount rate.
+---
+
+Calculate the **price per $100 face value** of a Treasury bill,
+given its discount rate — T-bills are sold at a discount to face
+value rather than paying periodic interest, so the "price" itself is
+the calculation of interest here.
+
+export const quickAnswerFacts = [
+  { text: 'discount ≤ 0 returns #NUM!; settlement after maturity, or maturity more than a year out, also returns #NUM!', type: 'warn' },
+  { text: 'Result is per $100 face value, not a dollar price for a specific holding', type: 'check' },
+  { text: 'Uses a 360-day year, the standard T-bill convention', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TBILLPRICE(settlement, maturity, discount)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TBILLPRICE(settlement, maturity, discount)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The purchase (settlement) date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: "The bill's maturity date. Must be within one year of settlement.",
+  },
+  {
+    name: 'discount',
+    type: 'number',
+    required: true,
+    description: "The bill's discount rate.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The price per $100 of face value — equal to `100 * (1 - discount * DSM/360)`, where DSM is the
+number of days between `settlement` and `maturity`.
+
+## Description
+
+Unlike a bond, a Treasury bill pays no periodic interest — it's sold
+below its face value and matures at full face value, with the
+discount *being* the investor's return. TBILLPRICE converts the
+quoted discount rate into the actual price an investor pays per $100
+of face value.
+
+<ExcelCode>{`=TBILLPRICE("3/31/2008", "6/1/2008", 0.09) → 98.45 (a 62-day bill at a 9% discount rate)`}</ExcelCode>
+
+<Callout type="idea">
+  TBILLPRICE uses a **360-day year** for the day count, the standard
+  money-market convention for Treasury bills — not the 365-day year
+  ordinary calendar math would suggest.
+</Callout>
+
+## Common errors
+
+### #NUM! — a non-positive discount rate
+
+<ExcelCode>{`TBILLPRICE("3/31/2008", "6/1/2008", 0) → #NUM!`}</ExcelCode>
+
+`discount` must be strictly greater than `0`.
+
+### #NUM! — maturity more than a year past settlement
+
+<ExcelCode>{`TBILLPRICE("1/1/2024", "6/1/2025", 0.05) → #NUM! (more than 1 year between the dates)`}</ExcelCode>
+
+Treasury bills mature within a year of issue by definition — a
+longer span isn't a valid T-bill and returns `#NUM!`.
+
+export const faqs = [
+  {
+    question: 'Why is the result "per $100 face value" instead of a dollar price?',
+    answer: "This is the standard way bond and bill prices are quoted — as a price per $100 of face value, regardless of the actual size of the holding. Multiply by (face value / 100) to get the actual dollar price for a specific holding.",
+  },
+  {
+    question: 'Why does TBILLPRICE use a 360-day year?',
+    answer: "It's the standard money-market day-count convention for Treasury bills and similar short-term instruments — a holdover from traditional banking practice, not a mistake or rounding shortcut.",
+  },
+  {
+    question: 'How do I go the other direction — find the discount rate from a known price?',
+    answer: 'There\'s no direct "reverse TBILLPRICE" function, but TBILLYIELD(settlement, maturity, pr) computes the equivalent investment yield from a known price, which is the more commonly needed reverse calculation.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TBILLPRICE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TBILLPRICE("3/31/2008", "6/1/2008", 0.09)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.TBillPrice(DateSerial(2008, 3, 31), DateSerial(2008, 6, 1), 0.09)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def tbillprice(settlement, maturity, discount):
+        dsm = (maturity - settlement).days
+        return 100 * (1 - discount * dsm / 360)
+
+    result = tbillprice(date(2008, 3, 31), date(2008, 6, 1), 0.09)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TBILLYIELD](/docs/financial/tbillyield) — the inverse direction,
+  computing yield from a known price.
+- [TBILLEQ](/docs/financial/tbilleq) — converts the same discount
+  rate into a bond-equivalent yield, for comparing a T-bill against
+  a coupon-paying bond.
+- [RATE](/docs/financial/rate) — the general-purpose rate-solving
+  function, useful when the investment isn't shaped like a T-bill.
