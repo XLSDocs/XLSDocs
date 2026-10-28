@@ -1,0 +1,151 @@
+---
+title: AREAS
+description: Return the number of separate areas in a reference.
+---
+
+Return the number of separate **areas** in a reference — where an
+area is one contiguous block of cells. A single cell or range is
+always one area; a reference deliberately built from several
+disconnected pieces can have more.
+
+export const quickAnswerFacts = [
+  { text: 'A single cell or contiguous range is always 1 area', type: 'check' },
+  { text: 'A multi-area reference needs an extra set of parentheses: AREAS((A1:B2,C3,D4:E6))', type: 'warn' },
+  { text: 'Rarely needed outside formulas that deliberately build multi-area references', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=AREAS(reference)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AREAS(reference)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'range',
+    required: true,
+    description: 'A reference to one or more ranges. A multi-area reference needs an extra pair of parentheses.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of contiguous blocks (areas) `reference` is made of —
+`1` for an ordinary single range, more for a reference deliberately
+built from several disconnected pieces separated by commas.
+
+## Description
+
+Most references in everyday Excel use are a single contiguous
+block, so AREAS almost always returns `1`. It only becomes
+interesting with a *union* reference — several separate ranges
+combined into one, written with commas and wrapped in an extra pair
+of parentheses so Excel doesn't read the comma as an argument
+separator: `AREAS((B2:D4, E5, F6:I9))` returns `3`.
+
+<Callout type="warn">
+  **The extra parentheses are required for a multi-area reference.**
+  `AREAS(B2:D4, E5)` (without the outer pair) is read as *two
+  separate arguments*, not one two-area reference, and doesn't
+  behave the way AREAS is meant to — it needs
+  `AREAS((B2:D4, E5))` instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'a single range': '1', 'three disconnected ranges': '3', 'a single cell': '1' }}
+  defaultValue="three disconnected ranges"
+  label={'Live preview — =AREAS({value})'}
+  fieldLabel="reference"
+  errorValue="(try one of the examples below)"
+/>
+
+## Common errors
+
+### Forgetting the extra parentheses for a multi-area reference
+
+<ExcelCode>{`AREAS(B2:D4, E5) → wrong — this is two arguments, not one 2-area reference`}</ExcelCode>
+
+Wrap the whole union in its own parentheses:
+`AREAS((B2:D4, E5))` — now it's correctly read as a single,
+two-area reference.
+
+### Expecting AREAS to count cells, not areas
+
+<ExcelCode>{`AREAS(A1:D10) → 1, not 40 — it counts contiguous blocks, not individual cells`}</ExcelCode>
+
+For counting cells, use [COUNTA](/docs/math/counta) or
+[COUNT](/docs/math/count) instead — AREAS only ever counts how many
+separate blocks a reference is made of.
+
+export const faqs = [
+  {
+    question: 'Why would AREAS ever return more than 1?',
+    answer: 'Only when reference is a deliberately-built union of several disconnected ranges, written with commas and wrapped in an extra pair of parentheses — AREAS((B2:D4, E5, F6:I9)) returns 3. An ordinary single range always returns 1.',
+  },
+  {
+    question: 'Why does AREAS(B2:D4, E5) not work as expected?',
+    answer: "Without an extra pair of parentheses around the whole union, Excel reads the comma as separating two different function arguments rather than as part of a single multi-area reference. AREAS((B2:D4, E5)) — with the outer parentheses — is the correct form.",
+  },
+  {
+    question: 'Does AREAS count individual cells?',
+    answer: 'No — it counts contiguous blocks (areas), not cells. AREAS(A1:D10) returns 1 regardless of how many cells that range contains, since it is a single contiguous block.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AREAS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AREAS((B2:D4, E5, F6:I9))`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim areaCount As Long
+    areaCount = Range("B2:D4, E5, F6:I9").Areas.Count ' VBA's own direct equivalent
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # pandas has no multi-area reference concept — this is Excel/VBA-specific
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISREF](/docs/info/isref) — tests whether a value is a valid
+  reference at all, before AREAS counts how many pieces it has.
+- [ROWS](/docs/lookup/rows) and [COLUMNS](/docs/lookup/columns) —
+  measure a single range's dimensions, rather than counting areas in
+  a union.
+- [INDIRECT](/docs/lookup/indirect) — builds a reference
+  dynamically, which AREAS can then inspect.

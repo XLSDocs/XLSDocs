@@ -1,0 +1,170 @@
+---
+title: EXPAND
+description: Pad an array out to a larger, fixed size with a chosen fill value.
+---
+
+Pad `array` out to a larger, fixed size — adding extra rows,
+columns, or both, filled with `pad_with` (`#N/A` by default). The
+opposite of trimming: EXPAND only ever makes an array *bigger*,
+never smaller.
+
+export const quickAnswerFacts = [
+  { text: 'rows/columns smaller than the source array\'s own size returns #VALUE!', type: 'warn' },
+  { text: 'pad_with defaults to #N/A if left out', type: 'warn' },
+  { text: 'Requires Excel 365 or Excel 2024 — not available in 2016/2019/2021', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=EXPAND(array, rows, [columns], [pad_with])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EXPAND(array, rows, [columns], [pad_with])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'The array to expand.',
+  },
+  {
+    name: 'rows',
+    type: 'number',
+    required: true,
+    description: "The total number of rows in the result. Omit to leave the row count unchanged.",
+  },
+  {
+    name: 'columns',
+    type: 'number',
+    required: false,
+    description: "The total number of columns in the result. Omit to leave the column count unchanged.",
+  },
+  {
+    name: 'pad_with',
+    type: 'any',
+    required: false,
+    description: 'The value used to fill the new cells. Defaults to #N/A if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`array`, resized to exactly `rows` × `columns`, with every new cell
+filled by `pad_with`. The original values keep their same relative
+positions in the top-left corner of the result.
+
+## Description
+
+EXPAND is useful whenever a formula needs every output to be a
+*fixed, predictable size*, even though the source array's size might
+vary — padding a short list out to match a template's row count, for
+instance, so downstream formulas referencing fixed cell positions
+don't break when the source data shrinks.
+
+<ExcelCode>{`=EXPAND(A1:B2, 4, 3) → the 2x2 range becomes 4 rows x 3 columns, with #N/A filling every new cell`}</ExcelCode>
+
+<ExcelCode>{`=EXPAND(A1:B2, 4, 3, 0) → the same expansion, but new cells are filled with 0 instead of #N/A`}</ExcelCode>
+
+<Callout type="warn">
+  **EXPAND only grows — it never shrinks.** Passing a `rows` or
+  `columns` value *smaller* than `array`'s own size returns
+  `#VALUE!`, rather than truncating the array down to that size. For
+  trimming an array smaller, [TAKE](/docs/arrays/take) or
+  [TRIMRANGE](/docs/lookup/trimrange) do that instead.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a target size smaller than the source array
+
+<ExcelCode>{`EXPAND(A1:D1, 1, 2) → #VALUE! (A1:D1 already has 4 columns; EXPAND can't shrink it to 2)`}</ExcelCode>
+
+EXPAND's `rows`/`columns` must each be at least as large as
+`array`'s own matching dimension.
+
+### #NUM! — a target size that's too large
+
+<ExcelCode>{`EXPAND(A1:B2, 1000000, 1000000) → #NUM! (exceeds Excel's worksheet size limits)`}</ExcelCode>
+
+A `rows`/`columns` combination larger than the worksheet itself can
+accommodate returns `#NUM!` instead of attempting the expansion.
+
+export const faqs = [
+  {
+    question: 'What happens if I omit the columns argument?',
+    answer: "The column count is left unchanged — only the row count is resized to the rows argument. The same applies in reverse if rows is supplied but the array's row count should stay as-is; at least one of rows or columns must still be given.",
+  },
+  {
+    question: 'Can EXPAND shrink an array?',
+    answer: "No — EXPAND only grows an array. A rows or columns value smaller than the array's own corresponding dimension returns #VALUE! instead of trimming it down. Use TAKE or TRIMRANGE for shrinking.",
+  },
+  {
+    question: 'What does pad_with default to if I leave it out?',
+    answer: '#N/A — every newly added cell shows the #N/A error unless a specific pad_with value (like 0 or an empty string) is supplied instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EXPAND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EXPAND(A1:B2, 4, 3, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in EXPAND — pad a 2D array manually
+    Dim padded(1 To 4, 1 To 3) As Variant
+    Dim r As Long, c As Long
+    For r = 1 To 4
+      For c = 1 To 3
+        padded(r, c) = 0
+      Next c
+    Next r
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    arr = np.array([[1, 2], [3, 4]])
+    padded = np.pad(arr, ((0, 2), (0, 1)), constant_values=0)  # grow to 4x3, fill with 0
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TAKE](/docs/arrays/take) — the opposite operation, shrinking an
+  array down instead of growing it.
+- [VSTACK](/docs/arrays/vstack) and [HSTACK](/docs/arrays/hstack) —
+  combine arrays together, another way to build a specific target
+  shape.
+- [ROWS](/docs/lookup/rows) and [COLUMNS](/docs/lookup/columns) —
+  measure an array's current size, before deciding how much to
+  expand it.

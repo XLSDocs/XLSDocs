@@ -1,0 +1,155 @@
+---
+title: FORMULATEXT
+description: Return a cell's formula as a text string, exactly as it appears in the formula bar.
+---
+
+Return a cell's **formula as text** — exactly what shows in the
+formula bar when that cell is selected, not the value it calculates
+to. Useful for documenting a workbook, building an audit sheet, or
+showing a formula and its result side by side.
+
+export const quickAnswerFacts = [
+  { text: 'A cell with no formula returns #N/A, not an empty string', type: 'warn' },
+  { text: 'A reference to a closed workbook also returns #N/A', type: 'warn' },
+  { text: 'For a multi-cell range, returns each cell\'s own formula as a spilled array', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FORMULATEXT(reference)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FORMULATEXT(reference)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'range',
+    required: true,
+    description: 'A reference to a cell or range.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The formula in `reference`, as a text string — `=B2*1.08`, say, not
+whatever number that formula evaluates to. `#N/A` if the referenced
+cell holds a plain value instead of a formula.
+
+## Description
+
+FORMULATEXT turns a formula itself into displayable text, which is
+otherwise only visible by selecting the cell and looking at the
+formula bar. It's commonly used on an audit or documentation sheet —
+one column showing each key cell's live *value*, a neighboring
+column (built with FORMULATEXT) showing the exact *formula* that
+produced it, so a reviewer doesn't have to click through every cell
+individually.
+
+<Callout type="warn">
+  **A cell with a plain value, not a formula, returns `#N/A`** — not
+  an empty string or `0`. Pair FORMULATEXT with
+  [ISFORMULA](/docs/info/isformula) or
+  [IFERROR](/docs/logical/iferror) if `reference` might not
+  actually contain a formula.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ 'a cell with a formula': '=B2*1.08', 'a cell with a plain value': '#N/A', 'a closed workbook reference': '#N/A' }}
+  defaultValue="a cell with a formula"
+  label={'Live preview — =FORMULATEXT({value})'}
+  fieldLabel="reference"
+  errorValue="(type exactly one of the examples below)"
+/>
+
+## Common errors
+
+### #N/A — the referenced cell has no formula
+
+<ExcelCode>{`FORMULATEXT(A1) → #N/A (if A1 just holds a plain typed value, like 42)`}</ExcelCode>
+
+Check first with [ISFORMULA](/docs/info/isformula), or wrap the
+call in IFERROR, if `reference` isn't guaranteed to hold a formula.
+
+### #N/A — the reference points to a closed workbook
+
+<ExcelCode>{`FORMULATEXT('[OtherFile.xlsx]Sheet1'!A1) → #N/A, if OtherFile.xlsx isn't currently open`}</ExcelCode>
+
+FORMULATEXT can only read a formula from a workbook that's actually
+open at calculation time.
+
+export const faqs = [
+  {
+    question: 'What does FORMULATEXT return for a cell with no formula?',
+    answer: '#N/A — not an empty string, 0, or the cell\'s plain value. A genuinely formula-free cell has no formula text for FORMULATEXT to return.',
+  },
+  {
+    question: 'How is FORMULATEXT different from ISFORMULA?',
+    answer: 'ISFORMULA answers a yes/no question (TRUE/FALSE: does this cell contain a formula). FORMULATEXT goes further, returning the actual formula text itself — the two are commonly used together, ISFORMULA to check first, FORMULATEXT to display the result.',
+  },
+  {
+    question: 'Can FORMULATEXT read a formula from a closed workbook?',
+    answer: "No — if reference points to a workbook that isn't currently open, FORMULATEXT returns #N/A, the same as if the cell had no formula at all.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FORMULATEXT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IFERROR(FORMULATEXT(A2), "(no formula)")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim formulaText As String
+    If Range("A2").HasFormula Then
+      formulaText = Range("A2").Formula ' VBA's own direct equivalent
+    Else
+      formulaText = "(no formula)"
+    End If
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import openpyxl
+
+    wb = openpyxl.load_workbook("workbook.xlsx")  # no data_only=True, to keep formula strings
+    formula_text = wb["Sheet1"]["A2"].value
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISFORMULA](/docs/info/isformula) — tests whether a cell contains
+  a formula at all, before FORMULATEXT displays it.
+- [ISREF](/docs/info/isref) — confirms a value is a valid reference.
+- [CELL](/docs/info/cell) — returns other information about a
+  reference, like its address or formatting.

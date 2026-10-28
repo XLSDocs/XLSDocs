@@ -1,0 +1,162 @@
+---
+title: WRAPROWS
+description: Reshape a single row or column of values into a 2D array, wrapping into a new row every wrap_count values.
+---
+
+Reshape a flat **row or column** of values into a 2D array, starting
+a new **row** every `wrap_count` values — the opposite of
+flattening, and the row-first counterpart to
+[WRAPCOLS](/docs/lookup/wrapcols).
+
+export const quickAnswerFacts = [
+  { text: 'vector must be one-dimensional — a 2D range returns #VALUE!', type: 'warn' },
+  { text: 'wrap_count below 1 returns #NUM!', type: 'warn' },
+  { text: 'Requires Excel 365 or Excel 2024 — not available in 2016/2019/2021', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=WRAPROWS(vector, wrap_count, [pad_with])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=WRAPROWS(vector, wrap_count, [pad_with])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'vector',
+    type: 'range',
+    required: true,
+    description: 'The one-dimensional row or column of values to wrap.',
+  },
+  {
+    name: 'wrap_count',
+    type: 'number',
+    required: true,
+    description: 'The maximum number of values in each row before wrapping to the next one.',
+  },
+  {
+    name: 'pad_with',
+    type: 'any',
+    required: false,
+    description: 'The value used to fill any leftover cells in the final row. Defaults to #N/A if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A 2D array with `wrap_count` columns, filling across each row before
+dropping to the next one. If the final row isn't completely filled,
+the leftover cells get `pad_with` (`#N/A` by default).
+
+## Description
+
+WRAPROWS takes a single flat list and lays it out into a grid,
+filling **across the first row first**, then dropping to a new row —
+the way most people naturally read a numbered list wrapped onto
+several lines. This is the opposite fill order from
+[WRAPCOLS](/docs/lookup/wrapcols), which fills **down a column
+first**.
+
+<ExcelCode>{`=WRAPROWS(A1:F1, 3) → {1,2,3;4,5,6} — a 6-value row wraps into 2 rows of 3, filled left-to-right per row`}</ExcelCode>
+
+<ExcelCode>{`=WRAPROWS(A1:E1, 3, "x") → {1,2,3;4,5,"x"} — 5 values don't fill the second row evenly, so "x" pads the gap`}</ExcelCode>
+
+<Callout type="warn">
+  **WRAPROWS and WRAPCOLS fill in opposite orders for the same
+  input.** `WRAPROWS(A1:F1, 3)` fills across each row first,
+  producing `{1,2,3; 4,5,6}`; `WRAPCOLS(A1:F1, 3)` fills down each
+  column first, producing `{1,4; 2,5; 3,6}` instead — same input,
+  same `wrap_count`, genuinely different layouts.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a two-dimensional vector
+
+<ExcelCode>{`WRAPROWS(A1:C3, 3) → #VALUE! (A1:C3 is a 3x3 grid, not a one-dimensional row or column)`}</ExcelCode>
+
+`vector` must already be a single row or single column — WRAPROWS
+doesn't flatten a 2D range first.
+
+### #NUM! — a wrap_count below 1
+
+<ExcelCode>{`WRAPROWS(A1:F1, 0) → #NUM!`}</ExcelCode>
+
+`wrap_count` has to be a positive whole number of `1` or more.
+
+export const faqs = [
+  {
+    question: 'WRAPROWS vs WRAPCOLS — what is the actual difference?',
+    answer: "They reshape the same flat list in opposite fill orders. WRAPROWS fills across each row before dropping to the next one; WRAPCOLS fills down each column before starting the next one. The same input and wrap_count produce a transposed-looking, differently-ordered result between the two.",
+  },
+  {
+    question: 'What happens if the values don\'t divide evenly by wrap_count?',
+    answer: 'The leftover cells in the final row are filled with pad_with, which defaults to #N/A if not specified — supply a specific value like 0 or "" to avoid #N/A appearing in the padded gap.',
+  },
+  {
+    question: 'Which one should I use — WRAPROWS or WRAPCOLS?',
+    answer: 'It depends on the reading order the result should have. WRAPROWS matches how a numbered list naturally wraps across several lines (left to right, top to bottom); WRAPCOLS fills top to bottom within a column first. Pick based on which layout the downstream formula or display actually needs.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with WRAPROWS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=WRAPROWS(A1:F1, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in WRAPROWS — reshape a flat array manually, row-first
+    Dim flat As Variant, wrapped(1 To 2, 1 To 3) As Variant
+    flat = Array(1, 2, 3, 4, 5, 6)
+    Dim i As Long
+    For i = 0 To 5
+      wrapped(i \ 3 + 1, i Mod 3 + 1) = flat(i)
+    Next i
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    flat = np.array([1, 2, 3, 4, 5, 6])
+    wrapped = flat.reshape(2, 3)  # row-first fill, matching WRAPROWS
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [WRAPCOLS](/docs/lookup/wrapcols) — the column-first counterpart,
+  filling down each column before starting a new one.
+- [TOCOL](/docs/arrays/tocol) and [TOROW](/docs/arrays/torow) —
+  flatten a 2D range into a single column or row, the reverse
+  operation.
+- [EXPAND](/docs/lookup/expand) — resizes an array to a larger fixed
+  shape, rather than reshaping its existing values.

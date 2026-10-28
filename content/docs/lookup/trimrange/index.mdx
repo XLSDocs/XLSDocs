@@ -1,0 +1,163 @@
+---
+title: TRIMRANGE
+description: Remove blank rows and/or columns from the outer edges of a range, leaving interior blanks untouched.
+---
+
+Remove blank rows and/or columns from the **outer edges** of a
+range or array — trimming away leading/trailing blank space the
+same way [TRIM](/docs/text/trim) strips leading/trailing spaces
+from text, except TRIMRANGE never touches blanks *inside* the data.
+
+export const quickAnswerFacts = [
+  { text: 'Only trims the outer edges — a blank row or column in the middle of the data is left alone', type: 'warn' },
+  { text: 'trim_rows/trim_cols default to 3 (trim both leading and trailing) if omitted', type: 'check' },
+  { text: 'A dot-shorthand also exists: A1.:.E10 is the same as TRIMRANGE(A1:E10,3,3)', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=TRIMRANGE(range, [trim_rows], [trim_cols])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TRIMRANGE(range, [trim_rows], [trim_cols])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'range',
+    type: 'range',
+    required: true,
+    description: 'The range or array to trim.',
+  },
+  {
+    name: 'trim_rows',
+    type: 'number',
+    required: false,
+    description: 'Which blank rows to trim: 0 = none, 1 = leading only, 2 = trailing only, 3 = both (default).',
+  },
+  {
+    name: 'trim_cols',
+    type: 'number',
+    required: false,
+    description: 'Which blank columns to trim: 0 = none, 1 = leading only, 2 = trailing only, 3 = both (default).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`range` with its leading and/or trailing fully-blank rows and
+columns removed, according to `trim_rows`/`trim_cols`. Blank rows
+or columns sitting *inside* the data, surrounded by non-blank cells
+on both sides, are never removed.
+
+## Description
+
+TRIMRANGE solves a specific, common annoyance with a range whose
+real extent isn't known in advance — a pasted export with a few
+blank rows above the header, or trailing blank rows left over from
+deleted data. Rather than manually reselecting the exact non-blank
+extent every time the source changes, TRIMRANGE trims it
+automatically, and (being a live formula, not a one-time cleanup
+step) keeps re-trimming as the source range's blank edges change.
+
+<ExcelCode>{`=TRIMRANGE(A1:E10) → trims any fully-blank leading/trailing rows AND columns (the default, trim_rows=3, trim_cols=3)`}</ExcelCode>
+
+<ExcelCode>{`=TRIMRANGE(A1:E10, 1, 0) → trims only leading blank rows, leaves columns and trailing rows untouched`}</ExcelCode>
+
+<Callout type="warn">
+  **TRIMRANGE never removes a blank row or column from the middle of
+  the data** — only ones touching the outer edge. A blank row
+  between two sections of real data stays exactly where it is,
+  regardless of `trim_rows`; TRIMRANGE isn't a general "remove every
+  blank" tool, just an edge-trimming one.
+</Callout>
+
+## Common errors
+
+### Expecting TRIMRANGE to remove interior blank rows too
+
+<ExcelCode>{`TRIMRANGE(A1:E10) → a blank row at A5:E5 (surrounded by data above and below) is left exactly as-is`}</ExcelCode>
+
+For removing blanks anywhere in the data, not just the edges, use
+[FILTER](/docs/arrays/filter) with a non-blank condition instead.
+
+### Forgetting trim_rows and trim_cols are independent
+
+<ExcelCode>{`TRIMRANGE(A1:E10, 1, 2) → trims leading rows AND trailing columns — each argument controls its own dimension separately`}</ExcelCode>
+
+`trim_rows` and `trim_cols` don't have to match — one can trim
+leading-only while the other trims trailing-only, or not trim its
+dimension at all.
+
+export const faqs = [
+  {
+    question: 'Does TRIMRANGE remove blank rows anywhere in the data, like a filter would?',
+    answer: 'No — it only removes fully-blank rows or columns touching the outer edge of the range. A blank row or column surrounded by data on both sides is left completely untouched, no matter what trim_rows or trim_cols is set to.',
+  },
+  {
+    question: 'What do the trim mode numbers (0, 1, 2, 3) mean?',
+    answer: '0 trims nothing in that dimension, 1 trims leading blanks only, 2 trims trailing blanks only, and 3 (the default if the argument is omitted) trims both leading and trailing blanks.',
+  },
+  {
+    question: 'Is there a shorthand for TRIMRANGE?',
+    answer: 'Yes — a dot-based "Trim Ref" syntax does the same thing inline: A1.:.E10 is equivalent to TRIMRANGE(A1:E10,3,3) (trim both ends), and A1:.E10 trims trailing blanks only, equivalent to trim mode 2.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TRIMRANGE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TRIMRANGE(A1:E10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA's own closest equivalent — CurrentRegion stops at the first fully-blank row/column,
+    ' which is a similar but not identical idea to TRIMRANGE's explicit edge-trimming
+    Dim trimmed As Range
+    Set trimmed = Range("A1").CurrentRegion
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1", header=None)
+    trimmed = df.dropna(how="all").dropna(axis=1, how="all")  # drops fully-blank rows/cols, edges and interior alike
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TRIM](/docs/text/trim) — the text equivalent, stripping leading/
+  trailing spaces from a string instead of blank rows/columns from
+  a range.
+- [FILTER](/docs/arrays/filter) — removes rows anywhere they don't
+  match a condition, not just at the edges.
+- [EXPAND](/docs/lookup/expand) — the opposite direction, growing a
+  range to a larger fixed size rather than trimming it down.
