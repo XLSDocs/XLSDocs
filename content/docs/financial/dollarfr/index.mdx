@@ -1,0 +1,163 @@
+---
+title: DOLLARFR
+description: Convert a decimal dollar amount into fraction notation (like bond prices in 1/32nds).
+---
+
+Convert an ordinary **decimal number into fraction notation** — the
+traditional way bond and securities prices are quoted, like `1.125`
+becoming `1.02` (read as "1 and 2/16"). The exact inverse of
+[DOLLARDE](/docs/financial/dollarde).
+
+export const quickAnswerFacts = [
+  { text: 'The result isn\'t a true decimal — the digits after the point are a numerator, not a decimal fraction', type: 'warn' },
+  { text: 'fraction of exactly 0 returns #DIV/0!; a negative fraction returns #NUM!', type: 'warn' },
+  { text: 'DOLLARDE converts the opposite direction', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DOLLARFR(decimal_dollar, fraction)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DOLLARFR(decimal_dollar, fraction)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'decimal_dollar',
+    type: 'number',
+    required: true,
+    description: 'An ordinary decimal number to convert into fraction notation.',
+  },
+  {
+    name: 'fraction',
+    type: 'number',
+    required: true,
+    description: 'The denominator to express the result against — e.g. 16 for sixteenths, 32 for thirty-seconds.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`decimal_dollar`, re-expressed in fraction notation — `1.125`
+expressed against `fraction=16` becomes `1.02` (read as "1 and
+2/16," not as 1.02 dollars).
+
+## Description
+
+DOLLARFR is the reverse of [DOLLARDE](/docs/financial/dollarde): it
+takes an ordinary decimal result from a calculation and re-expresses
+it the way bond and securities prices are traditionally quoted —
+digits after the decimal point standing for a fraction's numerator,
+not a true decimal value. This matters whenever a calculated price
+needs to be displayed or re-entered in the market's conventional
+fraction format.
+
+<Callout type="warn">
+  **The output isn't a true decimal, even though it looks like one.**
+  `DOLLARFR(1.125, 16)` returns `1.02` — read as "1 and 2/16," which
+  happens to display identically to "one point zero two." Doing
+  further ordinary arithmetic on that `1.02` result (adding,
+  multiplying) treats it as a real decimal and produces a nonsensical
+  answer; convert back with DOLLARDE first if more math is needed.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.125': '1.02', '1.0625': '1.01', '1.5': '1.16' }}
+  defaultValue="1.125"
+  label={'Live preview — =DOLLARFR({value}, 16)'}
+  fieldLabel="decimal_dollar"
+/>
+
+## Common errors
+
+### #DIV/0! — a fraction of exactly 0
+
+<ExcelCode>{`DOLLARFR(1.125, 0) → #DIV/0!`}</ExcelCode>
+
+`fraction` can't be `0` — it's the denominator of the output
+fraction, which has to be a real positive value.
+
+### Doing further math on the result directly
+
+<ExcelCode>{`DOLLARFR(1.125, 16) + DOLLARFR(2.25, 16) → wrong — these are fraction-notation numbers, not decimals to add together`}</ExcelCode>
+
+Convert each result back to a true decimal with DOLLARDE before
+combining them in further arithmetic.
+
+export const faqs = [
+  {
+    question: 'Why does DOLLARFR(1.125, 16) return 1.02, not 1.125?',
+    answer: '1.125 equals "1 and 1/8," which is "1 and 2/16" in sixteenths — DOLLARFR expresses that fraction by writing the numerator (2) as the digits after the decimal point, giving 1.02 (read as the fraction, not as a true decimal 1.02).',
+  },
+  {
+    question: 'Is 1.02 from DOLLARFR an actual decimal value?',
+    answer: "No — it only looks like one. The digits after the decimal point represent a numerator over the fraction argument, not hundredths. Further arithmetic on that result needs to go through DOLLARDE first to get back to a true decimal.",
+  },
+  {
+    question: 'How do I convert back from the fraction notation to a true decimal?',
+    answer: 'Use DOLLARDE(fractional_dollar, fraction) — the exact inverse of DOLLARFR.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DOLLARFR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DOLLARFR(1.125, 16)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.DollarFr(1.125, 16) ' VBA itself has no built-in DollarFr — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    def dollarfr(decimal_dollar, fraction):
+        n = math.trunc(decimal_dollar)
+        frac = abs(decimal_dollar - n)
+        digits = math.ceil(math.log10(fraction))
+        numerator = frac * fraction
+        return n + numerator / 10 ** digits
+
+    result = dollarfr(1.125, 16)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DOLLARDE](/docs/financial/dollarde) — the inverse conversion,
+  fraction to decimal.
+- [YIELD](/docs/financial/yield) — bond yield calculations whose
+  results are sometimes re-expressed in this traditional fraction
+  notation.

@@ -1,0 +1,175 @@
+---
+title: ISPMT
+description: Calculate the interest paid during a specific period of a loan with equal principal payments.
+---
+
+Calculate the **interest portion** of a single period's payment —
+for a loan structured with **equal principal** payments each period
+(not [PMT](/docs/financial/pmt)'s equal *total* payments), where the
+interest portion shrinks every period as the balance goes down.
+
+export const quickAnswerFacts = [
+  { text: 'per is zero-indexed — the FIRST period is per=0, not per=1', type: 'warn' },
+  { text: 'Assumes equal principal payments each period, unlike PMT/IPMT\'s equal total payments', type: 'warn' },
+  { text: 'The result is negative for a loan (pv positive) — interest paid is a cash outflow', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ISPMT(rate, per, nper, pv)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISPMT(rate, per, nper, pv)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period.',
+  },
+  {
+    name: 'per',
+    type: 'number',
+    required: true,
+    description: 'The period to calculate interest for — zero-indexed, from 0 (the first period) to nper-1 (the last).',
+  },
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The total number of payment periods.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The loan amount (present value).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The interest portion of the payment due in period `per`, assuming
+`pv` is paid down in equal principal installments over `nper`
+periods — equal to `-pv * rate * (1 - per/nper)`.
+
+## Description
+
+ISPMT models a loan where the **principal** payment is the same
+every period (`pv/nper` each time), which means the **interest**
+portion shrinks steadily as the balance goes down — the opposite
+assumption from [PMT](/docs/financial/pmt)/[IPMT](/docs/financial/ipmt),
+which hold the *total* payment constant and let the interest/
+principal split change instead. The two models are genuinely
+different loan structures, not two ways of computing the same thing.
+
+<Callout type="warn">
+  **`per` starts at `0` for the first period, not `1`.** This breaks
+  the usual 1-based convention most of Excel's other period-indexed
+  financial functions use (`per` in [IPMT](/docs/financial/ipmt)/
+  [PPMT](/docs/financial/ppmt) runs `1` to `nper`). Passing `per=1`
+  into ISPMT expecting the *first* period's interest actually
+  returns the *second* period's interest instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '-300', '1': '-200', '2': '-100' }}
+  defaultValue="0"
+  label={'Live preview — =ISPMT(10%, {value}, 3, 3000)'}
+  fieldLabel="per"
+/>
+
+A $3,000 loan paid off over 3 periods in equal $1,000 principal
+installments — `per=0`'s interest (`-300`) is based on the full
+balance, `per=2`'s (`-100`) on just the final third still owed.
+
+## Common errors
+
+### Expecting per=1 to mean the first period
+
+<ExcelCode>{`ISPMT(10%, 1, 3, 3000) → -200 (the SECOND period's interest, not the first)`}</ExcelCode>
+
+Use `per=0` for the first period's interest — ISPMT's indexing
+starts at zero, unlike most other period-based financial functions.
+
+### Using ISPMT for an equal-total-payment loan
+
+<ExcelCode>{`ISPMT assumes equal PRINCIPAL payments — for a standard equal-payment loan (the far more common structure), use IPMT instead`}</ExcelCode>
+
+Most real-world loans (mortgages, auto loans) use equal *total*
+payments with a shifting principal/interest split — that's
+[IPMT](/docs/financial/ipmt)'s model, not ISPMT's.
+
+export const faqs = [
+  {
+    question: 'Why is per zero-indexed in ISPMT when other financial functions start at 1?',
+    answer: "It's simply how ISPMT's formula is defined — per=0 represents the first period (using the full starting balance), counting up to per=nper-1 for the last. IPMT and PPMT, by contrast, index per from 1 to nper. Always double-check which convention a specific function uses rather than assuming.",
+  },
+  {
+    question: 'How is ISPMT different from IPMT?',
+    answer: 'ISPMT assumes equal principal payments each period, so the interest portion steadily shrinks. IPMT assumes equal total payments each period (the standard mortgage/loan structure), so both the principal and interest portions change each period in a different pattern. They model genuinely different loan structures.',
+  },
+  {
+    question: 'Why is the ISPMT result negative?',
+    answer: 'The sign follows Excel\'s standard cash-flow convention: with pv entered as a positive number (money received as a loan), the interest owed is a cash outflow, shown as negative. Entering pv as negative would flip the sign of the result.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISPMT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ISPMT(10%, 0, 3, 3000)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Ispmt(0.1, 0, 3, 3000) ' per is zero-indexed here too
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def ispmt(rate, per, nper, pv):
+        return -pv * rate * (1 - per / nper)
+
+    result = ispmt(0.10, 0, 3, 3000)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [IPMT](/docs/financial/ipmt) — the equal-total-payment version,
+  used for standard mortgages and loans.
+- [PPMT](/docs/financial/ppmt) — the principal portion of an
+  equal-total-payment loan, IPMT's counterpart.
+- [PMT](/docs/financial/pmt) — the full payment amount for an
+  equal-total-payment loan.

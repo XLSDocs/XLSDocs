@@ -1,0 +1,161 @@
+---
+title: DOLLARDE
+description: Convert a dollar price expressed as a fraction (like bond prices in 1/32nds) into a decimal number.
+---
+
+Convert a dollar amount written as a **fraction** — the way bond and
+securities prices are traditionally quoted, like `1.02` meaning "1
+and 2/16" — into an ordinary decimal number.
+
+export const quickAnswerFacts = [
+  { text: 'fractional_dollar isn\'t a true decimal — the digits after the point are a numerator, not a decimal fraction', type: 'warn' },
+  { text: 'fraction below 0 returns #NUM!; fraction between 0 and 1 returns #DIV/0!', type: 'warn' },
+  { text: 'DOLLARFR converts the opposite direction', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DOLLARDE(fractional_dollar, fraction)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DOLLARDE(fractional_dollar, fraction)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'fractional_dollar',
+    type: 'number',
+    required: true,
+    description: 'A number whose integer part is dollars and whose digits after the decimal point are a numerator over fraction.',
+  },
+  {
+    name: 'fraction',
+    type: 'number',
+    required: true,
+    description: 'The denominator to interpret the digits after the decimal point against — e.g. 16 for sixteenths, 32 for thirty-seconds.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`fractional_dollar`, converted to an ordinary decimal number —
+`1.02` interpreted against `fraction=16` (1 and 2/16) becomes
+`1.125`.
+
+## Description
+
+Bond and securities prices are traditionally quoted in fractions of
+a dollar — a price of "101 and 4/32" rather than a decimal. Entered
+directly into Excel, `101.04` looks like a decimal number but isn't
+one: the `.04` is meant to be read as *4/32*, not *four
+hundredths*. DOLLARDE performs that reinterpretation, turning the
+fraction-styled number into the actual decimal value Excel can do
+ordinary arithmetic with.
+
+<Callout type="warn">
+  **The digits after the decimal point are a numerator, not a
+  decimal fraction.** `DOLLARDE(1.02, 16)` doesn't mean "1.02 dollars
+  converted somehow" — it means "1 and 2/16," which equals `1.125`.
+  Treating the input as an ordinary decimal and skipping DOLLARDE
+  entirely silently produces the wrong number for any further
+  calculation.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1.02': '1.125', '1.01': '1.0625', '1.16': '1.5' }}
+  defaultValue="1.02"
+  label={'Live preview — =DOLLARDE({value}, 16)'}
+  fieldLabel="fractional_dollar"
+/>
+
+## Common errors
+
+### #DIV/0! — a fraction between 0 and 1
+
+<ExcelCode>{`DOLLARDE(1.02, 0.5) → #DIV/0!`}</ExcelCode>
+
+`fraction` needs to be `1` or greater — it's a denominator like 16
+or 32, not itself a fraction.
+
+### #NUM! — a negative fraction
+
+<ExcelCode>{`DOLLARDE(1.02, -16) → #NUM!`}</ExcelCode>
+
+`fraction` must be zero or positive; Excel truncates a non-integer
+fraction automatically rather than erroring on it.
+
+export const faqs = [
+  {
+    question: 'Why does DOLLARDE(1.02, 16) return 1.125, not 1.02?',
+    answer: 'Because 1.02 is read as "1 and 2/16," the traditional bond-pricing fraction notation — not as an ordinary decimal. DOLLARDE performs that reinterpretation: 2/16 equals 0.125, so the result is 1.125.',
+  },
+  {
+    question: 'What values are valid for fraction?',
+    answer: 'A positive integer denominator — 16 and 32 are the most common in bond pricing (sixteenths and thirty-seconds of a dollar). A value below 0 returns #NUM!, and a value between 0 and 1 returns #DIV/0!.',
+  },
+  {
+    question: 'How do I convert back from a decimal to the fractional notation?',
+    answer: 'Use DOLLARFR(decimal_dollar, fraction) — the exact inverse of DOLLARDE.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DOLLARDE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DOLLARDE(1.02, 16)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.DollarDe(1.02, 16) ' VBA itself has no built-in DollarDe — use the worksheet function
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    def dollarde(fractional_dollar, fraction):
+        n = math.trunc(fractional_dollar)
+        frac = abs(fractional_dollar - n)
+        digits = math.ceil(math.log10(fraction))
+        numerator = round(frac * 10 ** digits)
+        return n + numerator / fraction
+
+    result = dollarde(1.02, 16)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DOLLARFR](/docs/financial/dollarfr) — the inverse conversion,
+  decimal to fraction.
+- [YIELD](/docs/financial/yield) — bond yield calculations that
+  often start from a fraction-quoted price DOLLARDE converts first.

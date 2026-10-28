@@ -1,0 +1,154 @@
+---
+title: PDURATION
+description: Calculate how many periods an investment needs to grow from its present value to a target future value.
+---
+
+Calculate how many **periods** an investment needs to grow from
+`pv` to `fv`, at a constant per-period rate — "how long until this
+investment doubles" turned into a formula.
+
+export const quickAnswerFacts = [
+  { text: 'All three arguments (rate, pv, fv) must be positive — invalid combinations return #NUM!', type: 'warn' },
+  { text: 'The result is a number of periods, not a date or a whole number of years', type: 'check' },
+  { text: 'Added in Excel 2013 — not available in older versions', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PDURATION(rate, pv, fv)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PDURATION(rate, pv, fv)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The interest rate per period.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The present value — the investment\'s starting amount.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: true,
+    description: 'The target future value.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of periods needed for `pv` to grow into `fv` at `rate`
+per period — equal to `LOG(fv/pv) / LOG(1+rate)`. Not necessarily a
+whole number.
+
+## Description
+
+PDURATION answers a specific, common question in reverse from most
+financial functions: instead of "how much will this grow to," it's
+"how long until this grows to a specific target." It's the single-
+rate special case of [NPER](/docs/financial/nper) — PDURATION takes
+no `pmt` argument at all, assuming the only thing happening is `pv`
+compounding on its own toward `fv`.
+
+<ExcelCode>{`=PDURATION(2.5%, 2000, 2200) → 3.86 (years for $2,000 at 2.5% annual interest to reach $2,200)`}</ExcelCode>
+
+<Callout type="idea">
+  The result is rarely a whole number — `3.86` periods means the
+  target is reached partway through the 4th period, not that it
+  takes exactly 4. Round up with
+  [ROUNDUP](/docs/math/roundup) if "how many *complete* periods"
+  is what's actually needed.
+</Callout>
+
+## Common errors
+
+### #NUM! — a non-positive argument
+
+<ExcelCode>{`PDURATION(2.5%, -2000, 2200) → #NUM! (pv must be positive)`}</ExcelCode>
+
+`rate`, `pv`, and `fv` all have to be positive numbers — PDURATION
+has no concept of a negative cash-flow convention the way PMT/FV do.
+
+### Expecting a whole number of periods
+
+<ExcelCode>{`PDURATION(2.5%, 2000, 2200) → 3.86, not 4`}</ExcelCode>
+
+The result is a continuous value, not rounded to the nearest whole
+period — wrap in `ROUNDUP` explicitly if a whole-period answer is
+needed.
+
+export const faqs = [
+  {
+    question: 'How is PDURATION different from NPER?',
+    answer: "NPER is the general case, also accounting for a regular payment (pmt) each period on top of the lump-sum pv. PDURATION is the simpler special case with no pmt at all — just a single starting amount compounding on its own toward a target.",
+  },
+  {
+    question: 'Why do rate, pv, and fv all need to be positive?',
+    answer: 'PDURATION has no negative-cash-flow sign convention the way PMT/FV/PV do — it\'s a straightforward "how long to grow from X to Y" calculation, and a negative value for any argument has no sensible interpretation in that formula, so it returns #NUM!.',
+  },
+  {
+    question: 'Does PDURATION round to whole periods?',
+    answer: 'No — it returns the exact (possibly fractional) number of periods, like 3.86. Wrap the result in ROUNDUP if a whole number of complete periods is specifically needed.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PDURATION from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PDURATION(2.5%, 2000, 2200)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Log(2200 / 2000) / Log(1 + 0.025) ' VBA has no built-in PDuration — compute the log ratio directly
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.log(2200 / 2000) / math.log(1.025)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [NPER](/docs/financial/nper) — the general case, also accounting
+  for a regular periodic payment.
+- [RRI](/docs/financial/rri) — the inverse question: given a fixed
+  number of periods, what rate gets pv to fv.
+- [RATE](/docs/financial/rate) — solves for the rate in a full
+  payment-based loan/investment, a more general version of RRI.

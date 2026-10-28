@@ -1,0 +1,151 @@
+---
+title: RRI
+description: Calculate the equivalent constant interest rate for an investment's growth from one value to another over a fixed number of periods.
+---
+
+Calculate the **equivalent constant interest rate** that explains
+how `pv` grew into `fv` over `nper` periods — the standard way to
+compute a Compound Annual Growth Rate (CAGR) from a start value, an
+end value, and a time span.
+
+export const quickAnswerFacts = [
+  { text: 'A common way to compute CAGR — just give the start value, end value, and number of years', type: 'check' },
+  { text: 'Assumes a single lump sum growing, with no recurring deposits/withdrawals — use RATE for that case instead', type: 'warn' },
+  { text: 'Invalid argument combinations return #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=RRI(nper, pv, fv)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RRI(nper, pv, fv)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'nper',
+    type: 'number',
+    required: true,
+    description: 'The number of periods over which the growth happened.',
+  },
+  {
+    name: 'pv',
+    type: 'number',
+    required: true,
+    description: 'The starting (present) value.',
+  },
+  {
+    name: 'fv',
+    type: 'number',
+    required: true,
+    description: 'The ending (future) value.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The constant per-period rate that would grow `pv` into `fv` over
+`nper` periods — equal to `(fv/pv)^(1/nper) - 1`.
+
+## Description
+
+RRI answers "what single constant rate explains this growth,"
+working backward from two known values and a time span — exactly
+the Compound Annual Growth Rate (CAGR) calculation analysts use to
+summarize an investment's performance as one comparable number,
+regardless of how bumpy its actual year-to-year returns were.
+
+<ExcelCode>{`=RRI(8, 10000, 11000) → 0.012 (an investment of $10,000 growing to $11,000 over 8 years implies a 1.2% annual rate)`}</ExcelCode>
+
+<Callout type="warn">
+  **RRI assumes a single lump sum growing on its own** — no
+  recurring contributions or withdrawals along the way. If the
+  investment also involves regular deposits or payments, use
+  [RATE](/docs/financial/rate) instead, which accounts for a
+  recurring `pmt` on top of the lump-sum growth.
+</Callout>
+
+## Common errors
+
+### Using RRI when deposits/withdrawals were also happening
+
+<ExcelCode>{`RRI assumes pv alone grew into fv — if money was added or withdrawn along the way, the result is meaningless`}</ExcelCode>
+
+Switch to [RATE](/docs/financial/rate), which has a `pmt` argument
+for exactly this case.
+
+### #NUM! — mismatched signs or invalid inputs
+
+<ExcelCode>{`RRI(8, 0, 11000) → #NUM! (pv can't be 0)`}</ExcelCode>
+
+`pv` can't be `0` (there's no rate that grows nothing into
+something), and other invalid combinations return `#NUM!` as well.
+
+export const faqs = [
+  {
+    question: 'Is RRI the same as calculating CAGR?',
+    answer: 'Yes — RRI(nper, pv, fv) is exactly the standard Compound Annual Growth Rate formula: (fv/pv)^(1/nper) - 1, with nper as the number of years.',
+  },
+  {
+    question: 'How is RRI different from RATE?',
+    answer: "RRI assumes a single starting lump sum grows on its own into the ending value, with nothing added or withdrawn along the way. RATE handles the more general case that also includes a regular periodic payment (pmt), which RRI has no argument for at all.",
+  },
+  {
+    question: 'Can RRI return a negative rate?',
+    answer: 'Yes — if fv is less than pv (the investment lost value), RRI returns a negative rate, representing the equivalent rate of decline rather than growth.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RRI from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RRI(8, 10000, 11000)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = (11000 / 10000) ^ (1 / 8) - 1 ' VBA has no built-in RRI — compute the CAGR formula directly
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = (11000 / 10000) ** (1 / 8) - 1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RATE](/docs/financial/rate) — the more general version,
+  accounting for recurring payments alongside the lump-sum growth.
+- [PDURATION](/docs/financial/pduration) — the inverse question:
+  given a fixed rate, how many periods to reach a target value.
+- [IRR](/docs/financial/irr) — the internal rate of return for a
+  full series of irregular cash flows, a different and more general
+  problem than RRI's single start/end comparison.
