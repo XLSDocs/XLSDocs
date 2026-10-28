@@ -1,0 +1,209 @@
+---
+title: PIVOTBY
+description: Build a two-dimensional cross-tabulation directly in a formula — the function version of a full PivotTable.
+---
+
+Group data by **both rows and columns** at once and aggregate a
+value against each row/column combination — the two-dimensional
+counterpart to [GROUPBY](/docs/lookup/groupby), and the formula
+equivalent of a full PivotTable's row-and-column layout.
+
+export const quickAnswerFacts = [
+  { text: 'row_fields, col_fields, values, and function are all required', type: 'check' },
+  { text: 'Needs clear space for the entire spill area — header row, row-label column, and any total rows/columns', type: 'warn' },
+  { text: 'Requires Excel 365 — not available in the 2021/2024 perpetual releases', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PIVOTBY(row_fields, col_fields, values, function, [field_headers], [row_total_depth], [row_sort_order], [col_total_depth], [col_sort_order], [filter_array], [relative_to])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PIVOTBY(row_fields, col_fields, values, function, [field_headers], [row_total_depth], [row_sort_order], [col_total_depth], [col_sort_order], [filter_array], [relative_to])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'row_fields',
+    type: 'range',
+    required: true,
+    description: 'The column(s) to group into row headers.',
+  },
+  {
+    name: 'col_fields',
+    type: 'range',
+    required: true,
+    description: 'The column(s) to group into column headers.',
+  },
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The column(s) of data to aggregate for each row/column combination.',
+  },
+  {
+    name: 'function',
+    type: 'any',
+    required: true,
+    description: 'The aggregation to apply — SUM, AVERAGE, COUNT, PERCENTOF, and others, or a LAMBDA.',
+  },
+  {
+    name: 'field_headers',
+    type: 'number',
+    required: false,
+    description: 'Whether the inputs have headers and whether to show them. Omit for automatic detection.',
+  },
+  {
+    name: 'row_total_depth',
+    type: 'number',
+    required: false,
+    description: 'Which row totals to include — same 0/1/2/-1/-2 scheme as GROUPBY\'s total_depth.',
+  },
+  {
+    name: 'row_sort_order',
+    type: 'number',
+    required: false,
+    description: 'Which column to sort rows by. Negative sorts descending.',
+  },
+  {
+    name: 'col_total_depth',
+    type: 'number',
+    required: false,
+    description: 'Which column totals to include — same scheme as row_total_depth.',
+  },
+  {
+    name: 'col_sort_order',
+    type: 'number',
+    required: false,
+    description: 'Which column to sort the output\'s columns by. Negative sorts descending.',
+  },
+  {
+    name: 'filter_array',
+    type: 'range',
+    required: false,
+    description: 'A TRUE/FALSE array marking which source rows to include before pivoting.',
+  },
+  {
+    name: 'relative_to',
+    type: 'number',
+    required: false,
+    description: 'For two-argument aggregations like PERCENTOF: what to compare against — 0 column totals (default), 1 row totals, 2 grand total, 3 parent column, 4 parent row.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled 2D array: one row per distinct `row_fields` group, one
+column per distinct `col_fields` group, with `function` applied to
+`values` for each row/column intersection — plus header rows/
+columns and any total rows/columns.
+
+## Description
+
+Where GROUPBY summarizes data down to a single column of grouped
+rows, PIVOTBY lays the result out as a genuine two-dimensional grid
+— the exact shape a traditional PivotTable produces when it has both
+a row field and a column field assigned. It's the formula-based
+alternative for a cross-tabulation that needs to stay directly
+composable with other formulas, rather than living as a separate
+PivotTable object.
+
+<ExcelCode>{`=PIVOTBY(C2:C76, A2:A76, D2:D76, SUM) → total sales (column D), broken out by product (rows, column C) across year (columns, column A)`}</ExcelCode>
+
+<Callout type="warn">
+  **PIVOTBY needs clear space for its entire spill area** — the
+  header row, the row-label column, any total row, and any total
+  column, all at once. A single occupied cell anywhere in that
+  footprint returns `#SPILL!`, which can be easy to trigger
+  accidentally since the full footprint is larger than just the
+  data grid itself.
+</Callout>
+
+## Common errors
+
+### #SPILL! — not enough room for the full grid
+
+<ExcelCode>{`PIVOTBY(C2:C76, A2:A76, D2:D76, SUM) → #SPILL! if anything blocks the header row, label column, or totals`}</ExcelCode>
+
+Clear the entire rectangular footprint the result needs — not just
+the inner data grid, but its header row and row-label column too.
+
+### #VALUE! — mismatched argument lengths
+
+<ExcelCode>{`PIVOTBY(C2:C76, A2:A50, D2:D76, SUM) → #VALUE! (col_fields covers fewer rows than row_fields and values)`}</ExcelCode>
+
+`row_fields`, `col_fields`, `values`, and `filter_array` (if
+supplied) all need to cover the exact same number of source rows.
+
+export const faqs = [
+  {
+    question: 'How is PIVOTBY different from GROUPBY?',
+    answer: 'GROUPBY groups by rows only, producing a single column of grouped results. PIVOTBY groups by both rows and columns, producing a genuine two-dimensional grid — the same shape a PivotTable produces when both a row field and a column field are assigned.',
+  },
+  {
+    question: 'Are both row_fields and col_fields required?',
+    answer: "Yes — Microsoft's documentation lists both as required arguments, along with values and function. There's no way to omit one and get a one-dimensional result from PIVOTBY itself; use GROUPBY instead for that.",
+  },
+  {
+    question: 'What does relative_to control?',
+    answer: 'It only matters for two-argument aggregations like PERCENTOF, setting what each cell\'s percentage is calculated against — column totals (the default), row totals, the grand total, or a parent row/column in a multi-level grouping.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PIVOTBY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PIVOTBY(C2:C76, A2:A76, D2:D76, SUM)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in PIVOTBY — a genuine PivotTable object is the usual equivalent
+    Dim pt As PivotTable
+    Set pt = ActiveSheet.PivotTables.Add( _
+      PivotCache:=ActiveWorkbook.PivotCaches.Create(xlDatabase, "A1:D76"), _
+      TableDestination:=Range("F1"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    pivoted = df.pivot_table(index="Product", columns="Year", values="Sales", aggfunc="sum")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GROUPBY](/docs/lookup/groupby) — the one-dimensional version,
+  grouping by rows only.
+- [SUMIFS](/docs/math/sumifs) — the older, formula-based way to
+  build a two-condition cross-tabulation cell by cell.
+- [UNIQUE](/docs/arrays/unique) — extracts the distinct row or
+  column values PIVOTBY groups by.

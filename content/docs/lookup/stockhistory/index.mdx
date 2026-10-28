@@ -1,0 +1,179 @@
+---
+title: STOCKHISTORY
+description: Retrieve historical price data for a stock, index, or other financial instrument, spilled as an array.
+---
+
+Retrieve **historical price data** for a stock, ticker, or other
+financial instrument over a date range — daily, weekly, or monthly —
+spilled directly into the sheet as an array, with Date and Close
+price as the default columns.
+
+export const quickAnswerFacts = [
+  { text: 'Requires a qualifying Microsoft 365 subscription — not available on a one-time-purchase Excel license', type: 'warn' },
+  { text: 'Defaults to just Date and Close price if no property columns are specified', type: 'check' },
+  { text: 'Many popular index funds (including the S&P 500 itself) have no historical data available', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=STOCKHISTORY(stock, start_date, [end_date], [interval], [headers], [property0], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=STOCKHISTORY(stock, start_date, [end_date], [interval], [headers], [property0], [property1], [property2], [property3], [property4], [property5])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'stock',
+    type: 'text',
+    required: true,
+    description: 'A ticker in quotes (e.g. "MSFT"), or a cell holding a Stocks data type. Target a specific exchange with "MIC:TICKER" (e.g. "XNAS:MSFT").',
+  },
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The earliest date to retrieve.',
+  },
+  {
+    name: 'end_date',
+    type: 'date',
+    required: false,
+    description: 'The latest date to retrieve. Defaults to start_date if omitted.',
+  },
+  {
+    name: 'interval',
+    type: 'number',
+    required: false,
+    description: '0 daily (default), 1 weekly, 2 monthly.',
+  },
+  {
+    name: 'headers',
+    type: 'number',
+    required: false,
+    description: '0 no headers, 1 show headers (default), 2 show the instrument identifier plus headers.',
+  },
+  {
+    name: 'property0, property1, ...',
+    type: 'number',
+    required: false,
+    description: 'Which data columns to return, in order: 0 Date, 1 Close, 2 Open, 3 High, 4 Low, 5 Volume. Defaults to Date and Close if none are given.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array of historical price data for `stock`, one row per
+date in the requested interval, with columns in the order given by
+`property0`, `property1`, and so on (or just Date and Close, by
+default).
+
+## Description
+
+STOCKHISTORY is built on the same live Stocks data connection behind
+Excel's Stocks data type — unlike a plain lookup formula, its result
+depends on Microsoft's financial-data service being reachable and
+having data for the requested instrument. Because it only requires a
+ticker and a date range (no add-in installation, unlike
+[RTD](/docs/lookup/rtd)), it's the more approachable of this site's
+two "live external data" lookup functions — but it still can't be
+demonstrated with a fixed worked example the way an ordinary
+calculation can.
+
+<Callout type="warn">
+  Because this result depends on a live, internet-connected
+  financial-data service (and the exact historical prices change
+  with every new trading day), it can't be demonstrated with a fixed
+  example the way a pure calculation can — the "Try it" widget used
+  elsewhere on this site doesn't apply here.
+</Callout>
+
+## Common errors
+
+### No data available for the requested instrument
+
+<ExcelCode>{`STOCKHISTORY("^GSPC", "2020-01-01") → no data for many popular index funds, including the S&P 500 itself`}</ExcelCode>
+
+Microsoft's own documentation notes that several widely-used index
+instruments simply have no historical data available through this
+function, regardless of ticker format.
+
+### Missing today's data right after the market closes
+
+<ExcelCode>{`STOCKHISTORY("MSFT", TODAY()) → may not include today's price yet`}</ExcelCode>
+
+Data generally only becomes available once a trading day fully
+completes — querying for the current day before the market closes
+(or before the day ends, for some markets) can come back without
+today's row yet.
+
+export const faqs = [
+  {
+    question: 'What subscription does STOCKHISTORY require?',
+    answer: 'A qualifying Microsoft 365 subscription — Personal, Family, Business Standard, or Business Premium. It is not available on a one-time-purchase (perpetual license) copy of Excel.',
+  },
+  {
+    question: 'What columns does STOCKHISTORY return by default?',
+    answer: 'Date and Close price — property0 and property1 default to 0 (Date) and 1 (Close) if no property arguments are supplied. Add more property arguments (2 Open, 3 High, 4 Low, 5 Volume) to include additional columns.',
+  },
+  {
+    question: 'How is STOCKHISTORY different from RTD?',
+    answer: "STOCKHISTORY retrieves historical (past) price data through Microsoft's own built-in financial-data service, with no extra software needed. RTD retrieves genuinely real-time, continuously-pushed data, but only works once a specific third-party COM automation add-in is installed — a much heavier external dependency.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with STOCKHISTORY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=STOCKHISTORY("MSFT", "2026-01-01", "2026-12-31", 1, 1, 0, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in STOCKHISTORY — calling the worksheet function from VBA is the usual approach
+    Dim result As Variant
+    result = Application.WorksheetFunction.StockHistory("MSFT", DateSerial(2026, 1, 1), DateSerial(2026, 12, 31))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import yfinance as yf
+
+    # STOCKHISTORY's closest Python equivalent is a dedicated market-data library,
+    # not anything built into pandas/openpyxl themselves
+    data = yf.Ticker("MSFT").history(start="2026-01-01", end="2026-12-31")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RTD](/docs/lookup/rtd) — genuinely real-time (not historical)
+  data, but requires a separately-installed add-in.
+- [UNIQUE](/docs/arrays/unique) and [SORT](/docs/arrays/sort) —
+  commonly layered on top of STOCKHISTORY's spilled output for
+  further analysis.

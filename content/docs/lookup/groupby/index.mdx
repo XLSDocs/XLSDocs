@@ -1,0 +1,195 @@
+---
+title: GROUPBY
+description: Group and aggregate data directly in a formula — the function version of a one-dimensional PivotTable.
+---
+
+Group rows by one or more values and aggregate another column
+against each group — `SUM` sales by region, `COUNT` orders by
+status, `AVERAGE` scores by class — all as a single live formula,
+without building a PivotTable.
+
+export const quickAnswerFacts = [
+  { text: 'row_fields, values, and function are all required — 5 more optional arguments control headers, totals, and sorting', type: 'check' },
+  { text: 'Multiple row_fields columns create nested grouping levels', type: 'check' },
+  { text: 'Requires Excel 365 — not available in the 2021/2024 perpetual releases', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=GROUPBY(row_fields, values, function, [field_headers], [total_depth], [sort_order], [filter_array], [field_relationship])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=GROUPBY(row_fields, values, function, [field_headers], [total_depth], [sort_order], [filter_array], [field_relationship])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'row_fields',
+    type: 'range',
+    required: true,
+    description: 'The column(s) to group rows by. Multiple columns create nested grouping levels.',
+  },
+  {
+    name: 'values',
+    type: 'range',
+    required: true,
+    description: 'The column(s) of data to aggregate for each group.',
+  },
+  {
+    name: 'function',
+    type: 'any',
+    required: true,
+    description: 'The aggregation to apply — SUM, AVERAGE, COUNT, MAX, MIN, and others, or a LAMBDA.',
+  },
+  {
+    name: 'field_headers',
+    type: 'number',
+    required: false,
+    description: 'Whether the inputs have headers and whether to show them in the output. Omit for automatic detection.',
+  },
+  {
+    name: 'total_depth',
+    type: 'number',
+    required: false,
+    description: 'Which totals to include: 0 none, 1 grand totals, 2 grand + subtotals, -1/-2 the same but shown at the top. Omit for automatic totals.',
+  },
+  {
+    name: 'sort_order',
+    type: 'number',
+    required: false,
+    description: 'Which column to sort by (row_fields columns first, then values columns). Negative sorts descending.',
+  },
+  {
+    name: 'filter_array',
+    type: 'range',
+    required: false,
+    description: 'A TRUE/FALSE array the same length as row_fields, marking which rows to include before grouping.',
+  },
+  {
+    name: 'field_relationship',
+    type: 'number',
+    required: false,
+    description: 'With multiple row_fields columns: 0 Hierarchy (default, later columns sort within earlier ones) or 1 Table (each column sorts independently).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A spilled array: one row per distinct group (or combination of
+groups, if `row_fields` has multiple columns), with `function`
+applied to `values` for that group — plus header rows and total
+rows, depending on `field_headers` and `total_depth`.
+
+## Description
+
+GROUPBY is the formula equivalent of the single most common
+PivotTable pattern — group rows by a category and summarize a number
+column against each group — built directly into a live, spillable
+formula instead of a separate PivotTable object that needs manual
+refreshing.
+
+<ExcelCode>{`=GROUPBY(A2:A76, D2:D76, SUM) → total sales (column D) summed for each distinct year (column A)`}</ExcelCode>
+
+<ExcelCode>{`=GROUPBY(C2:C76, D2:D76, SUM, , , -2) → total sales by product, sorted largest to smallest (sort_order -2 sorts descending by the values column)`}</ExcelCode>
+
+<Callout type="warn">
+  **GROUPBY needs enough clear space below and to the right to spill
+  its full result** — header row, every group row, and any total
+  rows `total_depth` adds. Existing data blocking any of that space
+  returns `#SPILL!`, the same as any other spilling function.
+</Callout>
+
+## Common errors
+
+### #SPILL! — not enough room for the full result
+
+<ExcelCode>{`GROUPBY(A2:A76, D2:D76, SUM) → #SPILL! if the cells below/right already contain data`}</ExcelCode>
+
+Clear enough space for every group row, the header, and any totals
+GROUPBY adds — the same fix as any other spilling formula.
+
+### #VALUE! — mismatched row counts
+
+<ExcelCode>{`GROUPBY(A2:A76, D2:D50, SUM) → #VALUE! (row_fields and values don't cover the same number of rows)`}</ExcelCode>
+
+`row_fields`, `values`, and `filter_array` (if supplied) all need to
+cover the exact same number of rows.
+
+export const faqs = [
+  {
+    question: 'How is GROUPBY different from a PivotTable?',
+    answer: "GROUPBY is a live formula — its result recalculates automatically whenever the source data changes, with no manual refresh needed the way a PivotTable requires. It trades some of a PivotTable's interactive UI (drag-and-drop fields, slicers) for being directly composable with other formulas.",
+  },
+  {
+    question: 'Can GROUPBY group by more than one column at once?',
+    answer: 'Yes — passing multiple columns as row_fields creates nested grouping levels (region within year, say). field_relationship controls whether those levels nest hierarchically (the default) or sort independently as a flat table.',
+  },
+  {
+    question: 'What aggregation functions can I use?',
+    answer: 'Standard aggregation functions like SUM, AVERAGE, COUNT, COUNTA, MAX, MIN, and PERCENTOF, or a custom LAMBDA. Passing a vector of several functions produces multiple aggregated columns in one call.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with GROUPBY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=GROUPBY(A2:A76, D2:D76, SUM)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in GROUPBY — a PivotTable, or a Scripting.Dictionary
+    ' accumulator loop, are the usual equivalents
+    Dim totals As Object
+    Set totals = CreateObject("Scripting.Dictionary")
+    Dim i As Long
+    For i = 2 To 76
+      Dim key As String
+      key = Cells(i, "A").Value
+      totals(key) = totals(key) + Cells(i, "D").Value
+    Next i
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    grouped = df.groupby("Year")["Sales"].sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PIVOTBY](/docs/lookup/pivotby) — the two-dimensional version,
+  grouping by both rows and columns at once, like a full
+  PivotTable.
+- [SUMIF](/docs/math/sumif) and [SUMIFS](/docs/math/sumifs) — the
+  older, single-condition way to aggregate by category.
+- [UNIQUE](/docs/arrays/unique) — extracts the distinct group values
+  GROUPBY groups by, when only the list of categories is needed.

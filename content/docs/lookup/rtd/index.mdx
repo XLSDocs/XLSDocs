@@ -1,0 +1,157 @@
+---
+title: RTD
+description: Retrieve real-time data from a COM automation add-in installed on the local computer.
+---
+
+Retrieve **real-time, continuously updating data** from a COM
+automation add-in — a market-data feed, a lab instrument, any
+external program built to supply live values to Excel. Unlike every
+other function on this site, RTD needs a specific add-in installed
+to do anything at all.
+
+export const quickAnswerFacts = [
+  { text: 'Requires an RTD server (a COM automation add-in) actually installed — none ship with Excel itself', type: 'warn' },
+  { text: 'With no RTD server installed for the given ProgID, RTD returns #N/A', type: 'warn' },
+  { text: 'server should be left blank for a program running on the local machine', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RTD(ProgID, server, topic1, [topic2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RTD(ProgID, server, topic1, [topic2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'ProgID',
+    type: 'text',
+    required: true,
+    description: 'The registered name of the COM automation add-in installed on the local computer, in quotation marks.',
+  },
+  {
+    name: 'server',
+    type: 'text',
+    required: true,
+    description: 'The name of the server running the add-in. Leave blank for a program running locally.',
+  },
+  {
+    name: 'topic1',
+    type: 'any',
+    required: true,
+    description: 'The first of up to 253 parameters that together identify a specific piece of real-time data.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+Whatever value the RTD server supplies for the given `topic`
+parameters — continuously updated as the server pushes new data,
+not just recalculated once. With no matching RTD server actually
+installed, RTD returns `#N/A`.
+
+## Description
+
+RTD is Excel's plumbing for genuinely live, push-based data — unlike
+a normal formula, which only recalculates when something triggers a
+recalculation, an RTD-sourced value can update on its own as the
+underlying server pushes new data through, while Excel is in
+automatic calculation mode. No RTD server ships with Excel itself;
+this function is only useful once a specific third-party or
+in-house-built COM automation add-in is actually installed on the
+machine running the workbook.
+
+<Callout type="warn">
+  **RTD does nothing without a matching add-in already installed.**
+  Opening a workbook that uses RTD on a machine without the
+  referenced server installed just produces `#N/A` in every RTD
+  cell — there's no way to make the function itself supply data
+  without that external piece in place first.
+</Callout>
+
+## Common errors
+
+### #N/A — no matching RTD server installed
+
+<ExcelCode>{`RTD("SomeVendor.RTDServer", "", "LAST", "MSFT") → #N/A (the add-in isn't installed on this machine)`}</ExcelCode>
+
+Install the specific RTD server the `ProgID` refers to — this isn't
+a formula syntax problem, it's a missing external dependency.
+
+### Confusing the server argument's blank vs. quoted-blank requirement
+
+<ExcelCode>{`In a worksheet formula, leave server empty: RTD("Vendor.Server", , "LAST")`}</ExcelCode>
+
+For a locally-running add-in, `server` should be left blank in a
+worksheet formula; from VBA specifically, an explicit empty string
+(`""`) or `vbNullString` is required instead of a truly omitted
+argument.
+
+export const faqs = [
+  {
+    question: 'Why does my RTD formula always show #N/A?',
+    answer: "The most common reason is simply that the RTD server (the COM automation add-in named by ProgID) isn't installed on the machine the workbook is open on. No RTD server ships with Excel — RTD only works once a specific third-party or custom add-in supplying that data is actually installed.",
+  },
+  {
+    question: 'What goes in the server argument?',
+    answer: "Leave it blank for a program running on the same local machine as Excel — the overwhelmingly common case. It's only non-blank when connecting to an RTD server running on a separate networked machine.",
+  },
+  {
+    question: 'How many topic arguments can RTD take?',
+    answer: 'From 1 to 253 — topic1 is required, and additional topic arguments narrow down exactly which piece of real-time data to retrieve from the server (a specific stock symbol and field, for instance).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RTD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RTD("Vendor.RTDServer", , "LAST", "MSFT")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.RTD("Vendor.RTDServer", vbNullString, "LAST", "MSFT")
+    ' VBA requires an explicit empty string or vbNullString for a local server — never a truly omitted argument
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # RTD is a live COM/Windows-automation mechanism with no pandas/openpyxl equivalent —
+    # the data would instead be pulled from whatever API the RTD server itself wraps
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [STOCKHISTORY](/docs/lookup/stockhistory) — a built-in, no-add-in-
+  required source of historical (not real-time push) market data.
+- [INDIRECT](/docs/lookup/indirect) — another function whose result
+  depends on something outside the formula itself, though resolved
+  once rather than continuously pushed.

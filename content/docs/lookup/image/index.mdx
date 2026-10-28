@@ -1,0 +1,176 @@
+---
+title: IMAGE
+description: Insert an image from a web URL directly into a cell, as a genuine formula result.
+---
+
+Insert an image **from a web URL directly into a cell** — unlike a
+floating picture object, the image is a formula result that moves,
+sorts, and fills with the cell it lives in, the same as any other
+value.
+
+export const quickAnswerFacts = [
+  { text: 'source must be an https URL — not a local file path', type: 'warn' },
+  { text: 'Combining a custom height/width with sizing 0, 1, or 2 returns #VALUE!', type: 'warn' },
+  { text: 'Requires Excel 365 or Excel 2024 — not available in 2016/2019/2021', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMAGE(source, [alt_text], [sizing], [height], [width])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=IMAGE(source, [alt_text], [sizing], [height], [width])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'source',
+    type: 'text',
+    required: true,
+    description: 'The https URL of the image. Supports BMP, JPG/JPEG, GIF, TIFF, PNG, ICO, and WEBP (WEBP doesn\'t work on web or Android).',
+  },
+  {
+    name: 'alt_text',
+    type: 'text',
+    required: false,
+    description: 'Accessibility description of the image.',
+  },
+  {
+    name: 'sizing',
+    type: 'number',
+    required: false,
+    description: '0 fit cell & keep aspect ratio (default), 1 fill cell (may distort), 2 original size, 3 use custom height/width.',
+  },
+  {
+    name: 'height',
+    type: 'number',
+    required: false,
+    description: 'Custom height in pixels. Only valid when sizing is 3.',
+  },
+  {
+    name: 'width',
+    type: 'number',
+    required: false,
+    description: 'Custom width in pixels. Only valid when sizing is 3.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The image at `source`, rendered inside the cell — a true formula
+result, so it moves with the cell on sort/filter/insert, unlike a
+floating picture anchored on top of the sheet.
+
+## Description
+
+Before IMAGE, a picture pasted or inserted into a worksheet floated
+as a separate object layered over the grid — it didn't belong to any
+particular cell, so sorting or filtering the data underneath left
+the picture behind, misaligned with its original row. IMAGE fixes
+this by making the image itself a cell's actual formula result: a
+product catalog with a photo column, for instance, now sorts and
+filters correctly with the photos moving right along with their row.
+
+<Callout type="warn">
+  **A custom `height`/`width` only works with `sizing=3`.** Supplying
+  either one alongside `sizing` 0, 1, or 2 returns `#VALUE!` — those
+  three modes size the image automatically and don't accept manual
+  dimensions at all.
+</Callout>
+
+## Common errors
+
+### #VALUE! — height/width supplied with the wrong sizing mode
+
+<ExcelCode>{`IMAGE("https://...", , 0, 200, 200) → #VALUE! (height/width only work with sizing=3)`}</ExcelCode>
+
+Switch `sizing` to `3` to use custom dimensions, or drop `height`/
+`width` entirely to let `sizing` 0, 1, or 2 size the image
+automatically.
+
+### #CONNECT! — a network or server problem
+
+<ExcelCode>{`IMAGE("https://example.com/broken-link.jpg") → #CONNECT! (the URL couldn't be reached)`}</ExcelCode>
+
+This reflects a live connectivity problem at calculation time, not a
+formula mistake — check the URL is reachable and the internet
+connection is working, then recalculate.
+
+### #BLOCKED! — security settings preventing the image
+
+<ExcelCode>{`IMAGE("https://...") → #BLOCKED! (Linked Data Types / web image settings are restricting it)`}</ExcelCode>
+
+Check the workbook's Linked Data Types privacy settings; in Excel
+for the web or mobile, images may also need enabling from the
+business bar at the top of the workbook.
+
+export const faqs = [
+  {
+    question: 'Can IMAGE display a local file, not just a web URL?',
+    answer: 'No — source must be an https URL that Excel fetches live. A local file path isn\'t supported; the image needs to be hosted somewhere reachable over the internet.',
+  },
+  {
+    question: 'How is an IMAGE-based picture different from a regular inserted picture?',
+    answer: "A regular inserted picture floats as a separate object layered over the grid, unrelated to any specific cell — sorting or filtering the data underneath leaves it behind. IMAGE's result is a true formula value belonging to its cell, so it moves, sorts, and fills along with the row or column it's in.",
+  },
+  {
+    question: 'Why does my IMAGE formula show #VALUE! when I add a height and width?',
+    answer: 'Custom height/width only work when sizing is explicitly set to 3. Supplying either dimension while sizing is 0, 1, or 2 (which size the image automatically) raises #VALUE! — set sizing to 3 to use manual dimensions.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with IMAGE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=IMAGE("https://example.com/logo.png", "Company logo", 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in IMAGE — inserting a floating Picture object is the closest equivalent,
+    ' but it won't behave as a true cell value the way IMAGE does
+    ActiveSheet.Pictures.Insert("https://example.com/logo.png").Left = Range("A1").Left
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import openpyxl
+    from openpyxl.drawing.image import Image
+
+    wb = openpyxl.load_workbook("workbook.xlsx")
+    ws = wb["Sheet1"]
+    ws.add_image(Image("logo.png"), "A1")  # openpyxl also only supports a floating image, not a cell value
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [HYPERLINK](/docs/lookup/hyperlink) — another function that turns
+  a URL into a clickable, cell-based result.
+- [XLOOKUP](/docs/lookup/xlookup) — commonly paired with IMAGE to
+  look up an image URL by product ID or name before displaying it.
