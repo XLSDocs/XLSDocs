@@ -1,0 +1,206 @@
+---
+title: SEARCHB
+description: The double-byte character set (DBCS) counterpart of SEARCH, counting byte position instead of character position.
+---
+
+Find the position of text within another string, ignoring case and
+supporting wildcards, counted by byte position instead of character
+position — the DBCS (double-byte character set) counterpart of
+[SEARCH](/docs/text/search), kept for compatibility with older
+workbooks built for Japanese, Chinese, or Korean editing
+environments.
+
+export const quickAnswerFacts = [
+  { text: 'Deprecated by Microsoft — SEARCH is the current function', type: 'warn' },
+  { text: 'Only counts bytes differently when a DBCS language is your default editing language', type: 'check' },
+  { text: 'Otherwise behaves exactly like SEARCH', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SEARCHB(find_text, within_text, [start_num])'}
+  facts={quickAnswerFacts}
+/>
+
+<Callout type="warn">
+  **Microsoft's current documentation marks SEARCHB as deprecated.**
+  It still works in every current Excel version for backward
+  compatibility with older DBCS-locale workbooks, but
+  [SEARCH](/docs/text/search) is the function Microsoft now documents
+  and recommends — use SEARCHB only if you're maintaining a workbook
+  that already relies on it.
+</Callout>
+
+## Syntax
+
+<ExcelCode>{`=SEARCHB(find_text, within_text, [start_num])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'find_text',
+    type: 'text',
+    required: true,
+    description: 'The text to search for. Can include `*` (any characters) or `?` (single character) wildcards.',
+  },
+  {
+    name: 'within_text',
+    type: 'text',
+    required: true,
+    description: 'The text to search within.',
+  },
+  {
+    name: 'start_num',
+    type: 'number',
+    required: false,
+    description: 'The position to start searching from. Defaults to `1`.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The position of the first occurrence of `find_text` within
+`within_text`, ignoring case — counted in bytes when a DBCS language
+is your default editing language, or in characters otherwise. Returns
+`#VALUE!` if `find_text` doesn't appear.
+
+## Description
+
+SEARCH and SEARCHB locate text the same way in almost every
+situation; the only difference is the unit the returned position is
+measured in. SEARCH always counts one unit per character. SEARCHB
+counts a double-byte character (common in Japanese, Chinese, and
+Korean text) as 2 units — but **only** when your Windows/Excel
+default editing language is set to a language that supports DBCS.
+Otherwise, SEARCHB counts one unit per character, identically to
+SEARCH.
+
+<Callout type="info">
+  **The switch depends on your Excel language settings, not on the
+  text itself.** A cell containing Japanese characters doesn't make
+  SEARCHB start counting bytes — it only does that if Japanese,
+  Chinese (Simplified), Chinese (Traditional), or Korean is enabled
+  and set as your default editing language. On an English-default
+  install, SEARCHB returns the exact same result as SEARCH even
+  against CJK text.
+</Callout>
+
+Like SEARCH, SEARCHB is case-insensitive and supports `*`/`?`
+wildcards — for a case-sensitive, literal-only search, use
+[FINDB](/docs/text/findb) instead.
+
+## Common errors
+
+### #VALUE! — text not found
+
+<ExcelCode>{`SEARCHB("x", A2) → #VALUE! (no "x" anywhere in A2, in any case)`}</ExcelCode>
+
+Same behavior as SEARCH — wrap it in IFERROR if a missing match is a
+valid, expected outcome.
+
+### Expecting different results on an English-language install
+
+<ExcelCode>{`SEARCHB("語", A2) → same result as SEARCH("語", A2), unless your default editing language is set to a DBCS language`}</ExcelCode>
+
+If SEARCHB and SEARCH are returning identical results even against
+CJK text, that's expected — the byte-counting behavior only activates
+under a DBCS default editing language.
+
+export const faqs = [
+  {
+    question: 'SEARCHB vs SEARCH — what is actually different?',
+    answer:
+      "Nothing, unless your default editing language is set to Japanese, Chinese (Simplified), Chinese (Traditional), or Korean. Under one of those, SEARCHB counts double-byte characters as 2 units; SEARCH always counts 1 per character regardless.",
+  },
+  {
+    question: 'Should I still use SEARCHB in a new workbook?',
+    answer:
+      "No — Microsoft's current documentation marks SEARCHB as deprecated and no longer describes it in detail. Use SEARCH unless you specifically need byte-based positions for an existing DBCS-locale workbook.",
+  },
+  {
+    question: 'SEARCHB vs FINDB — which should I use?',
+    answer:
+      'SEARCHB ignores case and supports wildcards, same as SEARCH. FINDB is case-sensitive with no wildcards, same as FIND. Pick between them exactly as you would between SEARCH and FIND.',
+  },
+  {
+    question: 'Does SEARCHB work in VBA?',
+    answer:
+      'Yes, as Application.WorksheetFunction.SearchB, taking the same find_text, within_text, and optional start_num arguments as the worksheet function.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SEARCHB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SEARCHB("語", A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim pos As Double
+    pos = Application.WorksheetFunction.SearchB("語", Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    text = "日本語です"
+    # Byte position in a DBCS encoding (Shift-JIS), matching SEARCHB
+    # under a Japanese default editing language (case-insensitive,
+    # same as the worksheet function):
+    byte_pos = text.encode("shift_jis").find("語".encode("shift_jis")) + 1
+
+    # Character position, matching SEARCH (and SEARCHB on a
+    # non-DBCS install):
+    char_pos = text.find("語") + 1
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SEARCH](/docs/text/search) — the single-byte-set version of this
+  function, and what Microsoft now recommends using instead.
+- [FINDB](/docs/text/findb) — the case-sensitive, no-wildcards DBCS
+  counterpart, paralleling SEARCH/FIND.
+- [MIDB](/docs/text/midb) — often combined with SEARCHB's byte
+  position to extract a DBCS substring.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — case-insensitive byte position" formula={`=SEARCHB("語", A2)`}>
+  On an English-default install, returns the same character position
+  SEARCH would. Under a DBCS default language, returns the byte
+  position instead.
+</ExampleCard>
+
+<ExampleCard number="02" label="Confirming identical behavior to SEARCH" formula={`=SEARCHB(" ", A2)=SEARCH(" ", A2)`}>
+  Returns TRUE on any non-DBCS-default install, since SEARCHB only
+  diverges from SEARCH when a DBCS language is your default editing
+  language.
+</ExampleCard>
+
+<ExampleCard number="03" label="Wildcard match" formula={`=SEARCHB("語*", A2)`}>
+  Wildcards work the same as in SEARCH — this matches any text
+  starting with "語", regardless of what follows.
+</ExampleCard>

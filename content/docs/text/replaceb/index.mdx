@@ -1,0 +1,210 @@
+---
+title: REPLACEB
+description: The double-byte character set (DBCS) counterpart of REPLACE, replacing a byte-position range instead of a character-position range.
+---
+
+Replace a chunk of text at a known byte position and byte length
+instead of a character position and length — the DBCS (double-byte
+character set) counterpart of [REPLACE](/docs/text/replace), kept for
+compatibility with older workbooks built for Japanese, Chinese, or
+Korean editing environments.
+
+export const quickAnswerFacts = [
+  { text: 'Deprecated by Microsoft — REPLACE is the current function', type: 'warn' },
+  { text: 'Only counts bytes differently when a DBCS language is your default editing language', type: 'check' },
+  { text: 'Otherwise behaves exactly like REPLACE', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=REPLACEB(old_text, start_num, num_bytes, new_text)'}
+  facts={quickAnswerFacts}
+/>
+
+<Callout type="warn">
+  **Microsoft's current documentation marks REPLACEB as deprecated.**
+  It still works in every current Excel version for backward
+  compatibility with older DBCS-locale workbooks, but
+  [REPLACE](/docs/text/replace) is the function Microsoft now
+  documents and recommends — use REPLACEB only if you're maintaining
+  a workbook that already relies on it.
+</Callout>
+
+## Syntax
+
+<ExcelCode>{`=REPLACEB(old_text, start_num, num_bytes, new_text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'old_text',
+    type: 'text',
+    required: true,
+    description: 'The original text.',
+  },
+  {
+    name: 'start_num',
+    type: 'number',
+    required: true,
+    description: 'The byte (or character, outside a DBCS default language) position to start replacing at, counting from 1.',
+  },
+  {
+    name: 'num_bytes',
+    type: 'number',
+    required: true,
+    description: 'How many bytes (or characters) to replace, starting at `start_num`.',
+  },
+  {
+    name: 'new_text',
+    type: 'text',
+    required: true,
+    description: 'The text to insert in place of the replaced characters.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`old_text` with the portion starting at `start_num` and sized by
+`num_bytes` replaced by `new_text` — counted in bytes when a DBCS
+language is your default editing language, or in characters (same as
+REPLACE) otherwise.
+
+## Description
+
+REPLACE and REPLACEB replace the same thing in almost every
+situation; the only difference is the unit `start_num`/`num_bytes` is
+measured in. REPLACE always counts one unit per character. REPLACEB
+counts a double-byte character (common in Japanese, Chinese, and
+Korean text) as 2 units — but **only** when your Windows/Excel
+default editing language is set to a language that supports DBCS.
+Otherwise, REPLACEB counts one unit per character, identically to
+REPLACE.
+
+<Callout type="info">
+  **The switch depends on your Excel language settings, not on the
+  text itself.** A cell containing Japanese characters doesn't make
+  REPLACEB start counting bytes — it only does that if Japanese,
+  Chinese (Simplified), Chinese (Traditional), or Korean is enabled
+  and set as your default editing language. On an English-default
+  install, REPLACEB returns the exact same result as REPLACE even
+  against CJK text.
+</Callout>
+
+## Common errors
+
+### Cutting a double-byte character in half
+
+<ExcelCode>{`REPLACEB("日本語です", 2, 3, "X") → an odd start position or byte count can split a double-byte character under a DBCS default language`}</ExcelCode>
+
+Under a DBCS default editing language, each CJK character is 2 bytes.
+A `start_num` or `num_bytes` that doesn't land on an even byte
+boundary can split a character, producing a garbled result — use even
+values, or work in characters with REPLACE instead.
+
+### Confusing REPLACEB's arguments with SUBSTITUTE's
+
+<ExcelCode>{`REPLACEB(A2, "abc", "xyz") → wrong — REPLACEB needs numeric position arguments, not text`}</ExcelCode>
+
+Same confusion as REPLACE vs SUBSTITUTE — REPLACEB always needs a
+numeric `start_num` and `num_bytes` in the middle.
+
+export const faqs = [
+  {
+    question: 'REPLACEB vs REPLACE — what is actually different?',
+    answer:
+      "Nothing, unless your default editing language is set to Japanese, Chinese (Simplified), Chinese (Traditional), or Korean. Under one of those, start_num and num_bytes count double-byte characters as 2 units; REPLACE always counts 1 per character regardless.",
+  },
+  {
+    question: 'Should I still use REPLACEB in a new workbook?',
+    answer:
+      "No — Microsoft's current documentation marks REPLACEB as deprecated and no longer describes it in detail. Use REPLACE unless you specifically need byte-based replacement for an existing DBCS-locale workbook.",
+  },
+  {
+    question: 'REPLACEB vs SUBSTITUTE — which should I use?',
+    answer:
+      'Same tradeoff as REPLACE vs SUBSTITUTE: use REPLACEB when you know the exact position and length to replace, and SUBSTITUTE when you know the text to find regardless of where it sits. REPLACEB adds nothing to that choice beyond byte-counting under a DBCS default language.',
+  },
+  {
+    question: 'Does REPLACEB work in VBA?',
+    answer:
+      'Yes, as Application.WorksheetFunction.ReplaceB, taking the same old_text, start_num, num_bytes, and new_text arguments as the worksheet function.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REPLACEB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REPLACEB(A2, 3, 4, "XXXX")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.ReplaceB( _
+      Range("A2").Value, 3, 4, "XXXX")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    text = "日本語です"
+    # Replace bytes 3-6 in a DBCS encoding (Shift-JIS), matching
+    # REPLACEB under a Japanese default editing language:
+    encoded = text.encode("shift_jis")
+    replaced_bytes = (encoded[:2] + "X".encode("shift_jis") + encoded[6:]).decode("shift_jis")
+
+    # Replace characters 3-6, matching REPLACE (and REPLACEB on a
+    # non-DBCS install):
+    replaced_chars = text[:2] + "X" + text[5:]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [REPLACE](/docs/text/replace) — the single-byte-set version of this
+  function, and what Microsoft now recommends using instead.
+- [SUBSTITUTE](/docs/text/substitute) — replaces based on matching
+  text content instead of a fixed byte position and length.
+- [FINDB](/docs/text/findb) and [SEARCHB](/docs/text/searchb) — often
+  nested inside `start_num` to locate a dynamic byte-based replacement
+  position.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — replace a fixed segment" formula={`=REPLACEB(A2, 3, 4, "XXXX")`}>
+  On an English-default install, replaces the same 4 characters
+  starting at position 3 that REPLACE would. Under a DBCS default
+  language, replaces 4 bytes starting at byte 3 instead.
+</ExampleCard>
+
+<ExampleCard number="02" label="Confirming identical behavior to REPLACE" formula={`=REPLACEB(A2, 3, 4, "X")=REPLACE(A2, 3, 4, "X")`}>
+  Returns TRUE on any non-DBCS-default install, since REPLACEB only
+  diverges from REPLACE when a DBCS language is your default editing
+  language.
+</ExampleCard>
+
+<ExampleCard number="03" label="Dynamic position with FINDB" formula={`=REPLACEB(A2, FINDB("-", A2), 1, "/")`}>
+  Locates the hyphen dynamically with FINDB, the same way REPLACE is
+  commonly combined with FIND.
+</ExampleCard>

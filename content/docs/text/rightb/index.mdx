@@ -1,0 +1,197 @@
+---
+title: RIGHTB
+description: The double-byte character set (DBCS) counterpart of RIGHT, extracting by byte count instead of character count.
+---
+
+Extract characters from the end of a string by byte count instead of
+character count — the DBCS (double-byte character set) counterpart
+of [RIGHT](/docs/text/right), kept for compatibility with older
+workbooks built for Japanese, Chinese, or Korean editing
+environments.
+
+export const quickAnswerFacts = [
+  { text: 'Deprecated by Microsoft — RIGHT is the current function', type: 'warn' },
+  { text: 'Only counts bytes differently when a DBCS language is your default editing language', type: 'check' },
+  { text: 'Otherwise behaves exactly like RIGHT', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RIGHTB(text, [num_bytes])'}
+  facts={quickAnswerFacts}
+/>
+
+<Callout type="warn">
+  **Microsoft's current documentation marks RIGHTB as deprecated.**
+  It still works in every current Excel version for backward
+  compatibility with older DBCS-locale workbooks, but
+  [RIGHT](/docs/text/right) is the function Microsoft now documents
+  and recommends — use RIGHTB only if you're maintaining a workbook
+  that already relies on it.
+</Callout>
+
+## Syntax
+
+<ExcelCode>{`=RIGHTB(text, [num_bytes])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to extract characters from.',
+  },
+  {
+    name: 'num_bytes',
+    type: 'number',
+    required: false,
+    description: 'How many bytes (or characters, outside a DBCS default language) to extract from the end. Defaults to `1`.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The rightmost portion of `text`, sized by `num_bytes` — counted in
+bytes when a DBCS language is your default editing language, or in
+characters (same as RIGHT) otherwise.
+
+## Description
+
+RIGHT and RIGHTB extract the same thing in almost every situation;
+the only difference is the unit `num_bytes`/`num_chars` is measured
+in. RIGHT always counts one unit per character. RIGHTB counts a
+double-byte character (common in Japanese, Chinese, and Korean text)
+as 2 units — but **only** when your Windows/Excel default editing
+language is set to a language that supports DBCS. Otherwise, RIGHTB
+counts one unit per character, identically to RIGHT.
+
+<Callout type="info">
+  **The switch depends on your Excel language settings, not on the
+  text itself.** A cell containing Japanese characters doesn't make
+  RIGHTB start counting bytes — it only does that if Japanese,
+  Chinese (Simplified), Chinese (Traditional), or Korean is enabled
+  and set as your default editing language. On an English-default
+  install, RIGHTB returns the exact same result as RIGHT even against
+  CJK text.
+</Callout>
+
+## Common errors
+
+### #VALUE! — negative num_bytes
+
+<ExcelCode>{`RIGHTB(A2, -1) → #VALUE!`}</ExcelCode>
+
+Same restriction as RIGHT — `num_bytes` must be zero or a positive
+number.
+
+### Cutting a double-byte character in half
+
+<ExcelCode>{`RIGHTB("日本語", 3) → an odd num_bytes can split a double-byte character under a DBCS default language`}</ExcelCode>
+
+Under a DBCS default editing language, each CJK character is 2 bytes.
+An odd `num_bytes` value can land in the middle of a character,
+producing a garbled or unexpected result — use an even count, or
+work in characters with RIGHT instead.
+
+export const faqs = [
+  {
+    question: 'RIGHTB vs RIGHT — what is actually different?',
+    answer:
+      "Nothing, unless your default editing language is set to Japanese, Chinese (Simplified), Chinese (Traditional), or Korean. Under one of those, num_bytes counts double-byte characters as 2; RIGHT always counts 1 per character regardless.",
+  },
+  {
+    question: 'Should I still use RIGHTB in a new workbook?',
+    answer:
+      "No — Microsoft's current documentation marks RIGHTB as deprecated and no longer describes it in detail. Use RIGHT unless you specifically need byte-based extraction for an existing DBCS-locale workbook.",
+  },
+  {
+    question: 'Why did RIGHTB cut off part of a character?',
+    answer:
+      'An odd num_bytes value can split a double-byte character in half under a DBCS default language, since each such character takes exactly 2 bytes. Use an even byte count, or switch to RIGHT to count in whole characters instead.',
+  },
+  {
+    question: 'Does RIGHTB work in VBA?',
+    answer:
+      'Yes, but as a native VBA string function (RightB), not a WorksheetFunction method — called directly: RightB(string, length).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RIGHTB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RIGHTB(A2, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' RightB is a native VBA string function, not a
+    ' WorksheetFunction method
+    Dim suffix As String
+    suffix = RightB(Range("A2").Value, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    text = "日本語です"
+    # Last 4 bytes in a DBCS encoding (Shift-JIS), matching RIGHTB
+    # under a Japanese default editing language:
+    suffix_bytes = text.encode("shift_jis")[-4:].decode("shift_jis")
+
+    # Last 4 characters, matching RIGHT (and RIGHTB on a non-DBCS
+    # install):
+    suffix_chars = text[-4:]
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RIGHT](/docs/text/right) — the single-byte-set version of this
+  function, and what Microsoft now recommends using instead.
+- [LEFTB](/docs/text/leftb) and [MIDB](/docs/text/midb) — the other
+  byte-counting extraction functions, for the start and the middle of
+  a string respectively.
+- [LENB](/docs/text/lenb) — often paired with LEFTB/RIGHTB to work
+  out how many bytes remain in a string.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — last 4 bytes" formula={`=RIGHTB(A2, 4)`}>
+  On an English-default install, returns the same 4 characters RIGHT
+  would. Under a DBCS default language, returns the last 4 bytes
+  instead — 2 full-width characters.
+</ExampleCard>
+
+<ExampleCard number="02" label="Confirming identical behavior to RIGHT" formula={`=RIGHTB(A2, 4)=RIGHT(A2, 4)`}>
+  Returns TRUE on any non-DBCS-default install, since RIGHTB only
+  diverges from RIGHT when a DBCS language is your default editing
+  language.
+</ExampleCard>
+
+<ExampleCard number="03" label="Default num_bytes (1 byte/character)" formula={`=RIGHTB(A2)`}>
+  Omitting num_bytes returns just the last unit — a single character
+  outside a DBCS default language, or potentially half of one
+  double-byte character under a DBCS default language.
+</ExampleCard>

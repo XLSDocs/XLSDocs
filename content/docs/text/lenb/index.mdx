@@ -1,0 +1,179 @@
+---
+title: LENB
+description: The double-byte character set (DBCS) counterpart of LEN, counting bytes instead of characters.
+---
+
+Count the number of bytes in a text string instead of characters —
+the DBCS (double-byte character set) counterpart of
+[LEN](/docs/text/len), kept for compatibility with older workbooks
+built for Japanese, Chinese, or Korean editing environments.
+
+export const quickAnswerFacts = [
+  { text: 'Deprecated by Microsoft — LEN is the current function', type: 'warn' },
+  { text: 'Only counts bytes differently when a DBCS language is your default editing language', type: 'check' },
+  { text: 'Otherwise behaves exactly like LEN', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LENB(text)'}
+  facts={quickAnswerFacts}
+/>
+
+<Callout type="warn">
+  **Microsoft's current documentation marks LENB as deprecated.** It
+  still works in every current Excel version for backward
+  compatibility with older DBCS-locale workbooks, but
+  [LEN](/docs/text/len) is the function Microsoft now documents and
+  recommends — use LENB only if you're maintaining a workbook that
+  already relies on it.
+</Callout>
+
+## Syntax
+
+<ExcelCode>{`=LENB(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to measure.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The length of `text` — counted in bytes when a DBCS language is your
+default editing language, or in characters (same as LEN) otherwise.
+
+## Description
+
+LEN and LENB count the same thing in almost every situation; the only
+difference is the unit each one counts in. LEN always counts one unit
+per character. LENB counts a double-byte character (common in
+Japanese, Chinese, and Korean text) as 2 units — but **only** when
+your Windows/Excel default editing language is set to a language that
+supports DBCS. Otherwise, LENB counts one unit per character,
+identically to LEN.
+
+<Callout type="info">
+  **The switch depends on your Excel language settings, not on the
+  text itself.** A cell containing Japanese characters doesn't make
+  LENB start counting bytes — it only does that if Japanese, Chinese
+  (Simplified), Chinese (Traditional), or Korean is enabled and set
+  as your default editing language. On an English-default install,
+  LENB("日本語") returns `3`, the same as LEN — not `6`.
+</Callout>
+
+## Common errors
+
+### Expecting LENB to always double-count CJK text
+
+<ExcelCode>{`LENB("日本語") → 3 on a non-DBCS install, 6 under a DBCS default editing language`}</ExcelCode>
+
+LENB doesn't inspect the text to decide whether to count bytes — it
+only does so when your Excel's default editing language itself is
+set to a DBCS language. The same formula returns different results
+on different installs, which is easy to misattribute to a formula
+bug rather than a settings difference.
+
+export const faqs = [
+  {
+    question: 'LENB vs LEN — what is actually different?',
+    answer:
+      "Nothing, unless your default editing language is set to Japanese, Chinese (Simplified), Chinese (Traditional), or Korean. Under one of those, LENB counts double-byte characters as 2; LEN always counts 1 per character regardless.",
+  },
+  {
+    question: 'Should I still use LENB in a new workbook?',
+    answer:
+      "No — Microsoft's current documentation marks LENB as deprecated and no longer describes it in detail. Use LEN unless you specifically need a byte count for an existing DBCS-locale workbook.",
+  },
+  {
+    question: 'Why does LENB return the same result as LEN on my machine?',
+    answer:
+      "LENB only switches to byte-counting when your Excel's default editing language is set to a DBCS language (Japanese, Chinese, or Korean). On any other default language, it behaves exactly like LEN — even against CJK text.",
+  },
+  {
+    question: 'Does LENB work in VBA?',
+    answer:
+      'Yes, but as a native VBA string function (LenB), not a WorksheetFunction method — called directly: LenB(string).',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LENB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LENB(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' LenB is a native VBA string function, not a
+    ' WorksheetFunction method
+    Dim byteLength As Long
+    byteLength = LenB(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    text = "日本語"
+    # Byte length in a DBCS encoding (Shift-JIS), matching LENB
+    # under a Japanese default editing language:
+    byte_length = len(text.encode("shift_jis"))  # 6
+
+    # Character length, matching LEN (and LENB on a non-DBCS install):
+    char_length = len(text)  # 3
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LEN](/docs/text/len) — the single-byte-set version of this
+  function, and what Microsoft now recommends using instead.
+- [LEFTB](/docs/text/leftb), [RIGHTB](/docs/text/rightb), and
+  [MIDB](/docs/text/midb) — commonly paired with LENB to work out how
+  many bytes remain in a string before extracting a substring.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — byte or character count" formula={`=LENB(A2)`}>
+  On an English-default install, returns the same result LEN would.
+  Under a DBCS default language, returns the byte count instead,
+  counting each full-width character as 2.
+</ExampleCard>
+
+<ExampleCard number="02" label="Confirming identical behavior to LEN" formula={`=LENB(A2)=LEN(A2)`}>
+  Returns TRUE on any non-DBCS-default install, since LENB only
+  diverges from LEN when a DBCS language is your default editing
+  language.
+</ExampleCard>
+
+<ExampleCard number="03" label="Detecting double-byte characters under a DBCS install" formula={`=LENB(A2)<>LEN(A2)`}>
+  Under a DBCS default editing language, this returns TRUE only if
+  A2 contains at least one double-byte character — LENB and LEN agree
+  on strings made up entirely of single-byte characters.
+</ExampleCard>
