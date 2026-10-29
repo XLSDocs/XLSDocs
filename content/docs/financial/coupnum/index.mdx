@@ -1,0 +1,187 @@
+---
+title: COUPNUM
+description: Calculate the number of coupon payments remaining between the settlement date and maturity.
+---
+
+Calculate **how many coupon payments are left** between settlement
+and maturity — the `N` figure
+[PRICE](/docs/financial/price) and
+[DURATION](/docs/financial/duration) sum their cash flows over.
+
+export const quickAnswerFacts = [
+  { text: 'Counts coupons from (but not including) settlement through maturity, inclusive', type: 'check' },
+  { text: 'A partial first period still counts as one full coupon toward the total', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUPNUM(settlement, maturity, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUPNUM(settlement, maturity, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of coupon payments remaining between `settlement` and
+`maturity`, counted as whole coupon dates — starting with the next
+one after `settlement` and ending at `maturity` itself.
+
+## Description
+
+Starting from the next coupon date after `settlement` (the same
+date [COUPNCD](/docs/financial/coupncd) finds), COUPNUM counts every
+remaining coupon payment up through `maturity`:
+
+<ExcelCode>{`=COUPNUM(DATE(2011,1,25), DATE(2011,11,15), 2, 1) → 2 (Microsoft's own documented example — the remaining coupons are 5/15/2011 and 11/15/2011)`}</ExcelCode>
+
+<Callout type="idea">
+  **A settlement date just one day after a coupon payment still
+  counts the same number of remaining coupons** as a settlement
+  date right before the next one — COUPNUM only cares how many
+  coupon dates are still ahead, not how much of the current period
+  has already elapsed. That finer-grained detail is what
+  [COUPDAYBS](/docs/financial/coupdaybs) and
+  [COUPDAYSNC](/docs/financial/coupdaysnc) are for.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1/25/2010': '4', '1/25/2011': '2', '6/1/2011': '1' }}
+  defaultValue="1/25/2011"
+  label={'Live preview — =COUPNUM({value}, 11/15/2011, 2, 1)'}
+  fieldLabel="settlement"
+/>
+
+Moving `settlement` closer to `maturity` reduces the number of
+coupon payments still owed — a full year earlier, this semiannual
+bond still has four coupons left; close to maturity, only one.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`COUPNUM(DATE(2011,11,15), DATE(2011,1,25), 2, 1) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — an invalid frequency
+
+<ExcelCode>{`COUPNUM(DATE(2011,1,25), DATE(2011,11,15), 3, 1) → #NUM! (frequency must be 1, 2, or 4)`}</ExcelCode>
+
+`frequency` only accepts `1`, `2`, or `4`.
+
+export const faqs = [
+  {
+    question: 'Why does COUPNUM matter for bond pricing?',
+    answer: "PRICE, DURATION, and MDURATION all need to know exactly how many coupon payments to sum present values over — COUPNUM is that count, derived directly from maturity, frequency, and how far settlement has already progressed into the bond's life.",
+  },
+  {
+    question: 'Does COUPNUM count a partial first period as a full coupon?',
+    answer: "Yes — the next coupon date after settlement always counts as one of the remaining coupons, even if settlement falls most of the way through the period leading up to it. COUPNUM counts coupon dates, not elapsed time.",
+  },
+  {
+    question: "How is COUPNUM related to a bond's total original number of coupons?",
+    answer: "COUPNUM only counts what's left from settlement onward — not the bond's total lifetime coupon count from issue. A bond trading near maturity returns a small COUPNUM even if it originally had dozens of coupon payments.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUPNUM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUPNUM(DATE(2011,1,25), DATE(2011,11,15), 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim numCoupons As Double
+    numCoupons = Application.WorksheetFunction.CoupNum( _
+      DateSerial(2011, 1, 25), DateSerial(2011, 11, 15), 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    def coupon_count(settlement, maturity, frequency):
+        interval = relativedelta(months=12 // frequency)
+        ncd = maturity
+        while ncd > settlement:
+            ncd -= interval
+        while ncd <= settlement:
+            ncd += interval
+        count = 0
+        d = ncd
+        while d <= maturity:
+            count += 1
+            d += interval
+        return count
+
+    n = coupon_count(date(2011, 1, 25), date(2011, 11, 15), 2)
+    print(n)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUPNCD](/docs/financial/coupncd) — the first of the remaining
+  coupon dates this function counts.
+- [PRICE](/docs/financial/price) — the bond-pricing function this
+  coupon count feeds into directly.
+- [DURATION](/docs/financial/duration) — the weighted-average time
+  to cash flows, summed over this same number of periods.

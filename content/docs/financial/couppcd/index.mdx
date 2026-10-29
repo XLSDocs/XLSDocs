@@ -1,0 +1,182 @@
+---
+title: COUPPCD
+description: Find the previous coupon date before the settlement date.
+---
+
+Find the **previous coupon payment date** before settlement — the
+actual calendar date, the mirror image of
+[COUPNCD](/docs/financial/coupncd).
+
+export const quickAnswerFacts = [
+  { text: 'Returns a date (serial number) — format the result cell as a date to read it', type: 'check' },
+  { text: 'A step function — the same result for every settlement date within one coupon period', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUPPCD(settlement, maturity, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUPPCD(settlement, maturity, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The most recent coupon date before `settlement`, as a date serial
+number.
+
+## Description
+
+Coupon dates are spaced `12/frequency` months apart, counting
+backward from `maturity`. COUPPCD walks that schedule to find the
+last one that falls on or before `settlement`:
+
+<ExcelCode>{`=COUPPCD(DATE(2011,1,25), DATE(2011,11,15), 2, 1) → 11/15/2010 (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="idea">
+  **COUPPCD is also [ACCRINT](/docs/financial/accrint)'s implicit
+  starting point** for a bond that's already paid at least one
+  coupon — once settlement is past the very first coupon period,
+  accrued interest counts from this previous coupon date, not from
+  the security's original issue date.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9/1/2010': '5/15/2010', '3/1/2011': '11/15/2010', '9/1/2011': '5/15/2011' }}
+  defaultValue="3/1/2011"
+  label={'Live preview — =COUPPCD({value}, 11/15/2011, 2, 1)'}
+  fieldLabel="settlement"
+/>
+
+Each settlement date here falls in a different half-year coupon
+period, so each one looks back to a different previous coupon date
+— but moving settlement without crossing a coupon date wouldn't
+change the result.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`COUPPCD(DATE(2011,11,15), DATE(2011,1,25), 2, 1) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### The result displays as a number instead of a date
+
+<ExcelCode>{`COUPPCD(...) → 40492 (format the cell as a date to see 11/15/2010)`}</ExcelCode>
+
+Like every Excel date, COUPPCD's result is a plain serial number
+under the hood — format the cell as a date to display it the way
+you'd expect.
+
+export const faqs = [
+  {
+    question: 'How is COUPPCD different from COUPDAYBS?',
+    answer: "COUPPCD returns the actual previous coupon date itself. COUPDAYBS returns the number of days between that same date and settlement. They describe the same underlying fact in two different forms.",
+  },
+  {
+    question: 'What if settlement falls exactly on a coupon date?',
+    answer: "COUPPCD treats that date itself as the previous coupon date (returning settlement unchanged), which makes COUPDAYBS come out to 0 for the same inputs — there's no elapsed time in the current period because it just started.",
+  },
+  {
+    question: 'Is the coupon schedule anchored to issue date or maturity?',
+    answer: "Maturity. COUPPCD (and this whole function family) has no issue date input — the schedule is built entirely by stepping backward from maturity in equal 12/frequency-month intervals, regardless of when the security was actually issued.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUPPCD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUPPCD(DATE(2011,1,25), DATE(2011,11,15), 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim prevCoupon As Date
+    prevCoupon = Application.WorksheetFunction.CoupPCD( _
+      DateSerial(2011, 1, 25), DateSerial(2011, 11, 15), 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    def previous_coupon_date(settlement, maturity, frequency):
+        interval = relativedelta(months=12 // frequency)
+        ncd = maturity
+        while ncd > settlement:
+            ncd -= interval
+        while ncd <= settlement:
+            ncd += interval
+        return ncd - interval
+
+    pcd = previous_coupon_date(date(2011, 1, 25), date(2011, 11, 15), 2)
+    print(pcd)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUPNCD](/docs/financial/coupncd) — the next coupon date, the
+  mirror image of this function.
+- [COUPDAYBS](/docs/financial/coupdaybs) — the day count from this
+  same previous coupon date.
+- [ACCRINT](/docs/financial/accrint) — accrued interest, which
+  counts from this same previous coupon date once a bond is past
+  its first coupon period.

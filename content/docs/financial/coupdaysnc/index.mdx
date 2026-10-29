@@ -1,0 +1,181 @@
+---
+title: COUPDAYSNC
+description: Calculate the number of days from the settlement date to the next coupon date.
+---
+
+Calculate how many days remain **until the next coupon payment**,
+counting forward from settlement — the mirror image of
+[COUPDAYBS](/docs/financial/coupdaybs).
+
+export const quickAnswerFacts = [
+  { text: 'Counts days from settlement forward to (and including) the next coupon date', type: 'check' },
+  { text: 'One of six coupon-date functions that share the same settlement/maturity/frequency/basis inputs', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUPDAYSNC(settlement, maturity, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUPDAYSNC(settlement, maturity, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of days between `settlement` and the next coupon date
+after it.
+
+## Description
+
+COUPDAYSNC finds the first coupon date after `settlement` (the same
+date [COUPNCD](/docs/financial/coupncd) returns), then counts how
+many days are left until it arrives — the "DSC" figure
+[PRICE](/docs/financial/price) and
+[DURATION](/docs/financial/duration) use internally to discount the
+current, partial coupon period:
+
+<ExcelCode>{`=COUPDAYSNC(DATE(2011,1,25), DATE(2011,11,15), 2, 1) → 110 (Microsoft's own documented example — the next coupon date is 5/15/2011)`}</ExcelCode>
+
+<Callout type="idea">
+  **COUPDAYSNC and [COUPDAYBS](/docs/financial/coupdaybs) always
+  add up to [COUPDAYS](/docs/financial/coupdays)** — days remaining
+  plus days already elapsed in the current coupon period equal the
+  period's full length, whatever `settlement` happens to be.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '11/20/2010': '176', '1/25/2011': '110', '3/1/2011': '75' }}
+  defaultValue="1/25/2011"
+  label={'Live preview — =COUPDAYSNC({value}, 11/15/2011, 2, 1)'}
+  fieldLabel="settlement"
+/>
+
+All three settlement dates fall in the same coupon period (next
+coupon due 5/15/2011) — moving `settlement` later counts down the
+days remaining until that payment.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`COUPDAYSNC(DATE(2011,11,15), DATE(2011,1,25), 2, 1) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — an invalid frequency
+
+<ExcelCode>{`COUPDAYSNC(DATE(2011,1,25), DATE(2011,11,15), 3, 1) → #NUM! (frequency must be 1, 2, or 4)`}</ExcelCode>
+
+`frequency` only accepts `1`, `2`, or `4`.
+
+export const faqs = [
+  {
+    question: 'How is COUPDAYSNC different from COUPDAYBS?',
+    answer: "COUPDAYSNC counts forward from settlement to the next coupon date — days remaining in the current period. COUPDAYBS counts backward instead, to the previous coupon date — days already elapsed. The two always sum to COUPDAYS, the full period length.",
+  },
+  {
+    question: 'Is this the same as COUPNCD minus settlement?',
+    answer: "Conceptually yes — COUPNCD returns the actual next coupon date, and COUPDAYSNC is the day count between settlement and that date. The difference is just that COUPDAYSNC returns a number of days directly, rather than a date you'd still need to subtract from settlement yourself.",
+  },
+  {
+    question: 'What is this used for in bond pricing?',
+    answer: "It's the DSC figure bond-pricing functions like PRICE and DURATION use to discount the partial current coupon period correctly, since a bond bought mid-period is owed less than a full period's worth of that next coupon.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUPDAYSNC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUPDAYSNC(DATE(2011,1,25), DATE(2011,11,15), 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim daysNC As Double
+    daysNC = Application.WorksheetFunction.CoupDaysNC( _
+      DateSerial(2011, 1, 25), DateSerial(2011, 11, 15), 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    def next_coupon_date(settlement, maturity, frequency):
+        interval = relativedelta(months=12 // frequency)
+        ncd = maturity
+        while ncd > settlement:
+            ncd -= interval
+        while ncd <= settlement:
+            ncd += interval
+        return ncd
+
+    ncd = next_coupon_date(date(2011, 1, 25), date(2011, 11, 15), 2)
+    days_nc = (ncd - date(2011, 1, 25)).days  # actual/actual (basis=1) only
+    print(days_nc)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUPDAYBS](/docs/financial/coupdaybs) — the complementary count,
+  days already elapsed since the previous coupon.
+- [COUPNCD](/docs/financial/coupncd) — the next coupon date itself,
+  rather than a day count to it.
+- [COUPDAYS](/docs/financial/coupdays) — the full length of the
+  current coupon period.

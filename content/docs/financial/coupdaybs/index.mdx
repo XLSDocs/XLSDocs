@@ -1,0 +1,183 @@
+---
+title: COUPDAYBS
+description: Calculate the number of days from the beginning of a bond's coupon period to the settlement date.
+---
+
+Calculate how many days have elapsed **since the last coupon
+payment**, up to the settlement date — one of the building blocks
+bond-pricing functions like [PRICE](/docs/financial/price) use
+internally to prorate accrued interest.
+
+export const quickAnswerFacts = [
+  { text: 'Counts days from the previous coupon date up to (not including) settlement', type: 'check' },
+  { text: 'One of six coupon-date functions that share the same settlement/maturity/frequency/basis inputs', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUPDAYBS(settlement, maturity, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUPDAYBS(settlement, maturity, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of days between the coupon date immediately before
+`settlement` and `settlement` itself.
+
+## Description
+
+Bonds pay coupons on a fixed schedule derived backward from
+`maturity`, spaced `12/frequency` months apart. COUPDAYBS finds the
+most recent one of those coupon dates that falls before
+`settlement`, then counts the days from there up to `settlement` —
+exactly the portion of the current coupon period a seller has
+already earned.
+
+<ExcelCode>{`=COUPDAYBS(DATE(2011,1,25), DATE(2011,11,15), 2, 1) → 71 (Microsoft's own documented example — the previous coupon date is 11/15/2010)`}</ExcelCode>
+
+<Callout type="idea">
+  **COUPDAYBS and [COUPDAYSNC](/docs/financial/coupdaysnc) always
+  add up to [COUPDAYS](/docs/financial/coupdays)** — the days
+  already elapsed plus the days still remaining in the current
+  coupon period equal the period's total length, no matter where
+  `settlement` falls within it.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '11/20/2010': '5', '1/25/2011': '71', '3/1/2011': '106' }}
+  defaultValue="1/25/2011"
+  label={'Live preview — =COUPDAYBS({value}, 11/15/2011, 2, 1)'}
+  fieldLabel="settlement"
+/>
+
+All three settlement dates fall in the same coupon period (the
+previous coupon paid 11/15/2010, the next due 5/15/2011) — moving
+`settlement` later in that period simply counts more elapsed days.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`COUPDAYBS(DATE(2011,11,15), DATE(2011,1,25), 2, 1) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — an invalid frequency
+
+<ExcelCode>{`COUPDAYBS(DATE(2011,1,25), DATE(2011,11,15), 3, 1) → #NUM! (frequency must be 1, 2, or 4)`}</ExcelCode>
+
+`frequency` only accepts `1`, `2`, or `4`.
+
+export const faqs = [
+  {
+    question: 'How is COUPDAYBS different from COUPDAYSNC?',
+    answer: "COUPDAYBS counts days backward from settlement to the previous coupon date — how much of the current period has already elapsed. COUPDAYSNC counts forward from settlement to the next coupon date instead. The two always add up to COUPDAYS, the full length of the period.",
+  },
+  {
+    question: 'Why would I need this instead of just subtracting dates manually?',
+    answer: "COUPDAYBS first has to work out exactly where the previous coupon date falls, which depends on maturity and frequency (coupon dates are spaced backward from maturity, not forward from issue) — getting that date right by hand is easy to get wrong, especially near month-end dates or under a 30/360 day-count basis.",
+  },
+  {
+    question: 'Does basis change which previous coupon date is found?',
+    answer: "No — basis only changes how the days between that date and settlement are counted (30/360 vs. actual calendar days, for example), not which date is identified as the previous coupon date in the first place.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUPDAYBS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUPDAYBS(DATE(2011,1,25), DATE(2011,11,15), 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim daysBS As Double
+    daysBS = Application.WorksheetFunction.CoupDayBS( _
+      DateSerial(2011, 1, 25), DateSerial(2011, 11, 15), 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    def previous_coupon_date(settlement, maturity, frequency):
+        interval = relativedelta(months=12 // frequency)
+        ncd = maturity
+        while ncd > settlement:
+            ncd -= interval
+        while ncd <= settlement:
+            ncd += interval
+        return ncd - interval
+
+    pcd = previous_coupon_date(date(2011, 1, 25), date(2011, 11, 15), 2)
+    days_bs = (date(2011, 1, 25) - pcd).days  # actual/actual (basis=1) only
+    print(days_bs)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUPDAYSNC](/docs/financial/coupdaysnc) — days from settlement
+  forward to the next coupon date, the complementary count.
+- [COUPDAYS](/docs/financial/coupdays) — the total length of the
+  coupon period containing settlement.
+- [COUPPCD](/docs/financial/couppcd) — the previous coupon date
+  itself, rather than a day count from it.

@@ -1,0 +1,182 @@
+---
+title: COUPDAYS
+description: Calculate the number of days in the coupon period that contains the settlement date.
+---
+
+Calculate the **total length, in days, of the coupon period
+containing settlement** — the denominator behind every
+proration calculation in this site's bond-pricing family.
+
+export const quickAnswerFacts = [
+  { text: 'The span from the previous coupon date to the next one, however long that period actually is', type: 'check' },
+  { text: 'One of six coupon-date functions that share the same settlement/maturity/frequency/basis inputs', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUPDAYS(settlement, maturity, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUPDAYS(settlement, maturity, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of days from the coupon date before `settlement` to the
+coupon date after it — the full length of whichever period
+`settlement` happens to fall in.
+
+## Description
+
+Every other proration this family of functions does — accrued
+interest, the fractional-period adjustment inside
+[PRICE](/docs/financial/price) — is expressed as a fraction *of*
+this period length. COUPDAYS finds that length directly:
+
+<ExcelCode>{`=COUPDAYS(DATE(2011,1,25), DATE(2011,11,15), 2, 1) → 181 (Microsoft's own documented example — the period runs 11/15/2010 to 5/15/2011)`}</ExcelCode>
+
+<Callout type="warn">
+  **A semiannual coupon period isn't always exactly 180 or 182
+  days** — under `basis 1` (actual/actual), the real calendar
+  length of each half-year period varies slightly depending on
+  which months it spans and whether a leap day falls inside it.
+  Only the 30/360-style bases (`0` and `4`) force every period to a
+  fixed round number of days.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': '365', '2': '181', '4': '92' }}
+  defaultValue="2"
+  label={'Live preview — =COUPDAYS(1/25/2011, 11/15/2011, {value}, 1)'}
+  fieldLabel="frequency"
+/>
+
+With the same settlement and maturity dates, a higher `frequency`
+packs more, shorter coupon periods into the same year — quarterly
+periods run roughly a quarter the length of annual ones.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`COUPDAYS(DATE(2011,11,15), DATE(2011,1,25), 2, 1) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — an invalid frequency
+
+<ExcelCode>{`COUPDAYS(DATE(2011,1,25), DATE(2011,11,15), 3, 1) → #NUM! (frequency must be 1, 2, or 4)`}</ExcelCode>
+
+`frequency` only accepts `1`, `2`, or `4`.
+
+export const faqs = [
+  {
+    question: 'How is COUPDAYS different from COUPDAYBS and COUPDAYSNC?',
+    answer: "COUPDAYS returns the full length of the coupon period containing settlement. COUPDAYBS and COUPDAYSNC split that same period into the portion already elapsed and the portion still remaining — together, they always add back up to COUPDAYS.",
+  },
+  {
+    question: "Why isn't the result always a round number like 180 or 90?",
+    answer: "Under basis 1 (actual/actual) or basis 2/3, COUPDAYS counts real calendar days, which varies period to period depending on month lengths and leap years. Only the 30/360-style conventions (basis 0 and 4) force every coupon period to a fixed round length.",
+  },
+  {
+    question: 'Does COUPDAYS depend on where exactly settlement falls within the period?',
+    answer: "No — COUPDAYS only cares which period settlement falls into, not the exact day within it. Any settlement date between the same two coupon dates returns the same result.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUPDAYS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUPDAYS(DATE(2011,1,25), DATE(2011,11,15), 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim daysInPeriod As Double
+    daysInPeriod = Application.WorksheetFunction.CoupDays( _
+      DateSerial(2011, 1, 25), DateSerial(2011, 11, 15), 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    def coupon_period_bounds(settlement, maturity, frequency):
+        interval = relativedelta(months=12 // frequency)
+        ncd = maturity
+        while ncd > settlement:
+            ncd -= interval
+        while ncd <= settlement:
+            ncd += interval
+        return ncd - interval, ncd  # previous, next
+
+    pcd, ncd = coupon_period_bounds(date(2011, 1, 25), date(2011, 11, 15), 2)
+    days_in_period = (ncd - pcd).days  # actual/actual (basis=1) only
+    print(days_in_period)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUPDAYBS](/docs/financial/coupdaybs) — days elapsed so far in
+  this same period.
+- [COUPDAYSNC](/docs/financial/coupdaysnc) — days remaining in this
+  same period.
+- [COUPNUM](/docs/financial/coupnum) — the total number of coupon
+  periods left until maturity.

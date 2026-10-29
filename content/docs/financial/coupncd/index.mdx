@@ -1,0 +1,178 @@
+---
+title: COUPNCD
+description: Find the next coupon date after the settlement date.
+---
+
+Find the **next coupon payment date** after settlement — the actual
+calendar date, rather than a day count toward it.
+
+export const quickAnswerFacts = [
+  { text: 'Returns a date (serial number) — format the result cell as a date to read it', type: 'check' },
+  { text: 'A step function — the same result for every settlement date within one coupon period', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=COUPNCD(settlement, maturity, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=COUPNCD(settlement, maturity, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The first coupon date after `settlement`, as a date serial number.
+
+## Description
+
+Coupon dates are spaced `12/frequency` months apart, counting
+backward from `maturity` — not forward from issue. COUPNCD walks
+that schedule to find the first one that falls after `settlement`:
+
+<ExcelCode>{`=COUPNCD(DATE(2011,1,25), DATE(2011,11,15), 2, 1) → 5/15/2011 (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="warn">
+  **COUPNCD is a step function of `settlement`, not a smooth one** —
+  every settlement date within the same coupon period returns the
+  exact same next coupon date. The result only changes once
+  `settlement` crosses an actual coupon date.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '9/1/2010': '11/15/2010', '3/1/2011': '5/15/2011', '9/1/2011': '11/15/2011' }}
+  defaultValue="3/1/2011"
+  label={'Live preview — =COUPNCD({value}, 11/15/2011, 2, 1)'}
+  fieldLabel="settlement"
+/>
+
+Each settlement date here falls in a different half-year coupon
+period, so each one returns a different next coupon date — but
+moving settlement without crossing one of those boundary dates
+wouldn't change the result at all.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`COUPNCD(DATE(2011,11,15), DATE(2011,1,25), 2, 1) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### The result displays as a number instead of a date
+
+<ExcelCode>{`COUPNCD(...) → 40674 (format the cell as a date to see 5/15/2011)`}</ExcelCode>
+
+Like every Excel date, COUPNCD's result is a plain serial number
+under the hood — format the cell as a date to display it the way
+you'd expect.
+
+export const faqs = [
+  {
+    question: 'How is COUPNCD different from COUPDAYSNC?',
+    answer: "COUPNCD returns the actual next coupon date itself. COUPDAYSNC returns the number of days between settlement and that same date. They describe the same underlying fact in two different forms.",
+  },
+  {
+    question: 'Why does changing settlement sometimes not change the result?',
+    answer: "COUPNCD only depends on which coupon period settlement falls into, not the exact day within it — any settlement date between the same two coupon dates returns the same next coupon date.",
+  },
+  {
+    question: 'Are coupon dates counted forward from issue or backward from maturity?',
+    answer: "Backward from maturity. COUPNCD (and the rest of this function family) has no issue date input at all — the schedule is entirely determined by maturity and frequency, stepping backward in equal 12/frequency-month intervals.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with COUPNCD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=COUPNCD(DATE(2011,1,25), DATE(2011,11,15), 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim nextCoupon As Date
+    nextCoupon = Application.WorksheetFunction.CoupNCD( _
+      DateSerial(2011, 1, 25), DateSerial(2011, 11, 15), 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+    from dateutil.relativedelta import relativedelta
+
+    def next_coupon_date(settlement, maturity, frequency):
+        interval = relativedelta(months=12 // frequency)
+        ncd = maturity
+        while ncd > settlement:
+            ncd -= interval
+        while ncd <= settlement:
+            ncd += interval
+        return ncd
+
+    ncd = next_coupon_date(date(2011, 1, 25), date(2011, 11, 15), 2)
+    print(ncd)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COUPPCD](/docs/financial/couppcd) — the previous coupon date,
+  the mirror image of this function.
+- [COUPDAYSNC](/docs/financial/coupdaysnc) — the day count to this
+  same next coupon date.
+- [COUPNUM](/docs/financial/coupnum) — how many coupons remain
+  between settlement and maturity.
