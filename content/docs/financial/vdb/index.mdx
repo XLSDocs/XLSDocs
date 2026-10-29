@@ -1,0 +1,190 @@
+---
+title: VDB
+description: Calculate declining-balance depreciation for any specified period, including partial periods, with automatic switch to straight-line.
+---
+
+Calculate declining-balance depreciation for **any specified period
+range**, including a fractional/partial period — the most flexible
+of this site's declining-balance depreciation functions, and the
+only one that can report depreciation summed across multiple
+periods in a single call.
+
+export const quickAnswerFacts = [
+  { text: 'start_period and end_period use the same units as life, and can be fractional', type: 'check' },
+  { text: 'factor defaults to 2 (double-declining balance) if omitted', type: 'check' },
+  { text: 'By default, automatically switches to straight-line once that exceeds the declining-balance amount', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VDB(cost, salvage, life, start_period, end_period, [factor], [no_switch])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VDB(cost, salvage, life, start_period, end_period, [factor], [no_switch])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'cost',
+    type: 'number',
+    required: true,
+    description: "The asset's purchase cost.",
+  },
+  {
+    name: 'salvage',
+    type: 'number',
+    required: true,
+    description: "The asset's value at the end of its useful life.",
+  },
+  {
+    name: 'life',
+    type: 'number',
+    required: true,
+    description: "The asset's useful life, in periods.",
+  },
+  {
+    name: 'start_period',
+    type: 'number',
+    required: true,
+    description: 'The starting period, in the same units as life. Can be fractional.',
+  },
+  {
+    name: 'end_period',
+    type: 'number',
+    required: true,
+    description: 'The ending period, in the same units as life. Can be fractional.',
+  },
+  {
+    name: 'factor',
+    type: 'number',
+    required: false,
+    description: 'The rate at which the balance declines. Defaults to 2 (double-declining balance).',
+  },
+  {
+    name: 'no_switch',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE to never switch to straight-line, even once it would exceed the declining-balance amount. Defaults to FALSE.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The total depreciation across the span from `start_period` to
+`end_period`, using declining-balance at `factor` (double-declining
+by default), switching to straight-line partway through unless
+`no_switch` is `TRUE`.
+
+## Description
+
+VDB generalizes [DDB](/docs/financial/ddb) in two ways: it can
+report depreciation summed across a *range* of periods (not just
+one), including a genuinely fractional start or end point for a
+partial period, and — unless `no_switch` is set — it automatically
+switches from declining-balance to straight-line partway through the
+asset's life, at exactly the point where straight-line would produce
+*more* depreciation than declining-balance would from there on. This
+switch matters because pure declining-balance alone never fully
+depreciates an asset down to its salvage value on its own.
+
+<ExcelCode>{`=VDB(10000, 1000, 5, 0, 1) → 4000 (year 1 of a 5-year double-declining-balance schedule — matches DDB's own first-year result)`}</ExcelCode>
+
+<ExcelCode>{`=VDB(10000, 1000, 5, 0, 5) → 9000 (summed across the full 5-year life, exactly cost - salvage, thanks to the automatic switch to straight-line)`}</ExcelCode>
+
+<Callout type="idea">
+  **The automatic switch to straight-line is what fully depreciates
+  the asset by the end of its life.** Pure declining-balance,
+  unmodified, approaches `salvage` but never actually reaches it —
+  VDB's default behavior (unless `no_switch=TRUE`) crosses over to
+  straight-line exactly when that produces the larger depreciation
+  amount, so the total across the full `life` lands exactly on
+  `cost - salvage`.
+</Callout>
+
+## Common errors
+
+### #NUM! — start_period or end_period outside the asset's life
+
+<ExcelCode>{`VDB(10000, 1000, 5, 0, 6) → #NUM! (end_period of 6 exceeds the 5-period life)`}</ExcelCode>
+
+`start_period` and `end_period` both need to fall within `0` to
+`life`.
+
+### Forgetting start_period/end_period use life's units, not dates
+
+<ExcelCode>{`VDB(10000, 1000, 5, "1/1/2024", "12/31/2024") → #VALUE! — these are period numbers, not calendar dates`}</ExcelCode>
+
+Unlike the French-accounting depreciation functions
+([AMORDEGRC](/docs/financial/amordegrc)/[AMORLINC](/docs/financial/amorlinc)),
+VDB's periods are plain numbers in whatever unit `life` is expressed
+in (years, months, etc.) — not calendar dates.
+
+export const faqs = [
+  {
+    question: 'How is VDB different from DDB?',
+    answer: "DDB calculates depreciation for exactly one whole period at a time. VDB can sum depreciation across a range of periods in one call, accepts fractional start/end periods for a partial-period calculation, and (by default) automatically switches to straight-line partway through the asset's life — DDB never switches on its own.",
+  },
+  {
+    question: 'What does the automatic switch to straight-line actually do?',
+    answer: "Declining-balance alone shrinks the depreciation amount every period but never reaches exactly 0 remaining book value above salvage. VDB checks each period whether straight-line depreciation on the remaining balance and remaining life would be larger than the declining-balance amount, and switches once it is — which is what lets the total depreciation across the full asset life land exactly on cost minus salvage.",
+  },
+  {
+    question: 'What happens if I set no_switch to TRUE?',
+    answer: "VDB stays on pure declining-balance for the entire period range, even past the point where straight-line would produce more depreciation — meaning the asset's book value approaches, but never quite reaches, its salvage value by the end of its stated life.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VDB from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VDB(10000, 1000, 5, 0, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.VDB(10000, 1000, 5, 0, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy_financial as npf
+
+    # numpy_financial has no direct VDB — its db()/ddb()-style helpers
+    # compute one period at a time, without VDB's automatic SLN switch
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DDB](/docs/financial/ddb) — the single-period version, with no
+  automatic switch to straight-line.
+- [DB](/docs/financial/db) — fixed-declining-balance depreciation,
+  a different (not double-declining) rate convention.
+- [SLN](/docs/financial/sln) — plain straight-line depreciation, the
+  method VDB automatically switches to partway through.

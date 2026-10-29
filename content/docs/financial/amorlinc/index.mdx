@@ -1,0 +1,180 @@
+---
+title: AMORLINC
+description: Calculate French-accounting-system straight-line depreciation, prorated for a mid-period purchase.
+---
+
+Calculate depreciation for an accounting period under the **French
+accounting system**, using a flat straight-line rate — the simpler
+counterpart to [AMORDEGRC](/docs/financial/amordegrc)'s accelerated,
+life-coefficient-based method.
+
+export const quickAnswerFacts = [
+  { text: 'Depreciation per full period is a flat cost * rate — no accelerating coefficient, unlike AMORDEGRC', type: 'check' },
+  { text: 'The first period is prorated by the actual days between date_purchased and first_period', type: 'check' },
+  { text: 'date_purchased later than first_period, or salvage greater than cost, returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=AMORLINC(cost, date_purchased, first_period, salvage, period, rate, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AMORLINC(cost, date_purchased, first_period, salvage, period, rate, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'cost',
+    type: 'number',
+    required: true,
+    description: "The asset's purchase cost.",
+  },
+  {
+    name: 'date_purchased',
+    type: 'date',
+    required: true,
+    description: 'The date the asset was purchased.',
+  },
+  {
+    name: 'first_period',
+    type: 'date',
+    required: true,
+    description: 'The date the first accounting period ends.',
+  },
+  {
+    name: 'salvage',
+    type: 'number',
+    required: true,
+    description: "The asset's value at the end of its useful life.",
+  },
+  {
+    name: 'period',
+    type: 'number',
+    required: true,
+    description: 'The accounting period to calculate depreciation for.',
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The depreciation rate.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: '0 (default) 360-day NASD, 1 actual, 3 365-day, 4 360-day European.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The depreciation amount for `period`. A full period's depreciation
+is a flat `cost * rate`; the first (partial) period is prorated by
+the actual number of days between `date_purchased` and
+`first_period`.
+
+## Description
+
+AMORLINC is the French accounting system's straight-line
+depreciation method — every full accounting period depreciates the
+asset by the same flat amount (`cost * rate`), with the one
+exception being the very first period, which is shortened to
+reflect however much of that period the asset was actually owned
+before `first_period`'s cutoff.
+
+<ExcelCode>{`=AMORLINC(2400, "8/19/2008", "12/31/2008", 300, 1, 0.15, 1) → 360 (a full period's flat depreciation, equal to cost * rate)`}</ExcelCode>
+
+<Callout type="idea">
+  **AMORLINC's period 1 result here is exactly `cost * rate`
+  (`2400 * 0.15 = 360`), with no proration** — the proration happens
+  in the implicit stub period *before* period 1, covering the 134
+  actual days between the August purchase date and the December
+  `first_period` cutoff. From period 1 onward, each full period
+  depreciates by the same flat amount, unlike
+  [AMORDEGRC](/docs/financial/amordegrc)'s accelerating coefficient.
+</Callout>
+
+## Common errors
+
+### #NUM! — salvage value greater than cost
+
+<ExcelCode>{`AMORLINC(2400, "8/19/2008", "12/31/2008", 3000, 1, 0.15) → #NUM! (salvage can't exceed cost)`}</ExcelCode>
+
+An asset can't have a salvage value worth more than what it
+originally cost.
+
+### #NUM! — a purchase date after the first period ends
+
+<ExcelCode>{`AMORLINC(2400, "1/1/2009", "12/31/2008", 300, 1, 0.15) → #NUM! (date_purchased is after first_period)`}</ExcelCode>
+
+`date_purchased` has to fall on or before `first_period`'s cutoff
+date — otherwise there's no valid span to prorate the first
+period's depreciation across.
+
+export const faqs = [
+  {
+    question: 'How is AMORLINC different from AMORDEGRC?',
+    answer: "AMORLINC uses a flat straight-line rate every full period (cost times rate, unchanged period to period). AMORDEGRC instead multiplies the rate by a coefficient based on the asset's useful life, producing a faster, declining-balance-style depreciation schedule.",
+  },
+  {
+    question: 'Why does the worked example for period 1 just equal cost times rate?',
+    answer: "Because the proration for the mid-year purchase happens in the period before period 1 — an implicit stub period covering the actual days from the purchase date to first_period's cutoff. From period 1 onward, AMORLINC uses the plain flat rate with no further adjustment (until the asset nears the end of its useful life).",
+  },
+  {
+    question: 'Is AMORLINC also deprecated, like AMORDEGRC?',
+    answer: "No — Microsoft's AMORLINC documentation carries no deprecation notice, unlike AMORDEGRC's. Both remain functions built specifically for the French accounting system, but only AMORDEGRC has been flagged as outdated following a change to that system's own methodology.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AMORLINC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AMORLINC(2400, "8/19/2008", "12/31/2008", 300, 1, 0.15, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.AmorLinc(2400, DateSerial(2008, 8, 19), DateSerial(2008, 12, 31), 300, 1, 0.15, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # AMORLINC's French-accounting-specific proration rules have no direct
+    # equivalent in numpy-financial or any common Python library
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AMORDEGRC](/docs/financial/amordegrc) — the accelerated
+  counterpart, using a life-based coefficient instead of a flat
+  rate.
+- [SLN](/docs/financial/sln) — the standard (non-French-accounting)
+  straight-line depreciation function.

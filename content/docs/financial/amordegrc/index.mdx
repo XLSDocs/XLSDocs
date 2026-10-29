@@ -1,0 +1,191 @@
+---
+title: AMORDEGRC
+description: Calculate French-accounting-system depreciation using a life-based accelerating coefficient. Deprecated — kept only for old workbooks.
+---
+
+Calculate depreciation for an accounting period under the **French
+accounting system**, using a declining-balance method accelerated
+by a coefficient based on the asset's useful life. **Microsoft
+documents this function as deprecated** — kept only so older
+workbooks that already use it keep working.
+
+export const quickAnswerFacts = [
+  { text: 'Deprecated by Microsoft — "should no longer be used," kept only for old workbooks', type: 'warn' },
+  { text: 'The depreciation rate is multiplied by a coefficient based on asset life (1/rate)', type: 'check' },
+  { text: 'The first period is prorated by the actual days between date_purchased and first_period', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=AMORDEGRC(cost, date_purchased, first_period, salvage, period, rate, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=AMORDEGRC(cost, date_purchased, first_period, salvage, period, rate, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'cost',
+    type: 'number',
+    required: true,
+    description: "The asset's purchase cost.",
+  },
+  {
+    name: 'date_purchased',
+    type: 'date',
+    required: true,
+    description: 'The date the asset was purchased.',
+  },
+  {
+    name: 'first_period',
+    type: 'date',
+    required: true,
+    description: 'The date the first accounting period ends.',
+  },
+  {
+    name: 'salvage',
+    type: 'number',
+    required: true,
+    description: "The asset's value at the end of its useful life.",
+  },
+  {
+    name: 'period',
+    type: 'number',
+    required: true,
+    description: 'The accounting period to calculate depreciation for.',
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: 'The depreciation rate.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: '0 (default) 360-day NASD, 1 actual, 3 365-day, 4 360-day European.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The depreciation amount for `period`, computed by declining-balance
+at `rate` multiplied by a coefficient set by the asset's useful
+life (`1/rate`):
+
+| Asset life | Coefficient |
+| --- | --- |
+| 3 to 4 years | 1.5 |
+| 5 to 6 years | 2 |
+| More than 6 years | 2.5 |
+
+An asset life falling in the gaps between these bands (0-1, 1-2,
+2-3, or 4-5 years) returns `#NUM!`.
+
+## Description
+
+AMORDEGRC is built for the French accounting system's accelerated
+depreciation method — rather than a fixed declining-balance factor
+like [DDB](/docs/financial/ddb)'s default of `2`, the effective rate
+is determined by looking up the asset's useful life in the table
+above. The first accounting period is prorated for however many
+actual days sit between `date_purchased` and `first_period`,
+exactly the way a mid-year purchase doesn't earn a full year's
+depreciation.
+
+<ExcelCode>{`=AMORDEGRC(2400, "8/19/2008", "12/31/2008", 300, 1, 0.15, 1) → 776 (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="warn">
+  **Microsoft documents AMORDEGRC as deprecated**, specifically
+  because of changes to the French accounting system's own
+  depreciation methodology — it's kept in Excel purely so workbooks
+  built before that change keep calculating the same way they
+  always have. New work shouldn't build on this function.
+</Callout>
+
+## Common errors
+
+### #NUM! — an asset life that falls in a gap
+
+<ExcelCode>{`AMORDEGRC(2400, "8/19/2008", "12/31/2008", 300, 1, 0.4) → #NUM! (1/0.4 = 2.5 years, between the "3 to 4" and lower bands — no defined coefficient)`}</ExcelCode>
+
+The coefficient table has deliberate gaps between its bands — an
+asset life computed from `1/rate` that lands in one of those gaps
+has no defined coefficient and returns `#NUM!`.
+
+### #VALUE! — an invalid date
+
+<ExcelCode>{`AMORDEGRC(2400, "not a date", "12/31/2008", 300, 1, 0.15) → #VALUE!`}</ExcelCode>
+
+Enter dates with `DATE()` or a genuine date value, not free-form
+text — the same caution Microsoft gives for every date-based
+financial function.
+
+export const faqs = [
+  {
+    question: 'Should I use AMORDEGRC in a new workbook?',
+    answer: "No — Microsoft explicitly documents it as deprecated, following changes to the French accounting system's own depreciation rules. It's kept only so existing older workbooks that already reference it keep working.",
+  },
+  {
+    question: 'How is the depreciation coefficient determined?',
+    answer: "By the asset's useful life, computed as 1/rate: 1.5x for a 3-4 year life, 2x for 5-6 years, and 2.5x for more than 6 years. A life falling in the gaps between these bands (0-1, 1-2, 2-3, or 4-5 years) returns #NUM!.",
+  },
+  {
+    question: 'How is AMORDEGRC different from AMORLINC?',
+    answer: "AMORLINC uses a flat straight-line rate every period (cost times rate, with no coefficient). AMORDEGRC multiplies the rate by the life-based coefficient table above, producing a faster, declining-balance-style depreciation schedule instead.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with AMORDEGRC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=AMORDEGRC(2400, "8/19/2008", "12/31/2008", 300, 1, 0.15, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.AmorDegrc(2400, DateSerial(2008, 8, 19), DateSerial(2008, 12, 31), 300, 1, 0.15, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # AMORDEGRC's deprecated, French-accounting-specific coefficient table has no
+    # direct equivalent in numpy-financial or any common Python library
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [AMORLINC](/docs/financial/amorlinc) — the straight-line
+  counterpart, with no life-based coefficient.
+- [DDB](/docs/financial/ddb) — the standard (non-French-accounting)
+  declining-balance depreciation function.
+- [VDB](/docs/financial/vdb) — declining-balance depreciation for
+  any specified period, including partial periods.
