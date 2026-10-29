@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-29',
+    title: 'The Financial category is complete: 33 new functions across 5 rounds, from ACCRINTM to VDB',
+    description:
+      "The biggest gap-check on this site closes out: bond-pricing and depreciation math checked against Microsoft's full Financial reference. DOLLARDE/DOLLARFR, FVSCHEDULE, ISPMT, PDURATION, and RRI opened the project, followed by the TBILLPRICE/TBILLYIELD/TBILLEQ Treasury-bill family and the AMORDEGRC/AMORLINC/VDB depreciation functions. The bulk of the work was bond pricing: ACCRINTM, DISC, INTRATE, RECEIVED, PRICEDISC, YIELDDISC, PRICEMAT, YIELDMAT, PRICE, DURATION, and MDURATION handle discount, maturity, and coupon-paying securities; COUPDAYBS, COUPDAYS, COUPDAYSNC, COUPNCD, COUPNUM, and COUPPCD expose the coupon-date mechanics those functions rely on internally; and ODDFPRICE, ODDFYIELD, ODDLPRICE, and ODDLYIELD round it out for bonds with an irregular first or last coupon period. Every formula was independently reconstructed and numerically verified against Microsoft's own documented examples before being written up — several (AMORDEGRC, PRICE, the odd-period functions) had no formula text published at all, only final results to check against.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-10-28',
     title: 'The Lookup category is complete: AREAS, EXPAND, GROUPBY, PIVOTBY, IMAGE, and 5 more',
     description:
