@@ -1,0 +1,174 @@
+---
+title: CODE
+description: Return the numeric character code for the first character of a text string.
+---
+
+Return the numeric code for the first character in a text string —
+the exact reverse of [CHAR](/docs/text/char), useful for comparing
+characters numerically or diagnosing exactly what an unexpected
+character actually is.
+
+export const quickAnswerFacts = [
+  { text: 'Only looks at the very first character — the rest of the string is ignored', type: 'warn' },
+  { text: 'The exact code returned depends on your computer’s character set', type: 'warn' },
+  { text: 'The inverse of CHAR — CODE(CHAR(n)) returns n', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CODE(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CODE(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text whose first character’s code you want.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The numeric code, in your computer's character set, for the first
+character of `text`.
+
+## Description
+
+CODE is mostly used as a diagnostic tool — when a string that
+*looks* identical to another one fails an exact-match comparison,
+CODE on each one's first character (or combined with MID to check
+character-by-character) can reveal a sneaky invisible character or
+the wrong kind of space or dash that's causing the mismatch.
+
+<Callout type="warn">
+  **CODE only ever looks at the first character.**
+  `CODE("banana")` and `CODE("berry")` both return the code for
+  `"b"` — if you need to check every character in a string, combine
+  CODE with MID in a helper column or an array formula instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ A: '65', a: '97', $: '36' }}
+  defaultValue="A"
+  label={'=CODE(text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### #VALUE! — an empty string
+
+<ExcelCode>{`CODE("") → #VALUE! (there's no first character to look at)`}</ExcelCode>
+
+An empty string has no first character, so CODE has nothing to
+return a code for.
+
+### Expecting CODE to check more than the first character
+
+<ExcelCode>{`CODE("abc") = CODE("azz") → TRUE (both start with "a")`}</ExcelCode>
+
+If two strings share the same first character, CODE returns the
+same result for both regardless of what follows — it isn't a
+whole-string comparison.
+
+export const faqs = [
+  {
+    question: 'How is CODE different from UNICODE?',
+    answer: "CODE returns a code from your computer's own character set, which only reliably covers values up to 255 and can vary by region for anything above 127. UNICODE always returns the character's true Unicode code point, consistent across every system — the safer choice for anything beyond basic ASCII.",
+  },
+  {
+    question: 'Why would I use CODE instead of just looking at the text?',
+    answer: "To catch characters that look identical but aren't — a regular hyphen versus an en dash, a straight quote versus a curly one, or an invisible character like a non-breaking space. CODE turns an invisible or ambiguous difference into a concrete number you can compare.",
+  },
+  {
+    question: 'Can CODE check a character anywhere in a string, not just the first?',
+    answer: "Not directly — CODE always looks at position 1. To check a character elsewhere, extract it first with MID (e.g. MID(A2,3,1) for the third character) and wrap that result in CODE.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CODE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CODE(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim code As Integer
+    code = Asc(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    code = ord("A"[0])
+    print(code)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHAR](/docs/text/char) — the reverse: looks up the character for
+  a given numeric code.
+- [UNICODE](/docs/text/unicode) — the full-Unicode-range version of
+  this same lookup.
+- [EXACT](/docs/text/exact) — a case-sensitive whole-string
+  comparison, often a better fit than character-by-character CODE
+  checks.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — check a character's code" formula={`=CODE(A2)`}>
+  Returns the numeric code for whatever character sits first in the
+  cell.
+</ExampleCard>
+
+<ExampleCard number="02" label="Diagnosing an invisible mismatch" formula={`=CODE(MID(A2,5,1))`}>
+  Checks the code of a specific character position (here, the 5th)
+  to spot an unexpected space or special character.
+</ExampleCard>
+
+<ExampleCard number="03" label="Checking if text starts with an uppercase letter" formula={`=CODE(A2)<=90`}>
+  Uppercase ASCII letters fall in the range 65–90 — this flags
+  whether the first character is one of them.
+</ExampleCard>
+
+<ExampleCard number="04" label="Comparing a hyphen against an en dash" formula={`=CODE(A2)=CODE(B2)`}>
+  A regular hyphen (code 45) and an en dash (a different code)
+  look almost identical but compare as different — CODE reveals it.
+</ExampleCard>
+
+<ExampleCard number="05" label="Building a simple character-shift cipher" formula={`=CHAR(CODE(A2)+1)`}>
+  Shifts a single character forward by one code point — CODE and
+  CHAR used together as inverses.
+</ExampleCard>

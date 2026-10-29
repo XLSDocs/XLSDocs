@@ -1,0 +1,165 @@
+---
+title: "T"
+description: Return the text referred to by a value, or an empty string if the value isn't text.
+---
+
+Check whether a value is actually text, returning it unchanged if
+so or an empty string if not — a compatibility-focused function
+that exists mainly for spreadsheets imported from other programs.
+
+export const quickAnswerFacts = [
+  { text: 'Returns value unchanged if it’s text, or "" (empty string) otherwise', type: 'check' },
+  { text: 'Exists mainly for compatibility with other spreadsheet programs', type: 'check' },
+  { text: 'Numbers and TRUE/FALSE both return an empty string, not their text representation', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=T(value)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=T(value)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The value to test and conditionally return as text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`value` itself, unchanged, if it's text — otherwise an empty string
+(`""`).
+
+## Description
+
+T is a narrow, single-purpose compatibility function: unlike
+[VALUE](/docs/text/value) (text to number) or
+[TEXT](/docs/text/text) (number to formatted text), T does nothing
+to its input except decide whether to return it or discard it,
+based purely on whether it was already text to begin with.
+
+<Callout type="warn">
+  **T is not a way to convert a number into text** — a number
+  passed into T doesn't come back as its text representation, it
+  comes back as an empty string. For converting a number to text,
+  use [TEXT](/docs/text/text) instead.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ Hello: 'Hello', '123': '', TRUE: '' }}
+  defaultValue="Hello"
+  label={'=T(value)'}
+  fieldLabel="value"
+/>
+
+## Common errors
+
+### Expecting a number to come back as its text form
+
+<ExcelCode>{`T(123) → "" (not "123")`}</ExcelCode>
+
+T only passes text straight through — anything that isn't already
+text, including numbers, dates, and logical values, becomes an
+empty string instead of a text version of itself.
+
+### Confusing T with TYPE or ISTEXT
+
+<ExcelCode>{`T("hello") → "hello", not TRUE`}</ExcelCode>
+
+T returns the value itself (or an empty string), not a TRUE/FALSE
+flag. For a genuine yes/no answer to "is this text?", use
+[ISTEXT](/docs/info/istext) instead.
+
+export const faqs = [
+  {
+    question: 'What is T actually used for?',
+    answer: "Mainly compatibility with spreadsheet files imported from other programs that use it as part of their own formulas — it's rarely something you'd reach for when writing a new formula from scratch in Excel.",
+  },
+  {
+    question: 'How is T different from ISTEXT?',
+    answer: "ISTEXT returns TRUE or FALSE, answering the yes/no question of whether a value is text. T instead returns the value itself (if it's text) or an empty string (if it's not) — useful when you want to use the text conditionally, not just test for it.",
+  },
+  {
+    question: 'Does T convert numbers or dates to text?',
+    answer: "No — that's a common mix-up. T only passes an existing text value through unchanged; anything that isn't already text becomes an empty string. Use TEXT to actually convert a number into a formatted text string.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with T from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=T(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.T(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def t(value):
+        return value if isinstance(value, str) else ""
+
+    result = t(Range_A2_value)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VALUE](/docs/text/value) — converts genuine numeric text into
+  an actual number, the opposite direction from T.
+- [TEXT](/docs/text/text) — converts a number into formatted text,
+  which T deliberately does not do.
+- [ISTEXT](/docs/info/istext) — returns TRUE or FALSE for whether a
+  value is text, rather than conditionally returning it.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — pass through only if text" formula={`=T(A2)`}>
+  Returns A2 unchanged if it holds text, or an empty string if it
+  holds a number, date, or logical value.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building a label only when one exists" formula={`=T(A2)&IF(T(A2)<>"", ": ", "")&B2`}>
+  Prefixes a value with a label, but only adds the label and
+  separator if the label cell actually contains text.
+</ExampleCard>
+
+<ExampleCard number="03" label="Filtering a mixed column to text only" formula={`=TEXTJOIN(", ", TRUE, T(A2:A10))`}>
+  Combined with TEXTJOIN, builds a comma-separated list that
+  silently skips any non-text entries in the range.
+</ExampleCard>

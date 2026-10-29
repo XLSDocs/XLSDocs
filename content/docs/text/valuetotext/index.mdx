@@ -1,0 +1,180 @@
+---
+title: VALUETOTEXT
+description: Return a text representation of a single value, optionally wrapped in quotes exactly as it would appear in a formula.
+---
+
+Convert any single value into text, with control over whether the
+result is wrapped in quotes the way it would need to be typed into
+a formula — [ARRAYTOTEXT](/docs/text/arraytotext)'s single-value
+counterpart.
+
+export const quickAnswerFacts = [
+  { text: 'format 0 (default) returns the value with no added quoting', type: 'check' },
+  { text: 'format 1 wraps text values in quotes, matching formula syntax', type: 'check' },
+  { text: 'Numbers, logical values, and errors look the same in either format', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=VALUETOTEXT(value, [format])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=VALUETOTEXT(value, [format])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'The value to convert to text.',
+  },
+  {
+    name: 'format',
+    type: 'number',
+    required: false,
+    description: '0 (default) for a concise result, or 1 for a strict, formula-ready result. Defaults to 0.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`value` as text — unquoted in the default concise format, or
+wrapped in quotes (if `value` is text) in strict format.
+
+## Description
+
+VALUETOTEXT exists for the same reason
+[ARRAYTOTEXT](/docs/text/arraytotext) does, scaled down to a single
+value: sometimes you need a value's text representation to actually
+match the syntax you'd type into a formula, quotes and all — not
+just the value displayed plainly.
+
+<ExcelCode>{`=VALUETOTEXT("Hello") → Hello (concise — no quotes)`}</ExcelCode>
+
+<ExcelCode>{`=VALUETOTEXT("Hello", 1) → "Hello" (strict — quoted, exactly as you'd type it in a formula)`}</ExcelCode>
+
+<Callout type="idea">
+  **Strict format only changes the output for text values** —
+  numbers, `TRUE`/`FALSE`, and error values look identical in both
+  formats, since they're already written the same way whether or
+  not they're inside a formula. Only text needs the extra quotes to
+  be valid formula syntax.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': 'Hello', '1': '"Hello"' }}
+  defaultValue="0"
+  label={'Live preview — =VALUETOTEXT("Hello", {value})'}
+  fieldLabel="format"
+/>
+
+## Common errors
+
+### #VALUE! — an invalid format
+
+<ExcelCode>{`VALUETOTEXT("Hello", 2) → #VALUE! (only 0 or 1 are valid)`}</ExcelCode>
+
+`format` only accepts `0` or `1` — any other number returns an
+error.
+
+### Expecting quotes around a number in strict format
+
+<ExcelCode>{`VALUETOTEXT(123, 1) → 123 (no quotes — numbers never get them)`}</ExcelCode>
+
+Strict format only adds quotes around text values — a number
+already looks the same whether or not it's inside quotes in a
+formula, so VALUETOTEXT leaves it as-is.
+
+export const faqs = [
+  {
+    question: 'How is VALUETOTEXT different from TEXT?',
+    answer: "TEXT formats a number using a custom display format you specify (currency, percentage, a particular date style). VALUETOTEXT instead just returns a value's plain text representation, with the only real choice being whether text gets wrapped in quotes — it's not a formatting tool.",
+  },
+  {
+    question: 'When would I actually need the strict (quoted) format?',
+    answer: "Mainly when building formula text dynamically — for example, constructing a string that will later be evaluated as a formula, where a text value genuinely needs quotes around it to parse correctly, the same way LAMBDA-related debugging or dynamic-formula-building scenarios often do.",
+  },
+  {
+    question: 'How is VALUETOTEXT different from ARRAYTOTEXT?',
+    answer: "They share the same concise/strict format idea, but ARRAYTOTEXT is built for a whole array (handling row and column separators), while VALUETOTEXT is for exactly one value at a time.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with VALUETOTEXT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=VALUETOTEXT(A2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' No dedicated WorksheetFunction method — call it through
+    ' Application.Evaluate instead
+    Dim result As String
+    result = Application.Evaluate("VALUETOTEXT(A2,1)")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def value_to_text(value, strict=False):
+        if strict and isinstance(value, str):
+            return f'"{value}"'
+        return str(value)
+
+    print(value_to_text("Hello", strict=True))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2024', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ARRAYTOTEXT](/docs/text/arraytotext) — the same concise/strict
+  text-formatting idea, for a whole array instead of one value.
+- [TEXT](/docs/text/text) — applies a custom display format to a
+  number, rather than just choosing quoting style.
+- [T](/docs/text/t) — returns a value only if it's already text,
+  rather than converting any value type to text.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — convert a value to text" formula={`=VALUETOTEXT(A2)`}>
+  Returns the value's plain text representation, unquoted.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building formula-ready text" formula={`=VALUETOTEXT(A2, 1)`}>
+  Wraps the result in quotes if A2 holds text — exactly how it
+  would need to appear typed into a formula.
+</ExampleCard>
+
+<ExampleCard number="03" label="Logging a cell's value and type together" formula={`="Value: "&VALUETOTEXT(A2,1)&" ("&TYPE(A2)&")"`}>
+  Combines VALUETOTEXT with TYPE to build a one-line diagnostic
+  summary of a cell's content.
+</ExampleCard>

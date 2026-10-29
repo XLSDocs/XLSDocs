@@ -1,0 +1,175 @@
+---
+title: REPT
+description: Repeat a text string a specified number of times.
+---
+
+Repeat a piece of text a given number of times in a row — a quick
+way to build simple visual bars, separators, or repeated patterns
+directly inside a formula.
+
+export const quickAnswerFacts = [
+  { text: 'number_times must be 0 or greater — 0 returns an empty string', type: 'warn' },
+  { text: 'Works in every Excel version', type: 'check' },
+  { text: 'A common way to build quick in-cell bar charts', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=REPT(text, number_times)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=REPT(text, number_times)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text to repeat.',
+  },
+  {
+    name: 'number_times',
+    type: 'number',
+    required: true,
+    description: 'A positive number specifying how many times to repeat text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` repeated `number_times` times, with nothing inserted between
+repetitions.
+
+## Description
+
+REPT is a simple building block, but it's a popular one for quick,
+formula-only visualizations — a row of bar characters scaled by a
+score or percentage makes a crude but genuinely useful in-cell bar
+chart with zero formatting required.
+
+<Callout type="idea">
+  **A common pattern: `=REPT("█", ROUND(A2/10,0))`** — repeating a
+  solid block character a number of times proportional to a value
+  in `A2` turns a plain number into an instant in-cell bar, no
+  conditional formatting or actual chart object needed.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '1': 'ab', '3': 'ababab', '5': 'ababababab' }}
+  defaultValue="3"
+  label={'Live preview — =REPT("ab", {value})'}
+  fieldLabel="number_times"
+/>
+
+## Common errors
+
+### REPT(text, 0) returns an empty string, not an error
+
+<ExcelCode>{`REPT("ab", 0) → "" (an empty string, not #VALUE!)`}</ExcelCode>
+
+Zero repetitions is a valid input — it just means "nothing," not a
+mistake, so REPT returns an empty string rather than an error.
+
+### #VALUE! — a negative number_times
+
+<ExcelCode>{`REPT("ab", -1) → #VALUE! (number_times can't be negative)`}</ExcelCode>
+
+`number_times` has to be zero or a positive number.
+
+export const faqs = [
+  {
+    question: 'How do I build a simple bar chart with REPT?',
+    answer: 'Scale a value down to a reasonable repeat count and repeat a block character that many times: =REPT("█", ROUND(A2/MAX($A$2:$A$100)*20,0)) scales every value in the column to a 20-character-wide bar, for example.',
+  },
+  {
+    question: 'Can REPT repeat more than one character at once?',
+    answer: 'Yes — text can be any string, not just a single character. REPT("ab",3) returns "ababab", repeating the whole two-character string three times.',
+  },
+  {
+    question: 'Is there a limit to how many times REPT can repeat something?',
+    answer: 'The result is still limited by Excel’s overall cell text limit of 32,767 characters — a very large number_times combined with a long text string can hit that ceiling and return an error.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REPT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REPT("ab", 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim repeated As String
+    repeated = Application.WorksheetFunction.Rept("ab", 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    repeated = "ab" * 3
+    print(repeated)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CHAR](/docs/text/char) — often paired with REPT to repeat a
+  specific symbol character for a quick in-cell bar.
+- [TEXTJOIN](/docs/text/textjoin) — joins several *different*
+  values together, where REPT repeats the same one.
+- [CONCAT](/docs/text/concat) — combines REPT's output with other
+  text when building a more complex string.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — repeat a string" formula={`=REPT("ab", 3)`}>
+  Repeats "ab" three times in a row, with nothing inserted between
+  repetitions.
+</ExampleCard>
+
+<ExampleCard number="02" label="A simple in-cell bar chart" formula={`=REPT("█", ROUND(A2/10,0))`}>
+  Repeats a solid block character proportionally to a value in
+  A2, scaled down by 10 — an instant, formula-only bar chart.
+</ExampleCard>
+
+<ExampleCard number="03" label="Building a visual separator row" formula={`=REPT("-", 40)`}>
+  Creates a 40-character horizontal rule out of hyphens, useful as a
+  plain-text section divider.
+</ExampleCard>
+
+<ExampleCard number="04" label="Padding a number to a fixed width" formula={`=REPT("0", 5-LEN(A2))&A2`}>
+  Pads a shorter number with leading zeros to a consistent 5-digit
+  width, like a product or employee code.
+</ExampleCard>
+
+<ExampleCard number="05" label="Visualizing a rating out of 5" formula={`=REPT("★", A2)&REPT("☆", 5-A2)`}>
+  Builds a 5-star rating display by repeating filled and empty star
+  characters based on a numeric score in A2.
+</ExampleCard>

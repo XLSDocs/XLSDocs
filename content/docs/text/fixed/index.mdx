@@ -1,0 +1,177 @@
+---
+title: FIXED
+description: Round a number to a specified number of decimal places and convert it to text, optionally without thousands separators.
+---
+
+Round a number to a fixed number of decimal places and convert it
+to text — [DOLLAR](/docs/text/dollar) without the currency symbol,
+with an extra option to drop the thousands separators entirely.
+
+export const quickAnswerFacts = [
+  { text: 'decimals defaults to 2 if omitted', type: 'check' },
+  { text: 'no_commas defaults to FALSE — commas are included unless you turn them off', type: 'check' },
+  { text: 'A negative decimals rounds to the left of the decimal point', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FIXED(number, [decimals], [no_commas])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FIXED(number, [decimals], [no_commas])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to round and convert to text.',
+  },
+  {
+    name: 'decimals',
+    type: 'number',
+    required: false,
+    description: 'The number of digits after the decimal point. Defaults to 2. A negative value rounds to the left of the decimal point.',
+  },
+  {
+    name: 'no_commas',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE to omit thousands separators from the result. Defaults to FALSE (commas included).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number`, rounded to `decimals` digits and converted to text — with
+thousands separators unless `no_commas` is `TRUE`.
+
+## Description
+
+FIXED is essentially DOLLAR without the currency symbol — a plain
+rounded number as text, with the same negative-decimals-rounds-left
+behavior, plus the option to drop the comma separators that DOLLAR
+always includes.
+
+<Callout type="idea">
+  **`no_commas` is the one option DOLLAR doesn't have** — if you
+  want a currency symbol, use DOLLAR; if you want a plain rounded
+  number as text with full control over whether thousands
+  separators appear, FIXED is the better fit.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '1,235', '1': '1,234.6', '2': '1,234.57' }}
+  defaultValue="1"
+  label={'Live preview — =FIXED(1234.567, {value})'}
+  fieldLabel="decimals"
+/>
+
+## Common errors
+
+### The result won't sum correctly with other numbers
+
+<ExcelCode>{`=FIXED(A2)+FIXED(B2) → #VALUE! (both are text, not numbers)`}</ExcelCode>
+
+FIXED's output is text, not a number — if you still need to do
+math with the value, round the actual number with
+[ROUND](/docs/math/round) instead and keep it numeric.
+
+### Forgetting no_commas and getting unwanted separators
+
+<ExcelCode>{`FIXED(1234.567, 1) → "1,234.6" (commas included by default)`}</ExcelCode>
+
+If you're building a string that shouldn't contain commas — for a
+CSV-style export, for example — pass `TRUE` for `no_commas`
+explicitly, since it defaults to including them.
+
+export const faqs = [
+  {
+    question: 'How is FIXED different from DOLLAR?',
+    answer: "They work almost identically, but DOLLAR always adds a currency symbol based on your regional settings, while FIXED never does — it also adds the no_commas option to drop thousands separators, which DOLLAR doesn't offer at all.",
+  },
+  {
+    question: 'How is FIXED different from ROUND?',
+    answer: "ROUND returns a genuine number, still usable in further math. FIXED returns text, formatted with commas (unless you turn them off) — it's meant for display, not for continued calculation.",
+  },
+  {
+    question: 'What happens with a negative decimals value?',
+    answer: "Same as DOLLAR — it rounds to the left of the decimal point before converting to text. A decimals of -1, for example, rounds to the nearest ten.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FIXED from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FIXED(1234.567, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim formatted As String
+    formatted = FormatNumber(1234.567, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    formatted = f"{1234.567:,.1f}"
+    print(formatted)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DOLLAR](/docs/text/dollar) — the same rounded-text formatting,
+  with a currency symbol added.
+- [ROUND](/docs/math/round) — rounds a number and keeps it numeric,
+  rather than converting it to text.
+- [TEXT](/docs/text/text) — a more flexible way to format a number
+  as text using a custom format code.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — round and convert to text" formula={`=FIXED(1234.567, 1)`}>
+  Returns "1,234.6" as text, rounded to 1 decimal place.
+</ExampleCard>
+
+<ExampleCard number="02" label="Dropping the thousands separators" formula={`=FIXED(1234.567, 1, TRUE)`}>
+  Returns "1234.6" — no comma, useful for plain-text exports.
+</ExampleCard>
+
+<ExampleCard number="03" label="Rounding to the nearest ten" formula={`=FIXED(1234.567, -1)`}>
+  A negative decimals value rounds left of the decimal point,
+  returning "1,230".
+</ExampleCard>
+
+<ExampleCard number="04" label="Building a label with a fixed-precision value" formula={`="Average: "&FIXED(A2, 2)&" units"`}>
+  Embeds a consistently-rounded number directly inside a text
+  label.
+</ExampleCard>

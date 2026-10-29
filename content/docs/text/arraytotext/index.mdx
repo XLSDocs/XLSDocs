@@ -1,0 +1,177 @@
+---
+title: ARRAYTOTEXT
+description: Return a text representation of an array, either as a plain delimited list or as a formula-ready literal.
+---
+
+Convert an entire array into a single text string — useful for
+displaying a dynamic array's full contents in one cell, or for
+building a status message that reports on several values at once.
+
+export const quickAnswerFacts = [
+  { text: 'format 0 (default) returns a plain comma-separated list', type: 'check' },
+  { text: 'format 1 returns a strict, formula-ready array literal with curly braces', type: 'check' },
+  { text: 'Ignores number formatting — always uses the array’s underlying values', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ARRAYTOTEXT(array, [format])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ARRAYTOTEXT(array, [format])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'array',
+    required: true,
+    description: 'The array to convert to text.',
+  },
+  {
+    name: 'format',
+    type: 'number',
+    required: false,
+    description: '0 (default) for a concise comma-separated list, or 1 for a strict array literal. Defaults to 0.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A single text string representing every value in `array` — a flat,
+comma-separated list in the default concise format, or a
+curly-brace array literal matching formula syntax in strict format.
+
+## Description
+
+A dynamic array spills across multiple cells, which is great for
+seeing every result at once but awkward when you actually need all
+of it as one piece of text — a status message, a log entry, a
+single cell summary. ARRAYTOTEXT flattens the whole thing down into
+one string.
+
+<ExcelCode>{`=ARRAYTOTEXT({1,2,3}) → "1, 2, 3" (concise — the default)`}</ExcelCode>
+
+<ExcelCode>{`=ARRAYTOTEXT({1,2,3}, 1) → "{1,2,3}" (strict — valid to paste back into a formula)`}</ExcelCode>
+
+<Callout type="idea">
+  **Strict format (`1`) produces text you could paste directly back
+  into a formula** as a literal array — row separators become
+  semicolons, column separators become commas, and text values are
+  wrapped in quotes, exactly matching the syntax Excel itself uses
+  for a typed-in array constant.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '1, 2, 3', '1': '{1,2,3}' }}
+  defaultValue="0"
+  label={'Live preview — =ARRAYTOTEXT({1,2,3}, {value})'}
+  fieldLabel="format"
+/>
+
+## Common errors
+
+### #VALUE! — an invalid format
+
+<ExcelCode>{`ARRAYTOTEXT({1,2,3}, 2) → #VALUE! (only 0 or 1 are valid)`}</ExcelCode>
+
+`format` only accepts `0` or `1` — any other number returns an
+error.
+
+### Expecting the original cell number formatting to carry over
+
+<ExcelCode>{`ARRAYTOTEXT(A2:A4) → "1234.5, 6789, 10" (raw values, not however A2:A4 happens to be formatted)`}</ExcelCode>
+
+ARRAYTOTEXT always works from the array's underlying values, not
+whatever currency, date, or decimal formatting is applied to the
+cells it came from.
+
+export const faqs = [
+  {
+    question: "What's the difference between the two format options?",
+    answer: "Format 0 (the default) returns a flat, human-readable comma-separated list, with no indication of the original array's row/column shape. Format 1 returns a strict array literal — curly braces, commas between columns, semicolons between rows, text wrapped in quotes — that you could type directly into a formula to recreate the same array.",
+  },
+  {
+    question: "Does ARRAYTOTEXT preserve a 2D array's row and column structure?",
+    answer: 'Only in strict format (1), using semicolons to mark row breaks. The default concise format (0) flattens everything into one comma-separated list with no row/column distinction at all.',
+  },
+  {
+    question: 'Can ARRAYTOTEXT be used to debug a formula?',
+    answer: 'Yes — wrapping an intermediate array result in ARRAYTOTEXT (format 1 especially) is a quick way to see the exact values and shape a formula is producing, without needing to spill it across actual cells first.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ARRAYTOTEXT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ARRAYTOTEXT(A2:A4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' No dedicated WorksheetFunction method — call it through
+    ' Application.Evaluate instead
+    Dim result As String
+    result = Application.Evaluate("ARRAYTOTEXT(A2:A4)")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    values = [1, 2, 3]
+    concise = ", ".join(str(v) for v in values)
+    print(concise)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2024', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [VALUETOTEXT](/docs/text/valuetotext) — the same concise/strict
+  text-formatting idea, for a single value instead of a whole array.
+- [TEXTJOIN](/docs/text/textjoin) — joins values with a custom
+  delimiter, offering more control than ARRAYTOTEXT's fixed format.
+- [TEXTSPLIT](/docs/text/textsplit) — the reverse direction,
+  turning one piece of text into a spilled array.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — flatten an array to text" formula={`=ARRAYTOTEXT(A2:A4)`}>
+  Returns a plain comma-separated list of the range's values.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building a formula-ready array literal" formula={`=ARRAYTOTEXT(UNIQUE(A2:A20), 1)`}>
+  Captures a dynamic UNIQUE result as a strict array literal —
+  useful for freezing a spilled result into a fixed, pasteable value.
+</ExampleCard>
+
+<ExampleCard number="03" label="Summarizing a lookup result in a message" formula={`="Matches found: "&ARRAYTOTEXT(FILTER(A2:A20,B2:B20="Open"))`}>
+  Reports every matching value from a FILTER result as one readable
+  sentence instead of a spilled range.
+</ExampleCard>

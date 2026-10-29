@@ -1,0 +1,179 @@
+---
+title: DOLLAR
+description: Convert a number to text using currency format, rounded to a specified number of decimal places.
+---
+
+Convert a number into currency-formatted text — a dollar sign,
+thousands separators, and a fixed number of decimal places, all
+baked directly into the text itself rather than applied as cell
+formatting.
+
+export const quickAnswerFacts = [
+  { text: 'decimals defaults to 2 if omitted', type: 'check' },
+  { text: 'A negative decimals rounds to the left of the decimal point', type: 'warn' },
+  { text: 'The currency symbol follows your computer’s regional settings', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DOLLAR(number, [decimals])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DOLLAR(number, [decimals])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to convert.',
+  },
+  {
+    name: 'decimals',
+    type: 'number',
+    required: false,
+    description: 'The number of digits after the decimal point. Defaults to 2. A negative value rounds to the left of the decimal point.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` as text, formatted with a currency symbol, thousands
+separators, and rounded to `decimals` digits after the decimal
+point.
+
+## Description
+
+DOLLAR produces an actual text string — not a number with currency
+*formatting* applied, the way selecting a currency number format
+from the ribbon would. That distinction matters because DOLLAR's
+result is left-aligned like any text, can be concatenated directly
+into a sentence, and no longer behaves like a number in further
+calculations.
+
+<Callout type="warn">
+  **A negative `decimals` rounds to the left of the decimal
+  point**, not just toward zero decimals. `DOLLAR(1234.567, -2)`
+  rounds to the nearest hundred first, returning `"$1,200"` — the
+  same rounding behavior [ROUND](/docs/math/round) uses for a
+  negative `num_digits`.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '0': '$1,235', '2': '$1,234.57', '-2': '$1,200' }}
+  defaultValue="2"
+  label={'Live preview — =DOLLAR(1234.567, {value})'}
+  fieldLabel="decimals"
+/>
+
+## Common errors
+
+### The result won't sum correctly with other numbers
+
+<ExcelCode>{`=DOLLAR(A2)+DOLLAR(B2) → #VALUE! (both are text, not numbers)`}</ExcelCode>
+
+DOLLAR's output is text, not a number — if you need to keep doing
+math with the value, apply a currency *number format* to the cell
+instead of using DOLLAR, and save DOLLAR for when you specifically
+need the formatted result as text (inside a sentence, for example).
+
+### The currency symbol isn't what you expected
+
+<ExcelCode>{`DOLLAR(100) → "£100.00" on a computer set to UK regional settings`}</ExcelCode>
+
+DOLLAR always uses your computer's current regional currency
+symbol, not necessarily a literal `$` — on a system set to a
+different locale, the symbol (and decimal/thousands separators)
+will follow that locale instead.
+
+export const faqs = [
+  {
+    question: 'How is DOLLAR different from applying a currency number format?',
+    answer: "A currency number format changes only how a number displays — it's still a real number underneath, usable in further math. DOLLAR actually converts the number into a text string, which looks similar but no longer behaves like a number at all.",
+  },
+  {
+    question: 'Will DOLLAR always show a $ sign?',
+    answer: "No — it uses whatever currency symbol your computer's regional settings specify. On a US-English system that's $, but it could be £, €, or another symbol entirely on a different locale.",
+  },
+  {
+    question: 'What happens with a negative decimals value?',
+    answer: "It rounds the number to the left of the decimal point before formatting — decimals of -2 rounds to the nearest hundred, for example, same as ROUND's own negative-num_digits behavior.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DOLLAR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DOLLAR(1234.567, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim formatted As String
+    formatted = FormatCurrency(1234.567, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    formatted = f"${1234.567:,.2f}"
+    print(formatted)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FIXED](/docs/text/fixed) — the same rounded-text-formatting
+  idea, without the currency symbol.
+- [TEXT](/docs/text/text) — a more flexible way to format a number
+  as text using a custom format code.
+- [VALUE](/docs/text/value) — converts formatted text (including a
+  currency string) back into a genuine number.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — currency-format a number" formula={`=DOLLAR(1234.567, 2)`}>
+  Returns "$1,234.57" as text, rounded to 2 decimal places.
+</ExampleCard>
+
+<ExampleCard number="02" label="Rounding to the nearest hundred" formula={`=DOLLAR(1234.567, -2)`}>
+  A negative decimals value rounds left of the decimal point,
+  returning "$1,200".
+</ExampleCard>
+
+<ExampleCard number="03" label="Building a sentence with a formatted amount" formula={`="Total due: "&DOLLAR(A2)`}>
+  Embeds a currency-formatted number directly inside a text
+  sentence — something a number format alone can't do.
+</ExampleCard>
+
+<ExampleCard number="04" label="Whole-dollar amounts with no decimals" formula={`=DOLLAR(A2, 0)`}>
+  Rounds to the nearest whole currency unit and omits the decimal
+  portion entirely.
+</ExampleCard>

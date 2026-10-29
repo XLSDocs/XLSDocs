@@ -1,0 +1,172 @@
+---
+title: UNICODE
+description: Return the Unicode code point for the first character of a text string.
+---
+
+Return the true Unicode code point for the first character of a
+text string — [CODE](/docs/text/code)'s full-range counterpart,
+giving a consistent result for any character regardless of
+operating system or regional settings.
+
+export const quickAnswerFacts = [
+  { text: 'Only looks at the very first character — the rest of the string is ignored', type: 'warn' },
+  { text: 'Returns a consistent code point regardless of operating system or region', type: 'check' },
+  { text: 'The inverse of UNICHAR — UNICODE(UNICHAR(n)) returns n', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=UNICODE(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=UNICODE(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text whose first character’s Unicode code point you want.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The Unicode code point for the first character of `text`.
+
+## Description
+
+CODE's result depends on your computer's local character set, which
+makes it unreliable for anything beyond basic ASCII. UNICODE always
+returns the character's true Unicode code point — the same number
+for the same character on every system, everywhere.
+
+<Callout type="idea">
+  **Use UNICODE instead of CODE whenever a character might fall
+  outside the basic 1–127 ASCII range** — accented letters, currency
+  symbols, and emoji all have well-defined Unicode code points that
+  UNICODE reports consistently, where CODE's result for the same
+  character could vary by computer.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ A: '65', '©': '169', '€': '8364' }}
+  defaultValue="€"
+  label={'=UNICODE(text)'}
+  fieldLabel="text"
+/>
+
+## Common errors
+
+### #VALUE! — an empty string
+
+<ExcelCode>{`UNICODE("") → #VALUE! (there's no first character to look at)`}</ExcelCode>
+
+An empty string has no first character, so UNICODE has nothing to
+return a code point for.
+
+### Expecting UNICODE to check more than the first character
+
+<ExcelCode>{`UNICODE("€100") → 8364 (only the Euro sign, not the digits after it)`}</ExcelCode>
+
+Just like CODE, UNICODE always looks at position 1 only — to check a
+different character, extract it first with MID.
+
+export const faqs = [
+  {
+    question: 'How is UNICODE different from CODE?',
+    answer: "CODE depends on your computer's local character set, which only reliably covers values up to 255 and can vary by region above 127. UNICODE always returns the character's true Unicode code point, consistent on every system — the safer choice for anything beyond plain ASCII.",
+  },
+  {
+    question: 'Why would I need a character’s code point at all?',
+    answer: "To compare characters numerically rather than visually — useful for catching characters that look nearly identical (a hyphen vs. an en dash, different kinds of quotation marks) but have different underlying code points, which breaks an exact-match comparison in a non-obvious way.",
+  },
+  {
+    question: 'Can I go from a code point back to the character?',
+    answer: "Yes — UNICHAR is the exact reverse: it takes a Unicode code point and returns the character it represents.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with UNICODE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=UNICODE(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim codePoint As Long
+    codePoint = AscW(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    code_point = ord("€"[0])
+    print(code_point)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [UNICHAR](/docs/text/unichar) — the reverse: looks up the
+  character for a given Unicode code point.
+- [CODE](/docs/text/code) — the limited-range, locale-dependent
+  version of this same lookup.
+- [EXACT](/docs/text/exact) — a case-sensitive whole-string
+  comparison, often a better fit than character-by-character
+  UNICODE checks.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — check a character's code point" formula={`=UNICODE(A2)`}>
+  Returns the Unicode code point for whatever character sits first
+  in the cell.
+</ExampleCard>
+
+<ExampleCard number="02" label="Diagnosing an invisible mismatch" formula={`=UNICODE(MID(A2,5,1))`}>
+  Checks the code point of a specific character position to spot an
+  unexpected special character.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing two similar-looking dashes" formula={`=UNICODE(A2)=UNICODE(B2)`}>
+  A hyphen and an en dash look almost identical but have different
+  code points — UNICODE reveals the difference.
+</ExampleCard>
+
+<ExampleCard number="04" label="Checking if text starts with an emoji" formula={`=UNICODE(A2)>127`}>
+  Flags text whose first character falls outside the basic ASCII
+  range — a quick way to spot emoji or special symbols up front.
+</ExampleCard>
+
+<ExampleCard number="05" label="Shifting a character forward" formula={`=UNICHAR(UNICODE(A2)+1)`}>
+  Combined with UNICHAR, shifts any Unicode character forward by
+  one code point.
+</ExampleCard>

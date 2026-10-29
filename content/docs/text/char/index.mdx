@@ -1,0 +1,176 @@
+---
+title: CHAR
+description: Return the character that corresponds to a given numeric character code.
+---
+
+Convert a numeric character code into the actual character it
+represents — the building block behind inserting line breaks, tabs,
+and other characters that are awkward or impossible to type directly
+into a formula.
+
+export const quickAnswerFacts = [
+  { text: 'number must be between 1 and 255', type: 'warn' },
+  { text: 'CHAR(10) is the standard way to insert a line break inside a cell', type: 'check' },
+  { text: 'The exact character returned depends on your computer’s character set', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CHAR(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CHAR(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'A number from 1 to 255 identifying the character to return.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The single character that corresponds to `number` in your computer's
+character set.
+
+## Description
+
+Most of the time you'd just type a character directly, but some
+characters — a line break, a tab, a non-breaking space — have no key
+you can press inside a formula. CHAR looks that character up by its
+numeric code instead, which is exactly what makes it useful inside
+formulas like `="Line one"&CHAR(10)&"Line two"`.
+
+<Callout type="warn">
+  **CHAR(10) inside a formula only shows as a line break if the cell
+  has "Wrap Text" turned on.** Without it, Excel still stores the
+  line break character correctly, but displays it as if it weren't
+  there — a common source of "why isn't this working" confusion.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '65': 'A', '97': 'a', '36': '$' }}
+  defaultValue="65"
+  label={'=CHAR(number)'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #VALUE! — a number outside 1–255
+
+<ExcelCode>{`CHAR(300) → #VALUE! (only 1–255 are valid)`}</ExcelCode>
+
+For characters beyond code 255 — most of Unicode — use
+[UNICHAR](/docs/text/unichar) instead, which accepts a much larger
+range.
+
+### The character doesn't look the same on another computer
+
+<ExcelCode>{`CHAR(145) → a curly quote on Windows, something else on a different system`}</ExcelCode>
+
+CHAR maps to whatever character set your computer actually uses —
+codes above 127 in particular can display differently across
+operating systems or regional settings. UNICHAR is the safer choice
+for anything beyond basic ASCII (codes 1–127).
+
+export const faqs = [
+  {
+    question: 'How is CHAR different from UNICHAR?',
+    answer: "CHAR only covers codes 1 through 255, using your computer's own character set — which can vary by operating system or region for codes above 127. UNICHAR covers the full Unicode range (over a million code points) and returns a consistent result everywhere, so it's the safer choice for anything beyond basic ASCII.",
+  },
+  {
+    question: 'What is CHAR(10) actually used for?',
+    answer: "Inserting a line break inside a text string built by a formula — for example, combining an address's street, city, and zip code onto separate lines within one cell. The cell needs Wrap Text turned on for the break to actually display.",
+  },
+  {
+    question: 'Is there a reverse of CHAR?',
+    answer: "Yes — CODE takes a character and returns its numeric code, the exact opposite direction. CODE(CHAR(65)) returns 65 right back.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CHAR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`="Line one"&CHAR(10)&"Line two"`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim withBreak As String
+    withBreak = "Line one" & Chr(10) & "Line two"
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    with_break = "Line one" + chr(10) + "Line two"
+    print(with_break)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CODE](/docs/text/code) — the reverse: returns a character's
+  numeric code instead of looking one up.
+- [UNICHAR](/docs/text/unichar) — the full-Unicode-range version of
+  this same lookup.
+- [CLEAN](/docs/text/clean) — removes non-printable characters,
+  often the kind CHAR is used to insert in the first place.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — insert a line break" formula={`="Line one"&CHAR(10)&"Line two"`}>
+  Combines two strings with a line break between them — requires
+  Wrap Text turned on for the cell to actually display it.
+</ExampleCard>
+
+<ExampleCard number="02" label="Stacking address lines into one cell" formula={`=A2&CHAR(10)&B2&", "&C2&" "&D2`}>
+  Builds a multi-line mailing address (street, then city/state/zip)
+  from separate columns.
+</ExampleCard>
+
+<ExampleCard number="03" label="Removing a non-breaking space" formula={`=SUBSTITUTE(A2, CHAR(160), " ")`}>
+  CHAR(160) identifies the non-breaking space character that often
+  survives a copy-paste from a web page, so SUBSTITUTE can replace
+  it with a regular one.
+</ExampleCard>
+
+<ExampleCard number="04" label="Inserting a tab character" formula={`=A2&CHAR(9)&B2`}>
+  Joins two values with a tab between them — useful when building
+  text meant to be pasted into a tab-delimited format.
+</ExampleCard>
+
+<ExampleCard number="05" label="Generating the alphabet" formula={`=CHAR(64+ROW())`}>
+  Dragged down a column, returns A, B, C... by adding the row
+  number to CHAR(64) (the code just before "A").
+</ExampleCard>

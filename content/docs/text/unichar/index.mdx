@@ -1,0 +1,174 @@
+---
+title: UNICHAR
+description: Return the Unicode character that corresponds to a given numeric code point.
+---
+
+Convert a Unicode code point into the actual character it
+represents — [CHAR](/docs/text/char)'s full-range counterpart,
+covering emoji, accented letters, currency symbols, and virtually
+every character used in any written language.
+
+export const quickAnswerFacts = [
+  { text: 'Covers the full Unicode range, not just 1–255 like CHAR', type: 'check' },
+  { text: 'Returns a consistent character regardless of operating system or region', type: 'check' },
+  { text: 'number must be a valid Unicode code point (1 to 1,114,111)', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=UNICHAR(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=UNICHAR(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'A Unicode code point identifying the character to return.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The single Unicode character that corresponds to `number`.
+
+## Description
+
+CHAR is limited to codes 1 through 255 and depends on your
+computer's local character set for anything above 127. UNICHAR has
+neither limitation — it covers the entire Unicode standard, so the
+same code point always produces the same character on any computer,
+in any region.
+
+<Callout type="idea">
+  **UNICHAR is the reliable choice for anything beyond basic
+  English letters and punctuation** — currency symbols like `€`
+  (8364) and `£` (163), accented letters, and most emoji all have
+  well-defined Unicode code points that UNICHAR returns
+  consistently, where CHAR's result for the same numbers would be
+  unpredictable or simply wrong.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '65': 'A', '169': '©', '8364': '€' }}
+  defaultValue="169"
+  label={'=UNICHAR(number)'}
+  fieldLabel="number"
+/>
+
+## Common errors
+
+### #VALUE! — a number outside the valid Unicode range
+
+<ExcelCode>{`UNICHAR(0) → #VALUE! (0 isn't a valid code point)`}</ExcelCode>
+
+`number` has to be a genuine Unicode code point — 0 and negative
+numbers aren't valid, and the upper bound is 1,114,111 (the highest
+code point Unicode defines).
+
+### The character shows as a box or question mark
+
+<ExcelCode>{`UNICHAR(128512) → might display as □ if the cell's font doesn't include that character`}</ExcelCode>
+
+UNICHAR always returns the *correct* character, but your font still
+has to actually contain a glyph for it — this is especially common
+with emoji code points on an older or limited font.
+
+export const faqs = [
+  {
+    question: 'How is UNICHAR different from CHAR?',
+    answer: "CHAR only covers codes 1 through 255 and relies on your computer's local character set, which can vary. UNICHAR covers the entire Unicode standard (over a million code points) and always returns the same character everywhere, making it the safer choice for anything beyond plain ASCII.",
+  },
+  {
+    question: 'Why does a character sometimes show as a box or question mark?',
+    answer: "UNICHAR correctly identifies the character, but your current font might not include a glyph to actually draw it — common with rarer emoji or symbols. Switching to a font with broader Unicode coverage (many modern system fonts have one) usually fixes the display.",
+  },
+  {
+    question: 'Can I find the code point for a character I already have?',
+    answer: "Yes — UNICODE is the exact reverse: it takes a character and returns its Unicode code point.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with UNICHAR from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=UNICHAR(8364)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim euroSign As String
+    euroSign = ChrW(8364)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    euro_sign = chr(8364)
+    print(euro_sign)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [UNICODE](/docs/text/unicode) — the reverse: returns a
+  character's Unicode code point.
+- [CHAR](/docs/text/char) — the limited-range, locale-dependent
+  version of this same lookup.
+- [TEXTJOIN](/docs/text/textjoin) — often combined with UNICHAR to
+  build strings containing special separator characters.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — insert a currency symbol" formula={`=UNICHAR(8364)`}>
+  Returns the Euro sign (€) regardless of the computer's regional
+  settings.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building a bullet-point list" formula={`=UNICHAR(8226)&" "&A2`}>
+  Prefixes each cell's text with a bullet character (•) for a
+  simple inline list.
+</ExampleCard>
+
+<ExampleCard number="03" label="Adding a checkmark or cross indicator" formula={`=IF(A2="Done", UNICHAR(10003), UNICHAR(10007))`}>
+  Shows a checkmark (✓) or cross (✗) based on a status column,
+  without needing conditional formatting icons.
+</ExampleCard>
+
+<ExampleCard number="04" label="Inserting an arrow between values" formula={`=A2&" "&UNICHAR(8594)&" "&B2`}>
+  Joins two values with a right-arrow character (→) between them.
+</ExampleCard>
+
+<ExampleCard number="05" label="Finding what code point a character needs" formula={`=UNICHAR(UNICODE(A2)+1)`}>
+  Combined with UNICODE, shifts any Unicode character forward by
+  one code point.
+</ExampleCard>
