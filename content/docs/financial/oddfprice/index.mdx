@@ -1,0 +1,221 @@
+---
+title: ODDFPRICE
+description: Calculate the price per $100 face value of a bond with an odd (short or long) first coupon period, given its yield.
+---
+
+Calculate the price of a bond whose **first coupon period doesn't
+match the regular schedule** — shorter or longer than every coupon
+period after it, which happens whenever a bond's issue date doesn't
+line up neatly with its normal coupon spacing.
+
+export const quickAnswerFacts = [
+  { text: 'For bonds whose very first coupon period is irregular — every period after it is normal', type: 'check' },
+  { text: 'Uses a different internal formula depending on whether the odd period is shorter or longer than normal', type: 'warn' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ODDFPRICE(settlement, maturity, issue, first_coupon, rate, yld, redemption, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ODDFPRICE(settlement, maturity, issue, first_coupon, rate, yld, redemption, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'issue',
+    type: 'date',
+    required: true,
+    description: "The security's issue date.",
+  },
+  {
+    name: 'first_coupon',
+    type: 'date',
+    required: true,
+    description: "The security's first coupon date.",
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's interest rate.",
+  },
+  {
+    name: 'yld',
+    type: 'number',
+    required: true,
+    description: "The security's annual yield.",
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 face value.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The price per $100 face value of a bond whose first coupon period
+is shorter or longer than every regular period that follows it.
+
+## Description
+
+Most bonds are issued right at the start of a coupon period, so
+[PRICE](/docs/financial/price) can assume every period — including
+the first — is the same length. ODDFPRICE handles the case where
+that's not true: `issue` falls somewhere that makes the stretch from
+`issue` to `first_coupon` either shorter or longer than a normal
+`12/frequency`-month period.
+
+<Callout type="warn">
+  **ODDFPRICE uses one of two genuinely different formulas
+  internally**, depending on whether the odd first period is
+  shorter or longer than a regular one. The short case prorates a
+  single partial coupon; the long case splits the odd period into
+  several normal-length "quasi-coupon" periods and sums the present
+  value of each slice separately. You don't choose which — Excel
+  detects it automatically from your dates.
+</Callout>
+
+<ExcelCode>{`=ODDFPRICE(DATE(2008,11,11), DATE(2021,3,1), DATE(2008,10,15), DATE(2009,3,1), 7.85%, 6.25%, 100, 2, 1) → $113.60 (Microsoft's own documented example — a short first period)`}</ExcelCode>
+
+## Try it
+
+<TryIt
+  data={{ '5%': '$125.96', '6.25%': '$113.60', '8%': '$98.84' }}
+  defaultValue="6.25%"
+  label={'Live preview — =ODDFPRICE(11/11/2008, 3/1/2021, 10/15/2008, 3/1/2009, 7.85%, {value}, 100, 2, 1)'}
+  fieldLabel="yld"
+/>
+
+Just like a regular bond, a higher `yld` prices this one lower — the
+odd first period changes exactly how the discounting is done, not
+the basic inverse relationship between yield and price.
+
+## Common errors
+
+### #NUM! — dates out of the required order
+
+<ExcelCode>{`ODDFPRICE(DATE(2009,3,1), DATE(2021,3,1), DATE(2008,10,15), DATE(2008,11,11), 7.85%, 6.25%, 100, 2) → #NUM!`}</ExcelCode>
+
+Excel requires `maturity > first_coupon > settlement > issue` —
+all four dates have to fall in exactly that order.
+
+### #NUM! — a negative rate or yield
+
+<ExcelCode>{`ODDFPRICE(DATE(2008,11,11), DATE(2021,3,1), DATE(2008,10,15), DATE(2009,3,1), -7.85%, 6.25%, 100, 2) → #NUM!`}</ExcelCode>
+
+Both `rate` and `yld` have to be zero or positive.
+
+export const faqs = [
+  {
+    question: 'How do I know if my bond has a short or long odd first period?',
+    answer: "Compare the span from issue to first_coupon against a normal 12/frequency-month period ending at first_coupon. If issue falls closer to first_coupon than a full regular period would allow, it's short; if issue falls further back, spanning more than one regular period, it's long. Excel works this out automatically from your dates — you don't need to specify which case applies.",
+  },
+  {
+    question: 'How is ODDFPRICE different from PRICE?',
+    answer: "PRICE assumes every coupon period, including the first, is the same regular length. ODDFPRICE is specifically for the case where the first period isn't — it needs both an issue date and a first_coupon date (which PRICE doesn't take at all) to work out exactly how irregular that first period is.",
+  },
+  {
+    question: "Is there a function for an odd period at the end of a bond's life instead of the start?",
+    answer: "Yes — ODDLPRICE handles an odd last coupon period (between the last regular coupon and maturity) the same way ODDFPRICE handles an odd first one.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ODDFPRICE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ODDFPRICE(DATE(2008,11,11), DATE(2021,3,1), DATE(2008,10,15), DATE(2009,3,1), 7.85%, 6.25%, 100, 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim price As Double
+    price = Application.WorksheetFunction.OddFPrice( _
+      DateSerial(2008, 11, 11), DateSerial(2021, 3, 1), DateSerial(2008, 10, 15), _
+      DateSerial(2009, 3, 1), 0.0785, 0.0625, 100, 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # Covers only the "short odd first period" case (issue closer to
+    # first_coupon than a full regular period) — the "long" case needs
+    # a separate quasi-coupon-period summation entirely
+    def oddfprice_short(settlement, maturity, issue, first_coupon, rate, yld,
+                         redemption, frequency, e, n):
+        # e: days in the regular period ending at first_coupon
+        # n: number of coupons payable between settlement and maturity
+        dfc = (first_coupon - issue).days
+        dsc = (first_coupon - settlement).days
+        a = (settlement - issue).days
+        x = 1 + yld / frequency
+        y = dsc / e
+        coupon = 100 * rate / frequency
+        price = redemption / x ** (n - 1 + y)
+        price += coupon * dfc / e / x ** y
+        for k in range(2, n + 1):
+            price += coupon / x ** (k - 1 + y)
+        price -= a / e * coupon
+        return price
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ODDFYIELD](/docs/financial/oddfyield) — the inverse calculation,
+  solving for yield given a known price.
+- [ODDLPRICE](/docs/financial/oddlprice) — the equivalent
+  calculation for an odd *last* coupon period instead of the first.
+- [PRICE](/docs/financial/price) — the regular-schedule bond price
+  this function generalizes.

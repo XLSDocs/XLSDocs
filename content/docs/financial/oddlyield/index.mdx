@@ -1,0 +1,216 @@
+---
+title: ODDLYIELD
+description: Calculate the annual yield of a bond with an odd (short or long) last coupon period, given its price.
+---
+
+Calculate the yield of a bond whose **last coupon period doesn't
+match the regular schedule** — the exact inverse of
+[ODDLPRICE](/docs/financial/oddlprice).
+
+export const quickAnswerFacts = [
+  { text: 'For bonds whose very last coupon period is irregular — every period before it is normal', type: 'check' },
+  { text: 'Unlike ODDFYIELD, this one has a direct algebraic inverse — no iteration needed', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ODDLYIELD(settlement, maturity, last_interest, rate, pr, redemption, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ODDLYIELD(settlement, maturity, last_interest, rate, pr, redemption, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'last_interest',
+    type: 'date',
+    required: true,
+    description: "The security's last coupon date.",
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's interest rate.",
+  },
+  {
+    name: 'pr',
+    type: 'number',
+    required: true,
+    description: "The security's price per $100 face value.",
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 face value.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The annual yield implied by `pr`, for a bond whose last coupon
+period — between `last_interest` and `maturity` — is shorter or
+longer than every regular period before it.
+
+## Description
+
+ODDLYIELD rearranges [ODDLPRICE](/docs/financial/oddlprice)'s
+formula to solve directly for yield, since that formula is simple
+enough to invert algebraically:
+
+<ExcelCode>{`ODDLYIELD = ([redemption + DCi×coupon] - [Ai×coupon + pr]) / [Ai×coupon + pr] × (frequency / DSCi)`}</ExcelCode>
+
+Where `coupon` is `100 × rate / frequency`, and `DCi`, `DSCi`, and
+`Ai` are the same period-length, discounting-span, and
+accrued-interest figures ODDLPRICE itself uses.
+
+<Callout type="idea">
+  **ODDLYIELD doesn't need iteration, unlike
+  [ODDFYIELD](/docs/financial/oddfyield)** — because ODDLPRICE's
+  own formula only raises its discounting term to the first power
+  (no fractional-exponent summation across multiple quasi-coupon
+  periods), it can be rearranged directly to isolate `yld` on one
+  side. The result is exact, not an approximation from repeated
+  guessing.
+</Callout>
+
+<ExcelCode>{`=ODDLYIELD(DATE(2008,2,7), DATE(2008,6,15), DATE(2007,10,15), 3.75%, 99.88, 100, 2, 0) → 4.05% (Microsoft's own documented price, inverted)`}</ExcelCode>
+
+## Try it
+
+<TryIt
+  data={{ '98': '9.45%', '99.88': '4.05%', '101': '0.92%' }}
+  defaultValue="99.88"
+  label={'Live preview — =ODDLYIELD(2/7/2008, 6/15/2008, 10/15/2007, 3.75%, {value}, 100, 2, 0)'}
+  fieldLabel="pr"
+/>
+
+A lower price implies a higher yield, as always — notice how
+sharply the yield swings here, since this bond's remaining life is
+very short, so small price differences translate into large
+annualized rate differences.
+
+## Common errors
+
+### #NUM! — dates out of the required order
+
+<ExcelCode>{`ODDLYIELD(DATE(2007,10,15), DATE(2008,6,15), DATE(2008,2,7), 3.75%, 99.88, 100, 2) → #NUM!`}</ExcelCode>
+
+Excel requires `maturity > settlement > last_interest`.
+
+### #NUM! — a negative rate or price
+
+<ExcelCode>{`ODDLYIELD(DATE(2008,2,7), DATE(2008,6,15), DATE(2007,10,15), -3.75%, 99.88, 100, 2) → #NUM!`}</ExcelCode>
+
+Both `rate` and `pr` have to be zero or positive.
+
+export const faqs = [
+  {
+    question: 'How is ODDLYIELD different from ODDLPRICE?',
+    answer: "They're inverses of each other. ODDLPRICE takes a known yield and solves for price. ODDLYIELD takes a known price and solves for yield, using the same underlying formula rearranged.",
+  },
+  {
+    question: 'Why does ODDLYIELD get a direct formula but ODDFYIELD needs iteration?',
+    answer: "ODDLPRICE's formula only discounts across the single remaining odd period, raising its discount factor to the first power — simple enough to solve for yld with algebra. ODDFPRICE's formula (for an odd first period) sums several separate discounted terms at different fractional powers, which has no clean algebraic inverse, so Excel falls back to iterative root-finding for ODDFYIELD instead.",
+  },
+  {
+    question: 'Why does a short remaining period make the yield so sensitive to price?',
+    answer: "Annualizing a return earned over a very short span naturally amplifies small differences — the same $1-2 price gap that would barely move a 10-year bond's yield swings this short-lived bond's yield by several percentage points, since there's so little time left to spread the gain or loss over.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ODDLYIELD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ODDLYIELD(DATE(2008,2,7), DATE(2008,6,15), DATE(2007,10,15), 3.75%, 99.88, 100, 2, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yld As Double
+    yld = Application.WorksheetFunction.OddLYield( _
+      DateSerial(2008, 2, 7), DateSerial(2008, 6, 15), DateSerial(2007, 10, 15), _
+      0.0375, 99.88, 100, 2, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def days_360(d1, d2):
+        # US (NASD) 30/360 day count — basis=0, Excel's default
+        day1, day2 = d1.day, d2.day
+        if day1 == 31:
+            day1 = 30
+        if day2 == 31 and day1 == 30:
+            day2 = 30
+        return (d2.year - d1.year) * 360 + (d2.month - d1.month) * 30 + (day2 - day1)
+
+    def oddlyield(settlement, maturity, last_interest, rate, pr, redemption, frequency, year_days=360):
+        dci = days_360(last_interest, maturity) / year_days * frequency
+        dsci = days_360(settlement, maturity) / year_days * frequency
+        ai = days_360(last_interest, settlement) / year_days * frequency
+        coupon = 100 * rate / frequency
+        term1 = dci * coupon + redemption
+        term2 = ai * coupon + pr
+        return (term1 - term2) / term2 * (frequency / dsci)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ODDLPRICE](/docs/financial/oddlprice) — the inverse
+  calculation, solving for price given a known yield.
+- [ODDFYIELD](/docs/financial/oddfyield) — the equivalent yield
+  calculation for an odd *first* coupon period instead of the last.
+- [YIELD](/docs/financial/yield) — the regular-schedule bond yield
+  this function generalizes.

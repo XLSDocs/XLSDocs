@@ -1,0 +1,205 @@
+---
+title: ODDFYIELD
+description: Calculate the annual yield of a bond with an odd (short or long) first coupon period, given its price.
+---
+
+Calculate the yield of a bond whose **first coupon period doesn't
+match the regular schedule** — the exact inverse of
+[ODDFPRICE](/docs/financial/oddfprice).
+
+export const quickAnswerFacts = [
+  { text: 'For bonds whose very first coupon period is irregular — every period after it is normal', type: 'check' },
+  { text: 'The inverse of ODDFPRICE — ODDFPRICE solves for price, ODDFYIELD solves for yield', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ODDFYIELD(settlement, maturity, issue, first_coupon, rate, pr, redemption, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ODDFYIELD(settlement, maturity, issue, first_coupon, rate, pr, redemption, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'issue',
+    type: 'date',
+    required: true,
+    description: "The security's issue date.",
+  },
+  {
+    name: 'first_coupon',
+    type: 'date',
+    required: true,
+    description: "The security's first coupon date.",
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's interest rate.",
+  },
+  {
+    name: 'pr',
+    type: 'number',
+    required: true,
+    description: "The security's price per $100 face value.",
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 face value.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The annual yield implied by `pr`, for a bond whose first coupon
+period is shorter or longer than every regular period that follows
+it.
+
+## Description
+
+ODDFYIELD answers [ODDFPRICE](/docs/financial/oddfprice)'s question
+in reverse: given a known price, what yield does that price imply?
+
+<Callout type="warn">
+  **Unlike [ODDLYIELD](/docs/financial/oddlyield), ODDFYIELD has no
+  direct algebraic inverse** — the underlying ODDFPRICE formula
+  isn't simple enough to rearrange and solve for `yld` directly.
+  Excel finds it by iterative root-finding instead: trying
+  candidate yields, running each one through the ODDFPRICE formula,
+  and refining the guess until the resulting price matches `pr`.
+  This is the same technique [YIELD](/docs/financial/yield) and
+  [IRR](/docs/financial/irr) use internally.
+</Callout>
+
+<ExcelCode>{`=ODDFYIELD(DATE(2008,11,11), DATE(2021,3,1), DATE(2008,10,15), DATE(2009,3,1), 5.75%, 84.5, 100, 2, 0) → 7.72% (an 84.5 price implies this yield for a bond with a short first period)`}</ExcelCode>
+
+## Try it
+
+<TryIt
+  data={{ '80': '8.39%', '84.5': '7.72%', '90': '6.97%' }}
+  defaultValue="84.5"
+  label={'Live preview — =ODDFYIELD(11/11/2008, 3/1/2021, 10/15/2008, 3/1/2009, 5.75%, {value}, 100, 2, 0)'}
+  fieldLabel="pr"
+/>
+
+A lower price implies a higher yield — the same inverse relationship
+every other price/yield pair on this site follows, just computed
+through ODDFPRICE's odd-first-period formula instead of the regular
+one.
+
+## Common errors
+
+### #NUM! — dates out of the required order
+
+<ExcelCode>{`ODDFYIELD(DATE(2009,3,1), DATE(2021,3,1), DATE(2008,10,15), DATE(2008,11,11), 5.75%, 84.5, 100, 2) → #NUM!`}</ExcelCode>
+
+Excel requires `maturity > first_coupon > settlement > issue`.
+
+### #NUM! — a negative rate or price
+
+<ExcelCode>{`ODDFYIELD(DATE(2008,11,11), DATE(2021,3,1), DATE(2008,10,15), DATE(2009,3,1), 5.75%, -84.5, 100, 2) → #NUM!`}</ExcelCode>
+
+Both `rate` and `pr` have to be zero or positive.
+
+export const faqs = [
+  {
+    question: 'How is ODDFYIELD different from ODDFPRICE?',
+    answer: "They're inverses of each other. ODDFPRICE takes a known yield and solves for price. ODDFYIELD takes a known price and solves for yield, using the exact same odd-first-period formula underneath.",
+  },
+  {
+    question: 'Why does ODDFYIELD need to use iteration instead of solving directly?',
+    answer: "The ODDFPRICE formula raises (1 + yld/frequency) to several different fractional powers across its terms, which makes it algebraically impossible to isolate yld on one side cleanly. Excel instead starts from an estimated guess and refines it repeatedly until the resulting price matches the target — the same root-finding approach YIELD and IRR use.",
+  },
+  {
+    question: 'Could the iteration fail to converge?',
+    answer: "In principle, for extreme or inconsistent inputs, yes — Excel's root-finder has a limited number of iterations. In practice, for realistic bond prices and yields, it converges reliably. If you ever see a wildly implausible result, double-check that pr, rate, and the date arguments are all genuinely consistent with a real bond.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ODDFYIELD from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ODDFYIELD(DATE(2008,11,11), DATE(2021,3,1), DATE(2008,10,15), DATE(2009,3,1), 5.75%, 84.5, 100, 2, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yld As Double
+    yld = Application.WorksheetFunction.OddFYield( _
+      DateSerial(2008, 11, 11), DateSerial(2021, 3, 1), DateSerial(2008, 10, 15), _
+      DateSerial(2009, 3, 1), 0.0575, 84.5, 100, 2, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from scipy.optimize import brentq
+
+    # Needs an oddfprice_short(...) implementation (see ODDFPRICE's own
+    # code sample) to price candidate yields against during the search
+    def oddfyield_short(target_price, price_fn, low=0.0001, high=1.0):
+        return brentq(lambda yld: price_fn(yld) - target_price, low, high)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ODDFPRICE](/docs/financial/oddfprice) — the inverse
+  calculation, solving for price given a known yield.
+- [ODDLYIELD](/docs/financial/oddlyield) — the equivalent yield
+  calculation for an odd *last* coupon period instead of the first.
+- [YIELD](/docs/financial/yield) — the regular-schedule bond yield
+  this function generalizes.
