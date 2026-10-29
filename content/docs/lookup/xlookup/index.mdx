@@ -204,6 +204,31 @@ Python, here's the equivalent lookup logic in each.
   </CodeBlockTab>
 </CodeBlockTabs>
 
+export const claudePrompts = [
+  {
+    title: 'Audit every lookup formula on this sheet',
+    prompt:
+      'Find every XLOOKUP, VLOOKUP, and INDEX/MATCH formula in this workbook and list what each one is looking up and returning. Flag any that look fragile — hardcoded ranges, missing a fallback value, or a column index that would break if a column were inserted.',
+  },
+  {
+    title: 'Convert a VLOOKUP to XLOOKUP',
+    prompt:
+      'Rewrite the VLOOKUP formulas in the selected range as XLOOKUP formulas, keeping the same lookup and return behavior. Add a fourth "Not found" argument instead of leaving them to return #N/A.',
+  },
+  {
+    title: 'Debug a #N/A result',
+    prompt:
+      "This XLOOKUP formula is returning #N/A. Check whether the lookup value actually exists in the lookup array, whether there's a type mismatch (text vs. number) or extra whitespace, and suggest a fix.",
+  },
+  {
+    title: 'Explain this wildcard match_mode formula',
+    prompt:
+      'Explain what this XLOOKUP formula does, step by step, including what match_mode and search_mode are set to and why.',
+  },
+];
+
+<ClaudePrompts prompts={claudePrompts} />
+
 ## Compatibility
 
 export const compatibility = [

@@ -15,6 +15,7 @@ import { CodeWrapToggle } from './code-wrap-toggle';
 import { CategoryCards } from './category-cards';
 import { FunctionDiagram } from './function-diagram/function-diagram';
 import { ShortcutTable } from './shortcut-table';
+import { ClaudePrompts } from './claude-prompts';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -57,6 +58,7 @@ export function getMDXComponents(components?: MDXComponents) {
     CategoryCards,
     FunctionDiagram,
     ShortcutTable,
+    ClaudePrompts,
     ...components,
   } satisfies MDXComponents;
 }
