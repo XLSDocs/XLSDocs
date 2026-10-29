@@ -1,0 +1,183 @@
+---
+title: PRICEDISC
+description: Calculate the price per $100 face value of a discounted security, given its discount rate.
+---
+
+Calculate a discount security's **price per $100 face value**, given
+a known discount rate — the exact inverse of [DISC](/docs/financial/disc).
+
+export const quickAnswerFacts = [
+  { text: 'redemption is per $100 face value — the result is on the same scale', type: 'check' },
+  { text: 'The exact inverse of DISC — DISC solves for the rate, PRICEDISC solves for the price', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PRICEDISC(settlement, maturity, discount, redemption, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PRICEDISC(settlement, maturity, discount, redemption, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'discount',
+    type: 'number',
+    required: true,
+    description: "The security's discount rate.",
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 face value.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The security's price per $100 face value, implied by discounting
+`redemption` back by `discount`, annualized over the span from
+`settlement` to `maturity`.
+
+## Description
+
+PRICEDISC is [DISC](/docs/financial/disc) run in reverse — instead
+of taking a known price and solving for the discount rate, it takes
+a known discount rate and solves for the price:
+
+<ExcelCode>{`PRICEDISC = redemption × (1 - discount × (days between settlement and maturity) / (days in a year, per basis))`}</ExcelCode>
+
+<ExcelCode>{`=PRICEDISC(DATE(2008,2,16), DATE(2008,3,1), 5.25%, 100, 2) → $99.80 (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="idea">
+  **PRICEDISC and DISC are exact inverses.** Feeding PRICEDISC's own
+  output back into DISC, alongside the same `settlement`,
+  `maturity`, `redemption`, and `basis`, returns the original
+  `discount` rate exactly.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '3%': '$98.49', '4%': '$97.99', '5%': '$97.49' }}
+  defaultValue="4%"
+  label={'Live preview — =PRICEDISC(1/1/2025, 7/1/2025, {value}, 100, 2)'}
+  fieldLabel="discount"
+/>
+
+A higher `discount` rate implies a steeper discount from the `100`
+redemption value — moving the rate up pushes the computed price
+further below par.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`PRICEDISC(DATE(2025,7,1), DATE(2025,1,1), 4%, 100) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — a non-positive discount rate or redemption value
+
+<ExcelCode>{`PRICEDISC(DATE(2025,1,1), DATE(2025,7,1), 0, 100) → #NUM! (discount must be greater than 0)`}</ExcelCode>
+
+Both `discount` and `redemption` have to be positive numbers.
+
+export const faqs = [
+  {
+    question: 'How is PRICEDISC different from DISC?',
+    answer: "They're exact inverses. DISC takes a known price and solves for the discount rate. PRICEDISC takes a known discount rate and solves for the price. Which one to reach for depends on whether you're starting from a quoted price or a quoted rate.",
+  },
+  {
+    question: 'Why is redemption expressed per $100 instead of the actual face value?',
+    answer: "It's the standard quoting convention for discount securities — pricing per $100 lets results compare cleanly across securities with different face values, and PRICEDISC's result comes back on that same per-$100 scale.",
+  },
+  {
+    question: 'Does PRICEDISC work for a coupon-paying bond?',
+    answer: "No — PRICEDISC assumes the entire return comes from the discount between price and redemption value, with no coupon paid along the way. A coupon-paying bond needs PRICE instead, which accounts for the coupon stream.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PRICEDISC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PRICEDISC(DATE(2008,2,16), DATE(2008,3,1), 5.25%, 100, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim price As Double
+    price = Application.WorksheetFunction.PriceDisc( _
+      DateSerial(2008, 2, 16), DateSerial(2008, 3, 1), 0.0525, 100, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def pricedisc(settlement, maturity, discount, redemption, year_days=360):
+        # basis=2 (actual/360) only — other bases change year_days and/or
+        # how the day span itself is counted
+        dsm = (maturity - settlement).days
+        return redemption * (1 - discount * dsm / year_days)
+
+    price = pricedisc(date(2008, 2, 16), date(2008, 3, 1), 0.0525, 100)
+    print(price)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DISC](/docs/financial/disc) — the inverse calculation, solving
+  for the discount rate given a known price.
+- [YIELDDISC](/docs/financial/yielddisc) — the investment yield for
+  the same security, annualized against price instead of redemption
+  value.
+- [PRICEMAT](/docs/financial/pricemat) — the equivalent price
+  calculation for a security that pays interest at maturity instead
+  of trading at a pure discount.

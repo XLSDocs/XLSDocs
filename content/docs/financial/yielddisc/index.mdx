@@ -1,0 +1,187 @@
+---
+title: YIELDDISC
+description: Calculate the annual yield of a discounted security, from its price and redemption value.
+---
+
+Calculate a discount security's **annual yield** — the investment
+return a buyer actually earns, annualized against the price paid
+rather than the redemption value DISC uses.
+
+export const quickAnswerFacts = [
+  { text: 'Annualizes against pr (price paid), not redemption — the key difference from DISC', type: 'check' },
+  { text: 'pr and redemption are both per $100 face value', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=YIELDDISC(settlement, maturity, pr, redemption, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=YIELDDISC(settlement, maturity, pr, redemption, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'pr',
+    type: 'number',
+    required: true,
+    description: "The security's price per $100 face value.",
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 face value.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The security's annualized yield — the return earned on the actual
+price paid, as opposed to [DISC](/docs/financial/disc)'s discount
+rate, which annualizes against the redemption value instead.
+
+## Description
+
+DISC and YIELDDISC both describe the same transaction — buying a
+no-coupon security below its redemption value — but they annualize
+the gap against different bases. YIELDDISC divides by the price
+actually paid, which is the more intuitive "what did I actually
+earn on my money" figure:
+
+<ExcelCode>{`YIELDDISC = (redemption - pr) / pr × (days in a year, per basis) / (days between settlement and maturity)`}</ExcelCode>
+
+<ExcelCode>{`=YIELDDISC(DATE(2008,2,16), DATE(2008,3,1), 99.795, 100, 2) → 5.28% (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="warn">
+  **YIELDDISC's result is always slightly larger than DISC's**, for
+  the same security — because it divides by the smaller `pr`
+  instead of the larger `redemption`. The two numbers measure
+  related but genuinely different things: DISC is the discount rate
+  the security is quoted at, while YIELDDISC is the actual return
+  earned on the money paid.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '99': '2.01%', '98': '4.06%', '97': '6.15%' }}
+  defaultValue="98"
+  label={'Live preview — =YIELDDISC(1/1/2025, 7/1/2025, {value}, 100, 2)'}
+  fieldLabel="pr"
+/>
+
+A lower price paid for the same `100` redemption value means a
+bigger gain relative to what was actually spent — pushing the
+computed yield up as `pr` moves down.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`YIELDDISC(DATE(2025,7,1), DATE(2025,1,1), 98, 100) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — a non-positive price or redemption value
+
+<ExcelCode>{`YIELDDISC(DATE(2025,1,1), DATE(2025,7,1), 0, 100) → #NUM! (pr must be greater than 0)`}</ExcelCode>
+
+Both `pr` and `redemption` have to be positive numbers.
+
+export const faqs = [
+  {
+    question: 'How is YIELDDISC different from DISC?',
+    answer: "Both describe the same no-coupon security, but DISC annualizes the price/redemption gap against the redemption value, while YIELDDISC annualizes it against the price actually paid. YIELDDISC's result is always a bit larger than DISC's for the same numbers, since it divides by the smaller figure.",
+  },
+  {
+    question: 'Which one should I use — DISC or YIELDDISC?',
+    answer: "DISC matches how these securities are typically quoted in the market (as a discount rate). YIELDDISC answers the more intuitive investor question — what annualized return did buying this security at this price actually earn. Use whichever matches the convention your data or audience expects.",
+  },
+  {
+    question: 'Is YIELDDISC the inverse of PRICEDISC?',
+    answer: "Not quite — PRICEDISC is the exact inverse of DISC (same denominator convention). YIELDDISC uses pr as its denominator instead, so going from a known yield back to a price takes rearranging YIELDDISC's own formula, not calling PRICEDISC.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with YIELDDISC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=YIELDDISC(DATE(2008,2,16), DATE(2008,3,1), 99.795, 100, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim yld As Double
+    yld = Application.WorksheetFunction.YieldDisc( _
+      DateSerial(2008, 2, 16), DateSerial(2008, 3, 1), 99.795, 100, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def yielddisc(settlement, maturity, pr, redemption, year_days=360):
+        # basis=2 (actual/360) only — other bases change year_days and/or
+        # how the day span itself is counted
+        dsm = (maturity - settlement).days
+        return (redemption - pr) / pr * (year_days / dsm)
+
+    yld = yielddisc(date(2008, 2, 16), date(2008, 3, 1), 99.795, 100)
+    print(yld)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DISC](/docs/financial/disc) — the related discount rate,
+  annualized against redemption value instead of price.
+- [PRICEDISC](/docs/financial/pricedisc) — solves for price given
+  a known discount rate.
+- [YIELDMAT](/docs/financial/yieldmat) — the equivalent yield
+  calculation for a security that pays interest at maturity instead
+  of trading at a pure discount.

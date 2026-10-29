@@ -1,0 +1,210 @@
+---
+title: PRICEMAT
+description: Calculate the price per $100 face value of a security that pays interest at maturity, given its yield.
+---
+
+Calculate the price per $100 face value of a security that pays
+**all of its interest in one lump sum at maturity** — PRICEMAT's
+coupon-bearing counterpart to [PRICEDISC](/docs/financial/pricedisc)'s
+pure-discount case.
+
+export const quickAnswerFacts = [
+  { text: 'For securities that accrue interest and pay it once, at maturity — not periodic coupon bonds', type: 'check' },
+  { text: 'Accounts for interest already accrued between issue and settlement, unlike PRICEDISC', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PRICEMAT(settlement, maturity, issue, rate, yld, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PRICEMAT(settlement, maturity, issue, rate, yld, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'issue',
+    type: 'date',
+    required: true,
+    description: "The security's issue date.",
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's interest rate at issue.",
+  },
+  {
+    name: 'yld',
+    type: 'number',
+    required: true,
+    description: "The security's annual yield.",
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The price per $100 face value implied by `yld`, for a security that
+pays its entire interest amount in one lump sum at `maturity`,
+accounting for interest already accrued between `issue` and
+`settlement`.
+
+## Description
+
+PRICEMAT handles a security that accrues interest continuously but
+pays it all out at once when it matures — the same payment shape
+[ACCRINTM](/docs/financial/accrintm) describes — and solves for what
+a buyer should pay today, given a target yield:
+
+<ExcelCode>{`PRICEMAT = [100 + (DIM/B × rate × 100)] / [1 + (DSM/B × yld)] - (A/B × rate × 100)`}</ExcelCode>
+
+Where `DIM` is the day count from `issue` to `maturity`, `DSM` is
+from `settlement` to `maturity`, `A` is from `issue` to `settlement`
+(the interest already accrued before the trade), and `B` is the
+year length for the chosen `basis`.
+
+<ExcelCode>{`=PRICEMAT(DATE(2025,4,1), DATE(2026,1,1), DATE(2025,1,1), 5%, 5%, 0) → $99.95 (settlement 3 months after issue, 9 months before maturity)`}</ExcelCode>
+
+<Callout type="idea">
+  **When `yld` exactly equals `rate`, PRICEMAT returns almost exactly
+  par (`100`)** — the buyer pays face value because the security's
+  stated interest rate already matches the return they're targeting.
+  Set `yld` above `rate` for a price below par, or below `rate` for
+  a price above par.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4%': '$100.69', '5%': '$99.95', '6%': '$99.23' }}
+  defaultValue="5%"
+  label={'Live preview — =PRICEMAT(4/1/2025, 1/1/2026, 1/1/2025, 5%, {value}, 0)'}
+  fieldLabel="yld"
+/>
+
+A higher target `yld` pushes the computed price down — a buyer
+demanding a bigger annualized return has to pay less for the same
+security today.
+
+## Common errors
+
+### #NUM! — dates out of order
+
+<ExcelCode>{`PRICEMAT(DATE(2025,1,1), DATE(2026,1,1), DATE(2025,4,1), 5%, 5%) → #NUM! (issue is after settlement)`}</ExcelCode>
+
+`issue` has to fall on or before `settlement`, which in turn has to
+fall before `maturity`.
+
+### #NUM! — a non-positive rate or yield
+
+<ExcelCode>{`PRICEMAT(DATE(2025,4,1), DATE(2026,1,1), DATE(2025,1,1), 0, 5%) → #NUM! (rate must be greater than 0)`}</ExcelCode>
+
+Both `rate` and `yld` have to be positive numbers.
+
+export const faqs = [
+  {
+    question: 'How is PRICEMAT different from PRICEDISC?',
+    answer: "PRICEDISC is for a pure-discount security with no stated interest rate at all — the entire return is the gap between price and redemption value. PRICEMAT is for a security that does accrue interest at a stated rate, just paid out in one lump sum at maturity rather than periodically, so it needs both a rate and a yield as separate inputs.",
+  },
+  {
+    question: 'What does the accrued-interest adjustment actually do?',
+    answer: "Since issue, the security has been earning interest at rate — some of that belongs to whoever held it before settlement. PRICEMAT subtracts that already-accrued portion from the maturity-value calculation, so the price reflects only the interest the new buyer will actually receive credit for going forward.",
+  },
+  {
+    question: 'Is PRICEMAT the inverse of YIELDMAT?',
+    answer: "Yes — PRICEMAT solves for price given a known yield, and YIELDMAT solves for yield given a known price, using the exact same underlying relationship between settlement, maturity, issue, and rate.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PRICEMAT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PRICEMAT(DATE(2025,4,1), DATE(2026,1,1), DATE(2025,1,1), 5%, 5%, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim price As Double
+    price = Application.WorksheetFunction.PriceMat( _
+      DateSerial(2025, 4, 1), DateSerial(2026, 1, 1), DateSerial(2025, 1, 1), 0.05, 0.05, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def days_360(d1, d2):
+        # US (NASD) 30/360 day count — basis=0, Excel's default
+        day1, day2 = d1.day, d2.day
+        if day1 == 31:
+            day1 = 30
+        if day2 == 31 and day1 == 30:
+            day2 = 30
+        return (d2.year - d1.year) * 360 + (d2.month - d1.month) * 30 + (day2 - day1)
+
+    def pricemat(settlement, maturity, issue, rate, yld, year_days=360):
+        dim = days_360(issue, maturity)
+        dsm = days_360(settlement, maturity)
+        a = days_360(issue, settlement)
+        numerator = 100 + (dim / year_days) * rate * 100
+        accrued = (a / year_days) * rate * 100
+        return numerator / (1 + (dsm / year_days) * yld) - accrued
+
+    price = pricemat(date(2025, 4, 1), date(2026, 1, 1), date(2025, 1, 1), 0.05, 0.05)
+    print(price)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [YIELDMAT](/docs/financial/yieldmat) — the inverse calculation,
+  solving for yield given a known price.
+- [PRICEDISC](/docs/financial/pricedisc) — the equivalent price
+  calculation for a pure-discount security with no stated interest
+  rate.
+- [ACCRINTM](/docs/financial/accrintm) — the accrued-interest
+  amount for the same kind of interest-at-maturity security.

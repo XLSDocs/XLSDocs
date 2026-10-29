@@ -1,0 +1,198 @@
+---
+title: MDURATION
+description: Calculate a bond's modified duration — an estimate of how much its price moves per unit change in yield.
+---
+
+Calculate a bond's **modified duration** — a direct estimate of how
+much its price moves for a given change in yield, derived from
+[DURATION](/docs/financial/duration)'s Macaulay duration.
+
+export const quickAnswerFacts = [
+  { text: 'Modified duration = Macaulay duration / (1 + yld/frequency)', type: 'check' },
+  { text: 'Approximates % price change per 1 percentage point change in yield', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=MDURATION(settlement, maturity, coupon, yld, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MDURATION(settlement, maturity, coupon, yld, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'coupon',
+    type: 'number',
+    required: true,
+    description: "The security's annual coupon rate.",
+  },
+  {
+    name: 'yld',
+    type: 'number',
+    required: true,
+    description: "The security's annual yield.",
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The modified duration, in years — [DURATION](/docs/financial/duration)'s
+Macaulay duration adjusted to more directly approximate the bond's
+price sensitivity to a change in yield.
+
+## Description
+
+Macaulay duration measures a weighted-average time to cash flows,
+but modified duration is the number actually used to estimate price
+sensitivity — it rescales Macaulay duration by the periodic yield:
+
+<ExcelCode>{`MDURATION = Macaulay duration / (1 + yld / frequency)`}</ExcelCode>
+
+<ExcelCode>{`=MDURATION(DATE(2008,1,1), DATE(2016,1,1), 8%, 9%, 2, 1) → 5.736 years (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="idea">
+  **Modified duration approximates the percentage price change for
+  a small change in yield** — a bond with a modified duration of
+  `5.736`, for example, is estimated to lose roughly `5.736%` of its
+  price for each 1 percentage point `yld` rises (and gain roughly
+  that much if `yld` falls instead). It's an approximation that gets
+  less accurate for larger yield swings.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4%': '4.41', '5%': '4.38', '6%': '4.34' }}
+  defaultValue="5%"
+  label={'Live preview — =MDURATION(1/1/2025, 1/1/2030, 5%, {value}, 2, 0)'}
+  fieldLabel="yld"
+/>
+
+Modified duration runs consistently a bit below Macaulay duration
+for the same inputs — dividing by `(1 + yld/frequency)` always
+shrinks the number slightly.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`MDURATION(DATE(2030,1,1), DATE(2025,1,1), 5%, 6%, 2) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — an invalid frequency
+
+<ExcelCode>{`MDURATION(DATE(2025,1,1), DATE(2030,1,1), 5%, 6%, 3) → #NUM! (frequency must be 1, 2, or 4)`}</ExcelCode>
+
+`frequency` only accepts `1`, `2`, or `4`.
+
+export const faqs = [
+  {
+    question: 'How is MDURATION different from DURATION?',
+    answer: "DURATION returns the raw Macaulay duration — a present-value-weighted average time to cash flows. MDURATION divides that number by (1 + yld/frequency), producing modified duration, which is the figure actually used to estimate how much a bond's price moves for a given change in yield.",
+  },
+  {
+    question: 'How do I actually use modified duration to estimate a price change?',
+    answer: "Multiply modified duration by the expected change in yield (in the same units, e.g. 0.01 for 1 percentage point) and by -1 — that gives the approximate percentage change in price. It's a linear approximation, most accurate for small yield changes.",
+  },
+  {
+    question: 'Why does a higher yld generally reduce modified duration slightly?',
+    answer: "Modified duration divides Macaulay duration by (1 + yld/frequency) — a larger yld makes that divisor bigger, shrinking the result. This is on top of yld's own (usually larger) effect on Macaulay duration itself.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MDURATION from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MDURATION(DATE(2008,1,1), DATE(2016,1,1), 8%, 9%, 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim modDuration As Double
+    modDuration = Application.WorksheetFunction.MDuration( _
+      DateSerial(2008, 1, 1), DateSerial(2016, 1, 1), 0.08, 0.09, 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # Simplified version covering only the case where settlement falls
+    # exactly on a coupon date — see DURATION's own code sample for the
+    # Macaulay duration this builds on
+    def mduration_on_coupon_date(coupon_rate, yld, frequency, periods_remaining, redemption=100):
+        coupon = redemption * coupon_rate / frequency
+        y = yld / frequency
+        price = 0.0
+        weighted = 0.0
+        for k in range(1, periods_remaining + 1):
+            cf = coupon + redemption if k == periods_remaining else coupon
+            pv = cf / (1 + y) ** k
+            price += pv
+            weighted += k * pv
+        macaulay_years = (weighted / price) / frequency
+        return macaulay_years / (1 + y)
+
+    years = mduration_on_coupon_date(0.08, 0.09, 2, 16)
+    print(years)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DURATION](/docs/financial/duration) — the Macaulay duration this
+  function rescales.
+- [PRICE](/docs/financial/price) — the bond price both duration
+  functions are built from.
+- [YIELD](/docs/financial/yield) — a bond's annual yield to
+  maturity, another shared input.

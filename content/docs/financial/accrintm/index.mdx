@@ -1,0 +1,190 @@
+---
+title: ACCRINTM
+description: Calculate the accrued interest on a security that pays all of its interest at maturity, rather than periodically.
+---
+
+Calculate the interest accrued on a security that pays **all of its
+interest in one lump sum at maturity** — no periodic coupons along
+the way — rather than ACCRINT's periodic-coupon case.
+
+export const quickAnswerFacts = [
+  { text: 'For securities that pay interest only once, at maturity — not periodic coupon bonds', type: 'check' },
+  { text: 'par defaults to $1,000 if omitted', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ACCRINTM(issue, settlement, rate, par, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ACCRINTM(issue, settlement, rate, par, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'issue',
+    type: 'date',
+    required: true,
+    description: "The security's issue date.",
+  },
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: "The security's maturity date — confusingly named settlement in this function specifically.",
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's annual coupon rate.",
+  },
+  {
+    name: 'par',
+    type: 'number',
+    required: false,
+    description: 'The face value of the security. Defaults to $1,000 if omitted.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The total interest accrued between `issue` and `settlement` (the
+maturity date), for a security that pays its entire interest amount
+in one lump sum rather than periodically.
+
+## Description
+
+Most bonds pay interest on a schedule — semiannually, most commonly
+— but some securities instead accumulate interest the whole time
+they're outstanding and pay it all out in a single lump sum at
+maturity. ACCRINTM calculates that accumulated amount as a simple
+proportion of a full year's interest, scaled by how much of a year
+(by day count) sits between `issue` and `settlement`:
+
+<ExcelCode>{`ACCRINTM = par × rate × (days between issue and settlement) / (days in a year, per basis)`}</ExcelCode>
+
+<Callout type="warn">
+  **This function's own `settlement` argument is actually the
+  maturity date**, not a trade date like every other ACCRINT-style
+  function's `settlement` argument. It's Microsoft's own naming
+  choice, not a site convention — worth double-checking if you're
+  used to ACCRINT's argument order.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4/1/2025': '$12.33', '7/1/2025': '$24.79', '1/1/2026': '$50.00' }}
+  defaultValue="7/1/2025"
+  label={'Live preview — =ACCRINTM(1/1/2025, {value}, 5%, 1000, 3)'}
+  fieldLabel="settlement (maturity)"
+/>
+
+Moving the maturity date further from the January 1 issue date
+accrues proportionally more interest — a full year out, the result
+lands exactly on a full year's coupon (`1000 × 5% = $50`), since
+`basis 3` (actual/365) counts 365 actual days as one full year.
+
+## Common errors
+
+### #NUM! — issue is on or after settlement
+
+<ExcelCode>{`ACCRINTM(DATE(2025,7,1), DATE(2025,1,1), 5%, 1000) → #NUM! (issue is after settlement)`}</ExcelCode>
+
+`issue` has to fall strictly before `settlement` (the maturity
+date) — there's no span to accrue interest over otherwise.
+
+### Confusing ACCRINTM with ACCRINT
+
+<ExcelCode>{`ACCRINTM(issue, settlement, rate, par) — only 4 required arguments, no frequency`}</ExcelCode>
+
+ACCRINTM has no `frequency` argument at all, because it doesn't
+need one — there's only ever one payment, at maturity.
+[ACCRINT](/docs/financial/accrint) is the function for periodic
+coupon bonds, and needs `frequency` to know how often those coupons
+land.
+
+export const faqs = [
+  {
+    question: 'How is ACCRINTM different from ACCRINT?',
+    answer: "ACCRINT calculates accrued interest for a bond that pays periodic coupons (semiannually, for example) and needs a frequency argument to know the payment schedule. ACCRINTM is for securities that pay all of their interest in a single lump sum at maturity, so there's no schedule to specify — just issue date, maturity date, rate, and par.",
+  },
+  {
+    question: "Why is the maturity date called 'settlement' in this function?",
+    answer: "That's simply the argument name Microsoft chose for ACCRINTM — unlike every other ACCRINT-family function, where settlement means the trade date, here it means the date the security matures and pays out. It's worth double-checking against the parameter table rather than assuming consistency across functions.",
+  },
+  {
+    question: 'What kind of security actually works this way?',
+    answer: "Certain short-term notes and discount instruments pay no periodic coupon at all — interest just accumulates and is paid out as a single sum when the security matures, which is exactly what ACCRINTM is built to calculate.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ACCRINTM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ACCRINTM(DATE(2025,1,1), DATE(2025,7,1), 5%, 1000, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim accruedInterest As Double
+    accruedInterest = Application.WorksheetFunction.AccrIntM( _
+      DateSerial(2025, 1, 1), DateSerial(2025, 7, 1), 0.05, 1000, 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def accrintm(issue, settlement, rate, par, year_days=365):
+        # basis=3 (actual/365) only — other bases need a different
+        # day-count convention for both the span and the year length
+        days = (settlement - issue).days
+        return par * rate * (days / year_days)
+
+    accrued = accrintm(date(2025, 1, 1), date(2025, 7, 1), 0.05, 1000)
+    print(accrued)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ACCRINT](/docs/financial/accrint) — accrued interest for a
+  security that pays periodic coupons instead of one lump sum.
+- [DISC](/docs/financial/disc) — the discount rate for a security,
+  a related short-term-instrument calculation.
+- [RECEIVED](/docs/financial/received) — the amount received at
+  maturity for a discount-rate-based security.

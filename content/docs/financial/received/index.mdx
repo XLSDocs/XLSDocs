@@ -1,0 +1,188 @@
+---
+title: RECEIVED
+description: Calculate the amount received at maturity for a fully invested, no-coupon security given its discount rate.
+---
+
+Calculate the **amount paid out at maturity** for a security bought
+at a discount — the inverse of INTRATE: given how much was invested
+and the discount rate, find the redemption amount.
+
+export const quickAnswerFacts = [
+  { text: 'discount is the rate used to discount investment up to the redemption amount', type: 'check' },
+  { text: 'The inverse calculation to INTRATE — INTRATE solves for the rate, RECEIVED solves for the payout', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=RECEIVED(settlement, maturity, investment, discount, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RECEIVED(settlement, maturity, investment, discount, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'investment',
+    type: 'number',
+    required: true,
+    description: 'The amount invested in the security.',
+  },
+  {
+    name: 'discount',
+    type: 'number',
+    required: true,
+    description: "The security's discount rate.",
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The total amount received at maturity for a fully invested, no-coupon
+security — always larger than `investment`, scaled up by `discount`
+annualized over the span from `settlement` to `maturity`.
+
+## Description
+
+RECEIVED answers the question INTRATE's inputs ask in reverse: given
+an amount invested and a known discount rate, how much comes back at
+maturity?
+
+<ExcelCode>{`RECEIVED = investment / (1 - discount × (days between settlement and maturity) / (days in a year, per basis))`}</ExcelCode>
+
+<ExcelCode>{`=RECEIVED(DATE(2025,1,1), DATE(2025,7,1), 1000, 5%, 0) → $1,025.64 (a $1,000 investment at a 5% discount rate, basis 0, over exactly half a year)`}</ExcelCode>
+
+<Callout type="idea">
+  **RECEIVED is INTRATE solved the other way around.** INTRATE takes
+  a known investment and redemption amount and solves for the rate;
+  RECEIVED takes a known investment and rate and solves for the
+  redemption amount. Plugging RECEIVED's own output back into
+  INTRATE (alongside the same investment, dates, and basis) returns
+  the original `discount` rate.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4%': '$1,020.41', '5%': '$1,025.64', '6%': '$1,030.93' }}
+  defaultValue="5%"
+  label={'Live preview — =RECEIVED(1/1/2025, 7/1/2025, 1000, {value}, 0)'}
+  fieldLabel="discount"
+/>
+
+A higher `discount` rate scales up the amount received at maturity
+by more — the gap between the fixed `$1,000` investment and the
+payout widens as the discount rate climbs.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`RECEIVED(DATE(2025,7,1), DATE(2025,1,1), 1000, 5%) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — a discount rate at or above 100% of the period
+
+<ExcelCode>{`RECEIVED(DATE(2025,1,1), DATE(2025,7,1), 1000, 250%, 0) → #NUM! (discount × days/year ≥ 1, dividing by zero or less)`}</ExcelCode>
+
+If `discount` multiplied by the fraction of a year between
+`settlement` and `maturity` reaches or exceeds `1`, RECEIVED's
+denominator hits zero or goes negative — an economically meaningless
+discount rate for the period, not just a large one.
+
+export const faqs = [
+  {
+    question: 'How is RECEIVED different from INTRATE?',
+    answer: "They're inverses of each other. INTRATE takes a known investment and redemption amount and solves for the annualized rate. RECEIVED takes a known investment and discount rate and solves for the redemption amount paid out at maturity.",
+  },
+  {
+    question: 'Why does a small discount rate produce a redemption amount noticeably larger than the investment?',
+    answer: "Because RECEIVED divides by (1 - discount × days/year) rather than simply multiplying — this is the standard discount-rate convention for short-term instruments, where the rate is quoted against the redemption (face) value rather than the amount actually paid, slightly amplifying the effect compared to a simple interest calculation.",
+  },
+  {
+    question: 'Does RECEIVED work for a bond that pays periodic coupons?',
+    answer: "No — RECEIVED assumes a single payout at maturity with no coupons along the way, the same assumption DISC and INTRATE make. A coupon-paying bond needs PRICE or YIELD instead.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RECEIVED from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RECEIVED(DATE(2025,1,1), DATE(2025,7,1), 1000, 5%, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim received As Double
+    received = Application.WorksheetFunction.Received( _
+      DateSerial(2025, 1, 1), DateSerial(2025, 7, 1), 1000, 0.05, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def received(settlement, maturity, investment, discount, year_days=360):
+        # basis=0 (NASD 30/360) assumed here for the day span too — a
+        # real 30/360 day count differs from calendar subtraction once
+        # a month doesn't have exactly 30 days
+        dim = (maturity - settlement).days
+        return investment / (1 - discount * dim / year_days)
+
+    payout = received(date(2025, 1, 1), date(2025, 7, 1), 1000, 0.05)
+    print(payout)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [INTRATE](/docs/financial/intrate) — the inverse calculation,
+  solving for the rate given a known redemption amount.
+- [DISC](/docs/financial/disc) — the discount rate for a security
+  quoted per $100 face value, rather than actual dollar amounts.
+- [TBILLPRICE](/docs/financial/tbillprice) — a similar discount-rate
+  calculation, specific to Treasury bills.

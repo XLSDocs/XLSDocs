@@ -1,0 +1,188 @@
+---
+title: DISC
+description: Calculate the discount rate for a security, from its price and redemption value.
+---
+
+Calculate a security's **discount rate** — how steeply it's priced
+below its redemption value, annualized, the standard way short-term
+instruments like Treasury bills are quoted.
+
+export const quickAnswerFacts = [
+  { text: 'Both pr and redemption are expressed per $100 face value', type: 'check' },
+  { text: 'Returns a decimal — format the cell as a percentage to display it as one', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DISC(settlement, maturity, pr, redemption, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DISC(settlement, maturity, pr, redemption, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'pr',
+    type: 'number',
+    required: true,
+    description: "The security's price per $100 face value.",
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 face value.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The security's annualized discount rate, as a decimal — the
+proportional gap between `pr` and `redemption`, scaled up to a
+full-year rate based on how much of a year sits between
+`settlement` and `maturity`.
+
+## Description
+
+Short-term discount instruments (Treasury bills among them) don't
+pay a coupon — they're simply sold below their redemption value, and
+the return is entirely in that gap. DISC converts a quoted price
+into the annualized discount rate that price implies:
+
+<ExcelCode>{`DISC = (redemption - pr) / redemption × (days in a year, per basis) / (days between settlement and maturity)`}</ExcelCode>
+
+<ExcelCode>{`=DISC(DATE(2025,1,1), DATE(2025,7,1), 98, 100, 2) → 3.98% (a security priced at 98 against a redemption value of 100, basis 2)`}</ExcelCode>
+
+<Callout type="idea">
+  **DISC and [PRICEDISC](/docs/financial/pricedisc) are exact
+  inverses of each other** — DISC takes a known price and solves
+  for the discount rate, while PRICEDISC takes a known discount rate
+  and solves for the price. Pick whichever one matches the number
+  you actually have.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '99': '1.99%', '98.5': '2.98%', '98': '3.98%' }}
+  defaultValue="98.5"
+  label={'Live preview — =DISC(1/1/2025, 7/1/2025, {value}, 100, 2)'}
+  fieldLabel="pr"
+/>
+
+The further `pr` sits below the `100` redemption value, the larger
+the discount rate DISC reports — a steeper discount from face value
+implies a higher annualized return.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`DISC(DATE(2025,7,1), DATE(2025,1,1), 98, 100) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity` — there's no
+span to annualize the discount over otherwise.
+
+### #NUM! — a non-positive price or redemption value
+
+<ExcelCode>{`DISC(DATE(2025,1,1), DATE(2025,7,1), 0, 100) → #NUM! (pr must be greater than 0)`}</ExcelCode>
+
+Both `pr` and `redemption` have to be positive numbers — a security
+can't be priced at zero or less.
+
+export const faqs = [
+  {
+    question: 'Why does DISC use "per $100 face value" instead of the actual face value?',
+    answer: "It's the standard quoting convention for short-term discount instruments — quoting per $100 lets prices and rates compare cleanly across securities with different actual face values, without changing the formula.",
+  },
+  {
+    question: 'How is DISC different from YIELDDISC?',
+    answer: "DISC returns the discount rate — the proportional gap between price and redemption value, annualized by day count. YIELDDISC instead returns the actual investment yield, which is the same gap but annualized against the price paid rather than the redemption value — the two numbers are close but not identical.",
+  },
+  {
+    question: 'Does DISC work for coupon-paying bonds?',
+    answer: "No — DISC is specifically for securities with no periodic coupon, where the entire return comes from buying below redemption value. A coupon-paying bond's price depends on PRICE or YIELD instead, which account for the coupon stream.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DISC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DISC(DATE(2025,1,1), DATE(2025,7,1), 98, 100, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim discountRate As Double
+    discountRate = Application.WorksheetFunction.Disc( _
+      DateSerial(2025, 1, 1), DateSerial(2025, 7, 1), 98, 100, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def disc(settlement, maturity, pr, redemption, year_days=360):
+        # basis=2 (actual/360) only — other bases change year_days and/or
+        # how the day span itself is counted
+        dsm = (maturity - settlement).days
+        return (redemption - pr) / redemption * (year_days / dsm)
+
+    rate = disc(date(2025, 1, 1), date(2025, 7, 1), 98, 100)
+    print(rate)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [PRICEDISC](/docs/financial/pricedisc) — the inverse calculation,
+  solving for price given a known discount rate.
+- [YIELDDISC](/docs/financial/yielddisc) — the investment yield for
+  the same kind of security, annualized against price instead of
+  redemption value.
+- [INTRATE](/docs/financial/intrate) — the interest rate for a
+  fully invested security, a closely related calculation.

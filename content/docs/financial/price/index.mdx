@@ -1,0 +1,212 @@
+---
+title: PRICE
+description: Calculate the price per $100 face value of a bond that pays periodic interest, given its yield.
+---
+
+Calculate the price per $100 face value of a **coupon-paying bond**
+— the standard bond-pricing calculation, accounting for every
+remaining coupon payment and the accrued interest since the last one.
+
+export const quickAnswerFacts = [
+  { text: 'For bonds that pay periodic coupons — the most general of this site\'s bond-pricing functions', type: 'check' },
+  { text: 'redemption is per $100 face value — the result is on the same scale', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=PRICE(settlement, maturity, rate, yld, redemption, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PRICE(settlement, maturity, rate, yld, redemption, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'rate',
+    type: 'number',
+    required: true,
+    description: "The security's annual coupon rate.",
+  },
+  {
+    name: 'yld',
+    type: 'number',
+    required: true,
+    description: "The security's annual yield.",
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The redemption value per $100 face value.',
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The clean price per $100 face value — the present value of every
+remaining coupon plus the redemption amount, discounted at `yld`,
+with interest already accrued since the last coupon subtracted back
+out.
+
+## Description
+
+Unlike [PRICEDISC](/docs/financial/pricedisc) or
+[PRICEMAT](/docs/financial/pricemat), PRICE handles a bond that pays
+a coupon on a recurring schedule — the general case most bonds
+actually use. It discounts every coupon still owed between
+`settlement` and `maturity`, plus the final `redemption` payment,
+back to present value at the periodic yield:
+
+<ExcelCode>{`dirty price = redemption/(1+y)^(N-1+p) + Σ coupon/(1+y)^(k-1+p), for k = 1 to N`}</ExcelCode>
+
+<ExcelCode>{`PRICE = dirty price - accrued interest since the last coupon`}</ExcelCode>
+
+Where `N` is the number of coupons remaining, `coupon` is
+`redemption × rate / frequency`, `y` is `yld / frequency`, and `p`
+is how much of the current coupon period is still ahead of
+`settlement` (`1` exactly on a coupon date, smaller mid-period).
+
+<ExcelCode>{`=PRICE(DATE(2008,2,15), DATE(2017,11,15), 5.75%, 6.5%, 100, 2, 0) → $94.63 (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="idea">
+  **When `yld` exactly equals `rate`, PRICE returns exactly
+  `redemption` (typically par, `100`)** — a bond priced to yield
+  exactly its own coupon rate always trades at face value. Set `yld`
+  above `rate` for a discount (price below par), or below `rate`
+  for a premium (price above par).
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4%': '$104.49', '5%': '$100.00', '6%': '$95.73' }}
+  defaultValue="5%"
+  label={'Live preview — =PRICE(1/1/2025, 1/1/2030, 5%, {value}, 100, 2, 0)'}
+  fieldLabel="yld"
+/>
+
+With the coupon rate fixed at `5%`, a `yld` below that rate prices
+the bond above par, and a `yld` above it prices the bond below par
+— the inverse relationship between yield and price that defines
+bond pricing.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`PRICE(DATE(2030,1,1), DATE(2025,1,1), 5%, 6.5%, 100, 2) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — an invalid frequency
+
+<ExcelCode>{`PRICE(DATE(2025,1,1), DATE(2030,1,1), 5%, 6.5%, 100, 3) → #NUM! (frequency must be 1, 2, or 4)`}</ExcelCode>
+
+`frequency` only accepts `1` (annual), `2` (semiannual), or `4`
+(quarterly) — no other coupon schedule is supported.
+
+export const faqs = [
+  {
+    question: 'How is PRICE different from PRICEDISC and PRICEMAT?',
+    answer: "PRICEDISC is for a pure-discount security with no coupon at all. PRICEMAT is for a security that accrues interest but pays it all in one lump sum at maturity. PRICE is for the general case — a bond that pays a recurring coupon on a schedule set by frequency — which is why it needs a frequency argument the other two don't.",
+  },
+  {
+    question: 'Why does the price include an accrued-interest subtraction?',
+    answer: "The raw present-value sum of every remaining coupon and the redemption amount (the \"dirty price\") includes interest the current holder has already earned since the last coupon payment. PRICE subtracts that accrued portion back out to report the \"clean\" price — the figure bonds are actually quoted at in the market.",
+  },
+  {
+    question: 'Is PRICE the inverse of YIELD?',
+    answer: "Yes — YIELD takes a known price and solves for the yield that justifies it, using the same underlying coupon-schedule math. PRICE goes the other direction, from a known yield to the price.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PRICE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PRICE(DATE(2008,2,15), DATE(2017,11,15), 5.75%, 6.5%, 100, 2, 0)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim price As Double
+    price = Application.WorksheetFunction.Price( _
+      DateSerial(2008, 2, 15), DateSerial(2017, 11, 15), 0.0575, 0.065, 100, 2, 0)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # A simplified version covering only the case where settlement falls
+    # exactly on a coupon date (N whole periods remaining, nothing accrued) —
+    # the general mid-period case needs the DSC/E/A day-count adjustment too
+    def price_on_coupon_date(rate, yld, frequency, periods_remaining, redemption=100):
+        coupon = redemption * rate / frequency
+        y = yld / frequency
+        price = redemption / (1 + y) ** periods_remaining
+        for k in range(1, periods_remaining + 1):
+            price += coupon / (1 + y) ** k
+        return price
+
+    price = price_on_coupon_date(0.05, 0.065, 2, 10)
+    print(price)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [YIELD](/docs/financial/yield) — the inverse calculation,
+  solving for yield given a known price.
+- [DURATION](/docs/financial/duration) — the weighted-average time
+  to a bond's cash flows, computed from the same inputs.
+- [PRICEMAT](/docs/financial/pricemat) — the equivalent price
+  calculation for a security that pays interest at maturity instead
+  of periodically.

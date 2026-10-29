@@ -1,0 +1,186 @@
+---
+title: INTRATE
+description: Calculate the interest rate for a fully invested security, from its investment and redemption amounts.
+---
+
+Calculate the annualized **interest rate implied by a fully invested
+security** — one bought at one amount and redeemed at a larger one,
+with no periodic coupon along the way.
+
+export const quickAnswerFacts = [
+  { text: 'investment and redemption are actual dollar amounts, not per-$100 figures', type: 'check' },
+  { text: 'Returns a decimal — format the cell as a percentage to display it as one', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=INTRATE(settlement, maturity, investment, redemption, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=INTRATE(settlement, maturity, investment, redemption, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'investment',
+    type: 'number',
+    required: true,
+    description: 'The amount invested in the security.',
+  },
+  {
+    name: 'redemption',
+    type: 'number',
+    required: true,
+    description: 'The amount received at maturity.',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The annualized interest rate implied by growing `investment` into
+`redemption` over the span from `settlement` to `maturity`,
+returned as a decimal.
+
+## Description
+
+INTRATE is DISC's close cousin, but working in actual dollar amounts
+instead of per-$100 price and redemption figures — useful when you
+know exactly what was paid and exactly what comes back, rather than
+a quoted price:
+
+<ExcelCode>{`INTRATE = (redemption - investment) / investment × (days in a year, per basis) / (days between settlement and maturity)`}</ExcelCode>
+
+<ExcelCode>{`=INTRATE(DATE(2025,2,15), DATE(2025,5,15), 985000, 1000000, 2) → 6.16% (a 985,000 investment redeeming at 1,000,000, basis 2)`}</ExcelCode>
+
+<Callout type="idea">
+  **INTRATE and DISC compute the same underlying thing** —
+  annualized return on a no-coupon security — but DISC expresses it
+  against `redemption` in the denominator, while INTRATE expresses
+  it against `investment`. Which one to use just depends on whether
+  your numbers are "price per $100" or actual dollar amounts.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '990000': '4.09%', '985000': '6.16%', '980000': '8.26%' }}
+  defaultValue="985000"
+  label={'Live preview — =INTRATE(2/15/2025, 5/15/2025, {value}, 1000000, 2)'}
+  fieldLabel="investment"
+/>
+
+A smaller `investment` growing into the same fixed `redemption`
+implies a larger annualized return — moving the investment amount
+down pushes the computed rate up.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`INTRATE(DATE(2025,5,15), DATE(2025,2,15), 985000, 1000000) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — a non-positive investment or redemption amount
+
+<ExcelCode>{`INTRATE(DATE(2025,2,15), DATE(2025,5,15), 0, 1000000) → #NUM! (investment must be greater than 0)`}</ExcelCode>
+
+Both `investment` and `redemption` have to be positive — an amount
+invested or redeemed can't be zero or negative.
+
+export const faqs = [
+  {
+    question: 'How is INTRATE different from DISC?',
+    answer: "They compute the same kind of annualized return for a no-coupon security, but with different inputs: DISC takes a quoted price and redemption value per $100 face value, while INTRATE takes the actual dollar amounts invested and redeemed. Pick whichever matches the numbers you actually have.",
+  },
+  {
+    question: 'Can INTRATE be used for a coupon-paying bond?',
+    answer: "No — INTRATE assumes the entire return comes from the gap between investment and redemption, with nothing paid in between. A bond that pays periodic coupons needs YIELD or RATE instead, which account for those intermediate payments.",
+  },
+  {
+    question: 'What does basis actually change about the result?',
+    answer: "basis sets the day-count convention used both to count the days between settlement and maturity and to define how many days make up a full year — switching basis on the same dates and amounts can shift the result slightly, since it changes what fraction of a year the investment period represents.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with INTRATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=INTRATE(DATE(2025,2,15), DATE(2025,5,15), 985000, 1000000, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim rate As Double
+    rate = Application.WorksheetFunction.IntRate( _
+      DateSerial(2025, 2, 15), DateSerial(2025, 5, 15), 985000, 1000000, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    def intrate(settlement, maturity, investment, redemption, year_days=360):
+        # basis=2 (actual/360) only — other bases change year_days and/or
+        # how the day span itself is counted
+        dim = (maturity - settlement).days
+        return (redemption - investment) / investment * (year_days / dim)
+
+    rate = intrate(date(2025, 2, 15), date(2025, 5, 15), 985000, 1000000)
+    print(rate)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DISC](/docs/financial/disc) — the same calculation expressed in
+  per-$100 price and redemption terms instead of dollar amounts.
+- [RECEIVED](/docs/financial/received) — the inverse direction,
+  solving for the redemption amount given a known discount rate.
+- [RRI](/docs/financial/rri) — the equivalent constant rate for an
+  investment's growth, a more general (non-security-specific) version
+  of the same idea.

@@ -1,0 +1,205 @@
+---
+title: DURATION
+description: Calculate a bond's Macaulay duration — the weighted-average time to receive its cash flows.
+---
+
+Calculate a bond's **Macaulay duration** — the weighted-average time
+(in years) it takes to receive the bond's cash flows, weighted by
+each payment's present value. A standard measure of a bond's
+sensitivity to interest-rate changes.
+
+export const quickAnswerFacts = [
+  { text: 'Assumes a par value of $100 — the result is a duration in years, not a dollar amount', type: 'check' },
+  { text: 'A bond with a longer maturity or lower coupon generally has a higher duration', type: 'check' },
+  { text: 'basis defaults to US (NASD) 30/360 day count', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=DURATION(settlement, maturity, coupon, yld, frequency, [basis])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DURATION(settlement, maturity, coupon, yld, frequency, [basis])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'settlement',
+    type: 'date',
+    required: true,
+    description: 'The date the security is traded to the buyer — after its issue date.',
+  },
+  {
+    name: 'maturity',
+    type: 'date',
+    required: true,
+    description: 'The date the security expires.',
+  },
+  {
+    name: 'coupon',
+    type: 'number',
+    required: true,
+    description: "The security's annual coupon rate.",
+  },
+  {
+    name: 'yld',
+    type: 'number',
+    required: true,
+    description: "The security's annual yield.",
+  },
+  {
+    name: 'frequency',
+    type: 'number',
+    required: true,
+    description: 'Coupon payments per year — 1 (annual), 2 (semiannual), or 4 (quarterly).',
+  },
+  {
+    name: 'basis',
+    type: 'number',
+    required: false,
+    description: 'The day count basis (0–4). Defaults to 0, US (NASD) 30/360.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The Macaulay duration, in years — the present-value-weighted average
+time until each of the bond's remaining cash flows (coupons plus the
+final redemption) arrives.
+
+## Description
+
+Every coupon payment and the final redemption amount contributes
+some weight to a bond's overall "effective maturity" — a payment
+far in the future, discounted heavily, contributes less than one
+arriving soon. DURATION computes that weighted average directly:
+
+<ExcelCode>{`Macaulay duration (periods) = [Σ k × CF_k / (1+y)^k] / [Σ CF_k / (1+y)^k], for k = 1 to N`}</ExcelCode>
+
+<ExcelCode>{`Macaulay duration (years) = Macaulay duration (periods) / frequency`}</ExcelCode>
+
+Where `CF_k` is the cash flow in period `k` (the coupon amount, plus
+`redemption` for the final period), `y` is `yld / frequency`, and
+`N` is the number of coupon periods remaining — the denominator here
+is exactly the bond's own [PRICE](/docs/financial/price).
+
+<ExcelCode>{`=DURATION(DATE(2018,7,1), DATE(2048,1,1), 8%, 9%, 2, 1) → 10.9191453 years (Microsoft's own documented example)`}</ExcelCode>
+
+<Callout type="idea">
+  **Duration is always shorter than the bond's remaining time to
+  maturity**, because every coupon paid along the way pulls some
+  weight toward the present — only a zero-coupon bond has a
+  duration exactly equal to its time to maturity.
+</Callout>
+
+## Try it
+
+<TryIt
+  data={{ '4%': '4.50', '5%': '4.49', '6%': '4.47' }}
+  defaultValue="5%"
+  label={'Live preview — =DURATION(1/1/2025, 1/1/2030, 5%, {value}, 2, 0)'}
+  fieldLabel="yld"
+/>
+
+For this 5-year, 5%-coupon bond, duration barely moves across these
+yields — a higher `yld` discounts later cash flows more heavily
+relative to earlier ones, very slightly shortening the
+weighted-average time.
+
+## Common errors
+
+### #NUM! — settlement on or after maturity
+
+<ExcelCode>{`DURATION(DATE(2030,1,1), DATE(2025,1,1), 5%, 6%, 2) → #NUM! (settlement is after maturity)`}</ExcelCode>
+
+`settlement` has to fall strictly before `maturity`.
+
+### #NUM! — an invalid frequency
+
+<ExcelCode>{`DURATION(DATE(2025,1,1), DATE(2030,1,1), 5%, 6%, 3) → #NUM! (frequency must be 1, 2, or 4)`}</ExcelCode>
+
+`frequency` only accepts `1`, `2`, or `4`.
+
+export const faqs = [
+  {
+    question: 'How is DURATION different from MDURATION?',
+    answer: "DURATION returns Macaulay duration — the raw present-value-weighted average time to cash flows, in years. MDURATION divides that same number by (1 + yld/frequency) to get modified duration, which more directly estimates how much a bond's price moves for a given change in yield.",
+  },
+  {
+    question: 'Why does a lower coupon generally mean a higher duration?',
+    answer: "A lower coupon means more of the bond's total value comes from the final redemption payment far in the future, rather than from coupons paid along the way — pulling the weighted-average payment time further out, which raises duration.",
+  },
+  {
+    question: 'What does an assumed par value of $100 actually mean here?',
+    answer: "DURATION's calculation doesn't need an actual par value input — it works entirely in percentages/ratios, with the redemption cash flow implicitly treated as 100 per 100 face value. The result (a duration in years) is the same regardless of a bond's actual face value.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DURATION from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DURATION(DATE(2018,7,1), DATE(2048,1,1), 8%, 9%, 2, 1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim duration As Double
+    duration = Application.WorksheetFunction.Duration( _
+      DateSerial(2018, 7, 1), DateSerial(2048, 1, 1), 0.08, 0.09, 2, 1)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # Simplified version covering only the case where settlement falls
+    # exactly on a coupon date — the general mid-period case needs the
+    # same DSC/E/A day-count adjustment PRICE uses
+    def duration_on_coupon_date(coupon_rate, yld, frequency, periods_remaining, redemption=100):
+        coupon = redemption * coupon_rate / frequency
+        y = yld / frequency
+        price = 0.0
+        weighted = 0.0
+        for k in range(1, periods_remaining + 1):
+            cf = coupon + redemption if k == periods_remaining else coupon
+            pv = cf / (1 + y) ** k
+            price += pv
+            weighted += k * pv
+        return (weighted / price) / frequency
+
+    years = duration_on_coupon_date(0.08, 0.09, 2, 59)
+    print(years)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MDURATION](/docs/financial/mduration) — modified duration, a
+  more direct estimate of price sensitivity to yield changes.
+- [PRICE](/docs/financial/price) — the bond price this function's
+  weighting is built on.
+- [YIELD](/docs/financial/yield) — a bond's annual yield to
+  maturity, another input DURATION depends on.
