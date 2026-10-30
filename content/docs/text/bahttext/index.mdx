@@ -1,0 +1,168 @@
+---
+title: BAHTTEXT
+description: Convert a number to Thai text and add a suffix of "Baht."
+---
+
+Convert a number into its Thai-language text representation, with
+"Baht" appended automatically — useful for Thai-currency invoices and
+documents, regardless of your Excel's own default language.
+
+export const quickAnswerFacts = [
+  { text: 'Always converts to Thai text, regardless of your Excel language settings', type: 'check' },
+  { text: 'Appends "Baht" (บาทถ้วน) automatically', type: 'check' },
+  { text: 'Works in every Excel version', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=BAHTTEXT(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BAHTTEXT(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The number to convert to Thai text. Can be a literal number, a cell reference, or a formula that returns a number.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` written out as Thai-language text, with "Baht" (บาทถ้วน)
+appended — unlike most text functions on this site, BAHTTEXT's output
+is always in Thai, no matter what language your copy of Excel is set
+to.
+
+## Description
+
+BAHTTEXT is a single-purpose function: it spells out a numeric amount
+in Thai words, formatted the way Thai currency amounts are
+conventionally written. It's the Thai-language equivalent of writing
+a check amount in words.
+
+<ExcelCode>{`=BAHTTEXT(1234) → "หนึ่งพันสองร้อยสามสิบสี่บาทถ้วน" ("one thousand two hundred thirty-four Baht")`}</ExcelCode>
+
+<Callout type="info">
+  **BAHTTEXT works regardless of your Excel's default language** —
+  unlike PHONETIC (which requires a Far East region setting) or the
+  DBCS byte-counting functions (whose behavior changes based on your
+  default editing language), BAHTTEXT always produces Thai text, on
+  any copy of Excel.
+</Callout>
+
+<Callout type="idea">
+  On Windows, the currency label BAHTTEXT appends can be changed via
+  **Regional Settings** (**Regional Options** on older versions) in
+  Control Panel; on Mac, via the **Control Panel for Numbers**.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`BAHTTEXT("abc") → #VALUE!`}</ExcelCode>
+
+`number` must actually be a number, a cell containing one, or a
+formula that returns one.
+
+export const faqs = [
+  {
+    question: 'Does BAHTTEXT require a Thai or Far East language setting in Excel?',
+    answer:
+      "No — BAHTTEXT always converts to Thai text and appends “Baht,” regardless of your Excel's own default language. This is different from PHONETIC, which specifically requires a Far East region setting.",
+  },
+  {
+    question: 'How is BAHTTEXT different from TEXT or DOLLAR?',
+    answer:
+      'TEXT and DOLLAR format a number using digits and a format code or currency symbol. BAHTTEXT spells the number out entirely in Thai words, the way you’d write a check amount, rather than formatting it as digits.',
+  },
+  {
+    question: 'Can I change the currency word BAHTTEXT appends?',
+    answer:
+      "On Windows, yes, through Regional Settings in Control Panel. On Mac, through the Control Panel for Numbers. There's no way to change it directly from within a formula.",
+  },
+  {
+    question: 'Does BAHTTEXT work with negative numbers or decimals?',
+    answer:
+      'Yes — it spells out the full value, including handling negative amounts and decimal (satang) portions in Thai text, the same way it handles whole numbers.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BAHTTEXT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BAHTTEXT(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.BahtText(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # No standard-library equivalent — Thai number-to-text conversion
+    # needs a dedicated library, e.g. the third-party "bahttext" package:
+    #   pip install bahttext
+    from bahttext import bahttext
+
+    result = bahttext(1234)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DOLLAR](/docs/text/dollar) — formats a number as currency digits
+  with a symbol, rather than spelling it out in words.
+- [TEXT](/docs/text/text) — general-purpose number-to-text formatting
+  with a custom format code.
+- [NUMBERVALUE](/docs/text/numbervalue) — the reverse direction for
+  ordinary numeric text, converting formatted text back into a
+  number (not applicable to BAHTTEXT's Thai word output).
+
+## Examples
+
+<ExampleCard number="01" label="Basic — convert an amount to Thai text" formula={`=BAHTTEXT(A2)`}>
+  Spells out the numeric amount in A2 as Thai-language text, with
+  "Baht" appended.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building an invoice line" formula={`="Amount in words: "&BAHTTEXT(A2)`}>
+  Embeds the Thai text representation directly into a longer label,
+  useful for an invoice or receipt template.
+</ExampleCard>
+
+<ExampleCard number="03" label="Converting a calculated total" formula={`=BAHTTEXT(SUM(A2:A10))`}>
+  Works on the result of any formula that returns a number, not just
+  a literal value or direct cell reference.
+</ExampleCard>

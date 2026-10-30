@@ -1,0 +1,174 @@
+---
+title: ASC
+description: Convert full-width (double-byte) characters to half-width (single-byte) characters, for double-byte character set languages.
+---
+
+Convert full-width characters to their half-width equivalents — used
+with double-byte character set (DBCS) languages like Japanese, where
+letters and katakana can exist in both a full-width and a half-width
+form.
+
+export const quickAnswerFacts = [
+  { text: 'Converts full-width (double-byte) characters to half-width (single-byte)', type: 'check' },
+  { text: 'Text with no full-width characters is returned unchanged', type: 'check' },
+  { text: 'Not restricted to a specific region setting, unlike PHONETIC', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ASC(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ASC(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text, or a reference to a cell containing text, to convert. If it contains no full-width characters, it is returned unchanged.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with every full-width (double-byte) character converted to its
+half-width (single-byte) equivalent. Characters that have no
+half-width form, and ordinary single-byte text, pass through
+unchanged.
+
+## Description
+
+In languages that use a double-byte character set — Japanese,
+Chinese, and Korean — many letters and symbols exist in two visual
+widths: a full-width (double-byte) form and a half-width (single-byte)
+form. ASC normalizes full-width characters down to their half-width
+equivalents, which is useful for cleaning up data entered with the
+wrong input-width setting (a common issue when typing Latin letters
+or numbers in a Japanese IME still set to full-width mode).
+
+<ExcelCode>{`=ASC("ＥＸＣＥＬ") → "EXCEL" (full-width Latin letters converted to half-width)`}</ExcelCode>
+
+<Callout type="warn">
+  **`WorksheetFunction.Asc` in VBA is not the same as VBA's own
+  built-in `Asc()` function.** The native VBA `Asc()` returns the
+  character code of a string's first character (like Excel's
+  [CODE](/docs/text/code)) — a completely different operation. Only
+  `Application.WorksheetFunction.Asc` performs the full-width-to-
+  half-width conversion described on this page.
+</Callout>
+
+## Common errors
+
+### Expecting ASC to change ordinary single-byte text
+
+<ExcelCode>{`=ASC("EXCEL") → "EXCEL" (unchanged — nothing here is full-width)`}</ExcelCode>
+
+ASC only affects characters that actually have a full-width form.
+Ordinary half-width Latin text passes through unmodified — this isn't
+an error, just a no-op.
+
+export const faqs = [
+  {
+    question: 'ASC vs DBCS — which should I use?',
+    answer:
+      "They're opposites: ASC converts full-width characters down to half-width. DBCS does the reverse, converting half-width characters up to full-width.",
+  },
+  {
+    question: 'Do I need a specific region setting to use ASC?',
+    answer:
+      "Microsoft's documentation doesn't list a region restriction for ASC the way it does for PHONETIC — it simply leaves text with no full-width characters unchanged, so it's safe to use regardless of your Excel's language settings.",
+  },
+  {
+    question: 'Is WorksheetFunction.Asc the same as VBA’s Asc() function?',
+    answer:
+      "No, and this is a common point of confusion. VBA's native Asc() returns a character code, similar to Excel's CODE function. Only Application.WorksheetFunction.Asc performs the full-width-to-half-width text conversion this page describes.",
+  },
+  {
+    question: 'What kinds of characters does ASC convert?',
+    answer:
+      'Full-width Latin letters, numbers, and katakana are the most common cases — any character that has both a full-width and half-width form in a double-byte character set.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ASC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ASC(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Application.WorksheetFunction.Asc — NOT VBA's native Asc()
+    Dim result As String
+    result = Application.WorksheetFunction.Asc(Range("A2").Value)
+
+    ' Alternatively, VBA's native StrConv with vbNarrow performs the
+    ' same full-width-to-half-width conversion:
+    result = StrConv(Range("A2").Value, vbNarrow)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import unicodedata
+
+    text = "ＥＸＣＥＬ"
+    # NFKC normalization collapses full-width forms to their
+    # half-width equivalents, the same effect as ASC
+    result = unicodedata.normalize("NFKC", text)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DBCS](/docs/text/dbcs) — the reverse conversion, from half-width
+  to full-width characters.
+- [PHONETIC](/docs/text/phonetic) — another Far-East-language text
+  function, extracting furigana readings rather than converting
+  character width.
+- [CLEAN](/docs/text/clean) and [TRIM](/docs/text/trim) — other
+  text-normalizing functions, for stripping control characters and
+  extra spaces rather than converting character width.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — normalize full-width Latin text" formula={`=ASC(A2)`}>
+  Converts full-width letters and numbers typed with the wrong
+  input-width setting down to their ordinary half-width form.
+</ExampleCard>
+
+<ExampleCard number="02" label="Cleaning up a column of mixed-width entries" formula={`=ASC(TRIM(A2))`}>
+  Combines ASC with TRIM to normalize both character width and stray
+  whitespace in one step.
+</ExampleCard>
+
+<ExampleCard number="03" label="No-op on ordinary text" formula={`=ASC("Invoice-2027")`}>
+  Returns the text unchanged, since none of its characters have a
+  full-width form to convert.
+</ExampleCard>

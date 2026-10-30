@@ -12,6 +12,13 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-10-30',
+    title: 'The Text category is complete: 21 new functions, from CHAR to PHONETIC',
+    description:
+      "A gap-check against Microsoft's full 44-function Text category closes out across three rounds. CHAR, CODE, UNICHAR, UNICODE, REPT, T, DOLLAR, FIXED, ARRAYTOTEXT, and VALUETOTEXT opened the project. FINDB, LEFTB, LENB, MIDB, REPLACEB, RIGHTB, and SEARCHB — the double-byte character set (DBCS) counterparts of FIND/LEFT/LEN/MID/REPLACE/RIGHT/SEARCH — are all marked deprecated in Microsoft's current documentation, so their behavior was sourced from Microsoft's VBA reference instead. ASC, DBCS, BAHTTEXT, and PHONETIC round it out: full-width/half-width character conversion, Thai currency text, and furigana extraction for Japanese, Chinese, and Korean locales.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
     date: '2026-10-29',
     title: 'The Financial category is complete: 33 new functions across 5 rounds, from ACCRINTM to VDB',
     description:

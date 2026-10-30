@@ -1,0 +1,187 @@
+---
+title: PHONETIC
+description: Extract the phonetic (furigana) characters from a text string.
+---
+
+Extract the furigana — the phonetic reading stored alongside Japanese
+text — from a cell or range, letting a formula pull out the
+pronunciation guide instead of the kanji itself.
+
+export const quickAnswerFacts = [
+  { text: 'Extracts furigana already stored on the text, rather than generating a reading', type: 'warn' },
+  { text: 'Requires your region setting to be Japanese, Chinese, or Korean', type: 'warn' },
+  { text: 'Returns #N/A for a non-contiguous range', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PHONETIC(reference)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PHONETIC(reference)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'reference',
+    type: 'text',
+    required: true,
+    description: 'A text string, or a reference to a single cell or range, containing a furigana text string.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The furigana (phonetic reading) text stored with `reference`. For a
+multi-cell range, Excel returns the furigana from the upper-left
+cell. A non-contiguous range returns `#N/A`.
+
+## Description
+
+PHONETIC doesn't generate a pronunciation — it extracts a furigana
+reading that's already attached to the text, stored as metadata
+alongside the visible characters themselves. In the Japanese version
+of Excel, typing kanji through an IME automatically attaches the
+reading you typed it with as furigana; that stored reading is what
+PHONETIC reads back out.
+
+<ExcelCode>{`=PHONETIC(C4) → "トウキョウト" (when C4 contains "東京都" with its furigana reading attached)`}</ExcelCode>
+
+<Callout type="warn">
+  **PHONETIC requires your region setting to be a Far East language**
+  — Japanese, Chinese, or Korean. It also only works on text that
+  already has a furigana reading attached; plain kanji typed or
+  pasted in without going through a Japanese IME, or kanji from an
+  older file format, won't have one to extract.
+</Callout>
+
+<Callout type="idea">
+  To add or edit a furigana reading manually, select the cell, open
+  the **Phonetic Guide** dropdown in the **Home** tab's **Font**
+  group, and choose **Edit**. Viewing furigana is supported in Excel
+  for the web, but editing it requires Excel for Windows.
+</Callout>
+
+## Common errors
+
+### #N/A — a non-contiguous range
+
+<ExcelCode>{`PHONETIC(A1:A3, C1:C3) → #N/A`}</ExcelCode>
+
+PHONETIC only accepts a single contiguous range (or a single cell) —
+pass one `reference`, not a combined selection of separate ranges.
+
+### Empty result — no furigana attached
+
+<ExcelCode>{`PHONETIC(A2) → "" (when A2's text has no furigana reading stored)`}</ExcelCode>
+
+Not every piece of Japanese text has a furigana reading attached —
+only text entered through an IME that recorded one, or text that's
+had a reading added manually via the Phonetic Guide feature.
+
+export const faqs = [
+  {
+    question: 'Does PHONETIC generate a reading for kanji automatically?',
+    answer:
+      "No — it only extracts a furigana reading that's already stored with the text. If the text has no reading attached (for example, it was pasted in rather than typed through a Japanese IME), PHONETIC has nothing to return.",
+  },
+  {
+    question: 'Why does PHONETIC return #N/A?',
+    answer:
+      'The most common cause is passing a non-contiguous range (a selection combining separate areas) as reference. PHONETIC only accepts a single cell or one contiguous range.',
+  },
+  {
+    question: 'Can I use PHONETIC outside a Japanese, Chinese, or Korean region setting?',
+    answer:
+      "Microsoft's documentation states the region setting must be one of those Far East languages for PHONETIC to work — it's one of the more restrictive functions on this site in that respect.",
+  },
+  {
+    question: 'How do I add a furigana reading to existing text that doesn’t have one?',
+    answer:
+      "Select the cell, open the Phonetic Guide dropdown in the Home tab's Font group, and choose Edit to enter or correct the reading manually. Excel only attaches readings automatically to new text typed through a Japanese IME.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PHONETIC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PHONETIC(C4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim reading As String
+    reading = Application.WorksheetFunction.Phonetic(Range("C4"))
+
+    ' The Range.Phonetics object model offers finer control, e.g.
+    ' reading individual phonetic runs rather than the whole string:
+    Dim ph As Phonetic
+    For Each ph In Range("C4").Phonetics
+      Debug.Print ph.Text
+    Next ph
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # No standard-library equivalent — furigana is Excel-specific
+    # cell metadata, not something derivable from the text alone.
+    # A library like pykakasi can *generate* a reading (not the same
+    # as extracting a stored one):
+    #   pip install pykakasi
+    import pykakasi
+
+    kks = pykakasi.kakasi()
+    result = "".join(item["kana"] for item in kks.convert("東京都"))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ASC](/docs/text/asc) and [DBCS](/docs/text/dbcs) — other
+  Far-East-language text functions, converting character width rather
+  than extracting a stored reading.
+- [UNICHAR](/docs/text/unichar) and [UNICODE](/docs/text/unicode) —
+  work with the underlying Unicode code points of text, rather than
+  reading-metadata like furigana.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — extract a furigana reading" formula={`=PHONETIC(C4)`}>
+  Returns the furigana reading stored with the kanji in C4, if one is
+  attached.
+</ExampleCard>
+
+<ExampleCard number="02" label="Building a reading alongside the original text" formula={`=C4&" ("&PHONETIC(C4)&")"`}>
+  Combines the kanji with its reading in parentheses, a common format
+  for name lists or address books.
+</ExampleCard>
+
+<ExampleCard number="03" label="Reading from the first cell of a range" formula={`=PHONETIC(C4:C6)`}>
+  Returns only the furigana from C4, the upper-left cell of the
+  range — PHONETIC doesn't combine readings across multiple cells.
+</ExampleCard>
