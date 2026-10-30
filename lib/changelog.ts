@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-10-30',
+    title: 'The Math category is complete: 29 new functions, from EXP to RANDARRAY',
+    description:
+      "A gap-check against Microsoft's full 80-function Math and Trigonometry category closes out across five rounds. EXP, LN, LOG, and LOG10 filled the logarithm gap. CEILING.MATH, FLOOR.MATH, CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING, MROUND, and QUOTIENT round out the rounding-variant family alongside the existing CEILING/FLOOR/ROUND/TRUNC. ARABIC, ROMAN, BASE, DECIMAL, COMBINA, FACTDOUBLE, and MULTINOMIAL cover number-base conversion and combinatorics. MDETERM, MINVERSE, MMULT, and MUNIT bring in matrix algebra. SUMSQ, SUMX2MY2, SUMX2PY2, SUMXMY2, SQRTPI, SERIESSUM, and RANDARRAY close it out. Along the way, nine existing pages — AGGREGATE, COMBIN, FACT, GCD, LCM, PI, PRODUCT, RAND, and RANDBETWEEN — were found to have no card on the category index page, and got linked in.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
+    date: '2026-10-30',
     title: 'The Text category is complete: 21 new functions, from CHAR to PHONETIC',
     description:
       "A gap-check against Microsoft's full 44-function Text category closes out across three rounds. CHAR, CODE, UNICHAR, UNICODE, REPT, T, DOLLAR, FIXED, ARRAYTOTEXT, and VALUETOTEXT opened the project. FINDB, LEFTB, LENB, MIDB, REPLACEB, RIGHTB, and SEARCHB — the double-byte character set (DBCS) counterparts of FIND/LEFT/LEN/MID/REPLACE/RIGHT/SEARCH — are all marked deprecated in Microsoft's current documentation, so their behavior was sourced from Microsoft's VBA reference instead. ASC, DBCS, BAHTTEXT, and PHONETIC round it out: full-width/half-width character conversion, Thai currency text, and furigana extraction for Japanese, Chinese, and Korean locales.",
