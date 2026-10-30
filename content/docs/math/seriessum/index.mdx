@@ -1,0 +1,168 @@
+---
+title: SERIESSUM
+description: Return the sum of a power series, given its coefficients.
+---
+
+Evaluate a power series — a sum of terms like
+`a₁x^n + a₂x^(n+m) + a₃x^(n+2m) + ...` — directly from `x`, a
+starting power, a step between powers, and a list of coefficients.
+
+export const quickAnswerFacts = [
+  { text: 'coefficients determines how many terms the series has', type: 'check' },
+  { text: 'Each term is coefficient × x raised to an increasing power, starting at n and stepping by m', type: 'check' },
+  { text: 'Used to approximate functions like sine, cosine, or exponentials from their Taylor-series coefficients', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=SERIESSUM(x, n, m, coefficients)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SERIESSUM(x, n, m, coefficients)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'x',
+    type: 'number',
+    required: true,
+    description: 'The input value to the power series.',
+  },
+  {
+    name: 'n',
+    type: 'number',
+    required: true,
+    description: 'The initial power to raise x to.',
+  },
+  {
+    name: 'm',
+    type: 'number',
+    required: true,
+    description: 'The step to increase n by for each subsequent term.',
+  },
+  {
+    name: 'coefficients',
+    type: 'range',
+    required: true,
+    description: 'A set of coefficients, one per term — its count determines how many terms the series has.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of the power series: for each coefficient `aᵢ` (starting at
+index 0), the term `aᵢ × x^(n + i×m)`, all added together.
+
+## Description
+
+SERIESSUM computes a polynomial-like expression in one call,
+instead of writing out each power term and coefficient multiplication
+by hand. It's most often used to approximate a mathematical function
+from its known power-series (Taylor series) coefficients — Microsoft's
+own documentation example approximates cosine this way, using the
+coefficients `1, -1/2!, 1/4!, -1/6!` with `n=0` and `m=2` to match
+cosine's even-power series.
+
+<ExcelCode>{`=SERIESSUM(2, 1, 1, {1,1,1}) → 14 (2^1 + 2^2 + 2^3)`}</ExcelCode>
+
+<Callout type="idea">
+  **The number of terms comes entirely from `coefficients`.** Three
+  coefficients means three terms, computed at powers `n`, `n+m`,
+  and `n+2m` — add or remove coefficients to change how many terms
+  the series includes.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`SERIESSUM("x", 1, 1, {1,1,1}) → #VALUE!`}</ExcelCode>
+
+Every argument, including each coefficient, must be numeric.
+
+export const faqs = [
+  {
+    question: 'What does SERIESSUM actually compute?',
+    answer: 'For each coefficient (starting at index 0), it computes coefficient × x raised to the power (n + index×m), then adds all those terms together — a general-purpose power series evaluator.',
+  },
+  {
+    question: 'What is SERIESSUM typically used for?',
+    answer: 'Approximating functions like sine, cosine, or exponentials using their known Taylor-series coefficients, without implementing the series expansion manually term by term.',
+  },
+  {
+    question: 'How many terms does the series have?',
+    answer: 'Exactly as many as there are values in coefficients — a 4-value coefficients array produces a 4-term series.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SERIESSUM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SERIESSUM(2, 1, 1, {1,1,1})`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.SeriesSum(2, 1, 1, Array(1, 1, 1))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    def seriessum(x, n, m, coefficients):
+        return sum(c * x ** (n + i * m) for i, c in enumerate(coefficients))
+
+    result = seriessum(2, 1, 1, [1, 1, 1])
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [POWER](/docs/math/power) — raises a single base to a single
+  power, the building block SERIESSUM repeats across many terms.
+- [SUMPRODUCT](/docs/math/sumproduct) — a related element-by-element
+  multiply-then-sum pattern, without the power-series structure.
+- [PI](/docs/math/pi) — often appears in the coefficients of a
+  trigonometric power series.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — a simple 3-term series" formula={`=SERIESSUM(2, 1, 1, {1,1,1})`}>
+  Returns `14` (`2¹ + 2² + 2³`).
+</ExampleCard>
+
+<ExampleCard number="02" label="Approximating cosine from its Taylor coefficients" formula={`=SERIESSUM(PI()/4, 0, 2, {1,-0.5,0.0417,-0.00139})`}>
+  Approximates `COS(PI()/4)` using the first four terms of cosine's
+  power series.
+</ExampleCard>
+
+<ExampleCard number="03" label="Coefficients from a range" formula={`=SERIESSUM(A2, 0, 1, B2:B5)`}>
+  Evaluates a 4-term polynomial in A2 using coefficients stored in
+  B2:B5.
+</ExampleCard>

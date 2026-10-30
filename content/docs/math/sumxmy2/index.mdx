@@ -1,0 +1,154 @@
+---
+title: SUMXMY2
+description: Return the sum of the squares of differences of corresponding values in two arrays.
+---
+
+For each pair of corresponding values in `array_x` and `array_y`,
+subtract first, then square the difference, then add all the
+results together — the "X Minus Y, squared" sum.
+
+export const quickAnswerFacts = [
+  { text: 'For each pair, computes (x - y)², then sums all the results', type: 'check' },
+  { text: 'array_x and array_y must have the same number of values, or #N/A', type: 'warn' },
+  { text: 'Different from SUMX2MY2, which squares each value before subtracting', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SUMXMY2(array_x, array_y)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUMXMY2(array_x, array_y)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array_x',
+    type: 'range',
+    required: true,
+    description: 'The first array or range of values.',
+  },
+  {
+    name: 'array_y',
+    type: 'range',
+    required: true,
+    description: 'The second array or range of values, matching array_x in count.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum, across every corresponding pair of values, of each pair's
+`(x - y)²`. For `array_x = {2,3}` and `array_y = {4,1}`, the result
+is `8` (`(2-4)² + (3-1)²` = `4 + 4`).
+
+## Description
+
+SUMXMY2 subtracts each pair of values first, then squares the
+difference, then sums every squared difference across the whole
+array — exactly the calculation behind a sum-of-squared-errors or
+sum-of-squared-residuals, which shows up throughout regression and
+variance-style statistics.
+
+<ExcelCode>{`=SUMXMY2({2,3}, {4,1}) → 8`}</ExcelCode>
+
+<Callout type="warn">
+  **Don't confuse SUMXMY2 with SUMX2MY2.** SUMXMY2 subtracts first,
+  then squares the difference (`(x-y)²`); SUMX2MY2 squares each
+  value first, then subtracts (`x²-y²`). They're easy to mix up by
+  name, and they return different results.
+</Callout>
+
+## Common errors
+
+### #N/A — mismatched array sizes
+
+<ExcelCode>{`SUMXMY2({1,2,3}, {1,2}) → #N/A`}</ExcelCode>
+
+`array_x` and `array_y` must contain the same number of values.
+
+export const faqs = [
+  {
+    question: 'What does SUMXMY2 actually compute?',
+    answer: 'For each pair of corresponding values in the two arrays, it subtracts y from x, squares that difference, then adds all the squared differences together.',
+  },
+  {
+    question: 'How is SUMXMY2 different from SUMX2MY2?',
+    answer: 'SUMXMY2 subtracts first, then squares the difference ((x-y)²). SUMX2MY2 squares each value first, then subtracts (x²-y²). Same two building blocks, applied in a different order, producing different results.',
+  },
+  {
+    question: 'What is SUMXMY2 commonly used for?',
+    answer: 'It directly computes a sum of squared differences, the core calculation behind sum-of-squared-errors and residual-based statistics, like evaluating how closely a model’s predictions match actual values.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUMXMY2 from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUMXMY2(A3:A9, B3:B9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.SumXMY2(Range("A3:A9"), Range("B3:B9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    x = [2, 3]
+    y = [4, 1]
+    result = sum((xi - yi) ** 2 for xi, yi in zip(x, y))
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMX2MY2](/docs/math/sumx2my2) — squares each value before
+  subtracting, rather than subtracting first.
+- [SUMX2PY2](/docs/math/sumx2py2) — adds the squares of each pair,
+  rather than squaring their difference.
+- [SUMSQ](/docs/math/sumsq) — sums the squares of a single list,
+  rather than comparing two paired arrays.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — sum of squared differences" formula={`=SUMXMY2({2,3}, {4,1})`}>
+  Returns `8`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Across two columns of actual vs. predicted values" formula={`=SUMXMY2(Actual[Value], Predicted[Value])`}>
+  Computes a sum-of-squared-errors between actual and predicted
+  values, a common model-fit measure.
+</ExampleCard>
+
+<ExampleCard number="03" label="Computing a root-mean-square error" formula={`=SQRT(SUMXMY2(Actual[Value],Predicted[Value])/COUNT(Actual[Value]))`}>
+  Divides the sum of squared errors by the count and takes the
+  square root, a standard RMSE calculation.
+</ExampleCard>

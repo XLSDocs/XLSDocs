@@ -1,0 +1,154 @@
+---
+title: SUMSQ
+description: Return the sum of the squares of a list of numbers.
+---
+
+Square every number given, then add the squares together — a
+single step used throughout statistics, physics, and least-squares
+calculations.
+
+export const quickAnswerFacts = [
+  { text: 'SUMSQ(3, 4) returns 25 (9 + 16)', type: 'check' },
+  { text: 'Squares each value first, then sums — not the same as SUM(range)^2', type: 'warn' },
+  { text: 'Accepts up to 255 arguments, or a range/array in place of listing values', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SUMSQ(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUMSQ(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first value, or a range/array of values, to square and sum.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Additional values, up to 255 total, to square and sum.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum of the squares of every number given. `SUMSQ(3, 4)` returns
+`25` (`9 + 16`).
+
+## Description
+
+SUMSQ squares each value individually, then adds the squares
+together — it's not the same as summing first and squaring once.
+`SUMSQ(3, 4)` is `25` (`3² + 4²`), while `SUM(3, 4)^2` is `49`
+(`(3+4)²`). This distinction matters anywhere sum-of-squares shows
+up directly in a formula, like computing a Euclidean distance or a
+standard-deviation-style calculation.
+
+<ExcelCode>{`=SUMSQ(3, 4) → 25 (compare to SUM(3,4)^2, which is 49)`}</ExcelCode>
+
+<Callout type="warn">
+  **Don't confuse SUMSQ(range) with SUM(range)^2.** They answer
+  different questions — SUMSQ squares each value before summing;
+  squaring a sum squares the total only once, at the end. The two
+  only agree when there's exactly one number involved.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`SUMSQ("abc", 4) → #VALUE!`}</ExcelCode>
+
+Direct non-numeric arguments cause an error; text and logical
+values inside a range or array argument are simply ignored instead.
+
+export const faqs = [
+  {
+    question: 'Is SUMSQ(range) the same as SUM(range)^2?',
+    answer: 'No — SUMSQ squares every individual value and then adds the squares. SUM(range)^2 adds the values first and squares the total once. They only match when there is a single number involved.',
+  },
+  {
+    question: 'What happens to text or empty cells in a range argument?',
+    answer: 'SUMSQ ignores empty cells, logical values, and text within a range or array argument. A text value passed directly (not inside a range) causes #VALUE! instead.',
+  },
+  {
+    question: 'What is SUMSQ commonly used for?',
+    answer: 'Sum-of-squares calculations throughout statistics and geometry — computing a Euclidean distance, a root-mean-square value, or as a building block in variance-style formulas.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUMSQ from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUMSQ(A2:A10)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.SumSq(Range("A2:A10"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    values = [3, 4]
+    result = sum(v ** 2 for v in values)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUM](/docs/math/sum) — adds values directly, without squaring
+  them first.
+- [SUMX2MY2](/docs/math/sumx2my2), [SUMX2PY2](/docs/math/sumx2py2),
+  and [SUMXMY2](/docs/math/sumxmy2) — sum-of-squares calculations
+  across two paired arrays, rather than a single list.
+- [SQRT](/docs/math/sqrt) — often wraps a SUMSQ result, as in
+  computing a Euclidean distance.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — sum of squares" formula={`=SUMSQ(3, 4)`}>
+  Returns `25`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Summing squares across a range" formula={`=SUMSQ(A2:A10)`}>
+  Squares and sums every number in A2:A10.
+</ExampleCard>
+
+<ExampleCard number="03" label="Computing a Euclidean distance" formula={`=SQRT(SUMSQ(A2-B2, A3-B3))`}>
+  Finds the straight-line distance between two 2D points, using
+  SUMSQ as the sum-of-squared-differences step.
+</ExampleCard>

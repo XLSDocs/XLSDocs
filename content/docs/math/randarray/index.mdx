@@ -1,0 +1,182 @@
+---
+title: RANDARRAY
+description: Return an array of random numbers, spilled across the rows and columns you specify.
+---
+
+Generate a whole grid of random numbers in one formula — RAND's
+dynamic-array counterpart, with control over the grid size, value
+range, and whether the results are whole numbers or decimals.
+
+export const quickAnswerFacts = [
+  { text: 'All five arguments are optional — RANDARRAY() alone returns one decimal between 0 and 1', type: 'check' },
+  { text: 'whole_number: TRUE for integers, FALSE (default) for decimals', type: 'check' },
+  { text: 'Recalculates every time the workbook does, like RAND', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=RANDARRAY([rows], [columns], [min], [max], [whole_number])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=RANDARRAY([rows], [columns], [min], [max], [whole_number])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'rows',
+    type: 'number',
+    required: false,
+    description: 'How many rows to generate. Defaults to 1.',
+  },
+  {
+    name: 'columns',
+    type: 'number',
+    required: false,
+    description: 'How many columns to generate. Defaults to 1.',
+  },
+  {
+    name: 'min',
+    type: 'number',
+    required: false,
+    description: 'The smallest value to return. Defaults to 0.',
+  },
+  {
+    name: 'max',
+    type: 'number',
+    required: false,
+    description: 'The largest value to return. Defaults to 1. Must be greater than min.',
+  },
+  {
+    name: 'whole_number',
+    type: 'boolean',
+    required: false,
+    description: 'TRUE returns whole numbers; FALSE (the default) returns decimals.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A dynamic array of `rows` × `columns` random numbers between `min`
+and `max`, spilled into the cells below/right of the formula.
+
+## Description
+
+RANDARRAY is a dynamic array function — it fills a whole grid of
+random values in a single formula, instead of writing `=RAND()` in
+one cell and copying it across a range. With no arguments at all,
+`RANDARRAY()` behaves just like `RAND()`, returning a single
+decimal between 0 and 1.
+
+<ExcelCode>{`=RANDARRAY(3, 2, 1, 100, TRUE) → a 3-row, 2-column grid of random whole numbers from 1 to 100`}</ExcelCode>
+
+<Callout type="warn">
+  **RANDARRAY requires Excel 365 or Excel 2021**, like other
+  dynamic array functions. It is not available in Excel 2019, 2016,
+  or earlier — those versions will show `#NAME?`.
+</Callout>
+
+<Callout type="warn">
+  **Every result recalculates whenever the workbook does**, the
+  same volatile behavior as RAND and RANDBETWEEN. If a fixed set of
+  random values is needed, copy the results and paste them back as
+  values (Paste Special → Values).
+</Callout>
+
+## Common errors
+
+### #VALUE! — min is not less than max
+
+<ExcelCode>{`RANDARRAY(1, 1, 10, 5) → #VALUE!`}</ExcelCode>
+
+`min` must be strictly less than `max`.
+
+### #SPILL! — blocked spill range
+
+Cells below or to the right of the formula already contain data.
+Clear the spill range, or move the formula somewhere clear.
+
+export const faqs = [
+  {
+    question: 'How is RANDARRAY different from RAND?',
+    answer: 'RAND returns a single random decimal between 0 and 1 in one cell. RANDARRAY generates a whole grid of random values in one formula, spilling across the rows and columns you specify, with optional control over the value range and whether results are whole numbers.',
+  },
+  {
+    question: 'Does RANDARRAY recalculate like RAND does?',
+    answer: 'Yes — every value in the array recalculates whenever the workbook recalculates, the same volatile behavior as RAND and RANDBETWEEN.',
+  },
+  {
+    question: 'Can RANDARRAY generate whole numbers instead of decimals?',
+    answer: 'Yes — set whole_number to TRUE. The default, FALSE, returns decimal values between min and max.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with RANDARRAY from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=RANDARRAY(3, 2, 1, 100, TRUE)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.RandArray(3, 2, 1, 100, True)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    result = np.random.randint(1, 101, size=(3, 2))
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [RAND](/docs/math/rand) — returns a single random decimal between
+  0 and 1, without the array/grid capability.
+- [RANDBETWEEN](/docs/math/randbetween) — returns a single random
+  whole number in a range, the single-cell version of what
+  RANDARRAY's `whole_number` argument does across a grid.
+- [SEQUENCE](/docs/arrays/sequence) — another dynamic array
+  generator, producing a predictable sequence instead of random
+  values.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — a single random decimal" formula={`=RANDARRAY()`}>
+  Returns one random decimal between 0 and 1, the same as RAND().
+</ExampleCard>
+
+<ExampleCard number="02" label="A grid of random whole numbers" formula={`=RANDARRAY(3, 2, 1, 100, TRUE)`}>
+  Spills a 3-row, 2-column grid of random integers from 1 to 100.
+</ExampleCard>
+
+<ExampleCard number="03" label="A column of random decimals in a custom range" formula={`=RANDARRAY(10, 1, 0, 50)`}>
+  Spills a 10-row column of random decimals between 0 and 50.
+</ExampleCard>

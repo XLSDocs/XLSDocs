@@ -1,0 +1,143 @@
+---
+title: SQRTPI
+description: Return the square root of a number multiplied by pi.
+---
+
+Return the square root of `number × π` — a single-step shortcut for
+a calculation that otherwise needs SQRT, multiplication, and PI
+written out separately.
+
+export const quickAnswerFacts = [
+  { text: 'SQRTPI(number) is the same as SQRT(number*PI())', type: 'check' },
+  { text: 'SQRTPI(1) returns approximately 1.772454, the square root of π itself', type: 'check' },
+  { text: 'A negative number returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SQRTPI(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SQRTPI(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to multiply by π before taking the square root. Must be 0 or greater.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The square root of `number × π`. `SQRTPI(1)` returns approximately
+`1.772454`; `SQRTPI(2)` returns approximately `2.506628`.
+
+## Description
+
+SQRTPI exists purely as a convenience — it saves writing
+`SQRT(number*PI())` out by hand. The calculation shows up in
+certain geometry and probability formulas (like the normal
+distribution's normalizing constant), where a square root of a
+multiple of π is a recurring building block.
+
+<ExcelCode>{`=SQRTPI(1) → 1.772454 (the square root of π itself)`}</ExcelCode>
+
+<Callout type="info">
+  **SQRTPI(number) is identical to SQRT(number*PI())** — there's no
+  behavioral difference, only convenience. Use whichever reads more
+  clearly in context.
+</Callout>
+
+## Common errors
+
+### #NUM! — a negative argument
+
+<ExcelCode>{`SQRTPI(-1) → #NUM!`}</ExcelCode>
+
+`number` must be `0` or greater — a negative value would require
+taking the square root of a negative number, which isn't defined
+for real numbers.
+
+export const faqs = [
+  {
+    question: 'Is SQRTPI just SQRT and PI combined?',
+    answer: 'Yes exactly — SQRTPI(number) always equals SQRT(number*PI()). It exists purely for convenience, to avoid writing that combination out every time.',
+  },
+  {
+    question: 'Why does SQRTPI(-1) return #NUM!?',
+    answer: 'number must be 0 or greater. A negative number multiplied by π is still negative, and the square root of a negative number isn’t a real number.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SQRTPI from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SQRTPI(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    ' VBA has no built-in SqrtPi — combine Sqr and the Application.Pi constant
+    result = Sqr(1 * Application.WorksheetFunction.Pi())
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.sqrt(1 * math.pi)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SQRT](/docs/math/sqrt) — the plain square root, without the
+  built-in π multiplication.
+- [PI](/docs/math/pi) — returns π itself, the constant SQRTPI
+  multiplies in automatically.
+- [POWER](/docs/math/power) — a fractional exponent can compute the
+  same root manually, as an alternative to SQRT/SQRTPI.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — square root of π" formula={`=SQRTPI(1)`}>
+  Returns approximately `1.772454`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Square root of twice π" formula={`=SQRTPI(2)`}>
+  Returns approximately `2.506628`.
+</ExampleCard>
+
+<ExampleCard number="03" label="Confirming it matches SQRT and PI combined" formula={`=SQRTPI(5)=SQRT(5*PI())`}>
+  Returns `TRUE` — the two formulas always agree.
+</ExampleCard>

@@ -1,0 +1,154 @@
+---
+title: SUMX2MY2
+description: Return the sum of the differences of the squares of corresponding values in two arrays.
+---
+
+For each pair of corresponding values in `array_x` and `array_y`,
+compute `x² - y²`, then add all those differences together — the
+"X-squared Minus Y-squared" sum.
+
+export const quickAnswerFacts = [
+  { text: 'For each pair, computes x² - y², then sums all the results', type: 'check' },
+  { text: 'array_x and array_y must have the same number of values, or #N/A', type: 'warn' },
+  { text: 'Different from SUMXMY2, which squares the difference instead', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SUMX2MY2(array_x, array_y)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=SUMX2MY2(array_x, array_y)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array_x',
+    type: 'range',
+    required: true,
+    description: 'The first array or range of values.',
+  },
+  {
+    name: 'array_y',
+    type: 'range',
+    required: true,
+    description: 'The second array or range of values, matching array_x in count.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The sum, across every corresponding pair of values, of each pair's
+`x² - y²`. For `array_x = {2,3}` and `array_y = {4,1}`, the result
+is `-4` (`(2²-4²) + (3²-1²)` = `-12 + 8`).
+
+## Description
+
+SUMX2MY2 is one of four related functions (alongside SUMSQ,
+SUMX2PY2, and SUMXMY2) built for sum-of-squares calculations across
+two paired arrays. Each one combines squaring and differencing in a
+slightly different order, and the names spell out exactly which: X2
+(x squared), M (minus), Y2 (y squared) — square each value first,
+then subtract, then sum.
+
+<ExcelCode>{`=SUMX2MY2({2,3}, {4,1}) → -4`}</ExcelCode>
+
+<Callout type="warn">
+  **Don't confuse SUMX2MY2 with SUMXMY2.** SUMX2MY2 squares each
+  value *before* subtracting (`x² - y²`); SUMXMY2 subtracts first,
+  then squares the difference (`(x-y)²`). They produce different
+  results for the same inputs.
+</Callout>
+
+## Common errors
+
+### #N/A — mismatched array sizes
+
+<ExcelCode>{`SUMX2MY2({1,2,3}, {1,2}) → #N/A`}</ExcelCode>
+
+`array_x` and `array_y` must contain the same number of values.
+
+export const faqs = [
+  {
+    question: 'What does SUMX2MY2 actually compute?',
+    answer: 'For each pair of corresponding values in the two arrays, it computes x² - y², then adds all those results together.',
+  },
+  {
+    question: 'How is SUMX2MY2 different from SUMXMY2?',
+    answer: 'SUMX2MY2 squares each value first, then subtracts (x² - y²). SUMXMY2 subtracts first, then squares the difference ((x-y)²). They give different results on the same data.',
+  },
+  {
+    question: 'What happens if the two arrays are different sizes?',
+    answer: 'SUMX2MY2 returns #N/A if array_x and array_y don’t have the same number of values.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with SUMX2MY2 from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=SUMX2MY2(A2:A9, B2:B9)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.SumX2MY2(Range("A2:A9"), Range("B2:B9"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    x = [2, 3]
+    y = [4, 1]
+    result = sum(xi**2 - yi**2 for xi, yi in zip(x, y))
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [SUMX2PY2](/docs/math/sumx2py2) — adds the squares instead of
+  subtracting them.
+- [SUMXMY2](/docs/math/sumxmy2) — subtracts first, then squares the
+  difference, rather than squaring each value first.
+- [SUMSQ](/docs/math/sumsq) — sums the squares of a single list,
+  rather than comparing two paired arrays.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — sum of squared differences" formula={`=SUMX2MY2({2,3}, {4,1})`}>
+  Returns `-4`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Across two columns of data" formula={`=SUMX2MY2(A2:A9, B2:B9)`}>
+  Computes the sum of x² - y² for every row from 2 to 9.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing to SUMX2PY2 on the same data" formula={`=SUMX2PY2(A2:A9,B2:B9)-SUMX2MY2(A2:A9,B2:B9)`}>
+  Returns twice the sum of y², since adding the two functions'
+  defining expressions together cancels the x² terms.
+</ExampleCard>
