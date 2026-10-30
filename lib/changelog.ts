@@ -13,6 +13,13 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-10-30',
+    title: 'The Date category is complete: DAYS, DAYS360, and ISOWEEKNUM',
+    description:
+      "A gap-check against Microsoft's full 25-function Date and Time category closes out with just three functions missing. DAYS is a readable, text-date-friendly wrapper around ordinary date subtraction. DAYS360 counts days on a 360-day-year, 30-day-month accounting convention used in bond and amortization schedules, with separate U.S. (NASD) and European rules for day-31 dates. ISOWEEKNUM returns the ISO 8601 standard week number — Monday-started weeks, with week 1 defined by the year's first Thursday — distinct from WEEKNUM's more configurable, non-standard numbering.",
+    tags: ['New functions', 'Milestone'],
+  },
+  {
+    date: '2026-10-30',
     title: 'The Math category is complete: 29 new functions, from EXP to RANDARRAY',
     description:
       "A gap-check against Microsoft's full 80-function Math and Trigonometry category closes out across five rounds. EXP, LN, LOG, and LOG10 filled the logarithm gap. CEILING.MATH, FLOOR.MATH, CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING, MROUND, and QUOTIENT round out the rounding-variant family alongside the existing CEILING/FLOOR/ROUND/TRUNC. ARABIC, ROMAN, BASE, DECIMAL, COMBINA, FACTDOUBLE, and MULTINOMIAL cover number-base conversion and combinatorics. MDETERM, MINVERSE, MMULT, and MUNIT bring in matrix algebra. SUMSQ, SUMX2MY2, SUMX2PY2, SUMXMY2, SQRTPI, SERIESSUM, and RANDARRAY close it out. Along the way, nine existing pages — AGGREGATE, COMBIN, FACT, GCD, LCM, PI, PRODUCT, RAND, and RANDBETWEEN — were found to have no card on the category index page, and got linked in.",
