@@ -1,0 +1,172 @@
+---
+title: DAYS360
+description: Return the number of days between two dates based on a 360-day year (twelve 30-day months).
+---
+
+Return the number of days between `start_date` and `end_date`,
+counted using a 360-day year — twelve 30-day months — rather than
+real calendar days. Built for accounting calculations that follow
+this convention.
+
+export const quickAnswerFacts = [
+  { text: 'Counts every month as exactly 30 days, for a 360-day year', type: 'warn' },
+  { text: 'method chooses U.S. (NASD, default) or European day-31 handling', type: 'warn' },
+  { text: 'Used mainly for bond coupon and amortization schedules, not calendar-accurate day counts', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=DAYS360(start_date, end_date, [method])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DAYS360(start_date, end_date, [method])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The starting date.',
+  },
+  {
+    name: 'end_date',
+    type: 'date',
+    required: true,
+    description: 'The ending date.',
+  },
+  {
+    name: 'method',
+    type: 'boolean',
+    required: false,
+    description: 'FALSE or omitted selects the U.S. (NASD) method; TRUE selects the European method.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of days between `start_date` and `end_date`, on a
+360-day-year, 30-day-month basis. If `start_date` is later than
+`end_date`, the result is negative.
+
+## Description
+
+DAYS360 doesn't count real calendar days — it assumes every month
+has exactly 30 days and every year has 360, a long-standing
+accounting convention (sometimes called "30/360") for computing
+bond interest and loan amortization schedules without the irregular
+month lengths of a real calendar getting in the way.
+
+<ExcelCode>{`=DAYS360("1-Jan-2011", "31-Dec-2011") → 360 (a full 360-day year)`}</ExcelCode>
+
+<Callout type="warn">
+  **The `method` argument changes how a day-31 date is handled.**
+  Under the European method (`TRUE`), any start or end date on the
+  31st is simply treated as the 30th. Under the U.S. (NASD) method
+  (the default), the rule is more involved: if `end_date` is the
+  last day of its month and `start_date` is before the 30th,
+  `end_date` is treated as the 1st of the *following* month instead
+  of the 30th of its own.
+</Callout>
+
+## Common errors
+
+### Results don't match a real calendar-day count
+
+<ExcelCode>{`DAYS360(start, end) ≠ DAYS(end, start) (for most date pairs)`}</ExcelCode>
+
+Not a bug — DAYS360 deliberately counts on a 30-day-month, 360-day-year
+basis. Use DAYS for an ordinary calendar day count instead.
+
+export const faqs = [
+  {
+    question: 'Why doesn’t DAYS360 match a plain calendar day count?',
+    answer: 'By design — DAYS360 assumes every month has 30 days and every year has 360, a standard accounting convention. Use DAYS instead for real calendar-accurate day counts.',
+  },
+  {
+    question: 'What’s the difference between the U.S. and European methods?',
+    answer: 'The European method (TRUE) simply treats any date on the 31st as the 30th. The U.S./NASD method (the default) has more involved rules around end-of-month dates, including shifting end_date to the 1st of the following month in some cases.',
+  },
+  {
+    question: 'What is DAYS360 typically used for?',
+    answer: 'Bond interest accrual and loan amortization schedules that are specifically defined using the 30/360 day-count convention — it’s not meant for ordinary calendar date math.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DAYS360 from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DAYS360(A2, A3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Days360(Range("A2").Value, Range("A3").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    # A simplified European-method implementation — the U.S./NASD
+    # method has additional end-of-month edge cases not shown here.
+    def days360_european(start, end):
+        d1 = min(start.day, 30)
+        d2 = min(end.day, 30)
+        return (end.year - start.year) * 360 + (end.month - start.month) * 30 + (d2 - d1)
+
+    result = days360_european(date(2011, 1, 15), date(2011, 4, 15))
+    print(result)  # 90 — three clean 30-day months, no end-of-month edge case
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DAYS](/docs/date/days) — counts real calendar days, instead of
+  the 30/360 accounting convention.
+- [YEARFRAC](/docs/date/yearfrac) — expresses a date gap as a
+  fraction of a year, using the same family of day-count bases.
+- [EOMONTH](/docs/date/eomonth) — finds the last day of a month,
+  relevant to several of DAYS360's end-of-month special cases.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — a full 360-day year" formula={`=DAYS360("1-Jan-2011", "31-Dec-2011")`}>
+  Returns `360`.
+</ExampleCard>
+
+<ExampleCard number="02" label="A short span straddling a month boundary" formula={`=DAYS360("30-Jan-2011", "1-Feb-2011")`}>
+  Returns `1` — day 30 to day 1 of the next 30-day month, one day
+  apart on the 30-day-month calendar.
+</ExampleCard>
+
+<ExampleCard number="03" label="Using the European method" formula={`=DAYS360(A2, A3, TRUE)`}>
+  Switches to the European day-31 handling, which can return a
+  different result than the default U.S. method on the same dates.
+</ExampleCard>

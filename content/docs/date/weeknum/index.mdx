@@ -61,8 +61,9 @@ defined to start on.
   WEEKNUM's numbering doesn't match the international ISO 8601 week
   standard, which defines week 1 by a stricter rule (the week
   containing the year's first Thursday). For ISO-compliant week
-  numbers, use `ISOWEEKNUM` instead — it isn't a `return_type` option
-  on WEEKNUM, but a separate function entirely.
+  numbers, use [ISOWEEKNUM](/docs/date/isoweeknum) instead — it isn't
+  a `return_type` option on WEEKNUM, but a separate function
+  entirely.
 </Callout>
 
 ## Try it
@@ -158,6 +159,8 @@ export const compatibility = [
 
 ## Related functions
 
+- [ISOWEEKNUM](/docs/date/isoweeknum) — the ISO 8601 standard week
+  number, with a stricter and non-configurable week-1 rule.
 - [WEEKDAY](/docs/date/weekday) — returns which day of the week a
   date falls on, rather than which week of the year.
 - [YEARFRAC](/docs/date/yearfrac) — a different way to express a

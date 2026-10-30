@@ -1,0 +1,150 @@
+---
+title: ISOWEEKNUM
+description: Return the ISO week number of the year for a given date.
+---
+
+Return the ISO 8601 week number for `date` — the international
+standard week-numbering system, where week 1 is defined as the week
+containing the year's first Thursday.
+
+export const quickAnswerFacts = [
+  { text: 'Always treats Monday as the start of the week', type: 'check' },
+  { text: 'Not the same as WEEKNUM’s default — use ISOWEEKNUM for ISO 8601 compliance', type: 'warn' },
+  { text: 'Requires Excel 2013 or later', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ISOWEEKNUM(date)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISOWEEKNUM(date)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'date',
+    type: 'date',
+    required: true,
+    description: 'The date to find the ISO week number for.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The ISO 8601 week number of the year containing `date`, as a whole
+number from `1` to `53`. `ISOWEEKNUM("3/9/2012")` returns `10`.
+
+## Description
+
+ISOWEEKNUM follows the ISO 8601 international standard for week
+numbering, used widely outside the U.S. — weeks always start on
+Monday, and week 1 of a year is specifically defined as the week
+containing that year's first Thursday (equivalently, the week
+containing January 4th). This sometimes puts the very first days of
+January into the *last* week of the previous year, which is correct
+under the standard even though it can look surprising.
+
+<ExcelCode>{`=ISOWEEKNUM("3/9/2012") → 10`}</ExcelCode>
+
+<Callout type="warn">
+  **ISOWEEKNUM and WEEKNUM can disagree**, even on the same date.
+  WEEKNUM's default settings start the week on Sunday and always
+  put January 1st in week 1; ISOWEEKNUM starts weeks on Monday and
+  can place early-January dates in the final week of the *prior*
+  year. Use ISOWEEKNUM specifically when ISO 8601 compliance
+  matters — for European business reporting, for example.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-date argument
+
+<ExcelCode>{`ISOWEEKNUM("not a date") → #VALUE!`}</ExcelCode>
+
+`date` must be a real date or a date serial number.
+
+export const faqs = [
+  {
+    question: 'How is ISOWEEKNUM different from WEEKNUM?',
+    answer: 'WEEKNUM offers configurable options for which day starts the week, defaulting to Sunday, and always puts January 1st in week 1. ISOWEEKNUM always starts the week on Monday and follows the ISO 8601 rule that week 1 is the week containing the year’s first Thursday — the two can disagree on the same date, especially in late December or early January.',
+  },
+  {
+    question: 'Why might ISOWEEKNUM return a week number from the previous year?',
+    answer: 'Under ISO 8601, the first few days of January can fall in the last week of the prior year if that week’s Thursday belongs to the previous year. This is standard, correct ISO behavior, not a bug.',
+  },
+  {
+    question: 'What day does the ISO week start on?',
+    answer: 'Monday, always — this is fixed by the ISO 8601 standard and isn’t configurable, unlike WEEKNUM’s return_type argument.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISOWEEKNUM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ISOWEEKNUM(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = Application.WorksheetFunction.IsoWeekNum(Range("A2").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    result = date(2012, 3, 9).isocalendar().week
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [WEEKNUM](/docs/date/weeknum) — a configurable, non-ISO week
+  number, with a different default start-of-week and week-1 rule.
+- [WEEKDAY](/docs/date/weekday) — returns which day of the week a
+  date falls on, rather than which week of the year.
+- [YEAR](/docs/date/year) — a date's ISO week number can belong to
+  a different year than YEAR(date) reports, near year boundaries.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — ISO week number" formula={`=ISOWEEKNUM("3/9/2012")`}>
+  Returns `10`.
+</ExampleCard>
+
+<ExampleCard number="02" label="From a cell reference" formula={`=ISOWEEKNUM(A2)`}>
+  Returns the ISO week number for the date in A2.
+</ExampleCard>
+
+<ExampleCard number="03" label="Comparing to WEEKNUM near a year boundary" formula={`=ISOWEEKNUM("1/1/2022")<>WEEKNUM("1/1/2022")`}>
+  Returns `TRUE` for many years — January 1st often lands in a
+  different week number under each standard.
+</ExampleCard>

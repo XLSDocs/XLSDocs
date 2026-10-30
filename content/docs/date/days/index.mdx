@@ -1,0 +1,154 @@
+---
+title: DAYS
+description: Return the number of days between two dates.
+---
+
+Return the number of days between `start_date` and `end_date` — a
+direct, simple subtraction, as its own named function.
+
+export const quickAnswerFacts = [
+  { text: 'DAYS(end_date, start_date) — end comes first, start comes second', type: 'warn' },
+  { text: 'Identical to end_date - start_date when both are real dates', type: 'check' },
+  { text: 'A negative result just means start_date is after end_date', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=DAYS(end_date, start_date)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DAYS(end_date, start_date)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'end_date',
+    type: 'date',
+    required: true,
+    description: 'The later date (or the date to count toward).',
+  },
+  {
+    name: 'start_date',
+    type: 'date',
+    required: true,
+    description: 'The earlier date (or the date to count from).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The number of days between `start_date` and `end_date`.
+`DAYS("15-Mar-2021", "1-Feb-2021")` returns `42`.
+
+## Description
+
+DAYS is a thin wrapper around plain date subtraction — `DAYS(end,
+start)` returns the same result as `end - start` when both are
+genuine dates. Its main value is readability and resilience: it
+reads clearly as "days between these two dates" in a formula, and it
+accepts text dates directly, converting them the same way DATEVALUE
+would, rather than requiring a pre-converted serial number.
+
+<ExcelCode>{`=DAYS("15-Mar-2021", "1-Feb-2021") → 42`}</ExcelCode>
+
+<Callout type="warn">
+  **Argument order is `end_date` first, then `start_date`** — the
+  opposite of how the two dates usually get written in a sentence.
+  `DAYS(A2, A3)` with A2 the later date and A3 the earlier date
+  gives a positive result; swapping them gives the same magnitude,
+  negated.
+</Callout>
+
+## Common errors
+
+### #VALUE! — text that isn't a recognizable date
+
+<ExcelCode>{`DAYS("not a date", "1-Feb-2021") → #VALUE!`}</ExcelCode>
+
+Both arguments must be real dates, or text Excel can parse as a
+date.
+
+export const faqs = [
+  {
+    question: 'Is DAYS the same as end_date - start_date?',
+    answer: 'Yes, when both arguments are genuine dates — DAYS(end, start) returns the identical number. DAYS adds the convenience of accepting text dates directly without a separate DATEVALUE conversion step.',
+  },
+  {
+    question: 'Which argument comes first, the end date or the start date?',
+    answer: 'end_date comes first, then start_date — the opposite order from how the dates are usually described in a sentence. Getting this backward flips the sign of the result.',
+  },
+  {
+    question: 'How is DAYS different from DATEDIF?',
+    answer: 'DAYS always returns a plain day count. DATEDIF can return the gap in years, months, or days depending on the unit argument, and has its own set of quirks — DAYS is the simpler, more predictable choice when a day count is all that’s needed.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DAYS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DAYS(A2, A3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = Application.WorksheetFunction.Days(Range("A2").Value, Range("A3").Value)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    from datetime import date
+
+    result = (date(2021, 3, 15) - date(2021, 2, 1)).days
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DATEDIF](/docs/date/datedif) — measures the gap between two
+  dates in years, months, or days, instead of only days.
+- [DAYS360](/docs/date/days360) — counts days using a 360-day-year
+  accounting convention instead of real calendar days.
+- [NETWORKDAYS](/docs/date/networkdays) — counts only business days
+  between two dates, excluding weekends and holidays.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — days between two dates" formula={`=DAYS("15-Mar-2021", "1-Feb-2021")`}>
+  Returns `42`.
+</ExampleCard>
+
+<ExampleCard number="02" label="From cell references" formula={`=DAYS(A2, A3)`}>
+  Returns the number of days between the dates in A2 and A3.
+</ExampleCard>
+
+<ExampleCard number="03" label="Negative result from a reversed order" formula={`=DAYS(A3, A2)`}>
+  Returns the same magnitude as example 2, negated — a negative
+  result means `end_date` actually came before `start_date`.
+</ExampleCard>
