@@ -1,0 +1,165 @@
+---
+title: MROUND
+description: Round a number to the nearest multiple of a given value.
+---
+
+Round `number` to the *nearest* multiple of `multiple` — unlike
+CEILING or FLOOR, which always round in one fixed direction, MROUND
+rounds to whichever multiple is closer.
+
+export const quickAnswerFacts = [
+  { text: 'Rounds to the nearest multiple — could go up or down, whichever is closer', type: 'check' },
+  { text: 'number and multiple must have the same sign, or MROUND returns #NUM!', type: 'warn' },
+  { text: 'Exactly halfway rounds away from zero, matching ROUND’s own tie-breaking rule', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=MROUND(number, multiple)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MROUND(number, multiple)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round.',
+  },
+  {
+    name: 'multiple',
+    type: 'number',
+    required: true,
+    description: 'The multiple to round number to.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded to the nearest multiple of `multiple`.
+`MROUND(10, 3)` returns `9` (closer to 9 than to 12);
+`MROUND(1.3, 0.2)` returns `1.4`.
+
+## Description
+
+MROUND fills the gap between CEILING and FLOOR: instead of always
+rounding up or always rounding down, it picks whichever multiple of
+`multiple` is actually closer to `number`. It's the right tool
+whenever "round to the nearest X" is the goal, rather than a
+guaranteed direction.
+
+<ExcelCode>{`=MROUND(10, 3) → 9 (9 is 1 away, 12 is 2 away — 9 wins)`}</ExcelCode>
+
+<Callout type="warn">
+  **`number` and `multiple` must share the same sign** —
+  `MROUND(5, -2)` returns `#NUM!`, since a positive number can't be
+  rounded to a negative multiple. This is stricter than CEILING.MATH
+  or FLOOR.MATH, which both allow mismatched signs.
+</Callout>
+
+## Common errors
+
+### #NUM! — mismatched signs
+
+<ExcelCode>{`MROUND(5, -2) → #NUM!`}</ExcelCode>
+
+`number` and `multiple` need matching signs — use `MROUND(-5, -2)`
+for a negative number.
+
+## Try it
+
+<TryIt
+  data={{ '1': '10', '2': '10', '3': '9', '5': '10', '10': '10' }}
+  defaultValue="3"
+  label={'Live preview — =MROUND(10, {value})'}
+  fieldLabel="multiple"
+/>
+
+The same number, 10, rounding to the nearest multiple of each value
+tried — notice how a multiple of 3 rounds down to 9 (closer than
+12), while the others land back on 10 exactly.
+
+export const faqs = [
+  {
+    question: 'How is MROUND different from CEILING or FLOOR?',
+    answer: 'CEILING always rounds up and FLOOR always rounds down, to a given multiple. MROUND rounds to whichever multiple is actually closer, which could be either direction.',
+  },
+  {
+    question: 'What happens exactly halfway between two multiples?',
+    answer: "MROUND rounds away from zero at the exact midpoint, the same tie-breaking rule ROUND uses — for example, MROUND(15, 10) rounds to 20, not 10.",
+  },
+  {
+    question: 'Why does MROUND return #NUM! for MROUND(5, -2)?',
+    answer: "number and multiple must have the same sign. 5 is positive and -2 is negative, so there's no valid result — use MROUND(-5, -2) or MROUND(5, 2) instead.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MROUND from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MROUND(10, 3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.MRound(10, 3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = round(10 / 3) * 3
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CEILING.MATH](/docs/math/ceiling-math) — always rounds up to a
+  multiple, rather than to the nearest one.
+- [FLOOR.MATH](/docs/math/floor-math) — always rounds down to a
+  multiple, rather than to the nearest one.
+- [ROUND](/docs/math/round) — rounds to a number of decimal digits,
+  rather than to an arbitrary multiple.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — round to the nearest multiple of 3" formula={`=MROUND(10, 3)`}>
+  Returns `9`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Rounding a decimal to the nearest 0.2" formula={`=MROUND(1.3, 0.2)`}>
+  Returns `1.4`.
+</ExampleCard>
+
+<ExampleCard number="03" label="Rounding a price to the nearest quarter" formula={`=MROUND(Prices[Amount], 0.25)`}>
+  Rounds each price to the nearest 25-cent increment, in whichever
+  direction is closer.
+</ExampleCard>

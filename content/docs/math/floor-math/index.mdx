@@ -1,0 +1,174 @@
+---
+title: FLOOR.MATH
+description: Round a number down to the nearest integer or multiple of significance, with a mode switch for negative numbers.
+---
+
+Round `number` down to the nearest integer or multiple of
+`significance` — FLOOR's modern successor, with a `mode` argument
+that controls which direction negative numbers round, and no
+requirement that `number` and `significance` share a sign.
+
+export const quickAnswerFacts = [
+  { text: 'significance and mode are both optional — significance defaults to 1 (or -1 for negative numbers)', type: 'check' },
+  { text: 'mode only affects negative numbers — it has no effect on positive ones', type: 'warn' },
+  { text: "Unlike FLOOR, number and significance don't need matching signs", type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FLOOR.MATH(number, [significance], [mode])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FLOOR.MATH(number, [significance], [mode])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: false,
+    description: 'The multiple to round down to. Defaults to 1 for a positive number, or -1 for a negative number.',
+  },
+  {
+    name: 'mode',
+    type: 'number',
+    required: false,
+    description: 'For a negative number only, a zero or negative value reverses the default rounding direction (toward zero instead of away from zero). Has no effect on positive numbers.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded down to the nearest multiple of `significance`.
+`FLOOR.MATH(24.3, 5)` returns `20`; `FLOOR.MATH(6.7)` returns `6`.
+
+## Description
+
+FLOOR.MATH is the newer, more flexible version of FLOOR: it rounds
+down to a multiple of `significance` just like FLOOR, but doesn't
+require `number` and `significance` to share a sign, and adds the
+`mode` argument for explicit control over negative-number rounding
+direction. By default, a negative number rounds away from zero
+(`FLOOR.MATH(-8.1, 2)` returns `-10`); a `mode` of 0 or negative
+reverses that, rounding toward zero instead
+(`FLOOR.MATH(-5.5, 2, -1)` returns `-4`).
+
+<ExcelCode>{`=FLOOR.MATH(24.3, 5) → 20 (the next multiple of 5 at or below 24.3)`}</ExcelCode>
+
+<Callout type="warn">
+  **`mode` only matters for negative numbers.** A positive `number`
+  always rounds down toward negative infinity regardless of what
+  `mode` is set to — it exists purely to pick a direction for
+  negative inputs.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — significance is zero
+
+<ExcelCode>{`FLOOR.MATH(22, 0) → #DIV/0!`}</ExcelCode>
+
+A zero `significance` has no valid multiple to round to.
+
+### Unexpected sign confusion with mode
+
+<ExcelCode>{`FLOOR.MATH(-5.5, 2) → -6 (away from zero, the default)`}</ExcelCode>
+<ExcelCode>{`FLOOR.MATH(-5.5, 2, -1) → -4 (toward zero, with mode set)`}</ExcelCode>
+
+Forgetting to pass `mode` is a common source of surprise when
+rounding negative numbers — the default direction is away from
+zero, which some expect to be the opposite.
+
+export const faqs = [
+  {
+    question: 'How is FLOOR.MATH different from FLOOR?',
+    answer: "FLOOR.MATH doesn't require number and significance to share a sign (FLOOR returns #NUM! if they don't), and it adds a mode argument for explicit control over negative-number rounding direction.",
+  },
+  {
+    question: 'What does the mode argument actually do?',
+    answer: 'It only affects negative numbers. A mode of 0 (or omitted) rounds a negative number away from zero; a negative mode rounds it toward zero instead. Positive numbers are unaffected either way.',
+  },
+  {
+    question: 'What happens if I omit significance?',
+    answer: 'It defaults to 1 for a positive number, or -1 for a negative number — effectively rounding down to the nearest integer in both cases.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FLOOR.MATH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FLOOR.MATH(24.3, 5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Floor_Math(24.3, 5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.floor(24.3 / 5) * 5
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FLOOR](/docs/math/floor) — the older version, requiring `number`
+  and `significance` to share a sign, with no `mode` argument.
+- [CEILING.MATH](/docs/math/ceiling-math) — the rounding-up
+  counterpart, with the same `significance`/`mode` flexibility.
+- [FLOOR.PRECISE](/docs/math/floor-precise) — always rounds toward
+  negative infinity, ignoring the sign of `significance` entirely.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — round down to a multiple of 5" formula={`=FLOOR.MATH(24.3, 5)`}>
+  Returns `20`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Rounding down to the nearest integer" formula={`=FLOOR.MATH(6.7)`}>
+  Returns `6` — `significance` defaults to 1.
+</ExampleCard>
+
+<ExampleCard number="03" label="Negative number, default direction" formula={`=FLOOR.MATH(-8.1, 2)`}>
+  Returns `-10` — rounds away from zero by default.
+</ExampleCard>
+
+<ExampleCard number="04" label="Negative number, mode reversed" formula={`=FLOOR.MATH(-5.5, 2, -1)`}>
+  Returns `-4` — the negative `mode` rounds toward zero instead.
+</ExampleCard>

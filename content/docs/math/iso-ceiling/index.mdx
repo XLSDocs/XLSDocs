@@ -1,0 +1,159 @@
+---
+title: ISO.CEILING
+description: Round a number up to the nearest integer or multiple of significance, always rounding toward positive infinity — the ODF-compatible name for CEILING.PRECISE.
+---
+
+Round `number` up to the nearest integer or multiple of
+`significance`, always rounding toward positive infinity —
+functionally identical to CEILING.PRECISE, added under this name for
+compatibility with the Open Document Format (ODF) spreadsheet
+standard.
+
+export const quickAnswerFacts = [
+  { text: 'Behaves identically to CEILING.PRECISE — same arguments, same results', type: 'check' },
+  { text: 'Always rounds toward positive infinity, for both positive and negative numbers', type: 'check' },
+  { text: 'The sign of significance is ignored — only its absolute value matters', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=ISO.CEILING(number, [significance])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ISO.CEILING(number, [significance])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: false,
+    description: 'The multiple to round up to. Its sign is ignored — only the absolute value is used. Defaults to 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded up to the nearest multiple of `significance`,
+always moving toward positive infinity. `ISO.CEILING(4.3, 2)`
+returns `6`; `ISO.CEILING(-4.3)` returns `-4`.
+
+## Description
+
+ISO.CEILING exists specifically so that spreadsheets following the
+ODF (OpenDocument Format) standard — used by applications like
+LibreOffice Calc and Google Sheets — have a function name that
+matches what the standard specifies, while behaving exactly like
+Excel's own CEILING.PRECISE. There's no behavioral difference
+between the two; it's purely a naming-compatibility function.
+
+<ExcelCode>{`=ISO.CEILING(4.3, 2) → 6 (next multiple of 2 at or above 4.3)`}</ExcelCode>
+
+<Callout type="info">
+  **ISO.CEILING and CEILING.PRECISE are interchangeable.** Pick
+  ISO.CEILING when matching a formula imported from or shared with
+  an ODF-based tool; otherwise, either name works identically in
+  Excel.
+</Callout>
+
+## Common errors
+
+### Zero result from a zero argument
+
+<ExcelCode>{`ISO.CEILING(0, 5) → 0`}</ExcelCode>
+<ExcelCode>{`ISO.CEILING(4.3, 0) → 0`}</ExcelCode>
+
+If either `number` or `significance` is `0`, the result is `0` —
+there's no non-zero multiple to round a zero value to.
+
+export const faqs = [
+  {
+    question: 'Is ISO.CEILING different from CEILING.PRECISE?',
+    answer: "No — they're functionally identical. ISO.CEILING exists as the ODF-standard name for the same rounding behavior CEILING.PRECISE provides.",
+  },
+  {
+    question: 'Why does Excel have two functions that do the same thing?',
+    answer: "ISO.CEILING was added for compatibility with spreadsheets built around the OpenDocument Format (ODF) standard, which names this function ISO.CEILING. CEILING.PRECISE is Excel's own equivalent, added around the same time.",
+  },
+  {
+    question: 'Does the sign of significance matter for ISO.CEILING?',
+    answer: 'No — it always uses the absolute value of significance, so ISO.CEILING(4.3, 2) and ISO.CEILING(4.3, -2) return the same result.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ISO.CEILING from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ISO.CEILING(4.3, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Iso_Ceiling(4.3, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.ceil(4.3 / abs(2)) * abs(2)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CEILING.PRECISE](/docs/math/ceiling-precise) — functionally
+  identical, Excel's own non-ODF name for the same behavior.
+- [CEILING.MATH](/docs/math/ceiling-math) — adds a `mode` argument
+  to control negative-number rounding direction, rather than always
+  rounding toward positive infinity.
+- [FLOOR.PRECISE](/docs/math/floor-precise) — the rounding-down
+  counterpart, always rounding toward negative infinity.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — round up to a multiple of 2" formula={`=ISO.CEILING(4.3, 2)`}>
+  Returns `6`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Negative number rounds toward zero" formula={`=ISO.CEILING(-4.3)`}>
+  Returns `-4` — always toward positive infinity, regardless of
+  sign.
+</ExampleCard>
+
+<ExampleCard number="03" label="Confirming it matches CEILING.PRECISE" formula={`=ISO.CEILING(4.3,2)=CEILING.PRECISE(4.3,2)`}>
+  Returns `TRUE` — the two functions always agree.
+</ExampleCard>

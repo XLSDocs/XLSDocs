@@ -1,0 +1,176 @@
+---
+title: CEILING.MATH
+description: Round a number up to the nearest integer or multiple of significance, with a mode switch for negative numbers.
+---
+
+Round `number` up to the nearest integer or multiple of
+`significance` — CEILING's modern successor, with a `mode` argument
+that controls which direction negative numbers round, and no
+requirement that `number` and `significance` share a sign.
+
+export const quickAnswerFacts = [
+  { text: 'significance and mode are both optional — significance defaults to 1 (or -1 for negative numbers)', type: 'check' },
+  { text: 'mode only affects negative numbers — it has no effect on positive ones', type: 'warn' },
+  { text: "Unlike CEILING, number and significance don't need matching signs", type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CEILING.MATH(number, [significance], [mode])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CEILING.MATH(number, [significance], [mode])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: false,
+    description: 'The multiple to round up to. Defaults to 1 for a positive number, or -1 for a negative number.',
+  },
+  {
+    name: 'mode',
+    type: 'number',
+    required: false,
+    description: 'For a negative number only, a non-zero value reverses the default rounding direction (away from zero instead of toward zero). Has no effect on positive numbers.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded up to the nearest multiple of `significance`.
+`CEILING.MATH(24.3, 5)` returns `25`; `CEILING.MATH(6.7)` returns `7`.
+
+## Description
+
+CEILING.MATH is the newer, more flexible version of CEILING: it
+rounds up to a multiple of `significance` just like CEILING, but
+doesn't require `number` and `significance` to share a sign, and
+adds the `mode` argument for explicit control over negative-number
+rounding direction. By default, a negative number rounds toward
+zero (`CEILING.MATH(-8.1, 2)` returns `-8`); a non-zero `mode`
+reverses that, rounding away from zero instead
+(`CEILING.MATH(-5.5, 2, -1)` returns `-6`).
+
+<ExcelCode>{`=CEILING.MATH(24.3, 5) → 25 (the next multiple of 5 at or above 24.3)`}</ExcelCode>
+
+<Callout type="warn">
+  **`mode` only matters for negative numbers.** A positive `number`
+  always rounds up toward positive infinity regardless of what
+  `mode` is set to — it exists purely to pick a direction for
+  negative inputs.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — significance is zero
+
+<ExcelCode>{`CEILING.MATH(22, 0) → #DIV/0!`}</ExcelCode>
+
+A zero `significance` has no valid multiple to round to.
+
+### Unexpected sign confusion with mode
+
+<ExcelCode>{`CEILING.MATH(-5.5, 2) → -4 (toward zero, the default)`}</ExcelCode>
+<ExcelCode>{`CEILING.MATH(-5.5, 2, -1) → -6 (away from zero, with mode set)`}</ExcelCode>
+
+Forgetting to pass `mode` is a common source of surprise when
+rounding negative numbers — the default direction is toward zero,
+which some expect to be the opposite.
+
+export const faqs = [
+  {
+    question: 'How is CEILING.MATH different from CEILING?',
+    answer: "CEILING.MATH doesn't require number and significance to share a sign (CEILING returns #NUM! if they don't), and it adds a mode argument for explicit control over negative-number rounding direction.",
+  },
+  {
+    question: 'What does the mode argument actually do?',
+    answer: 'It only affects negative numbers. A mode of 0 (or omitted) rounds a negative number toward zero; any non-zero mode rounds it away from zero instead. Positive numbers are unaffected either way.',
+  },
+  {
+    question: 'What happens if I omit significance?',
+    answer: 'It defaults to 1 for a positive number, or -1 for a negative number — effectively rounding up to the nearest integer in both cases.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CEILING.MATH from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CEILING.MATH(24.3, 5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Ceiling_Math(24.3, 5)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.ceil(24.3 / 5) * 5
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CEILING](/docs/math/ceiling) — the older version, requiring
+  `number` and `significance` to share a sign, with no `mode`
+  argument.
+- [FLOOR.MATH](/docs/math/floor-math) — the rounding-down
+  counterpart, with the same `significance`/`mode` flexibility.
+- [CEILING.PRECISE](/docs/math/ceiling-precise) and
+  [ISO.CEILING](/docs/math/iso-ceiling) — always round toward
+  positive infinity, ignoring the sign of `significance` entirely.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — round up to a multiple of 5" formula={`=CEILING.MATH(24.3, 5)`}>
+  Returns `25`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Rounding up to the nearest integer" formula={`=CEILING.MATH(6.7)`}>
+  Returns `7` — `significance` defaults to 1.
+</ExampleCard>
+
+<ExampleCard number="03" label="Negative number, default direction" formula={`=CEILING.MATH(-8.1, 2)`}>
+  Returns `-8` — rounds toward zero by default.
+</ExampleCard>
+
+<ExampleCard number="04" label="Negative number, mode reversed" formula={`=CEILING.MATH(-5.5, 2, -1)`}>
+  Returns `-6` — the non-zero `mode` rounds away from zero instead.
+</ExampleCard>

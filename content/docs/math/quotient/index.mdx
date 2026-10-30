@@ -1,0 +1,160 @@
+---
+title: QUOTIENT
+description: Return the integer portion of a division, discarding the remainder.
+---
+
+Divide `numerator` by `denominator` and return only the integer
+portion, discarding whatever remainder is left over — the function
+version of integer division.
+
+export const quickAnswerFacts = [
+  { text: 'QUOTIENT(5, 2) returns 2 — the remainder is discarded entirely', type: 'check' },
+  { text: 'Different from 5/2, which returns 2.5 with the decimal kept', type: 'warn' },
+  { text: 'Truncates toward zero for negative results, like TRUNC', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=QUOTIENT(numerator, denominator)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=QUOTIENT(numerator, denominator)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'numerator',
+    type: 'number',
+    required: true,
+    description: 'The dividend.',
+  },
+  {
+    name: 'denominator',
+    type: 'number',
+    required: true,
+    description: 'The divisor.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The integer portion of `numerator` divided by `denominator`, with
+the remainder discarded. `QUOTIENT(5, 2)` returns `2`;
+`QUOTIENT(-10, 3)` returns `-3`.
+
+## Description
+
+QUOTIENT is ordinary division with the decimal portion dropped —
+not rounded, just truncated. `5/2` returns `2.5` with the `/`
+operator; `QUOTIENT(5, 2)` returns `2`, the whole-number part alone.
+It's the companion to MOD: together, `QUOTIENT(a, b)` and
+`MOD(a, b)` split a division into its whole and remainder parts.
+
+<ExcelCode>{`=QUOTIENT(5, 2) → 2 (compare to 5/2, which returns 2.5)`}</ExcelCode>
+
+<Callout type="info">
+  **Negative results truncate toward zero**, the same way TRUNC
+  does — `QUOTIENT(-10, 3)` returns `-3`, not `-4`, since truncation
+  drops the fractional part rather than rounding down.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — a zero denominator
+
+<ExcelCode>{`QUOTIENT(5, 0) → #DIV/0!`}</ExcelCode>
+
+`denominator` can't be zero.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`QUOTIENT("abc", 2) → #VALUE!`}</ExcelCode>
+
+Both arguments must be numbers, cells containing numbers, or
+formulas that return numbers.
+
+export const faqs = [
+  {
+    question: 'How is QUOTIENT different from the / operator?',
+    answer: 'The / operator returns the full decimal result of a division. QUOTIENT returns only the integer portion, discarding the remainder entirely — QUOTIENT(5, 2) is 2, while 5/2 is 2.5.',
+  },
+  {
+    question: 'How do QUOTIENT and MOD work together?',
+    answer: 'QUOTIENT(a, b) gives the whole-number part of a division, and MOD(a, b) gives what’s left over. Together they reconstruct the original division: b*QUOTIENT(a,b) + MOD(a,b) equals a.',
+  },
+  {
+    question: 'Does QUOTIENT round or truncate?',
+    answer: 'It truncates toward zero, the same way TRUNC does — it never rounds. QUOTIENT(-10, 3) returns -3, not -4.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with QUOTIENT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=QUOTIENT(5, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = 5 \ 2 ' VBA's integer-division operator does the same thing
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.trunc(5 / 2)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MOD](/docs/math/mod) — returns the remainder that QUOTIENT
+  discards.
+- [TRUNC](/docs/math/trunc) — truncates a decimal toward zero, the
+  same direction QUOTIENT uses for negative results.
+- [INT](/docs/math/int) — rounds down toward negative infinity,
+  which differs from QUOTIENT for negative results.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — integer division" formula={`=QUOTIENT(5, 2)`}>
+  Returns `2`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Splitting a total into full cases" formula={`=QUOTIENT(Orders[Units], 24)`}>
+  Returns the number of complete 24-unit cases in each order,
+  ignoring any partial case left over.
+</ExampleCard>
+
+<ExampleCard number="03" label="Pairing with MOD to reconstruct the division" formula={`=QUOTIENT(A2,B2)*B2+MOD(A2,B2)`}>
+  Returns the same value as A2 — QUOTIENT and MOD together always
+  add back up to the original numerator.
+</ExampleCard>

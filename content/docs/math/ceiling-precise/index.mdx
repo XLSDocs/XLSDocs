@@ -1,0 +1,159 @@
+---
+title: CEILING.PRECISE
+description: Round a number up to the nearest integer or multiple of significance, always rounding toward positive infinity.
+---
+
+Round `number` up to the nearest integer or multiple of
+`significance`, always rounding toward positive infinity — negative
+numbers included — regardless of the sign of either argument.
+
+export const quickAnswerFacts = [
+  { text: 'Always rounds toward positive infinity, for both positive and negative numbers', type: 'check' },
+  { text: 'The sign of significance is ignored — only its absolute value matters', type: 'check' },
+  { text: 'significance is optional and defaults to 1', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=CEILING.PRECISE(number, [significance])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=CEILING.PRECISE(number, [significance])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to round.',
+  },
+  {
+    name: 'significance',
+    type: 'number',
+    required: false,
+    description: 'The multiple to round up to. Its sign is ignored — only the absolute value is used. Defaults to 1.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` rounded up to the nearest multiple of `significance`,
+always moving toward positive infinity. `CEILING.PRECISE(4.3, 2)`
+returns `6`; `CEILING.PRECISE(-4.3)` returns `-4`.
+
+## Description
+
+CEILING.PRECISE solves the sign headache that CEILING has: instead
+of requiring `number` and `significance` to share a sign, it always
+rounds toward positive infinity, no matter what sign either argument
+has. For a negative `number`, that means rounding *toward* zero
+(`-4.3` becomes `-4`, not `-6`) — the opposite of what CEILING.MATH
+does by default.
+
+<ExcelCode>{`=CEILING.PRECISE(4.3, 2) → 6 (next multiple of 2 at or above 4.3)`}</ExcelCode>
+
+<Callout type="info">
+  **CEILING.PRECISE behaves identically to ISO.CEILING** — both
+  always round toward positive infinity and ignore the sign of
+  `significance`. ISO.CEILING exists specifically for compatibility
+  with the Open Document Format (ODF) spreadsheet standard; pick
+  whichever name reads better in context.
+</Callout>
+
+## Common errors
+
+### Zero result from a zero argument
+
+<ExcelCode>{`CEILING.PRECISE(0, 5) → 0`}</ExcelCode>
+<ExcelCode>{`CEILING.PRECISE(4.3, 0) → 0`}</ExcelCode>
+
+If either `number` or `significance` is `0`, the result is `0` —
+there's no non-zero multiple to round a zero value to.
+
+export const faqs = [
+  {
+    question: 'How is CEILING.PRECISE different from CEILING.MATH?',
+    answer: 'CEILING.PRECISE always rounds toward positive infinity, regardless of sign — a negative number rounds toward zero. CEILING.MATH defaults to that same direction for negatives, but lets you reverse it with a mode argument, which CEILING.PRECISE has no equivalent of.',
+  },
+  {
+    question: 'Does the sign of significance matter?',
+    answer: "No — CEILING.PRECISE always uses significance's absolute value, so CEILING.PRECISE(4.3, 2) and CEILING.PRECISE(4.3, -2) return the same result.",
+  },
+  {
+    question: 'Is CEILING.PRECISE the same as ISO.CEILING?',
+    answer: 'Yes, functionally identical. ISO.CEILING was added for ODF (OpenDocument Format) compatibility and behaves exactly like CEILING.PRECISE.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CEILING.PRECISE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CEILING.PRECISE(4.3, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Ceiling_Precise(4.3, 2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.ceil(4.3 / abs(2)) * abs(2)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ISO.CEILING](/docs/math/iso-ceiling) — functionally identical,
+  added for ODF compatibility.
+- [CEILING.MATH](/docs/math/ceiling-math) — adds a `mode` argument
+  to control negative-number rounding direction, rather than always
+  rounding toward positive infinity.
+- [FLOOR.PRECISE](/docs/math/floor-precise) — the rounding-down
+  counterpart, always rounding toward negative infinity.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — round up to a multiple of 2" formula={`=CEILING.PRECISE(4.3, 2)`}>
+  Returns `6`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Negative number rounds toward zero" formula={`=CEILING.PRECISE(-4.3)`}>
+  Returns `-4` — always toward positive infinity, regardless of
+  sign.
+</ExampleCard>
+
+<ExampleCard number="03" label="Sign of significance is ignored" formula={`=CEILING.PRECISE(4.3, -2)`}>
+  Returns `6` — the same result as passing `2`, since only the
+  absolute value of `significance` is used.
+</ExampleCard>
