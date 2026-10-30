@@ -1,0 +1,159 @@
+---
+title: MINVERSE
+description: Return the inverse of a square matrix, spilled as an array.
+---
+
+Return the inverse matrix of `array` — the matrix that, multiplied
+by the original, produces the identity matrix. A core operation for
+solving systems of linear equations.
+
+export const quickAnswerFacts = [
+  { text: 'array must be square and non-singular (determinant ≠ 0)', type: 'warn' },
+  { text: 'A singular matrix (determinant = 0) returns #NUM!', type: 'warn' },
+  { text: 'Spills automatically in Excel 365; older versions need Ctrl+Shift+Enter', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=MINVERSE(array)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MINVERSE(array)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'A numeric, square array — a cell range, an array constant, or a named range referring to either.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The inverse of `array`, spilled as a square array the same size as
+the input.
+
+## Description
+
+MINVERSE computes a matrix's inverse — conceptually the matrix
+equivalent of a reciprocal. Just as multiplying a number by its
+reciprocal gives `1`, multiplying a matrix by its inverse gives the
+identity matrix (MUNIT's output). The most common real use is
+solving a system of linear equations: for a system written as a
+matrix equation, multiplying the inverse of the coefficient matrix
+by the constants (via MMULT) solves for the unknowns directly.
+
+<Callout type="idea">
+  **A common linear-equation solving pattern**:
+  `=MMULT(MINVERSE(B2:C3), E2:E3)` solves a 2-variable, 2-equation
+  system in one formula — MINVERSE inverts the coefficients, MMULT
+  applies that inverse to the constants.
+</Callout>
+
+<Callout type="warn">
+  **Not every square matrix has an inverse.** A matrix with a
+  determinant of exactly `0` (check with MDETERM) is "singular," and
+  MINVERSE returns `#NUM!` for it.
+</Callout>
+
+## Common errors
+
+### #NUM! — a singular matrix
+
+<ExcelCode>{`MINVERSE({1,2;2,4}) → #NUM! (determinant is 0)`}</ExcelCode>
+
+A matrix whose determinant is `0` has no inverse.
+
+### #VALUE! — array isn't square
+
+<ExcelCode>{`MINVERSE(A1:C2) → #VALUE! (2 rows, 3 columns)`}</ExcelCode>
+
+`array` must have exactly the same number of rows as columns.
+
+export const faqs = [
+  {
+    question: 'Why does MINVERSE return #NUM!?',
+    answer: 'The matrix is singular — its determinant is exactly 0, meaning it has no inverse. Check with MDETERM(array) first if this is a concern.',
+  },
+  {
+    question: 'How do I enter a MINVERSE formula across multiple cells?',
+    answer: 'In Excel 365 or 2021, enter it in the top-left cell of the output range and press Enter — it spills automatically. In Excel 2019 or earlier, select the entire output range first, type the formula, and confirm with Ctrl+Shift+Enter.',
+  },
+  {
+    question: 'What is MINVERSE commonly used for?',
+    answer: 'Solving systems of linear equations — multiplying a coefficient matrix’s inverse by a constants vector (with MMULT) solves directly for the unknown variables.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MINVERSE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MINVERSE(B2:C3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.MInverse(Range("B2:C3"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    matrix = np.array([[3, 6], [1, 1]])
+    result = np.linalg.inv(matrix)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MDETERM](/docs/math/mdeterm) — computes the determinant that
+  determines whether an inverse exists at all.
+- [MMULT](/docs/math/mmult) — multiplies matrices together, often
+  paired with MINVERSE to solve equation systems.
+- [MUNIT](/docs/math/munit) — the identity matrix that results from
+  multiplying a matrix by its own inverse.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — invert a 2×2 matrix" formula={`=MINVERSE(B2:C3)`}>
+  Spills the inverse of the matrix in B2:C3.
+</ExampleCard>
+
+<ExampleCard number="02" label="Solving a linear equation system" formula={`=MMULT(MINVERSE(B2:C3), E2:E3)`}>
+  Solves a 2-equation, 2-unknown linear system directly.
+</ExampleCard>
+
+<ExampleCard number="03" label="Checking invertibility first" formula={`=IF(MDETERM(A1:C3)=0, "No inverse", "")`}>
+  Guards against calling MINVERSE on a singular matrix, which would
+  otherwise return `#NUM!`.
+</ExampleCard>

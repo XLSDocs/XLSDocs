@@ -1,0 +1,162 @@
+---
+title: MMULT
+description: Multiply two matrices together, returning their matrix product as an array.
+---
+
+Multiply `array1` by `array2`, returning their matrix product —
+genuine matrix multiplication, not an element-by-element product
+like SUMPRODUCT.
+
+export const quickAnswerFacts = [
+  { text: "array1's column count must equal array2's row count, or #VALUE!", type: 'warn' },
+  { text: 'The result has array1’s row count and array2’s column count', type: 'check' },
+  { text: 'Spills automatically in Excel 365; older versions need Ctrl+Shift+Enter', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=MMULT(array1, array2)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MMULT(array1, array2)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array1',
+    type: 'range',
+    required: true,
+    description: 'The first array to multiply — a cell range, array constant, or reference.',
+  },
+  {
+    name: 'array2',
+    type: 'range',
+    required: true,
+    description: 'The second array to multiply. Its row count must equal array1’s column count.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The matrix product of `array1` and `array2`, spilled as an array
+with `array1`'s row count and `array2`'s column count. Multiplying a
+2×3 array by a 3×2 array returns a 2×2 result.
+
+## Description
+
+MMULT performs true matrix multiplication — each element of the
+result is a sum of products across a row of `array1` and a column
+of `array2`, not a simple element-by-element multiply. This is
+genuinely different from SUMPRODUCT, which multiplies two
+same-shaped arrays element-by-element and sums the result into a
+single number; MMULT produces a whole new matrix, and the two
+input arrays don't even need to be the same shape.
+
+<Callout type="warn">
+  **The inner dimensions must match.** `array1`'s number of columns
+  must equal `array2`'s number of rows — multiplying a 2×3 array by
+  a 3×2 array works, but 2×3 by 2×2 doesn't, and returns `#VALUE!`.
+</Callout>
+
+## Common errors
+
+### #VALUE! — mismatched inner dimensions
+
+<ExcelCode>{`MMULT(A1:C2, A1:B2) → #VALUE! (2x3 times 2x2 — inner dimensions 3 and 2 don't match)`}</ExcelCode>
+
+`array1`'s column count must equal `array2`'s row count.
+
+### #VALUE! — empty or text cells
+
+<ExcelCode>{`MMULT(A1:B2, D1:E2) → #VALUE! (if any cell is empty or contains text)`}</ExcelCode>
+
+Both arrays must contain only numbers.
+
+export const faqs = [
+  {
+    question: 'How is MMULT different from SUMPRODUCT?',
+    answer: "SUMPRODUCT multiplies two same-shaped arrays element-by-element and sums everything into one number. MMULT performs true matrix multiplication, returning a whole new array, and the two inputs don't need matching shapes — only array1's columns must match array2's rows.",
+  },
+  {
+    question: 'Why does MMULT return #VALUE!?',
+    answer: "The most common cause is mismatched inner dimensions — array1's column count must equal array2's row count. The other cause is an empty or text cell in either array.",
+  },
+  {
+    question: 'What size is the result?',
+    answer: "The result has array1's row count and array2's column count. Multiplying a 2x3 array by a 3x2 array returns a 2x2 result.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MMULT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MMULT(A1:C2, A1:B3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.MMult(Range("A1:C2"), Range("A1:B3"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    array1 = np.array([[1, 2, 3], [4, 5, 6]])
+    array2 = np.array([[7, 8], [9, 10], [11, 12]])
+    result = array1 @ array2
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MINVERSE](/docs/math/minverse) — computes a matrix's inverse,
+  often multiplied by another matrix with MMULT to solve equations.
+- [MDETERM](/docs/math/mdeterm) — computes a matrix's determinant,
+  a related single-number summary rather than a full product.
+- [SUMPRODUCT](/docs/math/sumproduct) — multiplies two same-shaped
+  arrays element-by-element and sums the result, unlike MMULT's true
+  matrix product.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — multiply two matrices" formula={`=MMULT(A1:C2, A1:B3)`}>
+  Multiplies a 2x3 matrix by a 3x2 matrix, returning a 2x2 result.
+</ExampleCard>
+
+<ExampleCard number="02" label="Solving a linear equation system" formula={`=MMULT(MINVERSE(B2:C3), E2:E3)`}>
+  Applies an inverted coefficient matrix to a constants vector to
+  solve for the unknowns.
+</ExampleCard>
+
+<ExampleCard number="03" label="Squaring a matrix" formula={`=MMULT(A1:B2, A1:B2)`}>
+  Multiplies a matrix by itself — valid whenever the matrix is
+  square, since its row and column counts then automatically match.
+</ExampleCard>

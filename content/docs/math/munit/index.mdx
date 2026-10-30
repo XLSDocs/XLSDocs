@@ -1,0 +1,149 @@
+---
+title: MUNIT
+description: Return the unit (identity) matrix for a specified dimension.
+---
+
+Return the unit matrix — also called the identity matrix — of size
+`dimension`: a square array of 1s down the diagonal and 0s
+everywhere else.
+
+export const quickAnswerFacts = [
+  { text: 'MUNIT(3) spills a 3×3 identity matrix', type: 'check' },
+  { text: 'dimension must be a positive integer, or #VALUE!', type: 'warn' },
+  { text: 'Multiplying any matrix by its matching-size identity returns the original matrix unchanged', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=MUNIT(dimension)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MUNIT(dimension)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'dimension',
+    type: 'number',
+    required: true,
+    description: 'A positive integer specifying the size of the unit matrix to return (dimension x dimension).',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A `dimension` × `dimension` array, spilled, with `1` along the main
+diagonal and `0` everywhere else.
+
+## Description
+
+The identity matrix is the matrix equivalent of the number `1`:
+multiplying any compatible matrix by it leaves that matrix
+unchanged, the same way multiplying any number by `1` leaves it
+unchanged. MUNIT generates one of any size directly, without typing
+out the 1s and 0s by hand — mostly useful as a building block or
+sanity check alongside MMULT and MINVERSE.
+
+<ExcelCode>{`=MUNIT(3) → a 3×3 array: {1,0,0;0,1,0;0,0,1}`}</ExcelCode>
+
+<Callout type="idea">
+  **A quick way to confirm MINVERSE worked correctly**:
+  `MMULT(array, MINVERSE(array))` should return (allowing for tiny
+  floating-point rounding) the same identity matrix MUNIT would
+  generate for that size.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-positive dimension
+
+<ExcelCode>{`MUNIT(0) → #VALUE!`}</ExcelCode>
+<ExcelCode>{`MUNIT(-2) → #VALUE!`}</ExcelCode>
+
+`dimension` must be a positive integer.
+
+export const faqs = [
+  {
+    question: 'What is the identity matrix used for?',
+    answer: "It's the matrix equivalent of the number 1 — multiplying any compatible matrix by it leaves that matrix unchanged. It's commonly used as a building block or sanity check in matrix-algebra formulas, alongside MMULT and MINVERSE.",
+  },
+  {
+    question: 'Why does MUNIT(0) return an error?',
+    answer: 'dimension must be a positive integer — there’s no meaningful 0x0 identity matrix to return.',
+  },
+  {
+    question: 'How do I confirm two matrices are inverses of each other?',
+    answer: "Multiply them together with MMULT — if the result matches MUNIT's output for that size (allowing for tiny floating-point rounding), they're genuine inverses.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MUNIT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MUNIT(3)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Variant
+    result = Application.WorksheetFunction.MUnit(3)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    result = np.identity(3)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MMULT](/docs/math/mmult) — multiplying any matrix by its
+  matching-size identity returns that matrix unchanged.
+- [MINVERSE](/docs/math/minverse) — a matrix multiplied by its own
+  inverse produces the identity matrix.
+- [MDETERM](/docs/math/mdeterm) — the identity matrix always has a
+  determinant of exactly 1.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — a 3×3 identity matrix" formula={`=MUNIT(3)`}>
+  Spills a 3x3 array with 1s on the diagonal and 0s elsewhere.
+</ExampleCard>
+
+<ExampleCard number="02" label="Confirming MINVERSE worked" formula={`=MMULT(A1:C3, MINVERSE(A1:C3))`}>
+  Returns the identity matrix (allowing for tiny rounding) when
+  MINVERSE computed a genuine inverse.
+</ExampleCard>
+
+<ExampleCard number="03" label="Checking the determinant" formula={`=MDETERM(MUNIT(4))`}>
+  Returns `1` — the identity matrix's determinant is always 1,
+  regardless of size.
+</ExampleCard>

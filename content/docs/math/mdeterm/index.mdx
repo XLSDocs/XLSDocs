@@ -1,0 +1,157 @@
+---
+title: MDETERM
+description: Return the matrix determinant of a square array.
+---
+
+Return the determinant of `array` — a single number computed from a
+square matrix, used throughout linear algebra to test whether a
+matrix can be inverted and to solve systems of equations.
+
+export const quickAnswerFacts = [
+  { text: 'array must be square — equal rows and columns, or #VALUE!', type: 'warn' },
+  { text: 'A determinant of exactly 0 means the matrix has no inverse', type: 'info' },
+  { text: 'Accurate to about 16 digits — a singular matrix may show as 1E-16 instead of exactly 0', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=MDETERM(array)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MDETERM(array)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'array',
+    type: 'range',
+    required: true,
+    description: 'A numeric, square array — a cell range, an array constant, or a named range referring to either.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The matrix determinant of `array`, a single number.
+`MDETERM({3,6;1,1})` returns `-3`.
+
+## Description
+
+The determinant is a single value that summarizes certain
+properties of a square matrix — most importantly, whether it has an
+inverse at all. A determinant of `0` means the matrix is "singular"
+and MINVERSE will fail on it with `#NUM!`; any non-zero determinant
+means an inverse exists. For a 2×2 range, the formula is simple
+(`A1*B2 - B1*A2`); MDETERM computes the equivalent, much more
+complex expansion for any square size automatically.
+
+<ExcelCode>{`=MDETERM({3,6;1,1}) → -3`}</ExcelCode>
+
+<Callout type="warn">
+  **A "zero" determinant may show as a tiny non-zero number**, like
+  `1E-16`, due to floating-point precision limits — MDETERM is
+  accurate to about 16 digits. When testing whether a matrix is
+  singular, compare against a small tolerance rather than exactly
+  `0`.
+</Callout>
+
+## Common errors
+
+### #VALUE! — array isn't square
+
+<ExcelCode>{`MDETERM(A1:C2) → #VALUE! (2 rows, 3 columns)`}</ExcelCode>
+
+`array` must have exactly the same number of rows as columns.
+
+### #VALUE! — empty or text cells
+
+<ExcelCode>{`MDETERM(A1:C3) → #VALUE! (if any cell is empty or contains text)`}</ExcelCode>
+
+Every cell in `array` must contain a number.
+
+export const faqs = [
+  {
+    question: 'What does a determinant of 0 mean?',
+    answer: 'It means the matrix is singular — it has no inverse. Passing a matrix with a zero determinant to MINVERSE returns #NUM!.',
+  },
+  {
+    question: 'Why might MDETERM return a tiny number instead of exactly 0?',
+    answer: "Floating-point precision limits mean a genuinely singular matrix can return something like 1E-16 instead of exactly 0. MDETERM's results are accurate to about 16 digits, so compare against a small tolerance rather than checking for an exact zero.",
+  },
+  {
+    question: 'Why does MDETERM return #VALUE!?',
+    answer: "The most common causes are array not being square (equal rows and columns), or array containing an empty cell or text instead of a number.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MDETERM from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MDETERM(A2:D5)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.MDeterm(Range("A2:D5"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    matrix = np.array([[3, 6], [1, 1]])
+    result = np.linalg.det(matrix)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [MINVERSE](/docs/math/minverse) — computes a matrix's inverse,
+  which only exists when MDETERM is non-zero.
+- [MMULT](/docs/math/mmult) — multiplies two matrices together,
+  often used alongside MINVERSE to solve equation systems.
+- [MUNIT](/docs/math/munit) — generates an identity matrix, which
+  always has a determinant of exactly 1.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — 2×2 determinant" formula={`=MDETERM({3,6;1,1})`}>
+  Returns `-3`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Testing whether a matrix can be inverted" formula={`=MDETERM(A1:C3)<>0`}>
+  Returns `TRUE` if the matrix in A1:C3 has an inverse, `FALSE` if
+  it's singular.
+</ExampleCard>
+
+<ExampleCard number="03" label="Determinant of a 4×4 range" formula={`=MDETERM(A2:D5)`}>
+  Computes the determinant of a larger square range the same way as
+  any smaller one.
+</ExampleCard>
