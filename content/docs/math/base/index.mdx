@@ -1,0 +1,169 @@
+---
+title: BASE
+description: Convert a number into text representing it in a different numeric base, from binary to base 36.
+---
+
+Convert `number` into text representing it in `radix` — any base
+from 2 (binary) to 36 — with an optional `min_length` to pad the
+result with leading zeros.
+
+export const quickAnswerFacts = [
+  { text: 'BASE(7, 2) returns "111" — the binary representation of 7', type: 'check' },
+  { text: 'radix can be any integer from 2 to 36', type: 'check' },
+  { text: 'min_length pads the result with leading zeros, it doesn’t truncate it', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=BASE(number, radix, [min_length])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=BASE(number, radix, [min_length])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The decimal number to convert, from 0 up to (but not including) 2^53.',
+  },
+  {
+    name: 'radix',
+    type: 'number',
+    required: true,
+    description: 'The base to convert to, an integer from 2 to 36.',
+  },
+  {
+    name: 'min_length',
+    type: 'number',
+    required: false,
+    description: 'The minimum length of the returned text, padded with leading zeros if shorter. Must be 0 or greater.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` converted to base `radix`, returned as text. `BASE(7, 2)`
+returns `"111"`; `BASE(100, 16)` returns `"64"`.
+
+## Description
+
+BASE converts an ordinary decimal number into its representation in
+any other base, as text — binary (base 2), hexadecimal (base 16),
+or any base up to 36, which uses the letters A-Z for digit values 10
+through 35. It's the general-purpose counterpart to DECIMAL, which
+converts the other direction.
+
+<ExcelCode>{`=BASE(100, 16) → "64" (100 in hexadecimal)`}</ExcelCode>
+
+<Callout type="idea">
+  **`min_length` pads with leading zeros, without truncating.**
+  `BASE(15, 2, 10)` returns `"0000001111"` — the binary value for 15
+  is only 4 digits long, so it's padded out to the requested 10.
+  Passing a `min_length` shorter than the natural result has no
+  effect; it never cuts digits off.
+</Callout>
+
+## Common errors
+
+### #NUM! — an out-of-range argument
+
+<ExcelCode>{`BASE(100, 1) → #NUM!`}</ExcelCode>
+<ExcelCode>{`BASE(100, 37) → #NUM!`}</ExcelCode>
+
+`radix` must be between 2 and 36; `number` and `min_length` have
+their own valid ranges too, and any argument outside its range
+returns `#NUM!`.
+
+### #VALUE! — a non-numeric number
+
+<ExcelCode>{`BASE("abc", 2) → #VALUE!`}</ExcelCode>
+
+`number` must be a number, a cell containing one, or a formula that
+returns one.
+
+export const faqs = [
+  {
+    question: 'What bases does BASE support?',
+    answer: 'Any integer radix from 2 (binary) through 36. Bases above 10 use the letters A through Z to represent digit values 10 through 35.',
+  },
+  {
+    question: 'How is BASE different from DECIMAL?',
+    answer: 'BASE converts a decimal number into another base, returned as text. DECIMAL does the reverse — converting text in another base back into an ordinary decimal number.',
+  },
+  {
+    question: 'What does min_length do if the result is already longer?',
+    answer: "Nothing — min_length only pads a shorter result with leading zeros. It never truncates a result that's already longer than the requested minimum length.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with BASE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=BASE(100, 16)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Base(100, 16)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import numpy as np
+
+    # Python's built-in bin()/hex()/oct() only cover bases 2, 8, 16 —
+    # numpy's base_repr handles any base from 2 to 36:
+    result = np.base_repr(100, base=16)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DECIMAL](/docs/math/decimal) — the inverse of BASE, converting
+  text in another base back into a decimal number.
+- [ROMAN](/docs/math/roman) and [ARABIC](/docs/math/arabic) — a
+  different, non-positional numeral conversion between Roman
+  numerals and ordinary numbers.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — decimal to binary" formula={`=BASE(7, 2)`}>
+  Returns `"111"`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Decimal to hexadecimal" formula={`=BASE(100, 16)`}>
+  Returns `"64"`.
+</ExampleCard>
+
+<ExampleCard number="03" label="Padding with leading zeros" formula={`=BASE(15, 2, 10)`}>
+  Returns `"0000001111"` — padded out to 10 characters.
+</ExampleCard>

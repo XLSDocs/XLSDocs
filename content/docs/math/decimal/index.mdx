@@ -1,0 +1,157 @@
+---
+title: DECIMAL
+description: Convert text representing a number in another base into an ordinary decimal number.
+---
+
+Convert `text` — a number written in base `radix` — into an
+ordinary base-10 number. The inverse of BASE, which converts
+decimal numbers the other direction.
+
+export const quickAnswerFacts = [
+  { text: 'DECIMAL("FF", 16) returns 255 — converting hexadecimal to decimal', type: 'check' },
+  { text: 'radix can be any integer from 2 to 36', type: 'check' },
+  { text: 'text can be up to 255 characters and isn’t case-sensitive', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=DECIMAL(text, radix)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DECIMAL(text, radix)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The number, written in base radix, to convert. Up to 255 characters; not case-sensitive.',
+  },
+  {
+    name: 'radix',
+    type: 'number',
+    required: true,
+    description: 'The base text is written in, an integer from 2 to 36.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The base-10 (decimal) equivalent of `text`, interpreted as a number
+in base `radix`. `DECIMAL("FF", 16)` returns `255`;
+`DECIMAL(111, 2)` returns `7`.
+
+## Description
+
+DECIMAL is the inverse of BASE: feed it a number written in another
+base — binary, hexadecimal, or anything from base 2 through 36 — and
+it returns the equivalent ordinary decimal number. Bases above 10
+use the letters A-Z for digit values 10 through 35, matching the
+convention BASE uses on the way out.
+
+<ExcelCode>{`=DECIMAL("FF", 16) → 255`}</ExcelCode>
+
+<Callout type="info">
+  **Letter case doesn't matter.** `DECIMAL("ff", 16)` and
+  `DECIMAL("FF", 16)` both return `255` — digit letters are matched
+  without regard to case.
+</Callout>
+
+## Common errors
+
+### #NUM! — a digit invalid for the given radix
+
+<ExcelCode>{`DECIMAL("2", 2) → #NUM!`}</ExcelCode>
+
+Binary (`radix` 2) only allows the digits 0 and 1 — a `2` isn't a
+valid digit in that base.
+
+### #VALUE! — radix out of range
+
+<ExcelCode>{`DECIMAL("10", 1) → #VALUE!`}</ExcelCode>
+
+`radix` must be an integer from 2 to 36.
+
+export const faqs = [
+  {
+    question: 'How is DECIMAL different from BASE?',
+    answer: 'DECIMAL converts text written in another base into an ordinary decimal number. BASE does the reverse — converting a decimal number into text in another base.',
+  },
+  {
+    question: 'Why does DECIMAL("2", 2) return an error?',
+    answer: 'Binary (base 2) only uses the digits 0 and 1 — "2" is not a valid digit in that base, so DECIMAL returns #NUM!.',
+  },
+  {
+    question: 'Does DECIMAL care about uppercase or lowercase letters in text?',
+    answer: 'No — letter case is ignored when matching digit letters (A-Z for values 10-35), so "ff" and "FF" give the same result for a given radix.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DECIMAL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DECIMAL("FF", 16)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.Decimal("FF", 16)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    result = int("FF", 16)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [BASE](/docs/math/base) — the inverse of DECIMAL, converting a
+  decimal number into text in another base.
+- [ARABIC](/docs/math/arabic) — a different, non-positional
+  conversion, from Roman numeral text to a number.
+- [VALUE](/docs/text/value) — converts ordinary base-10 numeric
+  text to a number, not an arbitrary-base one.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — hexadecimal to decimal" formula={`=DECIMAL("FF", 16)`}>
+  Returns `255`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Binary to decimal" formula={`=DECIMAL(111, 2)`}>
+  Returns `7`.
+</ExampleCard>
+
+<ExampleCard number="03" label="Round-tripping with BASE" formula={`=DECIMAL(BASE(255, 16), 16)`}>
+  Returns `255` — BASE and DECIMAL exactly reverse each other for
+  the same radix.
+</ExampleCard>

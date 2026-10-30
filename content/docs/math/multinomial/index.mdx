@@ -1,0 +1,165 @@
+---
+title: MULTINOMIAL
+description: Return the ratio of the factorial of a sum of numbers to the product of their individual factorials.
+---
+
+Return the multinomial coefficient of a set of numbers — the
+factorial of their sum, divided by the product of each number's own
+factorial. A generalization of COMBIN to more than two groups.
+
+export const quickAnswerFacts = [
+  { text: 'MULTINOMIAL(2, 3, 4) returns 1260', type: 'check' },
+  { text: 'Accepts 1 to 255 numbers, or a single range containing them', type: 'check' },
+  { text: 'Counts how many ways to arrange items split into several named groups', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=MULTINOMIAL(number1, [number2], ...)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=MULTINOMIAL(number1, [number2], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number1',
+    type: 'number',
+    required: true,
+    description: 'The first value for which the multinomial is calculated.',
+  },
+  {
+    name: 'number2, ...',
+    type: 'number',
+    required: false,
+    description: 'Additional values, up to 255 total, for which the multinomial is calculated.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The factorial of the sum of all the numbers, divided by the product
+of each individual number's factorial. `MULTINOMIAL(2, 3, 4)`
+returns `1260`.
+
+## Description
+
+MULTINOMIAL generalizes COMBIN beyond a simple yes/no split: where
+COMBIN counts the ways to choose a subset from a group, MULTINOMIAL
+counts the ways to arrange a total when it's divided into several
+distinct groups of specified sizes — like the number of distinct
+ways to arrange the letters in a word with repeated letters, or to
+split a team into differently-sized roles.
+
+<ExcelCode>{`=MULTINOMIAL(2, 3, 4) → 1260 (9! / (2!×3!×4!))`}</ExcelCode>
+
+<Callout type="info">
+  **MULTINOMIAL with exactly two arguments is the same as COMBIN.**
+  `MULTINOMIAL(a, b)` and `COMBIN(a+b, a)` compute the same result —
+  MULTINOMIAL is COMBIN's generalization to more than two groups.
+</Callout>
+
+## Common errors
+
+### #NUM! — a negative argument
+
+<ExcelCode>{`MULTINOMIAL(2, -1, 4) → #NUM!`}</ExcelCode>
+
+Every argument must be `0` or greater.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`MULTINOMIAL(2, "abc", 4) → #VALUE!`}</ExcelCode>
+
+Every argument must be a number, a cell containing one, or a
+formula that returns one.
+
+export const faqs = [
+  {
+    question: 'What does MULTINOMIAL actually count?',
+    answer: 'It counts the number of distinct ways to arrange a total of items when they’re split into groups of the given sizes — for example, how many distinct orderings exist for a word with repeated letters, where each letter’s repeat count is one of the arguments.',
+  },
+  {
+    question: 'How is MULTINOMIAL related to COMBIN?',
+    answer: 'With exactly two arguments, MULTINOMIAL(a, b) equals COMBIN(a+b, a) — MULTINOMIAL generalizes the same idea to any number of groups, not just two.',
+  },
+  {
+    question: 'How many arguments can MULTINOMIAL take?',
+    answer: 'Up to 255 individual numeric arguments, or fewer arguments that are themselves ranges containing multiple values.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with MULTINOMIAL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=MULTINOMIAL(2, 3, 4)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.MultiNomial(2, 3, 4)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    nums = [2, 3, 4]
+    result = math.factorial(sum(nums))
+    for n in nums:
+        result //= math.factorial(n)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [COMBIN](/docs/math/combin) — the two-group special case of
+  MULTINOMIAL.
+- [FACT](/docs/math/fact) — computes the individual factorials
+  MULTINOMIAL's formula is built from.
+- [FACTDOUBLE](/docs/math/factdouble) — another factorial-based
+  function, multiplying every other integer instead.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — three groups" formula={`=MULTINOMIAL(2, 3, 4)`}>
+  Returns `1260`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Matching COMBIN with two groups" formula={`=MULTINOMIAL(3, 5)=COMBIN(8, 3)`}>
+  Returns `TRUE` — with exactly two arguments, MULTINOMIAL and
+  COMBIN agree.
+</ExampleCard>
+
+<ExampleCard number="03" label="Arrangements of a word with repeated letters" formula={`=MULTINOMIAL(1,1,2,1,1,1)`}>
+  Counts the distinct letter arrangements of a 7-letter word with
+  one letter repeated twice, treating each letter's repeat count as
+  one argument.
+</ExampleCard>

@@ -1,0 +1,171 @@
+---
+title: ROMAN
+description: Convert an Arabic (ordinary decimal) number to a Roman numeral, as text.
+---
+
+Convert `number` into a Roman numeral, returned as text — the
+inverse of ARABIC, with an optional `form` argument that controls
+how concise the result is.
+
+export const quickAnswerFacts = [
+  { text: 'ROMAN(499) returns "CDXCIX" in the classic style — form controls how concise it is', type: 'check' },
+  { text: 'number must be between 0 and 3999 — outside that range returns #VALUE!', type: 'warn' },
+  { text: 'The result is text, not a number — it can’t be used directly in arithmetic', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=ROMAN(number, [form])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ROMAN(number, [form])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The Arabic numeral to convert, from 0 to 3999.',
+  },
+  {
+    name: 'form',
+    type: 'number',
+    required: false,
+    description: 'A number from 0 (Classic, most expansive) to 4 (Simplified, most concise) controlling the numeral style. TRUE maps to Classic, FALSE maps to Simplified. Defaults to 0 (Classic) if omitted.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` as a Roman numeral, formatted as text in the style `form`
+specifies.
+
+## Description
+
+ROMAN converts an ordinary number into Roman numeral text. The
+`form` argument trades correctness-to-tradition for brevity: `0`
+(the default) gives the familiar "Classic" style everyone
+recognizes, while `1` through `4` produce progressively shorter,
+less traditional variants that some style guides use for
+space-constrained displays.
+
+<ExcelCode>{`=ROMAN(499) → "CDXCIX" (Classic form, the default)`}</ExcelCode>
+<ExcelCode>{`=ROMAN(499, 4) → "ID" (Simplified form, the shortest)`}</ExcelCode>
+
+<Callout type="warn">
+  **`number` must be between 0 and 3999.** Outside that range, ROMAN
+  returns `#VALUE!` — there's no standard Roman numeral
+  representation above `3999` (M repeated four times, MMMM, isn't
+  considered valid).
+</Callout>
+
+## Common errors
+
+### #VALUE! — number out of range
+
+<ExcelCode>{`ROMAN(4000) → #VALUE!`}</ExcelCode>
+<ExcelCode>{`ROMAN(-5) → #VALUE!`}</ExcelCode>
+
+`number` must be a whole number from `0` to `3999`.
+
+export const faqs = [
+  {
+    question: 'What does the form argument actually change?',
+    answer: 'It picks how concise the Roman numeral is. 0 (the default) is the traditional Classic style; 1, 2, and 3 get progressively shorter by substituting non-standard-but-shorter numeral patterns; 4 (Simplified) is the most concise of all.',
+  },
+  {
+    question: 'Why does ROMAN(4000) return #VALUE!?',
+    answer: "Excel's ROMAN only supports numbers from 0 to 3999 — there's no standard Roman numeral for 4000 and above using the traditional symbol set.",
+  },
+  {
+    question: 'Can I do math with a ROMAN result?',
+    answer: 'No — ROMAN returns text, like "CDXCIX", not a number. Use ARABIC to convert it back to a number first if you need to calculate with it.',
+  },
+  {
+    question: 'How is ROMAN related to ARABIC?',
+    answer: 'They are inverses. ROMAN converts a number to Roman numeral text, and ARABIC converts Roman numeral text back to a number.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ROMAN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ROMAN(499)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As String
+    result = Application.WorksheetFunction.Roman(499)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # No standard-library equivalent — a lookup-table approach is common:
+    values = [
+        (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
+        (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
+        (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
+    ]
+
+    def to_roman(n):
+        result = ""
+        for value, symbol in values:
+            while n >= value:
+                result += symbol
+                n -= value
+        return result
+
+    print(to_roman(499))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ARABIC](/docs/math/arabic) — the inverse of ROMAN, converting a
+  Roman numeral back to a number.
+- [BASE](/docs/math/base) — converts a decimal number to text in
+  any base from 2 to 36, a related but different kind of
+  conversion.
+- [TEXT](/docs/text/text) — general-purpose number-to-text
+  formatting with a custom format code.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — Classic Roman numeral" formula={`=ROMAN(499)`}>
+  Returns `"CDXCIX"`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Simplified form" formula={`=ROMAN(499, 4)`}>
+  Returns `"ID"` — the shortest, least traditional style.
+</ExampleCard>
+
+<ExampleCard number="03" label="Round-tripping with ARABIC" formula={`=ARABIC(ROMAN(1994))`}>
+  Returns `1994` — ROMAN and ARABIC exactly reverse each other.
+</ExampleCard>

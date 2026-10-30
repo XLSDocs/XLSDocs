@@ -1,0 +1,154 @@
+---
+title: FACTDOUBLE
+description: Return the double factorial of a number — the product of every other integer down to 1 or 2.
+---
+
+Return the double factorial of `number` — the product of `number`
+and every second integer below it, down to either `1` or `2`
+depending on whether `number` is odd or even.
+
+export const quickAnswerFacts = [
+  { text: 'FACTDOUBLE(6) returns 48 — 6×4×2, every other integer down to 2', type: 'check' },
+  { text: 'FACTDOUBLE(7) returns 105 — 7×5×3×1, every other integer down to 1', type: 'check' },
+  { text: 'A negative number returns #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FACTDOUBLE(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FACTDOUBLE(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The value to find the double factorial of. If not an integer, it’s truncated.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The double factorial of `number` — the product of `number`,
+`number - 2`, `number - 4`, and so on, stopping at `1` (for an odd
+`number`) or `2` (for an even `number`).
+
+## Description
+
+FACTDOUBLE skips every other term that an ordinary factorial (FACT)
+would include. For an even number like 6, it multiplies
+`6 × 4 × 2 = 48`; for an odd number like 7, it multiplies
+`7 × 5 × 3 × 1 = 105`. It shows up in certain combinatorics and
+series formulas where the "skip-one" pattern specifically matters.
+
+<ExcelCode>{`=FACTDOUBLE(6) → 48 (6×4×2)`}</ExcelCode>
+<ExcelCode>{`=FACTDOUBLE(7) → 105 (7×5×3×1)`}</ExcelCode>
+
+<Callout type="info">
+  **Don't confuse this with FACT twice, or `FACT(number)/2`** — the
+  double factorial isn't FACT applied twice, and it isn't a simple
+  fraction of the ordinary factorial. It's a genuinely different
+  product: every *other* integer, not every integer halved.
+</Callout>
+
+## Common errors
+
+### #NUM! — a negative argument
+
+<ExcelCode>{`FACTDOUBLE(-3) → #NUM!`}</ExcelCode>
+
+`number` must be `0` or greater.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`FACTDOUBLE("abc") → #VALUE!`}</ExcelCode>
+
+`number` must be a number, a cell containing one, or a formula that
+returns one.
+
+export const faqs = [
+  {
+    question: 'How is FACTDOUBLE different from FACT?',
+    answer: 'FACT(6) multiplies every integer from 1 to 6 (720). FACTDOUBLE(6) multiplies only every other integer down to 2 (6×4×2, which is 48) — a genuinely different, smaller product.',
+  },
+  {
+    question: 'What does FACTDOUBLE return for 0 or 1?',
+    answer: 'FACTDOUBLE(0) and FACTDOUBLE(1) both return 1, matching the standard mathematical convention for the double factorial’s base cases.',
+  },
+  {
+    question: 'Does FACTDOUBLE stop at 1 or at 2?',
+    answer: 'It depends on whether number is odd or even. An odd number’s double factorial multiplies down to 1; an even number’s multiplies down to 2.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FACTDOUBLE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FACTDOUBLE(6)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Application.WorksheetFunction.FactDouble(6)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.factorial2(6)  # Python 3.9+
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [FACT](/docs/math/fact) — the ordinary factorial, multiplying
+  every integer down to 1, not just every other one.
+- [MULTINOMIAL](/docs/math/multinomial) — another factorial-based
+  combinatorics function, computing a ratio of factorials.
+- [COMBIN](/docs/math/combin) — counts combinations, built from
+  ordinary factorials rather than double factorials.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — even number" formula={`=FACTDOUBLE(6)`}>
+  Returns `48` (`6×4×2`).
+</ExampleCard>
+
+<ExampleCard number="02" label="Odd number" formula={`=FACTDOUBLE(7)`}>
+  Returns `105` (`7×5×3×1`).
+</ExampleCard>
+
+<ExampleCard number="03" label="Base case" formula={`=FACTDOUBLE(0)`}>
+  Returns `1`, the standard base case for the double factorial.
+</ExampleCard>

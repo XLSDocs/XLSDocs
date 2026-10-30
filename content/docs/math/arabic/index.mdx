@@ -1,0 +1,162 @@
+---
+title: ARABIC
+description: Convert a Roman numeral to an Arabic (ordinary decimal) number — the inverse of ROMAN.
+---
+
+Convert a Roman numeral like "LVII" back into an ordinary Arabic
+number — the direct inverse of ROMAN, which converts the other
+direction.
+
+export const quickAnswerFacts = [
+  { text: 'ARABIC("LVII") returns 57 — the plain decimal equivalent', type: 'check' },
+  { text: 'Letter case is ignored — "mxmvii" and "MXMVII" give the same result', type: 'check' },
+  { text: 'An invalid Roman numeral (or a number) returns #VALUE!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=ARABIC(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=ARABIC(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The Roman numeral to convert, as a quoted string, an empty string, or a cell reference.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The Arabic (decimal) number equivalent to the Roman numeral in
+`text`. An empty string returns `0`.
+
+## Description
+
+ARABIC reverses ROMAN: feed it a Roman numeral, and it hands back
+the ordinary number it represents. `ARABIC("LVII")` returns `57`,
+and the comparison round-trips cleanly — `ARABIC(ROMAN(57))` is `57`
+again.
+
+<ExcelCode>{`=ARABIC("LVII") → 57`}</ExcelCode>
+
+<Callout type="info">
+  **Leading/trailing spaces and letter case are both ignored.**
+  `ARABIC(" mcmxii ")` and `ARABIC("MCMXII")` return the same result,
+  `1912`.
+</Callout>
+
+<Callout type="idea">
+  A **non-standard negative Roman numeral** is accepted if a minus
+  sign is placed directly before the text — `ARABIC("-MMXI")`
+  returns `-2011`, even though a minus sign isn't part of
+  traditional Roman numeral notation.
+</Callout>
+
+## Common errors
+
+### #VALUE! — not a valid Roman numeral
+
+<ExcelCode>{`ARABIC("ABC") → #VALUE!`}</ExcelCode>
+<ExcelCode>{`ARABIC(57) → #VALUE!`}</ExcelCode>
+
+`text` must be an actual Roman numeral string — a plain number, or
+text that doesn't form a valid Roman numeral, returns `#VALUE!`.
+
+export const faqs = [
+  {
+    question: 'What does ARABIC return for an empty string?',
+    answer: 'ARABIC("") returns 0, rather than an error.',
+  },
+  {
+    question: 'Does ARABIC care about uppercase vs. lowercase letters?',
+    answer: 'No — letter case is ignored entirely. ARABIC("mxmvii") and ARABIC("MXMVII") return identical results.',
+  },
+  {
+    question: 'How is ARABIC related to ROMAN?',
+    answer: 'They are exact inverses. ARABIC converts a Roman numeral string to a number, and ROMAN converts a number to a Roman numeral string — ARABIC(ROMAN(number)) returns number back.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with ARABIC from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=ARABIC("LVII")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Long
+    result = Application.WorksheetFunction.Arabic("LVII")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # No standard-library equivalent — a small lookup-based parser
+    # is the common approach:
+    values = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+
+    def arabic(s):
+        s, total, prev = s.upper(), 0, 0
+        for ch in reversed(s):
+            v = values[ch]
+            total += v if v >= prev else -v
+            prev = max(prev, v)
+        return total
+
+    print(arabic("LVII"))
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [ROMAN](/docs/math/roman) — the inverse of ARABIC, converting a
+  number into Roman numeral text.
+- [DECIMAL](/docs/math/decimal) — converts text in an arbitrary
+  numeric base to a decimal number, a related but separate kind of
+  conversion.
+- [VALUE](/docs/text/value) — converts ordinary numeric text to a
+  number, not Roman numerals specifically.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — convert a Roman numeral" formula={`=ARABIC("LVII")`}>
+  Returns `57`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Case-insensitive conversion" formula={`=ARABIC("mcmxii")`}>
+  Returns `1912`, the same as `ARABIC("MCMXII")`.
+</ExampleCard>
+
+<ExampleCard number="03" label="Round-tripping with ROMAN" formula={`=ARABIC(ROMAN(1994))`}>
+  Returns `1994` — ARABIC and ROMAN exactly reverse each other.
+</ExampleCard>
