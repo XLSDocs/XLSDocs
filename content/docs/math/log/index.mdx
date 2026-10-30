@@ -1,0 +1,163 @@
+---
+title: LOG
+description: Return the logarithm of a number to a base you specify, defaulting to base 10.
+---
+
+Return the logarithm of `number` to the `base` you give it — the
+general-purpose logarithm function, defaulting to base 10 when no
+base is supplied.
+
+export const quickAnswerFacts = [
+  { text: 'base is optional and defaults to 10 when omitted', type: 'check' },
+  { text: 'LOG(number) with no base is identical to LOG10(number)', type: 'check' },
+  { text: 'number and base must both be positive — otherwise #NUM!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=LOG(number, [base])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOG(number, [base])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The positive real number to find the logarithm of.',
+  },
+  {
+    name: 'base',
+    type: 'number',
+    required: false,
+    description: 'The base of the logarithm. If omitted, base defaults to 10.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The logarithm of `number` to `base` — the exponent that `base` would
+need to be raised to, to produce `number`.
+
+## Description
+
+LOG is the general-purpose version of the fixed-base logarithm
+functions: supply any `base` you need, or omit it entirely for a
+base-10 logarithm. `LOG(8, 2)` returns `3`, since 2 raised to the
+power of 3 equals 8.
+
+<ExcelCode>{`=LOG(8, 2) → 3 (2 to the power of 3 is 8)`}</ExcelCode>
+
+<Callout type="info">
+  **Omitting `base` defaults to 10** — `LOG(100)` and `LOG(100, 10)`
+  return the exact same result as `LOG10(100)`. Use LOG when the base
+  varies or needs to be a formula argument; use LOG10 when it's
+  always base 10 and the dedicated function reads more clearly.
+</Callout>
+
+## Common errors
+
+### #NUM! — a non-positive number or base
+
+<ExcelCode>{`LOG(-8, 2) → #NUM!`}</ExcelCode>
+<ExcelCode>{`LOG(8, 0) → #NUM!`}</ExcelCode>
+
+Both `number` and `base` must be positive real numbers.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`LOG("abc", 2) → #VALUE!`}</ExcelCode>
+
+Both arguments must be numbers, cells containing numbers, or formulas
+that return numbers.
+
+export const faqs = [
+  {
+    question: 'What base does LOG use if I don’t specify one?',
+    answer: 'LOG defaults to base 10 when the base argument is omitted — LOG(100) returns the same result as LOG10(100) or LOG(100, 10).',
+  },
+  {
+    question: 'How is LOG different from LN?',
+    answer: 'LN always uses base e (the natural logarithm). LOG lets you specify any base, and defaults to base 10 when none is given — they only produce the same result if you pass e as LOG’s base.',
+  },
+  {
+    question: 'Why does LOG return #NUM!?',
+    answer: 'Both number and base must be positive real numbers. A zero or negative value for either argument returns #NUM!, since logarithms of non-positive numbers (or to a non-positive base) aren’t defined.',
+  },
+  {
+    question: 'Is LOG(number) the same as LOG10(number)?',
+    answer: 'Yes — when base is omitted, LOG defaults to base 10, making it identical to LOG10 for the same number.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LOG from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LOG(8, 2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    ' VBA has no built-in arbitrary-base Log — use the change-of-base formula
+    result = Log(8) / Log(2)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.log(8, 2)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LOG10](/docs/math/log10) — the dedicated base-10 logarithm, the
+  same as LOG with base omitted.
+- [LN](/docs/math/ln) — the natural logarithm, fixed to base e.
+- [EXP](/docs/math/exp) — the inverse of LN, raising e to a given
+  power.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — logarithm to a custom base" formula={`=LOG(8, 2)`}>
+  Returns `3`, since 2 cubed is 8.
+</ExampleCard>
+
+<ExampleCard number="02" label="Omitting base for base-10" formula={`=LOG(1000)`}>
+  Returns `3` — identical to `LOG10(1000)`, since 10 cubed is 1000.
+</ExampleCard>
+
+<ExampleCard number="03" label="Finding how many doublings reach a target" formula={`=LOG(500, 2)`}>
+  Returns approximately `8.97` — roughly how many times a value must
+  double to reach 500 from 1.
+</ExampleCard>

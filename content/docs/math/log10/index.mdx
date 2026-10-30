@@ -1,0 +1,152 @@
+---
+title: LOG10
+description: Return the base-10 logarithm of a number.
+---
+
+Return the base-10 logarithm of `number` — the dedicated,
+single-argument version of LOG with the base fixed at 10.
+
+export const quickAnswerFacts = [
+  { text: 'LOG10(number) is identical to LOG(number, 10) or LOG(number)', type: 'check' },
+  { text: 'number must be positive — zero or negative returns #NUM!', type: 'warn' },
+  { text: 'LOG10(100000) returns 5, since 10 to the 5th power is 100,000', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LOG10(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LOG10(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The positive real number to find the base-10 logarithm of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The base-10 logarithm of `number` — the exponent that 10 would need
+to be raised to, to produce `number`.
+
+## Description
+
+LOG10 is the dedicated base-10 logarithm — the same calculation as
+`LOG(number, 10)` or `LOG(number)` with no base given, but as its own
+named function for readability. It's the inverse of raising 10 to a
+power: `LOG10(100000)` returns `5`, because `10^5` is `100000`.
+
+<ExcelCode>{`=LOG10(100000) → 5`}</ExcelCode>
+
+<Callout type="info">
+  **LOG10 is just LOG with the base fixed at 10.** Use LOG10 when the
+  base is always 10 and you want a self-documenting formula; use the
+  more general LOG function when the base needs to vary.
+</Callout>
+
+## Common errors
+
+### #NUM! — a zero or negative argument
+
+<ExcelCode>{`LOG10(0) → #NUM!`}</ExcelCode>
+<ExcelCode>{`LOG10(-100) → #NUM!`}</ExcelCode>
+
+The base-10 logarithm is only defined for positive real numbers.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`LOG10("abc") → #VALUE!`}</ExcelCode>
+
+`number` must be a number, a cell containing one, or a formula that
+returns one.
+
+export const faqs = [
+  {
+    question: 'How is LOG10 different from LOG?',
+    answer: 'LOG10 is fixed to base 10. LOG lets you specify any base as a second argument, defaulting to 10 when omitted — LOG10(number) and LOG(number) always return the same result.',
+  },
+  {
+    question: 'Why does LOG10 return #NUM!?',
+    answer: 'number must be a positive real number. A zero or negative value returns #NUM!, since the base-10 logarithm of a non-positive number isn’t defined.',
+  },
+  {
+    question: 'What’s LOG10 used for?',
+    answer: 'It’s common in contexts built around powers of 10 — decibel and pH calculations, order-of-magnitude comparisons, and any formula where results are naturally expressed in base-10 scale.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LOG10 from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LOG10(100000)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    ' VBA has no built-in Log10 — use the change-of-base formula
+    result = Log(100000) / Log(10)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.log10(100000)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LOG](/docs/math/log) — the general-purpose logarithm, letting you
+  specify any base.
+- [LN](/docs/math/ln) — the natural logarithm, fixed to base e.
+- [EXP](/docs/math/exp) — the inverse of LN, raising e to a given
+  power.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — base-10 logarithm" formula={`=LOG10(100000)`}>
+  Returns `5`, since `10^5` is `100000`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Comparing to LOG with base 10" formula={`=LOG10(1000)=LOG(1000,10)`}>
+  Returns `TRUE` — the two functions compute identically when LOG's
+  base is 10.
+</ExampleCard>
+
+<ExampleCard number="03" label="Counting digits in a whole number" formula={`=INT(LOG10(ABS(A2)))+1`}>
+  Returns the number of digits in the integer part of A2, a common
+  trick that relies on how base-10 logarithms scale with magnitude.
+</ExampleCard>

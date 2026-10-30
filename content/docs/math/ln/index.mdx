@@ -1,0 +1,155 @@
+---
+title: LN
+description: Return the natural logarithm of a number — the inverse of EXP.
+---
+
+Return the natural logarithm of `number` — the logarithm based on
+Euler's number `e` (approximately 2.71828182845904), and the inverse
+operation of EXP.
+
+export const quickAnswerFacts = [
+  { text: 'LN(number) is the power you’d raise e to, to get number back', type: 'check' },
+  { text: 'number must be positive — zero or negative returns #NUM!', type: 'warn' },
+  { text: 'LN(EXP(number)) returns number back, for any number', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=LN(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=LN(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The positive real number to find the natural logarithm of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The natural logarithm of `number` — the exponent that `e` would need
+to be raised to, to produce `number`.
+
+## Description
+
+LN answers the question "e to what power equals this number?" It's
+the base-e counterpart of LOG10 (base 10) and the general-base LOG
+function, and it's the inverse of EXP: raising e to the result LN
+gives you back gets you to exactly where you started.
+
+<ExcelCode>{`=LN(86) → 4.4543473 (rounded to 7 decimal places)`}</ExcelCode>
+
+<Callout type="warn">
+  **LN requires a positive number.** Zero or a negative argument
+  returns `#NUM!` — the natural logarithm is mathematically undefined
+  for non-positive values.
+</Callout>
+
+## Common errors
+
+### #NUM! — a zero or negative argument
+
+<ExcelCode>{`LN(0) → #NUM!`}</ExcelCode>
+<ExcelCode>{`LN(-5) → #NUM!`}</ExcelCode>
+
+The natural logarithm is only defined for positive real numbers.
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`LN("abc") → #VALUE!`}</ExcelCode>
+
+`number` must be a number, a cell containing one, or a formula that
+returns one.
+
+export const faqs = [
+  {
+    question: 'What base does LN use?',
+    answer: 'LN always uses the natural logarithm base, e (approximately 2.71828182845904). For base 10, use LOG10; for any other base, use LOG(number, base).',
+  },
+  {
+    question: 'Why does LN return #NUM! for 0 or a negative number?',
+    answer: 'The natural logarithm is only defined for positive real numbers — there’s no real exponent you could raise e to that produces zero or a negative result.',
+  },
+  {
+    question: 'How are LN and EXP related?',
+    answer: 'They are inverse functions. LN(EXP(number)) returns number back for any number, and EXP(LN(number)) returns number back for any positive number.',
+  },
+  {
+    question: 'How is LN different from LOG10?',
+    answer: 'LN uses base e (the natural logarithm); LOG10 always uses base 10. LOG(number, 10) is equivalent to LOG10(number), and LOG(number) with no base defaults to base 10 as well — none of those are the same calculation as LN.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with LN from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=LN(86)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Log(86) ' VBA's native Log function is natural log (base e), same as LN
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.log(86)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [EXP](/docs/math/exp) — the inverse of LN, raising e to a given
+  power.
+- [LOG](/docs/math/log) — the logarithm to a specified base, with
+  base e requiring that base to be passed in explicitly.
+- [LOG10](/docs/math/log10) — the base-10 logarithm, the other
+  common fixed-base variant.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — natural logarithm of a number" formula={`=LN(86)`}>
+  Returns approximately `4.4543473`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Reversing an EXP calculation" formula={`=LN(EXP(3))`}>
+  Returns `3` — LN undoes EXP exactly.
+</ExampleCard>
+
+<ExampleCard number="03" label="Finding e itself" formula={`=LN(2.718281828)`}>
+  Returns `1`, since raising e to the power of 1 gives e back.
+</ExampleCard>

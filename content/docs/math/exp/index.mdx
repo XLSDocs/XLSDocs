@@ -1,0 +1,148 @@
+---
+title: EXP
+description: Raise the constant e to a given power — the inverse of LN.
+---
+
+Raise Euler's number `e` (approximately 2.71828182845904) to the
+power of `number` — the inverse operation of LN, the natural
+logarithm.
+
+export const quickAnswerFacts = [
+  { text: 'EXP(1) returns e itself, approximately 2.718281828', type: 'check' },
+  { text: 'EXP is the inverse of LN — EXP(LN(number)) returns number back', type: 'check' },
+  { text: 'For powers of any other base, use the ^ operator or POWER instead', type: 'info' },
+];
+
+<QuickAnswer
+  formula={'=EXP(number)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EXP(number)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The exponent to apply to the base e.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`e` raised to `number`. A negative `number` returns the reciprocal of
+`e` raised to its absolute value — `EXP(-1)` is about `0.368`, the
+reciprocal of `EXP(1)`.
+
+## Description
+
+EXP computes `e^number`, where `e` is the base of the natural
+logarithm — a mathematical constant that shows up throughout
+continuous growth and decay calculations, compound interest, and
+calculus. It's the direct counterpart to LN: whatever LN undoes, EXP
+redoes.
+
+<ExcelCode>{`=EXP(1) → 2.718281828 (e itself, to nine decimal places)`}</ExcelCode>
+
+<Callout type="info">
+  **To raise a different base to a power**, use the `^` operator or
+  POWER instead — EXP is specifically base-`e`. `EXP(3)` computes
+  `e^3`, not `10^3` or any other base; for that, use `10^3` or
+  `POWER(10, 3)`.
+</Callout>
+
+## Common errors
+
+### #VALUE! — a non-numeric argument
+
+<ExcelCode>{`EXP("abc") → #VALUE!`}</ExcelCode>
+
+`number` must be a number, a cell containing one, or a formula that
+returns one.
+
+export const faqs = [
+  {
+    question: 'What does EXP actually compute?',
+    answer: 'EXP(number) returns e raised to the power of number, where e is approximately 2.71828182845904 — the base of the natural logarithm.',
+  },
+  {
+    question: 'How are EXP and LN related?',
+    answer: 'They are inverse functions. EXP(LN(number)) returns number back (for a positive number), and LN(EXP(number)) returns number back for any number.',
+  },
+  {
+    question: 'How do I raise a base other than e to a power?',
+    answer: 'Use the ^ operator (like 10^3) or the POWER function (POWER(10, 3)). EXP is specifically for powers of e — use it when the calculation genuinely calls for the natural-exponential base, such as continuous growth or decay.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EXP from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EXP(1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    Dim result As Double
+    result = Exp(1) ' VBA has a native Exp function — same behavior
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import math
+
+    result = math.exp(1)
+    print(result)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [LN](/docs/math/ln) — the inverse of EXP, returning the natural
+  logarithm of a number.
+- [LOG](/docs/math/log) and [LOG10](/docs/math/log10) — logarithms to
+  a specified base or to base 10, rather than the natural log base.
+- [POWER](/docs/math/power) — raises any base (not just e) to a given
+  power.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — the value of e" formula={`=EXP(1)`}>
+  Returns approximately `2.718281828`, the constant e itself.
+</ExampleCard>
+
+<ExampleCard number="02" label="Reversing a LN calculation" formula={`=EXP(LN(50))`}>
+  Returns `50` — EXP undoes LN exactly, for any positive number.
+</ExampleCard>
+
+<ExampleCard number="03" label="Continuous compound growth" formula={`=1000*EXP(0.05*10)`}>
+  Models $1,000 growing continuously at a 5% annual rate for 10
+  years, using the standard continuous-compounding formula.
+</ExampleCard>
