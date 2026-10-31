@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { loader } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
@@ -94,7 +96,46 @@ export interface FunctionCategory {
     title: string;
     description?: string;
     url: string;
+    is365Exclusive: boolean;
   }[];
+}
+
+// Perpetual (boxed/one-time-purchase) version labels a function's own
+// Compatibility table can mark as supported. A function is "365 exclusive"
+// when it's supported in 365 but in none of these — i.e. it never shipped
+// in any perpetual release, only the subscription.
+const PERPETUAL_LABELS = new Set(['2024', '2021', '2019', '2016']);
+
+/**
+ * Reads a function page's own `export const compatibility = [...]` array
+ * straight out of its raw MDX source (not the compiled page — MDX `export`
+ * statements are evaluated away by the time fumadocs' page data is
+ * available, so there's no post-compile way to read this back out). Safe to
+ * do at build/catalog time: this only ever runs server-side during
+ * `next build`/page generation, never in the browser.
+ */
+function is365ExclusiveFunction(categorySlug: string, fnSlug: string): boolean {
+  const filePath = path.join(process.cwd(), 'content', 'docs', categorySlug, fnSlug, 'index.mdx');
+  let source: string;
+  try {
+    source = fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return false;
+  }
+
+  const block = source.match(/export const compatibility = (\[[\s\S]*?\]);/)?.[1];
+  if (!block) return false;
+
+  let supports365 = false;
+  let supportsPerpetual = false;
+  const entryPattern = /label:\s*'([^']+)',\s*supported:\s*(true|false)/g;
+  for (const [, label, supported] of block.matchAll(entryPattern)) {
+    if (supported !== 'true') continue;
+    if (label === '365') supports365 = true;
+    if (PERPETUAL_LABELS.has(label)) supportsPerpetual = true;
+  }
+
+  return supports365 && !supportsPerpetual;
 }
 
 /**
@@ -122,6 +163,7 @@ export function getFunctionCatalog(): FunctionCategory[] {
           title: fn.data.title,
           description: fn.data.description,
           url: fn.url,
+          is365Exclusive: is365ExclusiveFunction(fn.slugs[0], fn.slugs[1]),
         })),
     }))
     .filter((cat) => cat.functions.length > 0)

@@ -5,26 +5,35 @@ import Link from 'next/link';
 import { HeroCanvas } from '@/components/home/hero-canvas';
 import type { FunctionCategory } from '@/lib/source';
 
+type FilterMode = 'all' | '365';
+
 export function FunctionsExplorer({ categories }: { categories: FunctionCategory[] }) {
   const [query, setQuery] = useState('');
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const sectionRef = useRef<HTMLElement>(null);
 
   const totalFunctions = categories.reduce((sum, c) => sum + c.functions.length, 0);
+  const total365Exclusive = categories.reduce(
+    (sum, c) => sum + c.functions.filter((fn) => fn.is365Exclusive).length,
+    0,
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return categories;
     return categories
       .map((cat) => ({
         ...cat,
-        functions: cat.functions.filter(
-          (fn) =>
+        functions: cat.functions.filter((fn) => {
+          if (filterMode === '365' && !fn.is365Exclusive) return false;
+          if (!q) return true;
+          return (
             fn.title.toLowerCase().includes(q) ||
-            (fn.description?.toLowerCase().includes(q) ?? false),
-        ),
+            (fn.description?.toLowerCase().includes(q) ?? false)
+          );
+        }),
       }))
       .filter((cat) => cat.functions.length > 0);
-  }, [categories, query]);
+  }, [categories, query, filterMode]);
 
   const matchCount = filtered.reduce((sum, c) => sum + c.functions.length, 0);
 
@@ -51,6 +60,32 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
               {matchCount} function{matchCount === 1 ? '' : 's'}
             </span>
           </div>
+          <div className="mt-4 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => setFilterMode('all')}
+              aria-pressed={filterMode === 'all'}
+              className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
+                filterMode === 'all'
+                  ? 'border-fd-primary bg-fd-primary/10 text-fd-primary'
+                  : 'border-fd-border text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
+              }`}
+            >
+              All functions
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilterMode('365')}
+              aria-pressed={filterMode === '365'}
+              className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
+                filterMode === '365'
+                  ? 'border-fd-primary bg-fd-primary/10 text-fd-primary'
+                  : 'border-fd-border text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
+              }`}
+            >
+              Excel 365 exclusive
+            </button>
+          </div>
           <div className="mt-8 flex items-center justify-center gap-8">
             <div>
               <div className="font-mono text-2xl text-fd-primary">{totalFunctions}</div>
@@ -59,6 +94,10 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
             <div>
               <div className="font-mono text-2xl text-fd-primary">{categories.length}</div>
               <div className="text-xs text-fd-muted-foreground">categories</div>
+            </div>
+            <div>
+              <div className="font-mono text-2xl text-fd-primary">{total365Exclusive}</div>
+              <div className="text-xs text-fd-muted-foreground">365 exclusive</div>
             </div>
           </div>
         </div>
@@ -83,7 +122,14 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
         <div className="min-w-0 flex-1">
           {filtered.length === 0 && (
             <p className="py-12 text-center text-fd-muted-foreground">
-              No functions match &ldquo;{query}&rdquo;.
+              {query ? (
+                <>
+                  No{filterMode === '365' ? ' Excel 365 exclusive' : ''} functions match &ldquo;
+                  {query}&rdquo;.
+                </>
+              ) : (
+                'No Excel 365 exclusive functions found.'
+              )}
             </p>
           )}
           {filtered.map((cat) => (
@@ -96,8 +142,15 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
                     href={fn.url}
                     className="rounded-xl border border-fd-border bg-fd-card p-4 transition-colors hover:border-fd-primary/50"
                   >
-                    <div className="font-mono text-sm font-medium text-fd-primary">
-                      {fn.title}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="font-mono text-sm font-medium text-fd-primary">
+                        {fn.title}
+                      </div>
+                      {fn.is365Exclusive && (
+                        <span className="shrink-0 rounded-full border border-fd-primary/30 bg-fd-primary/10 px-2 py-0.5 text-[10px] font-medium text-fd-primary">
+                          365
+                        </span>
+                      )}
                     </div>
                     {fn.description && (
                       <p className="mt-1.5 line-clamp-2 text-xs text-fd-muted-foreground">
