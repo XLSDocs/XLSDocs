@@ -11,7 +11,7 @@ equivalent of a full PivotTable's row-and-column layout.
 export const quickAnswerFacts = [
   { text: 'row_fields, col_fields, values, and function are all required', type: 'check' },
   { text: 'Needs clear space for the entire spill area — header row, row-label column, and any total rows/columns', type: 'warn' },
-  { text: 'Requires Excel 365 — not available in the 2021/2024 perpetual releases', type: 'warn' },
+  { text: 'Available in Excel 365, Excel 2024, and Excel 2021 — unlike GROUPBY, which is Excel 365 only', type: 'warn' },
 ];
 
 <QuickAnswer
@@ -191,7 +191,8 @@ export const faqs = [
 
 export const compatibility = [
   { label: '365', supported: true },
-  { label: '2021', supported: false },
+  { label: '2024', supported: true },
+  { label: '2021', supported: true },
   { label: '2019', supported: false },
   { label: '2016', supported: false },
   { label: 'Web', supported: true },
