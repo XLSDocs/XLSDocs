@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   description: 'Practical, non-fluff writing on Excel, VBA, Python, and the tools around a spreadsheet.',
   alternates: {
     canonical: '/blog',
+    types: {
+      'application/rss+xml': '/blog/rss.xml',
+    },
   },
 };
 

@@ -77,20 +77,28 @@ export function BlogIndex({ posts, categories }: { posts: Post[]; categories: st
       </section>
 
       <div className="mx-auto max-w-5xl px-6 py-12">
-        <div className="mb-10 flex flex-wrap gap-2">
-          {['All', ...categories].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActive(cat)}
-              className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
-                active === cat
-                  ? 'border-fd-primary bg-fd-primary/10 text-fd-primary'
-                  : 'border-fd-border text-fd-muted-foreground hover:bg-fd-card hover:text-fd-foreground'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="mb-10 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
+            {['All', ...categories].map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActive(cat)}
+                className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+                  active === cat
+                    ? 'border-fd-primary bg-fd-primary/10 text-fd-primary'
+                    : 'border-fd-border text-fd-muted-foreground hover:bg-fd-card hover:text-fd-foreground'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          <a
+            href="/blog/rss.xml"
+            className="flex items-center gap-1.5 rounded-full border border-fd-border px-3.5 py-1.5 text-sm text-fd-muted-foreground transition-colors hover:border-fd-primary/50 hover:text-fd-foreground"
+          >
+            RSS
+          </a>
         </div>
 
         {filtered.length === 0 && (
