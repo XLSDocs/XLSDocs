@@ -107,5 +107,17 @@ export async function generateMetadata(props: PageProps<'/blog/[slug]'>): Promis
     alternates: {
       canonical: `/blog/${post.slug}`,
     },
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: 'article',
+      images: `/og/blog/${post.slug}.png`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+      images: `/og/blog/${post.slug}.png`,
+    },
   };
 }
