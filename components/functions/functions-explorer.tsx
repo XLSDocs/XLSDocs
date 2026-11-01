@@ -79,7 +79,7 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
                     ? mode === 'deprecated'
                       ? 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400'
                       : 'border-fd-primary bg-fd-primary/10 text-fd-primary'
-                    : 'border-fd-border text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
+                    : 'border-fd-border bg-fd-card/80 text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
                 }`}
               >
                 {FILTER_LABELS[mode]}
