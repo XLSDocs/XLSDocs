@@ -5,7 +5,13 @@ import Link from 'next/link';
 import { HeroCanvas } from '@/components/home/hero-canvas';
 import type { FunctionCategory } from '@/lib/source';
 
-type FilterMode = 'all' | '365';
+type FilterMode = 'all' | '365' | 'deprecated';
+
+const FILTER_LABELS: Record<FilterMode, string> = {
+  all: 'All functions',
+  '365': 'Excel 365 exclusive',
+  deprecated: 'Deprecated',
+};
 
 export function FunctionsExplorer({ categories }: { categories: FunctionCategory[] }) {
   const [query, setQuery] = useState('');
@@ -25,6 +31,7 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
         ...cat,
         functions: cat.functions.filter((fn) => {
           if (filterMode === '365' && !fn.is365Exclusive) return false;
+          if (filterMode === 'deprecated' && !fn.isDeprecated) return false;
           if (!q) return true;
           return (
             fn.title.toLowerCase().includes(q) ||
@@ -61,30 +68,23 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
             </span>
           </div>
           <div className="mt-4 flex items-center justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => setFilterMode('all')}
-              aria-pressed={filterMode === 'all'}
-              className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
-                filterMode === 'all'
-                  ? 'border-fd-primary bg-fd-primary/10 text-fd-primary'
-                  : 'border-fd-border text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
-              }`}
-            >
-              All functions
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilterMode('365')}
-              aria-pressed={filterMode === '365'}
-              className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
-                filterMode === '365'
-                  ? 'border-fd-primary bg-fd-primary/10 text-fd-primary'
-                  : 'border-fd-border text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
-              }`}
-            >
-              Excel 365 exclusive
-            </button>
+            {(Object.keys(FILTER_LABELS) as FilterMode[]).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setFilterMode(mode)}
+                aria-pressed={filterMode === mode}
+                className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-colors ${
+                  filterMode === mode
+                    ? mode === 'deprecated'
+                      ? 'border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                      : 'border-fd-primary bg-fd-primary/10 text-fd-primary'
+                    : 'border-fd-border text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
+                }`}
+              >
+                {FILTER_LABELS[mode]}
+              </button>
+            ))}
           </div>
           <div className="mt-8 flex items-center justify-center gap-8">
             <div>
@@ -124,11 +124,11 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
             <p className="py-12 text-center text-fd-muted-foreground">
               {query ? (
                 <>
-                  No{filterMode === '365' ? ' Excel 365 exclusive' : ''} functions match &ldquo;
-                  {query}&rdquo;.
+                  No{filterMode !== 'all' ? ` ${FILTER_LABELS[filterMode].toLowerCase()}` : ''}{' '}
+                  functions match &ldquo;{query}&rdquo;.
                 </>
               ) : (
-                'No Excel 365 exclusive functions found.'
+                `No ${FILTER_LABELS[filterMode].toLowerCase()} functions found.`
               )}
             </p>
           )}
@@ -146,11 +146,18 @@ export function FunctionsExplorer({ categories }: { categories: FunctionCategory
                       <div className="font-mono text-sm font-medium text-fd-primary">
                         {fn.title}
                       </div>
-                      {fn.is365Exclusive && (
-                        <span className="shrink-0 rounded-full border border-fd-primary/30 bg-fd-primary/10 px-2 py-0.5 text-[10px] font-medium text-fd-primary">
-                          365
-                        </span>
-                      )}
+                      <div className="flex shrink-0 gap-1">
+                        {fn.is365Exclusive && (
+                          <span className="rounded-full border border-fd-primary/30 bg-fd-primary/10 px-2 py-0.5 text-[10px] font-medium text-fd-primary">
+                            365
+                          </span>
+                        )}
+                        {fn.isDeprecated && (
+                          <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                            Deprecated
+                          </span>
+                        )}
+                      </div>
                     </div>
                     {fn.description && (
                       <p className="mt-1.5 line-clamp-2 text-xs text-fd-muted-foreground">

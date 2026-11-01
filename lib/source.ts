@@ -97,6 +97,7 @@ export interface FunctionCategory {
     description?: string;
     url: string;
     is365Exclusive: boolean;
+    isDeprecated: boolean;
   }[];
 }
 
@@ -106,36 +107,53 @@ export interface FunctionCategory {
 // in any perpetual release, only the subscription.
 const PERPETUAL_LABELS = new Set(['2024', '2021', '2019', '2016']);
 
+// The exact phrase every genuinely-deprecated function's own
+// quickAnswerFacts warn entry uses (confirmed during the 2026-10-31
+// Compatibility audit — this string appears on exactly the 8 functions
+// Microsoft's own docs mark as deprecated: AMORDEGRC + the 7 byte-counting
+// "B" text functions, and nowhere else). Deliberately NOT a bare substring
+// match on "deprecated" — several pages (CONCATENATE, AMORLINC, STDEV.S,
+// GAMMALN.PRECISE) mention the word specifically to say they're NOT
+// deprecated, which would false-positive on a looser pattern.
+const DEPRECATED_MARKER = "text: 'Deprecated by Microsoft";
+
 /**
- * Reads a function page's own `export const compatibility = [...]` array
- * straight out of its raw MDX source (not the compiled page — MDX `export`
- * statements are evaluated away by the time fumadocs' page data is
- * available, so there's no post-compile way to read this back out). Safe to
- * do at build/catalog time: this only ever runs server-side during
- * `next build`/page generation, never in the browser.
+ * Reads a function page's raw MDX source once and derives both flags from
+ * it. Must read the raw source, not the compiled page — MDX `export`
+ * statements (like `compatibility`) are evaluated away by the time
+ * fumadocs' page data is available, so there's no post-compile way to get
+ * them back. Safe to do at build/catalog time: this only ever runs
+ * server-side during `next build`/page generation, never in the browser.
  */
-function is365ExclusiveFunction(categorySlug: string, fnSlug: string): boolean {
+function getFunctionMdxFlags(
+  categorySlug: string,
+  fnSlug: string,
+): { is365Exclusive: boolean; isDeprecated: boolean } {
   const filePath = path.join(process.cwd(), 'content', 'docs', categorySlug, fnSlug, 'index.mdx');
   let source: string;
   try {
     source = fs.readFileSync(filePath, 'utf8');
   } catch {
-    return false;
+    return { is365Exclusive: false, isDeprecated: false };
   }
 
+  let is365Exclusive = false;
   const block = source.match(/export const compatibility = (\[[\s\S]*?\]);/)?.[1];
-  if (!block) return false;
-
-  let supports365 = false;
-  let supportsPerpetual = false;
-  const entryPattern = /label:\s*'([^']+)',\s*supported:\s*(true|false)/g;
-  for (const [, label, supported] of block.matchAll(entryPattern)) {
-    if (supported !== 'true') continue;
-    if (label === '365') supports365 = true;
-    if (PERPETUAL_LABELS.has(label)) supportsPerpetual = true;
+  if (block) {
+    let supports365 = false;
+    let supportsPerpetual = false;
+    const entryPattern = /label:\s*'([^']+)',\s*supported:\s*(true|false)/g;
+    for (const [, label, supported] of block.matchAll(entryPattern)) {
+      if (supported !== 'true') continue;
+      if (label === '365') supports365 = true;
+      if (PERPETUAL_LABELS.has(label)) supportsPerpetual = true;
+    }
+    is365Exclusive = supports365 && !supportsPerpetual;
   }
 
-  return supports365 && !supportsPerpetual;
+  const isDeprecated = source.includes(DEPRECATED_MARKER);
+
+  return { is365Exclusive, isDeprecated };
 }
 
 /**
@@ -163,7 +181,7 @@ export function getFunctionCatalog(): FunctionCategory[] {
           title: fn.data.title,
           description: fn.data.description,
           url: fn.url,
-          is365Exclusive: is365ExclusiveFunction(fn.slugs[0], fn.slugs[1]),
+          ...getFunctionMdxFlags(fn.slugs[0], fn.slugs[1]),
         })),
     }))
     .filter((cat) => cat.functions.length > 0)
