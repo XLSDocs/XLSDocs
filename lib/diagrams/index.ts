@@ -3,6 +3,8 @@ import { xlookup } from './xlookup';
 import { vlookup } from './vlookup';
 import { hlookup } from './hlookup';
 import { indexMatch } from './index-match';
+import { sumifs } from './sumifs';
+import { countifs } from './countifs';
 
 /** Keyed by lowercase function name. Add one line per new spec file. */
 export const diagrams: Record<string, DiagramSpec> = {
@@ -10,4 +12,6 @@ export const diagrams: Record<string, DiagramSpec> = {
   vlookup,
   hlookup,
   'index-match': indexMatch,
+  sumifs,
+  countifs,
 };
