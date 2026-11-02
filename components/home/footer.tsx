@@ -12,6 +12,7 @@ const FOOTER_COLUMNS = [
       { href: '/tools/formula-builder', label: 'Formula Builder' },
       { href: '/tools/quick-fix', label: 'Quick Fix' },
       { href: '/tools/large-file-viewer', label: 'Large File Viewer' },
+      { href: '/tools/number-format-builder', label: 'Number Format Builder' },
       { href: '/playground', label: 'Playground' },
       { href: '/pricing', label: 'Pricing' },
     ],

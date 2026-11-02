@@ -255,6 +255,13 @@ export function FormulaBuilder() {
           <Link href="/tools/quick-fix" className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground">
             Try Quick Fix
           </Link>
+          . Need a custom number format code instead?{' '}
+          <Link
+            href="/tools/number-format-builder"
+            className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground"
+          >
+            Try the Number Format Builder
+          </Link>
           .
         </p>
       </div>
