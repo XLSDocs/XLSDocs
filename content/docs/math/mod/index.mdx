@@ -105,6 +105,14 @@ genuinely needed, the result has to be adjusted manually.
 off-by-one mistake is assuming it flags odd rows instead, or
 forgetting that row 1 itself returns `1`, not `0`.
 
+<Callout type="idea">
+  Setting this up as an actual conditional formatting rule — not just
+  the formula — has its own gotchas (which range to select, whether
+  the reference needs to stay relative). The [Conditional Format
+  Builder](/tools/conditional-format-builder) generates this exact
+  rule, with the range and setup steps included.
+</Callout>
+
 export const faqs = [
   {
     question: 'Why does MOD(-7, 3) return 2 instead of -1?',

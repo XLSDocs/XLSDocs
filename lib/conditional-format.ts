@@ -4,13 +4,15 @@ export type RuleType =
   | 'comparison'
   | 'textContains'
   | 'blank'
+  | 'isFormula'
   | 'aboveAverage'
   | 'belowAverage'
   | 'topN'
   | 'bottomN'
   | 'overdue'
   | 'dueSoon'
-  | 'weekend';
+  | 'weekend'
+  | 'alternateRows';
 
 export type ComparisonOp = 'gt' | 'lt' | 'gte' | 'lte' | 'eq' | 'between';
 
@@ -140,6 +142,12 @@ export function buildConditionalFormat(opts: ConditionalFormatOptions): Conditio
         selectRange,
         note: 'Flags empty cells (and cells holding a formula that returns an empty string).',
       };
+    case 'isFormula':
+      return {
+        formula: `=ISFORMULA(${cell})`,
+        selectRange,
+        note: 'Flags cells that contain a formula, as opposed to a typed-in value or an empty cell.',
+      };
     case 'aboveAverage':
       return {
         formula: `=${cell}>AVERAGE(${dataAbs})`,
@@ -181,6 +189,14 @@ export function buildConditionalFormat(opts: ConditionalFormatOptions): Conditio
         formula: `=WEEKDAY(${cell},2)>5`,
         selectRange,
         note: 'Flags Saturdays and Sundays — WEEKDAY(date,2) numbers Monday as 1, so 6/7 are the weekend.',
+      };
+    case 'alternateRows':
+      // Row-based, not value-based — doesn't reference the trigger
+      // column/cell at all, unlike every other rule type.
+      return {
+        formula: '=MOD(ROW(),2)=0',
+        selectRange,
+        note: 'Colors every even row. Row 1 itself returns 1, not 0 — a common off-by-one mistake is expecting it to flag odd rows instead.',
       };
   }
 }

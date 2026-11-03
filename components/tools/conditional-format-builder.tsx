@@ -12,9 +12,10 @@ import {
 import { Field, PillGroup, Select, TextInput } from '@/components/tools/form-controls';
 
 const RULE_GROUPS: { label: string; rules: RuleType[] }[] = [
-  { label: 'Values', rules: ['duplicates', 'unique', 'comparison', 'textContains', 'blank'] },
+  { label: 'Values', rules: ['duplicates', 'unique', 'comparison', 'textContains', 'blank', 'isFormula'] },
   { label: 'Ranking', rules: ['aboveAverage', 'belowAverage', 'topN', 'bottomN'] },
   { label: 'Dates', rules: ['overdue', 'dueSoon', 'weekend'] },
+  { label: 'Layout', rules: ['alternateRows'] },
 ];
 
 const RULE_LABELS: Record<RuleType, string> = {
@@ -23,6 +24,7 @@ const RULE_LABELS: Record<RuleType, string> = {
   comparison: 'Compare to a value',
   textContains: 'Contains text',
   blank: 'Blank cells',
+  isFormula: 'Contains a formula',
   aboveAverage: 'Above average',
   belowAverage: 'Below average',
   topN: 'Top N values',
@@ -30,6 +32,7 @@ const RULE_LABELS: Record<RuleType, string> = {
   overdue: 'Overdue dates',
   dueSoon: 'Due soon',
   weekend: 'Weekends',
+  alternateRows: 'Alternate rows (zebra stripes)',
 };
 
 const COMPARISON_LABELS: Record<ComparisonOp, string> = {

@@ -88,6 +88,12 @@ across a range, apply the rule `=ISFORMULA(A1)` to the range with A1
 as the anchor (Excel adjusts the reference per cell automatically),
 rather than expecting one formula to check the whole range at once.
 
+<Callout type="idea">
+  The [Conditional Format Builder](/tools/conditional-format-builder)
+  generates this exact rule — pick "Contains a formula," give it the
+  range, and it includes the correct anchor and setup steps.
+</Callout>
+
 ### Confusing "contains a formula" with "the formula returns a number"
 
 ISFORMULA only checks whether the cell's content **is** a formula —
