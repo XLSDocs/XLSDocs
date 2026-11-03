@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/tools/formula-builder`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/tools/quick-fix`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/tools/number-format-builder`, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${siteUrl}/tools/conditional-format-builder`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/blog`, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${siteUrl}/changelog`, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${siteUrl}/faq`, changeFrequency: 'monthly', priority: 0.6 },

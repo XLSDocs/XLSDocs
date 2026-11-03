@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Copy, Check } from 'lucide-react';
 import {
   buildFormatCode,
@@ -14,6 +15,7 @@ import {
   type ZeroStyle,
   type Scale,
 } from '@/lib/number-format';
+import { Field, PillGroup, Select } from '@/components/tools/form-controls';
 
 const KIND_LABELS: Record<FormatKind, string> = {
   number: 'Number',
@@ -40,72 +42,6 @@ const SCALE_LABELS: Record<Scale, string> = {
   thousands: 'Thousands (K)',
   millions: 'Millions (M)',
 };
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium text-fd-muted-foreground">{label}</span>
-      {children}
-    </div>
-  );
-}
-
-function PillGroup<T extends string>({
-  value,
-  options,
-  labels,
-  onChange,
-}: {
-  value: T;
-  options: readonly T[];
-  labels: Record<T, string>;
-  onChange: (v: T) => void;
-}) {
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          type="button"
-          onClick={() => onChange(opt)}
-          className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-            value === opt
-              ? 'border-fd-primary bg-fd-primary/10 text-fd-primary'
-              : 'border-fd-border bg-fd-card text-fd-muted-foreground hover:border-fd-primary/50 hover:text-fd-foreground'
-          }`}
-        >
-          {labels[opt]}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Select<T extends string>({
-  value,
-  options,
-  labels,
-  onChange,
-}: {
-  value: T;
-  options: readonly T[];
-  labels: Record<T, string>;
-  onChange: (v: T) => void;
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value as T)}
-      className="w-full rounded-lg border border-fd-border bg-fd-card px-3 py-2 text-sm outline-none focus:border-fd-primary"
-    >
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {labels[opt]}
-        </option>
-      ))}
-    </select>
-  );
-}
 
 export function NumberFormatBuilder() {
   const [opts, setOpts] = useState<NumberFormatOptions>(DEFAULT_OPTIONS);
@@ -328,6 +264,17 @@ export function NumberFormatBuilder() {
             <span className="text-fd-foreground">Custom</span>, and paste this code into the{' '}
             <span className="text-fd-foreground">Type</span> box.
           </div>
+
+          <p className="text-xs text-fd-muted-foreground">
+            Want to highlight cells instead of formatting them?{' '}
+            <Link
+              href="/tools/conditional-format-builder"
+              className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground"
+            >
+              Try the Conditional Format Builder
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </div>

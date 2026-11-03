@@ -13,6 +13,7 @@ const FOOTER_COLUMNS = [
       { href: '/tools/quick-fix', label: 'Quick Fix' },
       { href: '/tools/large-file-viewer', label: 'Large File Viewer' },
       { href: '/tools/number-format-builder', label: 'Number Format Builder' },
+      { href: '/tools/conditional-format-builder', label: 'Conditional Format Builder' },
       { href: '/playground', label: 'Playground' },
       { href: '/pricing', label: 'Pricing' },
     ],
