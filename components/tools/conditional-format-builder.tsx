@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Copy, Check } from 'lucide-react';
 import {
   buildConditionalFormat,
@@ -209,6 +210,17 @@ export function ConditionalFormatBuilder() {
             <span className="text-fd-foreground">Use a formula to determine which cells to format</span>, paste
             the formula above, then pick a format and click OK.
           </div>
+
+          <p className="text-xs text-fd-muted-foreground">
+            Formatting the numbers themselves instead of highlighting them?{' '}
+            <Link
+              href="/tools/number-format-builder"
+              className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground"
+            >
+              Try the Number Format Builder
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </div>
