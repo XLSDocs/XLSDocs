@@ -2,6 +2,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { gitConfig } from './shared';
 import { Logo } from '@/components/logo';
 import { GitHubIcon } from '@/components/github-icon';
+import { Sparkles, Wrench, Hash, Palette, Sheet } from 'lucide-react';
 
 // Used by app/docs/layout.tsx's notebook DocsLayout. Unlike the classic
 // `docs` layout (which needed a hand-built DocsTopNav plus grid/z-index
@@ -23,7 +24,42 @@ export function baseOptions(): BaseLayoutProps {
     links: [
       { text: 'Functions', url: '/functions' },
       { text: 'Blog', url: '/blog' },
-      { text: 'Formula Builder', url: '/tools/formula-builder' },
+      {
+        type: 'menu',
+        text: 'Tools',
+        items: [
+          {
+            icon: <Sparkles />,
+            text: 'AI Formula Builder',
+            description: 'Describe what you need, get a working formula.',
+            url: '/tools/formula-builder',
+          },
+          {
+            icon: <Wrench />,
+            text: 'Quick Fix',
+            description: 'Paste a broken formula, get it corrected.',
+            url: '/tools/quick-fix',
+          },
+          {
+            icon: <Hash />,
+            text: 'Number Format Builder',
+            description: 'Build a custom number format code with a form.',
+            url: '/tools/number-format-builder',
+          },
+          {
+            icon: <Palette />,
+            text: 'Conditional Format Builder',
+            description: 'Generate the formula for a highlighting rule.',
+            url: '/tools/conditional-format-builder',
+          },
+          {
+            icon: <Sheet />,
+            text: 'Large File Viewer',
+            description: "Open CSV/Parquet files bigger than Excel's row limit.",
+            url: '/tools/large-file-viewer',
+          },
+        ],
+      },
       { text: 'Pricing', url: '/pricing' },
       { text: 'Docs', url: '/docs' },
       {
