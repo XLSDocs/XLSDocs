@@ -2,12 +2,25 @@ import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { MobileNav } from './mobile-nav';
 import { NavSearchButton } from './nav-search-button';
+import { ToolsMenu } from './tools-menu';
 import { ThemeSwitch } from 'fumadocs-ui/layouts/shared/slots/theme-switch';
 
 const NAV_LINKS = [
   { href: '/functions', label: 'Functions' },
   { href: '/blog', label: 'Blog' },
-  { href: '/tools/formula-builder', label: 'Formula Builder' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/docs', label: 'Docs' },
+];
+
+// Mobile has no hover dropdown — list every tool individually instead.
+const MOBILE_LINKS = [
+  { href: '/functions', label: 'Functions' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/tools/formula-builder', label: 'AI Formula Builder' },
+  { href: '/tools/quick-fix', label: 'Quick Fix' },
+  { href: '/tools/number-format-builder', label: 'Number Format Builder' },
+  { href: '/tools/conditional-format-builder', label: 'Conditional Format Builder' },
+  { href: '/tools/large-file-viewer', label: 'Large File Viewer' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/docs', label: 'Docs' },
 ];
@@ -26,11 +39,19 @@ export function HomeNav() {
           </Link>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-fd-muted-foreground md:flex">
-          {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="transition-colors hover:text-fd-foreground">
-              {link.label}
-            </Link>
-          ))}
+          <Link href={NAV_LINKS[0].href} className="transition-colors hover:text-fd-foreground">
+            {NAV_LINKS[0].label}
+          </Link>
+          <Link href={NAV_LINKS[1].href} className="transition-colors hover:text-fd-foreground">
+            {NAV_LINKS[1].label}
+          </Link>
+          <ToolsMenu />
+          <Link href={NAV_LINKS[2].href} className="transition-colors hover:text-fd-foreground">
+            {NAV_LINKS[2].label}
+          </Link>
+          <Link href={NAV_LINKS[3].href} className="transition-colors hover:text-fd-foreground">
+            {NAV_LINKS[3].label}
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <ThemeSwitch mode="light-dark" />
@@ -41,7 +62,7 @@ export function HomeNav() {
           >
             Try for free →
           </Link>
-          <MobileNav links={NAV_LINKS} />
+          <MobileNav links={MOBILE_LINKS} />
         </div>
       </div>
     </header>
