@@ -2,7 +2,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { gitConfig } from './shared';
 import { Logo } from '@/components/logo';
 import { GitHubIcon } from '@/components/github-icon';
-import { Sparkles, Wrench, Hash, Palette, Sheet } from 'lucide-react';
+import { Sparkles, Wrench, Hash, Palette, Sheet, ListChecks } from 'lucide-react';
 
 // Used by app/docs/layout.tsx's notebook DocsLayout. Unlike the classic
 // `docs` layout (which needed a hand-built DocsTopNav plus grid/z-index
@@ -51,6 +51,12 @@ export function baseOptions(): BaseLayoutProps {
             text: 'Conditional Format Builder',
             description: 'Generate the formula for a highlighting rule.',
             url: '/tools/conditional-format-builder',
+          },
+          {
+            icon: <ListChecks />,
+            text: 'Data Validation Builder',
+            description: 'Dropdown lists, dependent dropdowns, and range limits.',
+            url: '/tools/data-validation-builder',
           },
           {
             icon: <Sheet />,

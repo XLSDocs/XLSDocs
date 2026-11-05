@@ -219,6 +219,13 @@ export function ConditionalFormatBuilder() {
             >
               Try the Number Format Builder
             </Link>
+            . Restricting what can be typed in instead of coloring it?{' '}
+            <Link
+              href="/tools/data-validation-builder"
+              className="underline decoration-dotted underline-offset-2 hover:text-fd-foreground"
+            >
+              Try the Data Validation Builder
+            </Link>
             .
           </p>
         </div>
