@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ImageResponse } from 'next/og';
 import { generate as DefaultImage } from 'fumadocs-ui/og';
 import { appName } from '@/lib/shared';
+import { truncateOgText, OG_TITLE_MAX, OG_DESCRIPTION_MAX } from '@/lib/og-text';
 
 export const revalidate = false;
 
@@ -29,8 +30,8 @@ export async function GET(_req: Request, { params }: RouteContext<'/og/docs/[...
   return new ImageResponse(
     (
       <DefaultImage
-        title={page.data.title}
-        description={page.data.description}
+        title={truncateOgText(page.data.title, OG_TITLE_MAX)}
+        description={truncateOgText(page.data.description ?? '', OG_DESCRIPTION_MAX)}
         site={appName}
         icon={<BrandIcon />}
         primaryColor={BRAND_GREEN}

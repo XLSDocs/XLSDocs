@@ -19,6 +19,20 @@ export const metadata: Metadata = {
   },
   description:
     'Every Excel function documented — syntax, examples, and an AI formula builder built in. The Excel reference site power users deserve.',
+  openGraph: {
+    title: 'xlsdocs.com — Excel Function Reference',
+    description:
+      'Every Excel function documented — syntax, examples, and an AI formula builder built in. The Excel reference site power users deserve.',
+    type: 'website',
+    images: '/og/home',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'xlsdocs.com — Excel Function Reference',
+    description:
+      'Every Excel function documented — syntax, examples, and an AI formula builder built in. The Excel reference site power users deserve.',
+    images: '/og/home',
+  },
   verification: {
     other: {
       'msvalidate.01': 'D7B9EC9B5210AB7F934CCCC1C1B95DFF',

@@ -1,5 +1,7 @@
 # xlsdocs
 
+![xlsdocs.com — The Excel reference built for the AI era](https://xlsdocs.com/og/home)
+
 The Excel function reference built for the AI era — every function
 documented (Excel formulas, VBA, and the code to reproduce them in
 Python/pandas), plus an AI formula builder and a searchable function

@@ -3,6 +3,7 @@ import { ImageResponse } from 'next/og';
 import { generate as DefaultImage } from 'fumadocs-ui/og';
 import { getBlogPost, getBlogPosts } from '@/lib/blog-source';
 import { appName } from '@/lib/shared';
+import { truncateOgText, OG_TITLE_MAX, OG_DESCRIPTION_MAX } from '@/lib/og-text';
 
 export const revalidate = false;
 
@@ -32,8 +33,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   return new ImageResponse(
     (
       <DefaultImage
-        title={post.title}
-        description={post.description}
+        title={truncateOgText(post.title, OG_TITLE_MAX)}
+        description={truncateOgText(post.description, OG_DESCRIPTION_MAX)}
         site={appName}
         icon={<BrandIcon />}
         primaryColor={BRAND_GREEN}
