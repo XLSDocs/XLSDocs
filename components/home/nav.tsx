@@ -18,6 +18,7 @@ const MOBILE_LINKS = [
   { href: '/blog', label: 'Blog' },
   { href: '/tools/formula-builder', label: 'AI Formula Builder' },
   { href: '/tools/quick-fix', label: 'Quick Fix' },
+  { href: '/tools/vlookup-converter', label: 'VLOOKUP to XLOOKUP Converter' },
   { href: '/tools/number-format-builder', label: 'Number Format Builder' },
   { href: '/tools/conditional-format-builder', label: 'Conditional Format Builder' },
   { href: '/tools/data-validation-builder', label: 'Data Validation Builder' },

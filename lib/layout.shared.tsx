@@ -2,7 +2,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { gitConfig } from './shared';
 import { Logo } from '@/components/logo';
 import { GitHubIcon } from '@/components/github-icon';
-import { Sparkles, Wrench, Hash, Palette, Sheet, ListChecks } from 'lucide-react';
+import { Sparkles, Wrench, Hash, Palette, Sheet, ListChecks, ArrowRightLeft } from 'lucide-react';
 
 // Used by app/docs/layout.tsx's notebook DocsLayout. Unlike the classic
 // `docs` layout (which needed a hand-built DocsTopNav plus grid/z-index
@@ -39,6 +39,12 @@ export function baseOptions(): BaseLayoutProps {
             text: 'Quick Fix',
             description: 'Paste a broken formula, get it corrected.',
             url: '/tools/quick-fix',
+          },
+          {
+            icon: <ArrowRightLeft />,
+            text: 'VLOOKUP → XLOOKUP Converter',
+            description: 'Paste a VLOOKUP, get the exact XLOOKUP equivalent.',
+            url: '/tools/vlookup-converter',
           },
           {
             icon: <Hash />,

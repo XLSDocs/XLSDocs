@@ -2,9 +2,15 @@
 
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
-import { ChevronDown, Sparkles, Wrench, Hash, Palette, Sheet, ListChecks } from 'lucide-react';
+import { ChevronDown, Sparkles, Wrench, Hash, Palette, Sheet, ListChecks, ArrowRightLeft } from 'lucide-react';
 
 const GENERATORS = [
+  {
+    href: '/tools/vlookup-converter',
+    label: 'VLOOKUP → XLOOKUP Converter',
+    description: 'Paste a VLOOKUP, get the exact XLOOKUP equivalent.',
+    icon: ArrowRightLeft,
+  },
   {
     href: '/tools/number-format-builder',
     label: 'Number Format Builder',
