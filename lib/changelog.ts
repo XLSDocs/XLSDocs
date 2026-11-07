@@ -12,6 +12,82 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-11-06',
+    title: 'PERCENTOF, DETECTLANGUAGE, and TRANSLATE',
+    description:
+      "A periodic freshness check against Microsoft's current function lists turned up three genuine gaps. PERCENTOF is shorthand for SUM(data_subset)/SUM(data_all), built specifically to drop into GROUPBY and PIVOTBY's function argument for a \"% of total\" column. DETECTLANGUAGE and TRANSLATE are both service-backed — they call Microsoft Translator directly from a formula, rather than looking anything up locally.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-11-06',
+    title: 'VLOOKUP → XLOOKUP Converter',
+    description:
+      "A new tool that parses an actual pasted VLOOKUP formula — not just clean form inputs — and returns the exact XLOOKUP and INDEX/MATCH equivalents. Correctly handles the gotcha where an omitted range_lookup defaults to an approximate match, and gives a clear error instead of a wrong answer on a named range or Table reference it can't safely resolve.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-05',
+    title: 'A homepage OG image, and a real bug fix across every OG image on the site',
+    description:
+      'The homepage now has its own branded social-share image. While building it, found and fixed a genuine bug affecting every OG image already live — docs pages and blog posts both — where a long enough title and description would overlap the footer instead of wrapping or truncating cleanly.',
+    tags: ['Improvement', 'Feature'],
+  },
+  {
+    date: '2026-11-05',
+    title: 'Data Validation Builder, and a redesigned Tools menu',
+    description:
+      "A fourth deterministic tool generates copy-paste-ready Data Validation rules — dropdown lists, dependent dropdowns, whole number and decimal limits, date ranges, text length limits, and duplicate prevention. The Tools dropdown in the main nav was also redesigned into grouped sections, with the AI Formula Builder called out on its own rather than blending in with the deterministic generators.",
+    tags: ['Feature', 'Improvement'],
+  },
+  {
+    date: '2026-11-04',
+    title: 'A Tools dropdown replaces the single Formula Builder nav link',
+    description:
+      'The main nav and the docs nav both now show every tool on the site, not just the Formula Builder, in a proper dropdown menu instead of one hardcoded link.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-11-03',
+    title: 'Conditional Format Formula Builder',
+    description:
+      'A third deterministic tool builds ready-to-paste Conditional Formatting formulas across 14 rule types — duplicates, blanks, above/below average, top/bottom N, overdue and due-soon dates, weekends, alternating rows, and more — without needing to remember the exact formula syntax each one requires.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-02',
+    title: 'Number Format Code Builder',
+    description:
+      "A new tool builds custom number format codes — currency, percentage, accounting, K/M scaling, and custom negative/zero styles — with a live preview against real numbers, instead of needing to memorize Excel's format-code syntax.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-02',
+    title: '8 more conditional-aggregation diagrams',
+    description:
+      "SUMIFS, COUNTIFS, AVERAGEIFS, SUMIF, COUNTIF, AVERAGEIF, MAXIFS, and MINIFS all get the same visual \"how it works\" diagram IF and IFS already had, reusing one shared sales dataset across the whole family so every page in it reads consistently.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-11-01',
+    title: 'Real OG images for blog posts',
+    description:
+      'Every blog post now generates its own branded social-share image from its own title and description, instead of every post sharing one generic image site-wide.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-01',
+    title: 'Working "365 exclusive" and "Deprecated" filters on the Functions page',
+    description:
+      "Both filter pills existed before with no real data behind them. They now work for real, built on the just-completed Compatibility audit — 29 of the site's functions are 365-only.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-10-31',
+    title: 'An RSS feed for the blog',
+    description: '/blog/rss.xml lets readers subscribe with any feed reader instead of having to check back manually.',
+    tags: ['Feature'],
+  },
+  {
     date: '2026-10-30',
     title: 'The Date category is complete: DAYS, DAYS360, and ISOWEEKNUM',
     description:
