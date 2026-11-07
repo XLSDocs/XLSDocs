@@ -1,0 +1,120 @@
+---
+title: "Percent of Total in Excel, Without a PivotTable"
+description: "\"What share of the total is this?\" used to mean either a PivotTable's % of Grand Total setting, or a wall of near-identical SUM(subset)/SUM(total) formulas. Three functions now cover it directly."
+date: "2026-11-07"
+category: Tutorials
+readTime: 4 min read
+---
+
+"What percent of the total does this row represent?" is one of the
+most common questions a spreadsheet gets asked, and until recently
+Excel answered it in exactly two ways: a PivotTable's "Show Values
+As → % of Grand Total" setting, or a manual `SUM(subset)/SUM(total)`
+formula copied down a column with the denominator locked by `$`.
+Both still work. Three newer functions now cover the same ground
+directly in a formula, without a separate PivotTable object to
+maintain.
+
+## The manual way, and why it's easy to get subtly wrong
+
+<ExcelCode>{`=SUM(C5)/SUM($C$5:$C$12)`}</ExcelCode>
+
+This is correct, and it's also exactly as fragile as any formula
+that depends on a human remembering to lock the right reference with
+`$`. Copy it down without the absolute reference on the denominator,
+and every row silently divides by the wrong range instead of
+throwing an error — a wrong percentage that looks entirely
+plausible.
+
+## PERCENTOF: the same formula, with the easy mistake removed
+
+<ExcelCode>{`=PERCENTOF(data_subset, data_all)`}</ExcelCode>
+
+[PERCENTOF](/docs/math/percentof) is logically identical to the
+`SUM/SUM` pattern above — it still needs the denominator argument
+locked with `$` when copied down — but it reads as what it actually
+means, instead of as two sums that happen to be divided:
+
+<ExcelCode>{`=PERCENTOF(C5, $C$5:$C$12)`}</ExcelCode>
+
+It doesn't require `data_subset` to be a literal part of `data_all`
+either — it's just two sums divided — so it works just as well on
+two unrelated ranges, though "this row's share of a total it belongs
+to" is by far the most common use.
+
+## Where it actually saves work: inside GROUPBY
+
+A single row's share of a total is one formula. A **category's**
+share of a total, for every category at once, is where this used to
+mean a PivotTable. [GROUPBY](/docs/lookup/groupby) takes PERCENTOF
+directly as its aggregation function:
+
+<ExcelCode>{`=GROUPBY(A2:A76, D2:D76, SUM) → total sales per region`}</ExcelCode>
+
+<ExcelCode>{`=GROUPBY(A2:A76, D2:D76, PERCENTOF) → each region's share of the overall total`}</ExcelCode>
+
+Same grouping column, same values column — swapping `SUM` for
+`PERCENTOF` is the entire difference between a totals table and a
+"% of total" table. Both spill live from source data, with no
+refresh button and no separate query object sitting alongside the
+sheet.
+
+## Two dimensions: PIVOTBY and relative_to
+
+[PIVOTBY](/docs/lookup/pivotby) is GROUPBY's two-dimensional sibling
+— rows and columns both, the shape a PivotTable produces with a row
+field and a column field assigned. Its `relative_to` argument
+controls what each cell's percentage is measured against, which is
+exactly the setting a PivotTable buries a few clicks deep in "Show
+Values As":
+
+<ExcelCode>{`=PIVOTBY(C2:C76, A2:A76, D2:D76, PERCENTOF, , , , , , , 2) → each cell as a % of the grand total`}</ExcelCode>
+
+`relative_to` switches between column totals (the default), row
+totals, the grand total, or a parent row/column in a multi-level
+grouping — four distinct "percent of what, exactly" questions a
+single static PivotTable view can only answer one of at a time.
+
+<Callout type="warn">
+  All three divide by a sum. If that sum is zero — every value in
+  `data_all` is zero, blank, or the range is genuinely empty —
+  PERCENTOF, and any GROUPBY/PIVOTBY call built on it, returns
+  `#DIV/0!` like any other division. Wrap in `IFERROR` if a zero
+  total is a real possibility, not just a sign something upstream is
+  broken.
+</Callout>
+
+## When a PivotTable still wins
+
+Nothing here replaces a PivotTable for genuinely interactive
+exploration — dragging fields around, slicers, drilling into a
+cell's source rows with a double-click. What changes is the narrower
+case: a report that always needs the same "% of total by category"
+breakdown, recalculating live as source data changes, directly
+composable with other formulas around it. That's the case a
+PivotTable was always a slightly heavy tool for, and it's now a
+one-line formula instead.
+
+Full reference pages for [PERCENTOF](/docs/math/percentof),
+[GROUPBY](/docs/lookup/groupby), and [PIVOTBY](/docs/lookup/pivotby)
+cover the complete argument list, error cases, and more worked
+examples for each.
+
+export const faqs = [
+  {
+    question: 'Does PERCENTOF require data_subset to be part of data_all?',
+    answer: "No — PERCENTOF just computes SUM(data_subset)/SUM(data_all). It works correctly when the subset is genuinely contained in the total, which is the common case, but nothing stops it from dividing two unrelated ranges.",
+  },
+  {
+    question: 'Can I use PERCENTOF without GROUPBY or PIVOTBY?',
+    answer: "Yes — it works as a standalone formula anywhere, with the denominator locked by $ the same way a manual SUM/SUM formula would be. It was introduced alongside GROUPBY and PIVOTBY specifically to make their percentage-of-total output cleaner, but it isn't limited to them.",
+  },
+  {
+    question: "What does PIVOTBY's relative_to argument actually control?",
+    answer: "It sets what each cell's percentage is measured against: 0 for column totals (the default), 1 for row totals, 2 for the grand total, or 3/4 for a parent column or row in a multi-level grouping. It only matters for two-argument aggregations like PERCENTOF.",
+  },
+  {
+    question: 'Do GROUPBY and PIVOTBY require Excel 365?',
+    answer: "GROUPBY and PERCENTOF are Excel 365-only. PIVOTBY is actually available a bit more broadly — Excel 365, Excel 2024, and Excel 2021 all support it, though still not 2019 or 2016.",
+  },
+];
