@@ -1,0 +1,188 @@
+---
+title: PERCENTOF
+description: Return what percentage a subset is of a total — a shorthand for SUM(subset)/SUM(total).
+---
+
+Calculate what share a subset of data represents of a larger total,
+in one argument-light call. PERCENTOF is logically equivalent to
+`SUM(data_subset)/SUM(data_all)`, but reads more clearly and was
+built specifically to drop into [GROUPBY](/docs/lookup/groupby) and
+[PIVOTBY](/docs/lookup/pivotby)'s `function` argument.
+
+export const quickAnswerFacts = [
+  { text: 'Equivalent to SUM(data_subset)/SUM(data_all)', type: 'check' },
+  { text: 'Result is a decimal — format the cell as a percentage to display it as one', type: 'warn' },
+  { text: 'Excel 365 only', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=PERCENTOF(data_subset, data_all)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=PERCENTOF(data_subset, data_all)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'data_subset',
+    type: 'range',
+    required: true,
+    description: 'The portion of the data to express as a percentage of the total.',
+  },
+  {
+    name: 'data_all',
+    type: 'range',
+    required: true,
+    description: 'The complete data set data_subset is measured against.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A decimal number — `0.25` for 25%, not the literal number `25`. The
+cell needs percentage number formatting applied for it to display
+with a `%` sign.
+
+## Description
+
+PERCENTOF sums both arguments and divides: `SUM(data_subset) /
+SUM(data_all)`. `data_subset` doesn't need to be a literal part of
+`data_all` — it's just two sums divided — but the function reads most
+naturally when it is, which is also its most common use.
+
+<ExcelCode>{`=PERCENTOF(C5, $C$5:$C$12) → what share C5 is of the whole C5:C12 total`}</ExcelCode>
+
+Copied down a column, the same formula with an absolute reference on
+`data_all` turns every row into "this row's share of the total" —
+one formula away from a 100%-stacked summary without a PivotTable.
+
+<Callout type="info">
+  PERCENTOF was introduced alongside [GROUPBY](/docs/lookup/groupby)
+  and [PIVOTBY](/docs/lookup/pivotby) specifically so their
+  `function` argument could produce "% of total" columns directly,
+  but it works standalone in any formula just as well.
+</Callout>
+
+## Common errors
+
+### #DIV/0! — data_all sums to zero
+
+<ExcelCode>{`PERCENTOF(A1:A5, B1:B10) → #DIV/0! if SUM(B1:B10) is 0`}</ExcelCode>
+
+Same as any division — if the total sums to zero (every value is
+zero, blank, or the range is empty of numbers), there's nothing to
+divide by. Wrap it in `IFERROR` for a fallback:
+
+<ExcelCode>{`IFERROR(PERCENTOF(A1:A5, B1:B10), 0)`}</ExcelCode>
+
+### Result looks like a whole number instead of a percentage
+
+<ExcelCode>{`PERCENTOF(250, 1000) → 0.25, displayed as "0.25" if the cell isn't formatted as a percentage`}</ExcelCode>
+
+PERCENTOF always returns a decimal, never a pre-multiplied value
+like `25`. Apply percentage number formatting to the cell to see
+`25%` instead of `0.25`.
+
+export const faqs = [
+  {
+    question: 'How is PERCENTOF different from writing SUM(subset)/SUM(all) myself?',
+    answer: "They're functionally identical — PERCENTOF is shorthand. The main reason to use it is readability, and that it's the function GROUPBY and PIVOTBY expect when you want a \"% of total\" column in their output.",
+  },
+  {
+    question: 'Does data_subset need to be a literal part of data_all?',
+    answer: "No — PERCENTOF just computes SUM(data_subset)/SUM(data_all). It works correctly when the subset is genuinely contained in the total (the common case), but nothing stops it from dividing two unrelated ranges.",
+  },
+  {
+    question: 'Why is my result showing as a decimal like 0.37 instead of 37%?',
+    answer: "PERCENTOF returns the raw decimal — the cell still needs percentage number formatting applied (Home tab, or Ctrl+Shift+%) for it to display with a % sign.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with PERCENTOF from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=PERCENTOF(C5, $C$5:$C$12)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in PERCENTOF — sum both ranges and divide
+    Dim pctOfTotal As Double
+    pctOfTotal = Application.WorksheetFunction.Sum(Range("C5")) _
+      / Application.WorksheetFunction.Sum(Range("C5:C12"))
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import pandas as pd
+
+    df = pd.read_excel("workbook.xlsx", sheet_name="Sheet1")
+    pct_of_total = df.loc[4, "Amount"] / df["Amount"].sum()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [GROUPBY](/docs/lookup/groupby) — commonly uses PERCENTOF as its
+  `function` argument to produce a "% of total" column per group.
+- [PIVOTBY](/docs/lookup/pivotby) — the two-dimensional equivalent,
+  same PERCENTOF use case.
+- [SUM](/docs/math/sum) — PERCENTOF is literally two SUM calls
+  divided; use SUM directly for anything that isn't a percentage.
+- [SUMIF](/docs/math/sumif) and [SUMIFS](/docs/math/sumifs) — sum a
+  conditional subset before dividing, for a "% of total" that only
+  counts matching rows.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — one value's share of a total" formula={`=PERCENTOF(250, 1000)`}>
+  Returns `0.25` — format the cell as a percentage to see `25%`.
+</ExampleCard>
+
+<ExampleCard number="02" label="Each row's share of a fixed total" formula={`=PERCENTOF(C5, $C$5:$C$12)`}>
+  Absolute references on `data_all` keep the denominator fixed when
+  this formula is copied down the column — each row becomes "this
+  row's share of C5:C12."
+</ExampleCard>
+
+<ExampleCard number="03" label="Inside GROUPBY for a % of total column" formula={`=GROUPBY(A2:A76, D2:D76, PERCENTOF)`}>
+  Passing PERCENTOF as GROUPBY's aggregation function returns each
+  group's share of the overall total, instead of a plain sum.
+</ExampleCard>
+
+<ExampleCard number="04" label="Conditional share with SUMIFS" formula={`=SUMIFS(D:D, A:A, "East") / SUM(D:D)`}>
+  The manual equivalent for a conditional subset — PERCENTOF itself
+  only accepts two ranges, so a filtered share needs SUMIFS (or
+  SUMIF) in place of the `data_subset` argument.
+</ExampleCard>
+
+<ExampleCard number="05" label="#DIV/0! from an empty total" formula={`=PERCENTOF(A1:A5, B1:B10)`}>
+  Returns `#DIV/0!` if `SUM(B1:B10)` is zero — wrap in `IFERROR` to
+  return a fallback like `0` instead.
+</ExampleCard>

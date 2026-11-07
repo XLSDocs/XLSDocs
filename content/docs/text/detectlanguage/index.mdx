@@ -1,0 +1,186 @@
+---
+title: DETECTLANGUAGE
+description: Identify the language of a piece of text using Microsoft Translator — returns a language code like "en" or "es".
+---
+
+Identify which language a piece of text is written in, returning a
+short language code (`en`, `es`, `fr`, `ja`, and so on) rather than a
+full language name. DETECTLANGUAGE calls Microsoft Translator over
+the internet to do the detection — it isn't a local, offline
+calculation like most worksheet functions.
+
+export const quickAnswerFacts = [
+  { text: 'Requires an internet connection — returns #CONNECT! when offline', type: 'warn' },
+  { text: 'Returns a short code (en, es, fr) rather than a full language name', type: 'check' },
+  { text: 'Subject to a daily translation-service quota shared with TRANSLATE', type: 'warn' },
+  { text: 'Excel 365 only', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DETECTLANGUAGE(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=DETECTLANGUAGE(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text (or a cell reference to text) to detect the language of.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A short language code as text — `"es"` for Spanish, `"ja"` for
+Japanese, and so on. An empty `text` input returns an empty string
+rather than an error.
+
+## Description
+
+DETECTLANGUAGE sends `text` to Microsoft Translator and returns
+whichever language code the service judges most likely. It's most
+useful as a building block for [TRANSLATE](/docs/text/translate),
+which can auto-detect the source language on its own, or for
+flagging rows in a mixed-language dataset before deciding how to
+handle each one.
+
+<ExcelCode>{`=DETECTLANGUAGE("Hola mundo!") → "es"`}</ExcelCode>
+
+<Callout type="warn">
+  DETECTLANGUAGE is a **service-backed function** — every call sends
+  `text` to Microsoft Translator over the internet. It doesn't work
+  offline, and Microsoft's own support page lists it as available in
+  Excel for Microsoft 365 (Windows and Mac) and Excel Mobile only,
+  with no confirmed support in Excel for the web as of this writing.
+</Callout>
+
+## Common errors
+
+### #CONNECT! — no internet connection
+
+<ExcelCode>{`DETECTLANGUAGE(A1) → #CONNECT! if the device is offline`}</ExcelCode>
+
+DETECTLANGUAGE can't reach Microsoft Translator without a network
+connection. Reconnect and recalculate (F9) to retry.
+
+### Request throttled — daily quota exceeded
+
+Microsoft Translator enforces a daily quota per user. Detecting the
+language of a very large number of cells in a short period can hit
+that limit — spread large batches out, or detect once and cache the
+result in a helper column instead of recalculating repeatedly.
+
+### #VALUE! — non-text input
+
+<ExcelCode>{`DETECTLANGUAGE(A1) → #VALUE! if A1 is a number or error, not text`}</ExcelCode>
+
+`text` needs to actually be text. Wrap a mixed-type reference in
+`TEXT` or `T` first if it might contain numbers.
+
+export const faqs = [
+  {
+    question: 'What format does DETECTLANGUAGE return — a code or a full name?',
+    answer: 'A short code, like "en" for English or "fr" for French — not the full language name. Pair it with a lookup table if a readable name is needed for display.',
+  },
+  {
+    question: 'Does DETECTLANGUAGE work without an internet connection?',
+    answer: "No — it's a service-backed function that calls Microsoft Translator over the internet for every calculation. It returns #CONNECT! if the connection is unavailable.",
+  },
+  {
+    question: 'Is there a limit to how often I can call DETECTLANGUAGE?',
+    answer: "Yes — Microsoft Translator enforces a daily quota, shared with TRANSLATE. Calling it on a very large range at once can trigger a throttling error; it's safer to detect once and store the result rather than leaving a live formula on thousands of rows.",
+  },
+  {
+    question: 'Can DETECTLANGUAGE tell apart very similar languages?',
+    answer: "It depends on the text — short or ambiguous snippets are harder to classify correctly than full sentences, and detection quality can vary as Microsoft updates the underlying service.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with DETECTLANGUAGE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=DETECTLANGUAGE(A1)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in equivalent — DETECTLANGUAGE is a worksheet-only
+    ' function backed by Microsoft Translator, not exposed to VBA directly
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # Requires a language-detection library, e.g. langdetect
+    from langdetect import detect
+
+    language_code = detect("Hola mundo!")  # "es"
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [TRANSLATE](/docs/text/translate) — translates text into another
+  language, and can auto-detect the source language the same way
+  DETECTLANGUAGE does on its own.
+- [TEXT](/docs/text/text) — general-purpose formatting, often used
+  alongside DETECTLANGUAGE to clean up input before detection.
+- [IFERROR](/docs/logical/iferror) — wraps DETECTLANGUAGE to catch
+  `#CONNECT!` and return a fallback when offline.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — detect a language from a cell" formula={`=DETECTLANGUAGE(A1)`}>
+  Returns a short code like `"es"` or `"en"` for whatever language
+  A1 is written in.
+</ExampleCard>
+
+<ExampleCard number="02" label="Flagging non-English rows" formula={`=IF(DETECTLANGUAGE(A1)="en", "English", "Review")`}>
+  Useful for triaging a mixed-language feedback or support dataset —
+  flag anything that isn't already in the expected language.
+</ExampleCard>
+
+<ExampleCard number="03" label="Feeding the result into TRANSLATE" formula={`=TRANSLATE(A1, DETECTLANGUAGE(A1), "en")`}>
+  Explicitly passing DETECTLANGUAGE's result as TRANSLATE's source
+  language — redundant most of the time, since TRANSLATE can
+  auto-detect on its own, but useful when the source needs to be
+  displayed separately too.
+</ExampleCard>
+
+<ExampleCard number="04" label="With a fallback for offline use" formula={`=IFERROR(DETECTLANGUAGE(A1), "Unknown")`}>
+  Returns `"Unknown"` instead of `#CONNECT!` if the connection drops,
+  so a larger formula depending on this result doesn't break.
+</ExampleCard>
+
+<ExampleCard number="05" label="#VALUE! from a non-text cell" formula={`=DETECTLANGUAGE(A1)`}>
+  Returns `#VALUE!` if A1 contains a number, date, or error instead
+  of text.
+</ExampleCard>

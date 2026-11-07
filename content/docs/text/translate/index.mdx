@@ -1,0 +1,200 @@
+---
+title: TRANSLATE
+description: Translate text from one language into another directly in a formula, using Microsoft Translator.
+---
+
+Translate a piece of text from one language into another, right
+inside a worksheet formula. Like [DETECTLANGUAGE](/docs/text/detectlanguage),
+TRANSLATE calls Microsoft Translator over the internet to do the
+actual translation — it isn't a local dictionary lookup.
+
+export const quickAnswerFacts = [
+  { text: 'source_language and target_language are both optional', type: 'check' },
+  { text: 'Omit source_language to auto-detect it', type: 'check' },
+  { text: 'Requires an internet connection — returns #CONNECT! when offline', type: 'warn' },
+  { text: 'Excel 365 only', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=TRANSLATE(text, [source_language], [target_language])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=TRANSLATE(text, [source_language], [target_language])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text (or a cell reference to text) to translate.',
+  },
+  {
+    name: 'source_language',
+    type: 'text',
+    required: false,
+    description: 'A language code (e.g. "en") for the language text is written in. Omit to auto-detect.',
+  },
+  {
+    name: 'target_language',
+    type: 'text',
+    required: false,
+    description: "A language code for the language to translate into. Omit to use Excel's display language.",
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The translated text as a string.
+
+## Description
+
+TRANSLATE sends `text` to Microsoft Translator and returns the
+result in `target_language`. Both language arguments are optional:
+leaving `source_language` out lets the service detect the source
+language itself (the same detection [DETECTLANGUAGE](/docs/text/detectlanguage)
+exposes directly), and leaving `target_language` out falls back to
+Excel's own display language.
+
+<ExcelCode>{`=TRANSLATE(A1, "en", "es") → translates A1 from English to Spanish`}</ExcelCode>
+
+<ExcelCode>{`=TRANSLATE(A1) → auto-detects A1's language and translates into Excel's display language`}</ExcelCode>
+
+<Callout type="warn">
+  TRANSLATE is a **service-backed function** — every call sends
+  `text` to Microsoft Translator over the internet, shares the same
+  daily quota as DETECTLANGUAGE, and doesn't work offline. Supported
+  language codes can change over time; check Microsoft's current
+  language list rather than assuming an older code is still valid.
+</Callout>
+
+## Common errors
+
+### #CONNECT! — no internet connection
+
+<ExcelCode>{`TRANSLATE(A1, "en", "fr") → #CONNECT! if the device is offline`}</ExcelCode>
+
+TRANSLATE can't reach Microsoft Translator without a network
+connection. Reconnect and recalculate (F9) to retry.
+
+### #VALUE! — invalid or unsupported language code
+
+<ExcelCode>{`TRANSLATE(A1, "en", "xx") → #VALUE! ("xx" isn't a real language code)`}</ExcelCode>
+
+Both `source_language` and `target_language` need to be codes the
+translation service actually recognizes — check the current
+supported-language list rather than guessing a code.
+
+### Request throttled — daily quota exceeded
+
+Microsoft Translator enforces a daily quota shared with
+DETECTLANGUAGE. Translating a very large number of cells in a short
+period can hit that limit — translate once and store the result in
+a helper column instead of leaving thousands of live TRANSLATE
+formulas recalculating.
+
+export const faqs = [
+  {
+    question: 'Do I have to specify the source language?',
+    answer: 'No — source_language is optional. Omitting it lets Microsoft Translator auto-detect the language text is written in, the same detection DETECTLANGUAGE performs on its own.',
+  },
+  {
+    question: "What happens if I omit target_language?",
+    answer: "TRANSLATE falls back to Excel's own display language. For predictable results across different users' copies of a workbook, it's safer to pass target_language explicitly.",
+  },
+  {
+    question: 'Does TRANSLATE work without an internet connection?',
+    answer: "No — it's a service-backed function that calls Microsoft Translator over the internet for every calculation. It returns #CONNECT! if the connection is unavailable.",
+  },
+  {
+    question: 'Is TRANSLATE the same translation quality as a professional translator?',
+    answer: "No — it's machine translation, suitable for a quick gist or triage but not for anything where precision or tone genuinely matters, such as legal or contractual text.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with TRANSLATE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=TRANSLATE(A1, "en", "es")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in equivalent — TRANSLATE is a worksheet-only
+    ' function backed by Microsoft Translator, not exposed to VBA directly
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # Requires a translation library or API, e.g. the Microsoft
+    # Translator Text API, or a package like deep-translator
+    from deep_translator import GoogleTranslator
+
+    translated = GoogleTranslator(source="en", target="es").translate("Hello, World!")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DETECTLANGUAGE](/docs/text/detectlanguage) — identifies a text's
+  language, the same auto-detection TRANSLATE uses internally when
+  `source_language` is omitted.
+- [TEXT](/docs/text/text) — general-purpose formatting, often
+  combined with TRANSLATE to clean up input before translating.
+- [IFERROR](/docs/logical/iferror) — wraps TRANSLATE to catch
+  `#CONNECT!` and return a fallback when offline.
+
+## Examples
+
+<ExampleCard number="01" label="Basic — translate between two known languages" formula={`=TRANSLATE(A1, "en", "es")`}>
+  Translates A1 from English to Spanish.
+</ExampleCard>
+
+<ExampleCard number="02" label="Auto-detecting the source language" formula={`=TRANSLATE(A1, , "en")`}>
+  Leaving `source_language` blank lets Microsoft Translator detect
+  it automatically — useful when A1 could be in any of several
+  languages.
+</ExampleCard>
+
+<ExampleCard number="03" label="Target language driven by a cell" formula={`=TRANSLATE(A1, "en", B1)`}>
+  Pulling `target_language` from B1 instead of hardcoding it lets
+  the same formula translate into a different language per row —
+  useful for a dataset where each recipient needs a different
+  language.
+</ExampleCard>
+
+<ExampleCard number="04" label="With a fallback for offline use" formula={`=IFERROR(TRANSLATE(A1, , "en"), A1)`}>
+  Falls back to the original, untranslated text instead of
+  `#CONNECT!` if the connection drops.
+</ExampleCard>
+
+<ExampleCard number="05" label="#VALUE! from an invalid language code" formula={`=TRANSLATE(A1, "en", "xx")`}>
+  Returns `#VALUE!` because `"xx"` isn't a language code Microsoft
+  Translator recognizes.
+</ExampleCard>

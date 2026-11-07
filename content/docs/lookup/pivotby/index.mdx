@@ -115,6 +115,11 @@ PivotTable object.
 
 <ExcelCode>{`=PIVOTBY(C2:C76, A2:A76, D2:D76, SUM) → total sales (column D), broken out by product (rows, column C) across year (columns, column A)`}</ExcelCode>
 
+Passing [PERCENTOF](/docs/math/percentof) as `function` instead of
+`SUM` turns the same grid into a "% of total" cross-tabulation —
+`relative_to` then controls what each cell's percentage is measured
+against.
+
 <Callout type="warn">
   **PIVOTBY needs clear space for its entire spill area** — the
   header row, the row-label column, any total row, and any total

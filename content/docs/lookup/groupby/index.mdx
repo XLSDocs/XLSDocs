@@ -97,6 +97,10 @@ refreshing.
 
 <ExcelCode>{`=GROUPBY(C2:C76, D2:D76, SUM, , , -2) → total sales by product, sorted largest to smallest (sort_order -2 sorts descending by the values column)`}</ExcelCode>
 
+Passing [PERCENTOF](/docs/math/percentof) as `function` instead of
+`SUM` returns each group's share of the overall total instead of a
+plain sum.
+
 <Callout type="warn">
   **GROUPBY needs enough clear space below and to the right to spill
   its full result** — header row, every group row, and any total
