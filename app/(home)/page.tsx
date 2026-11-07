@@ -4,6 +4,7 @@ import { CodeWriterSection } from '@/components/home/code-writer';
 import { Categories } from '@/components/home/categories';
 import { AskClaudeShowcase } from '@/components/home/ask-claude-showcase';
 import { QuickFixShowcase } from '@/components/home/quick-fix-showcase';
+import { ToolsShowcase } from '@/components/home/tools-showcase';
 import { TryItShowcase } from '@/components/home/try-it-showcase';
 import { FunctionDiagramShowcase } from '@/components/home/function-diagram-showcase';
 import { LlmsShowcase } from '@/components/home/llms-showcase';
@@ -35,6 +36,7 @@ export default function HomePage() {
       <FunctionDiagramShowcase />
       <AskClaudeShowcase />
       <QuickFixShowcase />
+      <ToolsShowcase />
       <LlmsShowcase />
       <ClosingCta />
       {/* AskClaudeShowcase above is a static mockup, not the real chat —
