@@ -1,4 +1,5 @@
 import type { DiagramSpec } from './types';
+import { ifFn } from './if';
 import { xlookup } from './xlookup';
 import { vlookup } from './vlookup';
 import { hlookup } from './hlookup';
@@ -14,6 +15,7 @@ import { minifs } from './minifs';
 
 /** Keyed by lowercase function name. Add one line per new spec file. */
 export const diagrams: Record<string, DiagramSpec> = {
+  if: ifFn,
   xlookup,
   vlookup,
   hlookup,
