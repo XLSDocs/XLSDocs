@@ -12,6 +12,41 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-11-12',
+    title: 'JIS, EUROCONVERT, CALL, and REGISTER.ID',
+    description:
+      "A full sweep against Microsoft's complete alphabetical function list — rather than checking category by category, which can miss things — turned up four last genuinely niche gaps. JIS is an older, narrower-platform synonym of the already-documented DBCS. EUROCONVERT converts between euros and the legacy EU currencies at their fixed adoption rates, behind the Euro Currency Tools add-in. CALL and REGISTER.ID are Excel 4.0 macro-sheet-era functions for calling DLL procedures directly from a formula — CALL in particular only works on a legacy XLM macro sheet, not an ordinary worksheet, which its page says plainly up front.",
+    tags: ['New functions'],
+  },
+  {
+    date: '2026-11-11',
+    title: 'A "Free from day one" section, with an animated LED display',
+    description:
+      'The homepage now states plainly what costs nothing — every doc page and all 5 generators, no account required — next to a hand-built dot-matrix display that cycles through the function count, generator count, and category count. Inspired by similar sections on other sites, it has a glow halo that fades outward from the lit number and a spotlight that follows the cursor, tuned for real contrast against a mostly-dark backdrop rather than one uniform field of dots.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-08',
+    title: 'A diagram for IF — probably the single most-visited page on the site',
+    description:
+      'The whole SUMIFS/COUNTIFS/lookup diagram family was built out, but plain IF never got one. It now has the same visual walkthrough showing exactly which cell a TRUE or FALSE result pulls from.',
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-11-07',
+    title: 'Percent of Total in Excel, Without a PivotTable',
+    description:
+      "A new blog post ties PERCENTOF, GROUPBY, and PIVOTBY together against the manual SUM/SUM pattern they replace — including PIVOTBY's relative_to argument, which controls what each cell's percentage is actually measured against.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-07',
+    title: 'A "Five tools" section on the homepage',
+    description:
+      'The homepage gives Ask AI and Quick Fix each a full dedicated section, but the deterministic generators — Number Format Builder, Conditional Format Builder, Data Validation Builder, VLOOKUP Converter, Large File Viewer — had no homepage presence at all, only the Tools nav dropdown. They now get their own section too.',
+    tags: ['Feature'],
+  },
+  {
     date: '2026-11-06',
     title: 'PERCENTOF, DETECTLANGUAGE, and TRANSLATE',
     description:
