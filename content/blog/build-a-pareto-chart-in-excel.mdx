@@ -1,0 +1,141 @@
+---
+title: "How to Build a Pareto Chart in Excel (and Read One Correctly)"
+description: "A Pareto chart answers one question: which few causes are driving most of the problem? Here's how to build one in Excel, step by step, and the parts people usually get wrong."
+date: "2026-11-12"
+category: Tutorials
+readTime: 6 min read
+---
+
+A support team logs 202 tickets in a month across nine root causes.
+Fixing all nine would take a quarter. Fixing the right four might fix
+most of the problem by next week — but only if you can tell which
+four those are. That's the question a Pareto chart answers: sort the
+causes by how much damage they do, then show how quickly their combined
+share adds up.
+
+<ParetoChart
+  items={[
+    { label: "Login failures", value: 70 },
+    { label: "Slow page loads", value: 48 },
+    { label: "Billing errors", value: 30 },
+    { label: "Broken CSV export", value: 18 },
+    { label: "Confusing settings UI", value: 12 },
+    { label: "Missing dark mode", value: 8 },
+    { label: "Notification bug", value: 8 },
+    { label: "Sync delay", value: 3 },
+    { label: "Other", value: 5 },
+  ]}
+  badges={[
+    { atIndex: 0, color: "blue", note: "Pareto rank — bars sorted largest-first by count. Login failures lead with 70 tickets, 34.7% of all 202." },
+    { atIndex: 1, color: "amber", note: "Cumulative % — each point is its own bar's share plus every bar to its left, read off the right-hand axis (0–100%). It rises fast, then flattens." },
+    { atIndex: 3, color: "red", note: "The 80% line — the running total crosses it at Broken CSV export (82.2%). That makes the top 4 of 9 causes the \"vital few\" responsible for most of the volume." },
+    { atIndex: 5, color: "purple", note: "Tie-break — Missing dark mode and Notification bug both log 8 tickets. RANK.EQ gives tied values the same rank and skips the next position, rather than splitting the difference." },
+    { atIndex: 8, color: "teal", note: "Other goes last on purpose — at 5 tickets it's bigger than Sync delay's 3, but \"other\" isn't one fixable cause, so it's plotted last regardless of where its count would otherwise rank." },
+  ]}
+/>
+
+## Step 1: sort the causes, largest first
+
+The chart only works if the bars are sorted descending by count — that's
+what makes the "how fast does this add up" shape visible at all. If
+your data already lives in a table, the fastest way is Excel's dynamic
+[SORT](/docs/arrays/sort) function rather than a manual Data → Sort
+that needs re-running every time the numbers change:
+
+<ExcelCode>{`=SORT(A2:B10, 2, -1)`}</ExcelCode>
+
+`2` sorts by the second column (the count), `-1` means descending.
+Keep "Other" out of this step — it's a catch-all bucket, not a cause
+with its own count to compete on, and it belongs at the end of the
+chart regardless of where its number would otherwise land (see the
+last callout above).
+
+## Step 2: compute the cumulative percentage
+
+This is the column that actually builds the line. The classic formula
+locks the denominator with `$` and copies down:
+
+<ExcelCode>{`=SUM($B$2:B2)/SUM($B$2:$B$10)`}</ExcelCode>
+
+Copied down, `B2` in the numerator's range grows one row at a time
+while the denominator stays fixed — a running total divided by the
+grand total. It works, but it depends on nobody breaking the `$` lock
+when the row range changes later.
+
+<ExcelCode>{`=SCAN(0, B2:B10, LAMBDA(acc,v, acc+v)) / SUM(B2:B10)`}</ExcelCode>
+
+[SCAN](/docs/custom-functions/scan) spills the whole running-total
+column in one formula, with no reference to lock and nothing to
+accidentally break on a copy-down. Divide the whole spilled array by
+the grand total and the cumulative-percent column is one formula
+instead of nine copies of one.
+
+<Callout type="info">
+  Excel also has a built-in Pareto chart: select your data, then
+  **Insert → Charts → Insert Statistic Chart → Histogram → Pareto**.
+  It sorts and adds the cumulative line automatically. Worth using when
+  you just need the chart — building it manually, as above, is what
+  you want when the 80% cutoff and the tie-break have to be visible
+  and explainable, not just drawn.
+</Callout>
+
+## Step 3: mark the 80% line, and read it correctly
+
+The dashed line at 80% isn't decoration — it's the actual cutoff for
+"the vital few." Whichever bar's cumulative percentage first reaches
+or passes 80% marks the last cause worth treating as a priority; every
+cause after it is the "trivial many," individually small enough that
+fixing them one at a time isn't worth the effort relative to the first
+few.
+
+In the chart above, that's **Broken CSV export** at 82.2% — meaning
+the top 4 of 9 causes (Login failures, Slow page loads, Billing
+errors, Broken CSV export) account for the large majority of ticket
+volume, and the other 5 causes combined don't reach the remaining 20%
+on their own merits.
+
+## Step 4: handle ties honestly
+
+Missing dark mode and Notification bug are tied at 8 tickets each.
+[RANK.EQ](/docs/statistical/rank-eq) handles this the way most people
+expect but don't always get from a formula: tied values share the
+better rank, and the next distinct value skips the position that would
+have gone to the tie:
+
+<ExcelCode>{`=RANK.EQ(B6, $B$2:$B$10)`}</ExcelCode>
+
+Both tied rows return rank 6. The next row down — Sync delay at 3
+tickets — returns rank 8, not 7. If two causes are genuinely tied,
+the chart should show that, not quietly break the tie by row order,
+which is what a plain sort does if you don't check for it.
+
+## The part that trips people up
+
+The single most common mistake isn't in the formulas — it's assuming
+the chart is finished once the bars are sorted and the line is drawn.
+The real output of a Pareto chart is the sentence it lets you say out
+loud: "fixing these N causes addresses 80% of the volume." If nothing
+in your data update process re-sorts the bars and recomputes the
+cumulative line when new tickets come in, the chart quietly goes stale
+and starts pointing at the wrong "vital few" — which is exactly why
+steps 1 and 2 above use SORT and SCAN instead of a one-time manual
+sort and a fragile locked-range formula.
+
+export const faqs = [
+  {
+    question: 'Does a Pareto chart have to follow the exact 80/20 split?',
+    answer: "No — 80/20 is a common pattern, not a law. The chart still works with a 70/30 or 90/10 split; the 80% line is a convention, and you can move the threshold to whatever cutoff is actually meaningful for the data in front of you.",
+  },
+  {
+    question: 'Where should an "Other" bucket go on the chart?',
+    answer: "Last, regardless of its count. \"Other\" bundles causes too small to track individually, so it isn't one fixable thing the way every other bar is — placing it last keeps the ranking meaningful for the causes you could actually act on.",
+  },
+  {
+    question: 'Can SORT and SCAN both be used in Excel for the web?',
+    answer: "Both are Excel 365 functions and work in Excel for the web, as well as desktop 365. If you're on a perpetual license (2019, 2016), use the manual Data → Sort for step 1 and the locked-$ SUM formula from step 2 instead — neither SORT nor SCAN is available there.",
+  },
+  {
+    question: "What's the difference between RANK.EQ and RANK for the tie-break?",
+    answer: "None in behavior — RANK.EQ is the modern, explicitly-named version of the legacy RANK function, and both handle ties identically (tied values share the top rank, skipping the next position). RANK still works but RANK.EQ is the clearer name to reach for now.",
+  },
+];

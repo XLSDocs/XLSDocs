@@ -16,6 +16,7 @@ import { CategoryCards } from './category-cards';
 import { FunctionDiagram } from './function-diagram/function-diagram';
 import { ShortcutTable } from './shortcut-table';
 import { ClaudePrompts } from './claude-prompts';
+import { ParetoChart } from './tutorial/pareto-chart';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -59,6 +60,7 @@ export function getMDXComponents(components?: MDXComponents) {
     FunctionDiagram,
     ShortcutTable,
     ClaudePrompts,
+    ParetoChart,
     ...components,
   } satisfies MDXComponents;
 }
