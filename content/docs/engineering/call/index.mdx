@@ -1,0 +1,179 @@
+---
+title: CALL
+description: Call a procedure in a DLL or code resource — a legacy macro function, not usable from an ordinary worksheet cell.
+---
+
+Call a procedure in a dynamic link library (DLL) or code resource
+directly from a formula. CALL predates VBA and COM add-ins by years,
+and comes with a hard restriction most functions on this site don't
+have: **it only works on an Excel 4.0 (XLM) macro sheet, not an
+ordinary worksheet.**
+
+export const quickAnswerFacts = [
+  { text: 'Only works on an XLM macro sheet, not a normal worksheet', type: 'warn' },
+  { text: 'Two syntax forms — a pre-registered call, or a register-and-call-in-one-step call', type: 'check' },
+  { text: 'Not available in Excel for the web', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=CALL(module_text, procedure, type_text, [argument1, ...])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+CALL has two forms. With a code resource already registered (its ID
+came from [REGISTER.ID](/docs/engineering/register-id)):
+
+<ExcelCode>{`=CALL(register_id, [argument1], ...)`}</ExcelCode>
+
+Registering and calling in one step:
+
+<ExcelCode>{`=CALL(module_text, procedure, type_text, [argument1], ...)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'register_id',
+    type: 'number',
+    required: false,
+    description: 'The ID returned by a prior REGISTER or REGISTER.ID call, for the already-registered-resource form.',
+  },
+  {
+    name: 'module_text',
+    type: 'text',
+    required: false,
+    description: 'The name of the DLL or code resource, for the register-and-call form.',
+  },
+  {
+    name: 'procedure',
+    type: 'text',
+    required: false,
+    description: 'The name of the function or procedure within the DLL to call.',
+  },
+  {
+    name: 'type_text',
+    type: 'text',
+    required: false,
+    description: 'A code describing the data type of the return value and each argument, e.g. "J!" for a long integer returning a float.',
+  },
+  {
+    name: 'argument1, ...',
+    type: 'any',
+    required: false,
+    description: 'Up to 253 arguments to pass through to the called procedure, matching the types declared in type_text.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+Whatever the called DLL procedure returns, interpreted according to
+the return-type code in `type_text`.
+
+## Description
+
+CALL is a bridge from a formula into compiled DLL code — the same
+underlying mechanism VBA's `Declare` statement uses, but exposed as a
+worksheet-style function from the Excel 4.0 macro era. It's almost
+never written by hand today; where it survives, it's usually in a
+workbook built before VBA existed, calling into a Windows API
+function or a custom add-in DLL.
+
+<Callout type="warn">
+  **CALL only works on an Excel 4.0 (XLM) macro sheet** — a legacy
+  sheet type, distinct from an ordinary worksheet, that still ships
+  hidden inside modern Excel for backward compatibility. Typing
+  `=CALL(...)` into a regular worksheet cell does not work the way
+  it does on an XLM macro sheet. Microsoft's own documentation also
+  warns that calling the wrong procedure, or passing mismatched
+  argument types, can crash Excel — this is a function for advanced,
+  deliberate use, not everyday formulas.
+</Callout>
+
+## Common errors
+
+### Formula entered on a normal worksheet, not an XLM macro sheet
+
+CALL is designed for Excel 4.0 macro sheets. On an ordinary worksheet
+it won't behave the way Microsoft's own CALL documentation describes
+— this is the most common source of confusion with the function.
+
+### Excel crashes or behaves unpredictably
+
+Mismatched argument types against `type_text`, or calling a
+procedure that wasn't designed to be invoked this way, can corrupt
+memory and crash Excel. Only call a DLL procedure specifically
+documented for use with CALL.
+
+export const faqs = [
+  {
+    question: 'Can I use CALL in a normal worksheet formula?',
+    answer: 'No — CALL is designed for Excel 4.0 (XLM) macro sheets, a legacy sheet type distinct from an ordinary worksheet. It does not function the same way, if at all, when entered on a regular worksheet.',
+  },
+  {
+    question: 'How is CALL different from a VBA Declare statement?',
+    answer: 'They do the same underlying job — calling a DLL procedure — but CALL predates VBA and is written as a worksheet-style formula on an XLM macro sheet, rather than as VBA code calling a Declare\'d function.',
+  },
+  {
+    question: 'What is register_id, and where does it come from?',
+    answer: 'It’s the numeric ID returned by a prior REGISTER or REGISTER.ID call for the same DLL procedure — pass it to CALL instead of re-specifying module_text/procedure/type_text every time.',
+  },
+  {
+    question: 'Is CALL still relevant in modern Excel development?',
+    answer: 'Rarely — VBA and COM/XLL add-ins are the modern ways to call external code from Excel. CALL mainly shows up in very old workbooks that predate those options.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with CALL from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=CALL("Kernel32","GetTickCount","J")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' The modern, VBA-native equivalent of CALL
+    Private Declare PtrSafe Function GetTickCount Lib "kernel32" () As Long
+
+    Dim ticks As Long
+    ticks = GetTickCount()
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # The equivalent concept in Python — calling into a DLL via ctypes
+    import ctypes
+
+    kernel32 = ctypes.windll.kernel32
+    ticks = kernel32.GetTickCount()
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [REGISTER.ID](/docs/engineering/register-id) — registers a DLL
+  procedure and returns an ID that CALL can reuse, instead of
+  re-specifying the module and procedure every time.

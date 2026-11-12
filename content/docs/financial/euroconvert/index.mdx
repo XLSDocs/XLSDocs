@@ -1,0 +1,179 @@
+---
+title: EUROCONVERT
+description: Convert a number between euros and a legacy EU member currency, using the fixed conversion rates set when that currency joined the euro.
+---
+
+Convert a number between euros and one of the national currencies
+that joined the euro, using the fixed official rates set at the time
+each currency adopted it — not a live, floating exchange rate.
+Requires the **Euro Currency Tools** add-in to be enabled first.
+
+export const quickAnswerFacts = [
+  { text: 'Requires the Euro Currency Tools add-in to be enabled', type: 'warn' },
+  { text: 'Uses fixed historical conversion rates, not live exchange rates', type: 'warn' },
+  { text: 'source and target are 3-letter currency codes, e.g. "EUR", "DEM", "FRF"', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=EUROCONVERT(number, source, target, [full_precision], [triangulation_precision])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=EUROCONVERT(number, source, target, [full_precision], [triangulation_precision])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'number',
+    type: 'number',
+    required: true,
+    description: 'The amount to convert, or a cell reference to it.',
+  },
+  {
+    name: 'source',
+    type: 'text',
+    required: true,
+    description: 'The 3-letter ISO currency code number is given in, e.g. "DEM" (German mark) or "EUR".',
+  },
+  {
+    name: 'target',
+    type: 'text',
+    required: true,
+    description: 'The 3-letter ISO currency code to convert into.',
+  },
+  {
+    name: 'full_precision',
+    type: 'boolean',
+    required: false,
+    description: 'FALSE (default) rounds the result to the target currency’s standard number of decimal places. TRUE returns the full, unrounded result.',
+  },
+  {
+    name: 'triangulation_precision',
+    type: 'number',
+    required: false,
+    description: 'The number of significant digits to round the intermediate euro value to, when converting between two non-euro currencies. Must be at least 3 if supplied.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`number` converted from `source` to `target`, using the fixed rate
+each legacy currency was locked to when it adopted the euro. If
+`source` and `target` are the same code, EUROCONVERT returns `number`
+unchanged.
+
+## Description
+
+EUROCONVERT exists for a specific historical purpose: converting
+amounts between the euro and the national currencies it replaced
+(German mark, French franc, Italian lira, and the other legacy EU
+currencies), using the exact fixed rate the EU set when each currency
+joined — not a market exchange rate that moves day to day.
+
+<ExcelCode>{`=EUROCONVERT(100, "DEM", "EUR") → converts 100 German marks to euros at the fixed 1999 accession rate`}</ExcelCode>
+
+Converting between two non-euro currencies (say, francs to lire)
+triangulates through euros internally — convert to euros, then to the
+target currency — and `triangulation_precision` controls how many
+significant digits that intermediate euro amount is rounded to before
+the second conversion.
+
+<Callout type="warn">
+  **EUROCONVERT does nothing until the Euro Currency Tools add-in is
+  enabled** (File → Options → Add-ins → Manage: Excel Add-ins →
+  Euro Currency Tools). Without it, the function isn't recognized at
+  all and returns `#NAME?`.
+</Callout>
+
+## Common errors
+
+### #NAME? — the add-in isn't enabled
+
+<ExcelCode>{`EUROCONVERT(100, "DEM", "EUR") → #NAME? if Euro Currency Tools isn't enabled`}</ExcelCode>
+
+Enable the Euro Currency Tools add-in first — EUROCONVERT isn't a
+built-in function the way most others on this site are.
+
+### #VALUE! — an invalid currency code
+
+<ExcelCode>{`EUROCONVERT(100, "USD", "EUR") → #VALUE! (USD was never a legacy euro-adoption currency)`}</ExcelCode>
+
+`source` and `target` must be euro or one of the specific legacy
+currencies that adopted it (DEM, FRF, ITL, and similar) — not an
+arbitrary world currency like USD or GBP.
+
+export const faqs = [
+  {
+    question: 'Why does EUROCONVERT return #NAME? on a workbook that worked before?',
+    answer: 'The Euro Currency Tools add-in needs to be enabled on the current machine and Excel install — it doesn’t travel with the workbook file. Enable it via File > Options > Add-ins > Manage: Excel Add-ins > Euro Currency Tools.',
+  },
+  {
+    question: 'Does EUROCONVERT use live exchange rates?',
+    answer: 'No — it uses the fixed official rate each legacy currency was locked to when it joined the euro, not a floating market rate. It’s only useful for euro-adoption-era conversions, not general currency conversion.',
+  },
+  {
+    question: 'Can EUROCONVERT convert between two non-euro currencies, like francs and lire?',
+    answer: 'Yes — it triangulates through euros internally (source to EUR, then EUR to target), and triangulation_precision controls how many significant digits that intermediate euro amount is rounded to.',
+  },
+  {
+    question: 'What currencies does EUROCONVERT actually support?',
+    answer: 'Euro plus the national currencies that adopted it — German mark, French franc, Italian lira, and the other pre-euro EU member currencies. It does not support unrelated world currencies like USD or GBP.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with EUROCONVERT from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=EUROCONVERT(100, "DEM", "EUR")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' Requires the Euro Currency Tools add-in to be enabled, same as the
+    ' worksheet function — it's exposed to VBA under the same name
+    Dim result As Double
+    result = Application.Run("EUROCONVERT", 100, "DEM", "EUR")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # No built-in equivalent — the fixed euro-adoption rates would need
+    # to be hardcoded or sourced from a reference table
+    EUR_DEM = 1.95583  # fixed rate German mark adopted the euro at
+
+    def dem_to_eur(amount):
+        return round(amount / EUR_DEM, 2)
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [DOLLAR](/docs/text/dollar) — formats a number as currency text
+  using a symbol, unrelated to EUROCONVERT's fixed-rate conversion.
+- [TEXT](/docs/text/text) — general-purpose number formatting,
+  often paired with EUROCONVERT to display the converted amount.

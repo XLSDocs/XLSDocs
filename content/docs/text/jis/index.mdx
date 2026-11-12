@@ -1,0 +1,149 @@
+---
+title: JIS
+description: Convert half-width English letters or katakana to full-width characters, for Japanese text.
+---
+
+Convert half-width (single-byte) English letters or katakana within a
+text string to their full-width (double-byte) equivalents — the
+Japanese-locale counterpart to [DBCS](/docs/text/dbcs), under a
+different, older name.
+
+export const quickAnswerFacts = [
+  { text: 'Only affects half-width English letters and katakana', type: 'check' },
+  { text: 'Text with no half-width characters is returned unchanged', type: 'check' },
+  { text: 'Narrow, version-specific availability — see Compatibility below', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=JIS(text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=JIS(text)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'text',
+    type: 'text',
+    required: true,
+    description: 'The text, or a cell reference to text, to convert. Only half-width English letters and katakana are affected.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+`text` with any half-width English letters or katakana converted to
+full-width. Any other character — including text with no half-width
+characters at all — passes through unchanged.
+
+## Description
+
+JIS is a Japanese-locale text function: it widens half-width English
+letters and half-width katakana to their full-width forms, the same
+operation [DBCS](/docs/text/dbcs) performs under its more general
+name. The two functions do the same conversion; JIS is the older,
+Japan-specific name for it.
+
+<ExcelCode>{`=JIS("ｴｸｾﾙ") → "エクセル" (half-width katakana widened to full-width)`}</ExcelCode>
+
+<Callout type="warn">
+  Microsoft's own documentation lists JIS as available only on a
+  narrow set of platforms — **Excel for Microsoft 365 on Mac, Excel
+  2024, and Excel 2021 on Mac** — notably not the standard Windows
+  365/2021 builds or Excel for the web. If a workbook needs to run
+  reliably across both Windows and Mac, or in a browser, use
+  [DBCS](/docs/text/dbcs) instead, which performs the identical
+  conversion with broader, better-documented support.
+</Callout>
+
+## Common errors
+
+### Expecting a visible change on already-full-width text
+
+<ExcelCode>{`JIS("EXCEL") → "EXCEL" (unchanged — no half-width characters to convert)`}</ExcelCode>
+
+JIS only touches half-width English letters and katakana. Ordinary
+full-width text, or text with no Japanese-locale half-width
+characters at all, passes through exactly as given.
+
+export const faqs = [
+  {
+    question: 'How is JIS different from DBCS?',
+    answer: "They perform the identical conversion — half-width English letters and katakana widened to full-width. JIS is the older, Japan-specific name for the same operation DBCS exposes more generally and with broader platform support.",
+  },
+  {
+    question: 'Does JIS work in Excel for the web or on Windows 365?',
+    answer: "Not reliably — Microsoft's own documentation lists JIS as available only on specific Mac builds and Excel 2024, not standard Windows 365/2021 or Excel for the web. DBCS is the safer choice for a workbook that needs to run consistently across platforms.",
+  },
+  {
+    question: 'What happens if the text has no half-width characters?',
+    answer: 'It’s returned unchanged — JIS only affects half-width English letters and katakana specifically, leaving everything else exactly as given.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with JIS from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=JIS(A2)`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no direct JIS equivalent — StrConv with vbWide performs
+    ' the same half-width-to-full-width conversion
+    Dim result As String
+    result = StrConv(Range("A2").Value, vbWide)
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    import unicodedata
+
+    # NFKC normalization widens half-width katakana, among other changes
+    result = unicodedata.normalize("NFKC", "ｴｸｾﾙ")
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2024', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+<Callout type="info">
+  The table above reflects Microsoft's own stated availability, which
+  is unusually platform-specific for JIS — in practice this means
+  **Mac builds of 365 and 2021, plus Excel 2024** rather than every
+  SKU of those versions. See the warning above before relying on it.
+</Callout>
+
+## Related functions
+
+- [DBCS](/docs/text/dbcs) — the modern, more broadly-supported name
+  for the identical half-width-to-full-width conversion.
+- [ASC](/docs/text/asc) — converts the opposite direction, full-width
+  to half-width.
+- [PHONETIC](/docs/text/phonetic) — another Far-East-locale text
+  function, extracting furigana rather than converting character
+  width.

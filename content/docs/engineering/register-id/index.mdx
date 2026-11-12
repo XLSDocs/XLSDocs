@@ -1,0 +1,146 @@
+---
+title: REGISTER.ID
+description: Register a DLL or code resource and return its register ID, for reuse with CALL — a legacy macro function.
+---
+
+Register a DLL or code resource that's already loaded and return its
+register ID — a number that [CALL](/docs/engineering/call) can reuse
+to invoke the same procedure repeatedly without re-specifying the
+module and procedure each time. Unlike CALL, REGISTER.ID works on an
+ordinary worksheet, not just an XLM macro sheet — though it's still a
+legacy function with very narrow modern use.
+
+export const quickAnswerFacts = [
+  { text: 'Works on an ordinary worksheet, unlike CALL', type: 'check' },
+  { text: 'Returns a register ID to pass into CALL', type: 'check' },
+  { text: 'Cannot specify a function name or argument names, unlike REGISTER', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=REGISTER.ID(module_text, procedure, [type_text])'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=REGISTER.ID(module_text, procedure, [type_text])`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'module_text',
+    type: 'text',
+    required: true,
+    description: 'The name of the DLL or code resource containing the procedure.',
+  },
+  {
+    name: 'procedure',
+    type: 'text',
+    required: true,
+    description: 'The name of the function or procedure to register.',
+  },
+  {
+    name: 'type_text',
+    type: 'text',
+    required: false,
+    description: 'A code describing the return and argument data types. Can be omitted if the resource is already registered.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+A number — the register ID for the specified procedure, which can be
+passed as [CALL](/docs/engineering/call)'s first argument instead of
+repeating `module_text`, `procedure`, and `type_text` on every call.
+
+## Description
+
+REGISTER.ID is the worksheet-callable half of the CALL/REGISTER
+pair: it registers a DLL procedure once and hands back an ID, so a
+workbook that calls the same external function many times doesn't
+need to re-specify the module, procedure, and type code on every
+single CALL. It's narrower than the standalone REGISTER macro
+function — REGISTER.ID can't assign a custom function name or
+argument names, only return the raw ID.
+
+<ExcelCode>{`=REGISTER.ID("Kernel32", "GetTickCount", "J!") → a register ID for the GetTickCount DLL procedure`}</ExcelCode>
+
+<Callout type="info">
+  Excel for Windows and Excel for Mac use different kinds of code
+  resources, so REGISTER.ID's exact arguments differ slightly by
+  platform — on Mac, the equivalent form takes a file name, a
+  resource name, and a type code rather than a Windows DLL name.
+</Callout>
+
+## Common errors
+
+### #VALUE! — the DLL or procedure can't be found
+
+<ExcelCode>{`REGISTER.ID("NotARealDll", "SomeFunction", "J") → #VALUE!`}</ExcelCode>
+
+`module_text` and `procedure` need to match a DLL and exported
+function that actually exist and are loadable on the current system.
+
+export const faqs = [
+  {
+    question: 'Does REGISTER.ID work on a normal worksheet?',
+    answer: 'Yes — unlike CALL, REGISTER.ID can be entered directly on an ordinary worksheet, not just an XLM macro sheet. It’s the registration step; CALL is what actually invokes the procedure afterward.',
+  },
+  {
+    question: 'How is REGISTER.ID different from REGISTER?',
+    answer: 'REGISTER.ID is a worksheet-usable subset: it returns only the numeric register ID and cannot assign a custom function name or named arguments the way the full REGISTER macro function can.',
+  },
+  {
+    question: 'What do I do with the ID REGISTER.ID returns?',
+    answer: 'Pass it as CALL’s first argument (register_id) to invoke the same registered procedure again, instead of re-specifying module_text, procedure, and type_text every time.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with REGISTER.ID from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=REGISTER.ID("Kernel32","GetTickCount","J!")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' The modern, VBA-native equivalent — no separate registration step
+    Private Declare PtrSafe Function GetTickCount Lib "kernel32" () As Long
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # ctypes loads the DLL directly — no separate "registration" concept
+    import ctypes
+
+    kernel32 = ctypes.windll.kernel32
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: true },
+  { label: '2019', supported: true },
+  { label: '2016', supported: true },
+  { label: 'Web', supported: false },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [CALL](/docs/engineering/call) — invokes the procedure
+  REGISTER.ID registered, using the returned ID.
