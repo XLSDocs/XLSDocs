@@ -6,7 +6,9 @@ import { textToDotGrid } from '@/lib/dot-matrix';
 const COLS = 22;
 const ROWS = 10;
 const INTERVAL_MS = 3500;
-const HALO_RADIUS = 6; // cells — how far the glow falloff reaches past the glyph itself
+const HALO_RADIUS = 4; // cells — past this, dots drop to a sparse, near-invisible floor
+const FAR_FLOOR = 0.035;
+const FAR_DOT_CHANCE = 0.4; // fraction of far-field dots that render at all, rest are invisible
 
 export interface Stat {
   value: string;
@@ -107,18 +109,23 @@ export function StatDots({ stats }: { stats: Stat[] }) {
           const c = i % COLS;
           const on = lit.has(`${r}-${c}`);
           const dist = on ? 0 : nearestLitDistance(r, c);
-          // Glow falls off from ~0.4 right next to the glyph down to a dim 0.05 floor.
-          const glowBase = on ? 1 : Math.max(0.05, 0.42 - (dist / HALO_RADIUS) * 0.37);
+          const isFarField = !on && dist > HALO_RADIUS;
+          // Beyond the halo, most dots render nothing at all — a sparse field
+          // rather than a uniformly dim grid, like scattered static.
+          const skip = isFarField && seeded(i * 4.1) > FAR_DOT_CHANCE;
+          // Steep exponential falloff — bright right at the glyph's edge,
+          // dropping to near-invisible within a couple of cells.
+          const glowBase = on ? 1 : Math.max(FAR_FLOOR, 0.38 * Math.exp(-dist / 1.6));
           const twinkleStyle =
-            !on && !reducedMotion
+            !on && !skip && !reducedMotion
               ? {
                   animationName: 'xlsdocs-dot-twinkle',
                   animationDuration: `${2.4 + seeded(i) * 2.6}s`,
                   animationTimingFunction: 'ease-in-out',
                   animationDelay: `${seeded(i * 7.3) * -5}s`,
                   animationIterationCount: 'infinite',
-                  ['--twinkle-min' as string]: String(Math.max(0.04, glowBase - 0.06)),
-                  ['--twinkle-max' as string]: String(Math.min(0.6, glowBase + 0.1)),
+                  ['--twinkle-min' as string]: String(Math.max(0.02, glowBase - 0.03)),
+                  ['--twinkle-max' as string]: String(Math.min(0.5, glowBase + 0.05)),
                 }
               : undefined;
           return (
@@ -128,8 +135,8 @@ export function StatDots({ stats }: { stats: Stat[] }) {
               className="aspect-square rounded-[2px] transition-[opacity,box-shadow] duration-500"
               style={{
                 background: 'var(--color-fd-primary)',
-                opacity: on || reducedMotion ? glowBase : undefined,
-                boxShadow: on ? '0 0 6px var(--color-fd-primary)' : undefined,
+                opacity: skip ? 0 : on || reducedMotion ? glowBase : undefined,
+                boxShadow: on ? '0 0 9px var(--color-fd-primary)' : undefined,
                 ...twinkleStyle,
               }}
             />
