@@ -336,6 +336,17 @@ figure.shiki.no-wrap .line {
   animation: xlsdocs-logo-breathe 6s ease-in-out infinite;
 }
 
+/* Homepage stat carousel's background dots (components/home/stat-dots.tsx) */
+@keyframes xlsdocs-dot-twinkle {
+  0%,
+  100% {
+    opacity: var(--twinkle-min, 0.12);
+  }
+  50% {
+    opacity: var(--twinkle-max, 0.32);
+  }
+}
+
 @keyframes xlsdocs-logo-breathe {
   0%,
   100% {
