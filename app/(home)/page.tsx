@@ -4,6 +4,7 @@ import { CodeWriterSection } from '@/components/home/code-writer';
 import { Categories } from '@/components/home/categories';
 import { AskClaudeShowcase } from '@/components/home/ask-claude-showcase';
 import { QuickFixShowcase } from '@/components/home/quick-fix-showcase';
+import { FreeSection } from '@/components/home/free-section';
 import { ToolsShowcase } from '@/components/home/tools-showcase';
 import { TryItShowcase } from '@/components/home/try-it-showcase';
 import { FunctionDiagramShowcase } from '@/components/home/function-diagram-showcase';
@@ -36,6 +37,7 @@ export default function HomePage() {
       <FunctionDiagramShowcase />
       <AskClaudeShowcase />
       <QuickFixShowcase />
+      <FreeSection functionCount={functionCount} />
       <ToolsShowcase />
       <LlmsShowcase />
       <ClosingCta />
