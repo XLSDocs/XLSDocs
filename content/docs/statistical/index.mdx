@@ -25,4 +25,90 @@ a given number ranks or sits relative to the rest of the set.
   <Card title="PERCENTILE" description="Find the value at a given percentile within a set of numbers." href="/docs/statistical/percentile" />
   <Card title="PERCENTILE.INC" description="The modern, explicit name for finding a percentile with the inclusive method." href="/docs/statistical/percentile-inc" />
   <Card title="PERCENTILE.EXC" description="Find a percentile using the exclusive method, which excludes the dataset's endpoints." href="/docs/statistical/percentile-exc" />
+  <Card title="AVEDEV" description="Return the average of the absolute deviations of a dataset from its own mean — a plain-English measure of spread." href="/docs/statistical/avedev" />
+  <Card title="AVERAGEA" description="Average a list of values, counting text as 0 and TRUE/FALSE as 1/0 instead of ignoring them like AVERAGE does." href="/docs/statistical/averagea" />
+  <Card title="BETA.DIST" description="The beta distribution — models a probability or proportion confined to a fixed interval, like a conversion rate." href="/docs/statistical/beta-dist" />
+  <Card title="BETA.INV" description="The value for a given cumulative probability in the beta distribution — the reverse of BETA.DIST." href="/docs/statistical/beta-inv" />
+  <Card title="BINOM.DIST" description="The binomial distribution — probability of exactly (or up to) a given number of successes across a fixed number of trials." href="/docs/statistical/binom-dist" />
+  <Card title="BINOM.DIST.RANGE" description="The probability of a range of successes across a fixed number of binomial trials, in one call." href="/docs/statistical/binom-dist-range" />
+  <Card title="BINOM.INV" description="The smallest number of successes reaching a given cumulative probability — the reverse of BINOM.DIST." href="/docs/statistical/binom-inv" />
+  <Card title="CHISQ.DIST" description="The left-tailed chi-square distribution — cumulative probability or density at a given chi-square value." href="/docs/statistical/chisq-dist" />
+  <Card title="CHISQ.DIST.RT" description="The right-tailed chi-square distribution — the p-value shape CHISQ.TEST reports internally." href="/docs/statistical/chisq-dist-rt" />
+  <Card title="CHISQ.INV" description="The chi-square value for a given left-tailed probability — the reverse of CHISQ.DIST." href="/docs/statistical/chisq-inv" />
+  <Card title="CHISQ.INV.RT" description="The chi-square value for a given right-tailed probability — Excel's standard chi-square critical-value lookup." href="/docs/statistical/chisq-inv-rt" />
+  <Card title="CHISQ.TEST" description="The probability that observed category counts differ this much from expected counts by chance." href="/docs/statistical/chisq-test" />
+  <Card title="CONFIDENCE.NORM" description="The margin of error for a population mean, using a normal distribution — the modern, explicit name for CONFIDENCE." href="/docs/statistical/confidence-norm" />
+  <Card title="CONFIDENCE.T" description="The margin of error for a population mean using the Student's t-distribution — better suited to small samples than CONFIDENCE.NORM." href="/docs/statistical/confidence-t" />
+  <Card title="CORREL" description="The correlation coefficient between two datasets — how strongly they move together, from -1 (perfectly opposite) to 1 (perfectly together)." href="/docs/statistical/correl" />
+  <Card title="COVARIANCE.P" description="Measure how two datasets vary together, treating the data as the entire population — the un-normalized building block behind CORREL." href="/docs/statistical/covariance-p" />
+  <Card title="COVARIANCE.S" description="Measure how two datasets vary together, treating the data as a sample of a larger population — the sample version of COVARIANCE.P." href="/docs/statistical/covariance-s" />
+  <Card title="DEVSQ" description="Return the sum of squared deviations of a dataset from its own mean — the raw numerator behind variance." href="/docs/statistical/devsq" />
+  <Card title="EXPON.DIST" description="The exponential distribution — models the waiting time between independent, randomly-occurring events." href="/docs/statistical/expon-dist" />
+  <Card title="F.DIST" description="The left-tailed F-distribution — cumulative probability or density at a given F-value." href="/docs/statistical/f-dist" />
+  <Card title="F.DIST.RT" description="The right-tailed F-distribution — the shape F.TEST's underlying variance-ratio statistic actually points in." href="/docs/statistical/f-dist-rt" />
+  <Card title="F.INV" description="The F-value for a given left-tailed probability — the reverse of F.DIST." href="/docs/statistical/f-inv" />
+  <Card title="F.INV.RT" description="The F-value for a given right-tailed probability — Excel's standard F-distribution critical-value lookup." href="/docs/statistical/f-inv-rt" />
+  <Card title="F.TEST" description="The two-tailed probability that two samples' variances differ this much by chance." href="/docs/statistical/f-test" />
+  <Card title="FISHER" description="The Fisher transformation — converts a correlation coefficient into a value that can be tested and averaged with normal statistics." href="/docs/statistical/fisher" />
+  <Card title="FISHERINV" description="The reverse of FISHER — converts a Fisher-transformed value back to a correlation coefficient." href="/docs/statistical/fisherinv" />
+  <Card title="FORECAST" description="Predict a future value along a linear trend, using known historical x/y pairs — the same calculation as FORECAST.LINEAR." href="/docs/statistical/forecast" />
+  <Card title="FORECAST.ETS" description="Forecast a future value using exponential smoothing, automatically detecting trend and seasonality in historical data." href="/docs/statistical/forecast-ets" />
+  <Card title="FORECAST.ETS.CONFINT" description="The confidence interval around a FORECAST.ETS forecast, based on how well the model fits its own historical data." href="/docs/statistical/forecast-ets-confint" />
+  <Card title="FORECAST.ETS.SEASONALITY" description="Detect the length of the repeating seasonal pattern in historical data, the same detection FORECAST.ETS uses internally." href="/docs/statistical/forecast-ets-seasonality" />
+  <Card title="FORECAST.ETS.STAT" description="Return a specific statistic (smoothing constants or error measures) from the exponential smoothing model FORECAST.ETS fits internally." href="/docs/statistical/forecast-ets-stat" />
+  <Card title="FORECAST.LINEAR" description="Predict a value along a linear trend — the identical calculation as FORECAST, under its newer, more explicit name." href="/docs/statistical/forecast-linear" />
+  <Card title="FREQUENCY" description="Count how many values fall into each of several bins — the formula behind a histogram, spilling every bin's count at once." href="/docs/statistical/frequency" />
+  <Card title="GAMMA" description="The gamma function — a smooth extension of the factorial to non-integers." href="/docs/statistical/gamma" />
+  <Card title="GAMMA.DIST" description="The gamma distribution — models waiting times and skewed positive quantities like insurance claims or rainfall totals." href="/docs/statistical/gamma-dist" />
+  <Card title="GAMMA.INV" description="The value for a given cumulative probability in the gamma distribution — the reverse of GAMMA.DIST." href="/docs/statistical/gamma-inv" />
+  <Card title="GAMMALN" description="The natural logarithm of the gamma function — a smooth extension of the factorial to non-integers." href="/docs/statistical/gammaln" />
+  <Card title="GAMMALN.PRECISE" description="A more accurate version of GAMMALN — the natural logarithm of the gamma function." href="/docs/statistical/gammaln-precise" />
+  <Card title="GAUSS" description="The probability that a standard normal variable falls between the mean and x — a shorthand built on NORM.S.DIST." href="/docs/statistical/gauss" />
+  <Card title="GEOMEAN" description="The geometric mean — the right average for growth rates, ratios, and compounding percentages, where AVERAGE overstates the result." href="/docs/statistical/geomean" />
+  <Card title="GROWTH" description="Predict one or many values along an exponential trend at once, using known historical x/y pairs." href="/docs/statistical/growth" />
+  <Card title="HARMEAN" description="The harmonic mean — the right average for rates like speed or price-per-unit, where AVERAGE overstates the result." href="/docs/statistical/harmean" />
+  <Card title="HYPGEOM.DIST" description="The hypergeometric distribution — probability of a given number of successes when sampling without replacement." href="/docs/statistical/hypgeom-dist" />
+  <Card title="INTERCEPT" description="The y-intercept of the linear regression line through a set of known x/y pairs — the predicted y when x is zero." href="/docs/statistical/intercept" />
+  <Card title="KURT" description="Measure how heavy-tailed a distribution is compared to a normal distribution — how prone it is to extreme outliers." href="/docs/statistical/kurt" />
+  <Card title="LINEST" description="Return a linear regression's slope and intercept as an array in one formula, with optional extended regression statistics." href="/docs/statistical/linest" />
+  <Card title="LOGEST" description="Return an exponential regression's coefficients as an array in one formula — LINEST's counterpart for curved, compounding data." href="/docs/statistical/logest" />
+  <Card title="LOGNORM.DIST" description="The lognormal distribution — models positive, right-skewed quantities like income, stock prices, or city populations." href="/docs/statistical/lognorm-dist" />
+  <Card title="LOGNORM.INV" description="The value for a given cumulative probability in the lognormal distribution — the reverse of LOGNORM.DIST." href="/docs/statistical/lognorm-inv" />
+  <Card title="MAXA" description="Find the largest value in a list, counting text as 0 and TRUE as 1 instead of ignoring them like MAX does." href="/docs/statistical/maxa" />
+  <Card title="MINA" description="Find the smallest value in a list, counting text as 0 and FALSE as 0 instead of ignoring them like MIN does." href="/docs/statistical/mina" />
+  <Card title="NEGBINOM.DIST" description="The negative binomial distribution — probability of a given number of failures before a fixed number of successes." href="/docs/statistical/negbinom-dist" />
+  <Card title="NORM.DIST" description="Return the normal distribution's cumulative probability or density at a given value, for any mean and standard deviation." href="/docs/statistical/norm-dist" />
+  <Card title="NORM.INV" description="Find the value corresponding to a given cumulative probability under a normal distribution with any mean and standard deviation." href="/docs/statistical/norm-inv" />
+  <Card title="NORM.S.DIST" description="Return the standard normal distribution's cumulative probability or density at a given z-score." href="/docs/statistical/norm-s-dist" />
+  <Card title="NORM.S.INV" description="Find the z-score corresponding to a given cumulative probability under the standard normal distribution." href="/docs/statistical/norm-s-inv" />
+  <Card title="PEARSON" description="The Pearson correlation coefficient between two datasets — the identical calculation as CORREL, under its original statistical name." href="/docs/statistical/pearson" />
+  <Card title="PERCENTRANK.EXC" description="Find a value's rank as a percentage using the exclusive method, which never returns exactly 0 or 1." href="/docs/statistical/percentrank-exc" />
+  <Card title="PERCENTRANK.INC" description="The modern, explicit name for finding a value's rank as a percentage using the inclusive method." href="/docs/statistical/percentrank-inc" />
+  <Card title="PERMUT" description="Count how many ways a fixed number of items can be arranged in order from a larger group — COMBIN's order-sensitive counterpart." href="/docs/statistical/permut" />
+  <Card title="PERMUTATIONA" description="Count how many ordered arrangements are possible when items can be chosen more than once — PERMUT's counterpart allowing repetition." href="/docs/statistical/permutationa" />
+  <Card title="PHI" description="The standard normal density function — the bell curve's height at a given z-score." href="/docs/statistical/phi" />
+  <Card title="POISSON.DIST" description="The probability of a given number of events occurring in a fixed interval, given a known average rate." href="/docs/statistical/poisson-dist" />
+  <Card title="PROB" description="Sum the probabilities assigned to a range of values that fall within given bounds." href="/docs/statistical/prob" />
+  <Card title="QUARTILE.EXC" description="Find a quartile using the exclusive method, which never returns the dataset's own minimum or maximum." href="/docs/statistical/quartile-exc" />
+  <Card title="QUARTILE.INC" description="The modern, explicit name for finding a quartile using the inclusive method — a shortcut for the most common percentile cutoffs." href="/docs/statistical/quartile-inc" />
+  <Card title="RSQ" description="Return the R-squared value of a linear regression — the proportion of variance in one variable explained by the other." href="/docs/statistical/rsq" />
+  <Card title="SKEW" description="Measure the asymmetry of a dataset's distribution around its mean, treating the data as a sample." href="/docs/statistical/skew" />
+  <Card title="SKEW.P" description="Measure the asymmetry of a dataset's distribution around its mean, treating the data as the entire population." href="/docs/statistical/skew-p" />
+  <Card title="SLOPE" description="The slope of the linear regression line through a set of known x/y pairs — how much y changes per unit of x." href="/docs/statistical/slope" />
+  <Card title="STANDARDIZE" description="Convert a value into a z-score — how many standard deviations it sits from the mean." href="/docs/statistical/standardize" />
+  <Card title="STDEVA" description="Estimate sample standard deviation across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like STDEV.S does." href="/docs/statistical/stdeva" />
+  <Card title="STDEVPA" description="Calculate population standard deviation across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like STDEV.P does." href="/docs/statistical/stdevpa" />
+  <Card title="STEYX" description="Return the standard error of the predicted y value in a linear regression — how far off a typical prediction tends to be." href="/docs/statistical/steyx" />
+  <Card title="T.DIST" description="The left-tailed Student's t-distribution — cumulative probability or density at a given t-value." href="/docs/statistical/t-dist" />
+  <Card title="T.DIST.2T" description="The two-tailed Student's t-distribution — the probability a t-statistic is this extreme in either direction." href="/docs/statistical/t-dist-2t" />
+  <Card title="T.DIST.RT" description="The right-tailed Student's t-distribution — the probability a t-statistic exceeds a given value." href="/docs/statistical/t-dist-rt" />
+  <Card title="T.INV" description="The t-value for a given left-tailed probability — the reverse of T.DIST." href="/docs/statistical/t-inv" />
+  <Card title="T.INV.2T" description="The t-value for a given two-tailed probability — the reverse of T.DIST.2T, and Excel's standard critical-value lookup." href="/docs/statistical/t-inv-2t" />
+  <Card title="T.TEST" description="The probability that two samples' means differ this much by chance, using the Student's t-distribution." href="/docs/statistical/t-test" />
+  <Card title="TREND" description="Predict one or many values along a linear trend at once, using known historical x/y pairs." href="/docs/statistical/trend" />
+  <Card title="TRIMMEAN" description="Average a dataset after excluding a percentage of the most extreme values from both ends, reducing the impact of outliers." href="/docs/statistical/trimmean" />
+  <Card title="VARA" description="Estimate sample variance across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like VAR.S does." href="/docs/statistical/vara" />
+  <Card title="VARPA" description="Calculate population variance across a list of values, counting text as 0 and TRUE as 1 instead of ignoring them like VAR.P does." href="/docs/statistical/varpa" />
+  <Card title="WEIBULL.DIST" description="The Weibull distribution — the standard model for time-to-failure and reliability analysis." href="/docs/statistical/weibull-dist" />
+  <Card title="Z.TEST" description="The one-tailed probability that a sample mean this far from a hypothesized value happened by chance." href="/docs/statistical/z-test" />
 </Cards>
