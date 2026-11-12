@@ -17,7 +17,7 @@ export function FreeSection({
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto max-w-7xl px-6 py-20">
       <div className="grid items-center gap-12 lg:grid-cols-[0.85fr_1.15fr]">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-fd-border px-3 py-1 text-xs font-medium text-fd-muted-foreground">
