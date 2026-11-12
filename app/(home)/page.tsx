@@ -37,7 +37,7 @@ export default function HomePage() {
       <FunctionDiagramShowcase />
       <AskClaudeShowcase />
       <QuickFixShowcase />
-      <FreeSection functionCount={functionCount} />
+      <FreeSection functionCount={functionCount} categoryCount={categories.length} />
       <ToolsShowcase />
       <LlmsShowcase />
       <ClosingCta />

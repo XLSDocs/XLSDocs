@@ -1,7 +1,21 @@
 import Link from 'next/link';
 import { Lock } from 'lucide-react';
+import { StatDots } from './stat-dots';
+import { TOOLS } from './tools-showcase';
 
-export function FreeSection({ functionCount }: { functionCount: number }) {
+export function FreeSection({
+  functionCount,
+  categoryCount,
+}: {
+  functionCount: number;
+  categoryCount: number;
+}) {
+  const stats = [
+    { value: String(functionCount), caption: 'functions, VBA calls, and LAMBDAs documented' },
+    { value: String(TOOLS.length), caption: 'generators, free and unlimited' },
+    { value: String(categoryCount), caption: 'categories, from Math to Custom Functions' },
+  ];
+
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
       <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -15,9 +29,9 @@ export function FreeSection({ functionCount }: { functionCount: number }) {
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
             Every function page, tutorial, and how-it-works diagram is free
-            to read, and all 5 generators are free to use as often as you
-            like — no account, no trial clock. The tools run in your
-            browser, so nothing you paste ever leaves it.
+            to read, and all {TOOLS.length} generators are free to use as
+            often as you like — no account, no trial clock. The tools run
+            in your browser, so nothing you paste ever leaves it.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link
@@ -35,21 +49,8 @@ export function FreeSection({ functionCount }: { functionCount: number }) {
           </div>
         </div>
 
-        <div className="gradient-border-card rounded-xl p-8">
-          <div className="grid grid-cols-2 divide-x divide-fd-border text-center">
-            <div className="px-4">
-              <div className="font-serif text-4xl text-fd-primary italic">{functionCount}</div>
-              <p className="mt-2 text-sm text-fd-muted-foreground">
-                functions documented, free to read
-              </p>
-            </div>
-            <div className="px-4">
-              <div className="font-serif text-4xl text-fd-primary italic">5</div>
-              <p className="mt-2 text-sm text-fd-muted-foreground">
-                generators, free and unlimited
-              </p>
-            </div>
-          </div>
+        <div className="gradient-border-card rounded-xl p-6">
+          <StatDots stats={stats} />
         </div>
       </div>
     </section>

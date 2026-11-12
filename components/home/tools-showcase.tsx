@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRightLeft, Hash, Palette, ListChecks, Sheet, type LucideIcon } from 'lucide-react';
 
-const TOOLS: { href: string; label: string; description: string; icon: LucideIcon }[] = [
+export const TOOLS: { href: string; label: string; description: string; icon: LucideIcon }[] = [
   {
     href: '/tools/vlookup-converter',
     label: 'VLOOKUP → XLOOKUP Converter',
