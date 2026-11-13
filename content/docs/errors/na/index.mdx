@@ -1,0 +1,102 @@
+---
+title: "#N/A"
+description: A lookup or match ran successfully but found no matching value — often not a mistake at all, just "not found."
+---
+
+`#N/A` is different in character from most Excel errors: it usually
+means the formula itself worked correctly, and genuinely found
+nothing. A VLOOKUP returning `#N/A` isn't broken — it's accurately
+reporting that the value you asked for isn't in the table.
+
+export const quickAnswerFacts = [
+  { text: 'Means: the formula ran fine, but found no match', type: 'check' },
+  { text: 'Use IFNA, not IFERROR, to catch only this and nothing else', type: 'check' },
+  { text: 'A trailing space or hidden character can cause a near-miss', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=VLOOKUP("Zebra", A2:B10, 2, FALSE) → #N/A (no "Zebra" in the table)'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**[VLOOKUP](/docs/lookup/vlookup) / [HLOOKUP](/docs/lookup/hlookup) /
+[MATCH](/docs/lookup/match) / [XLOOKUP](/docs/lookup/xlookup) /
+[XMATCH](/docs/lookup/xmatch): the lookup value genuinely isn't in
+the range.** The most common cause by far, and often not a mistake —
+the value simply isn't there yet:
+
+<ExcelCode>{`=MATCH("Zebra", A2:A20, 0) → #N/A`}</ExcelCode>
+
+**A trailing space or invisible character** makes an
+otherwise-identical value fail an exact match. The cell visibly reads
+"West" in both places, but one has a trailing space typed in by
+accident — exact-match lookups treat them as different strings.
+
+**A text/number type mismatch between the lookup value and the
+table.** A product code stored as text (`"1024"`) won't exact-match
+the same code stored as a number (`1024`) — visually identical,
+technically different values.
+
+**[NA()](/docs/info/na) used deliberately**, not as a mistake —
+to flag a value as not-yet-available, or because Excel's own charts
+skip `#N/A` data points entirely instead of plotting them as zero,
+which is useful for forecast series that don't start until partway
+through a chart.
+
+**TREND, FORECAST, and similar functions: mismatched array sizes**
+between `known_x`'s and `known_y`'s ranges.
+
+## How to fix it
+
+1. **Confirm the value you're looking for is actually in the
+   range** — don't assume `#N/A` is a formula bug before checking
+   this first; it's correct behavior more often than it's a mistake.
+2. **Check for a trailing space or type mismatch** if you're certain
+   the value is there. `=TRIM(A2)=TRIM(B2)` or wrapping the lookup
+   value in `VALUE()`/`TEXT()` to match types can confirm which.
+3. **If "not found" is an expected, normal outcome** — a product
+   that genuinely hasn't shipped yet, a date that hasn't arrived —
+   wrap the lookup in [IFNA](/docs/logical/ifna) rather than treating
+   the error as something to eliminate.
+
+## Catching it in a formula
+
+[IFNA](/docs/logical/ifna) catches `#N/A` specifically and nothing
+else, which is usually the more honest choice than
+[IFERROR](/docs/logical/iferror) here — IFERROR would also silently
+swallow a genuine `#REF!` or `#VALUE!` elsewhere in the same formula.
+[ERROR.TYPE](/docs/info/error-type) returns `7` for `#N/A`
+specifically; [ISNA](/docs/info/isna) returns `TRUE` for it and
+`FALSE` for every other error type — the narrowest of the detection
+functions, matching IFNA's own narrowness.
+
+## Not the same as #VALUE! or #REF!
+
+`#VALUE!` means an input's type was wrong before the formula could
+finish evaluating. `#REF!` means a reference that existed is now
+gone. `#N/A` is different in kind from both — the formula completed
+successfully and is reporting an honest "nothing matched," not a
+broken input or a broken reference.
+
+export const faqs = [
+  {
+    question: 'Should I always treat #N/A as an error to fix?',
+    answer: "No — it often means the lookup worked correctly and genuinely found nothing, which can be the expected, correct outcome (a product not yet in the table, a date that hasn't happened yet). Whether to \"fix\" it depends on whether finding nothing is actually a problem in your specific case.",
+  },
+  {
+    question: 'Why does IFNA exist when IFERROR already catches every error?',
+    answer: "IFERROR catches #N/A along with every other error type, which can hide a genuine #REF! or #VALUE! elsewhere in the same formula by quietly replacing it with the same fallback value. IFNA only catches #N/A specifically, so an unrelated real error still surfaces instead of being silently masked.",
+  },
+  {
+    question: 'Why would two visually identical values fail to match?',
+    answer: "The most common reasons are a trailing/leading space, a non-breaking space pasted from a webpage, or one value stored as text while the other is stored as a number. All four look identical in the cell but fail an exact-match comparison.",
+  },
+  {
+    question: "Does a chart series with #N/A values look different from one with zeros?",
+    answer: "Yes — Excel's charts skip #N/A data points entirely, leaving a gap in the line, instead of plotting them as zero. This is the specific reason NA() exists as a function: to deliberately create that gap rather than a misleading drop to zero.",
+  },
+];
+
+<Faq items={faqs} />

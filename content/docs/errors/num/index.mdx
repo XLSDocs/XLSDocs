@@ -1,0 +1,107 @@
+---
+title: "#NUM!"
+description: A formula's numeric input or result is invalid — out of range, mathematically impossible, or too extreme for Excel to represent.
+---
+
+`#NUM!` means every value in the formula is the right *type* — these
+are genuinely numbers, not text or a broken reference — but the
+specific number involved is invalid for what the formula is trying to
+do: a negative square root, a date beyond Excel's range, an iterative
+calculation that never settles on an answer.
+
+export const quickAnswerFacts = [
+  { text: 'Means: the number itself is out of range or impossible, not the wrong type', type: 'warn' },
+  { text: 'Common with iterative functions (RATE, IRR) that fail to converge', type: 'warn' },
+  { text: 'Different from #DIV/0! — not every #NUM! involves division at all', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SQRT(-4) → #NUM!'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**[SQRT](/docs/math/sqrt): a negative input.** Excel's SQRT has no
+complex/imaginary result — a negative number simply has no valid
+square root as far as this function is concerned:
+
+<ExcelCode>{`=SQRT(-4) → #NUM!`}</ExcelCode>
+
+**[DATE](/docs/date/date): a year outside Excel's supported range**
+(1900–9999):
+
+<ExcelCode>{`=DATE(10000, 1, 1) → #NUM!`}</ExcelCode>
+
+**[LARGE](/docs/math/large) / SMALL: `k` outside the array's
+bounds** — asking for the 20th-largest value in a 10-value array:
+
+<ExcelCode>{`=LARGE(A1:A10, 20) → #NUM! (only 10 values exist)`}</ExcelCode>
+
+**[RATE](/docs/financial/rate) / [IRR](/docs/financial/irr): the
+iterative solver can't converge.** Both functions guess, test, and
+refine toward an answer internally — if the arguments describe a
+scenario with no stable rate (or, for IRR specifically, no sign
+change across `values` at all — no negative investment to recover),
+the solver gives up:
+
+<ExcelCode>{`=IRR({1000, 2000, 3000}) → #NUM! (all positive, nothing invested to recover)`}</ExcelCode>
+
+**[POWER](/docs/math/power): a negative base with a fractional
+exponent.** `POWER(-8, 1/3)` should mathematically be `-2` (the real
+cube root of -8), but Excel's exponent algorithm doesn't handle
+negative bases with non-integer exponents and returns `#NUM!`
+instead of computing the real answer.
+
+## How to fix it
+
+1. **Check whether the underlying math is actually valid** before
+   assuming a bug — `SQRT` of a negative number and `POWER` with a
+   negative fractional base are cases where Excel's function
+   genuinely can't produce the mathematically correct answer, not
+   cases where the formula is written wrong.
+2. **For RATE/IRR convergence failures**, supply an explicit `guess`
+   argument closer to the real expected rate — the default guess
+   (10% for RATE, 10% for IRR) can fail to converge on scenarios far
+   from that range, even though a valid rate exists.
+3. **For range-bounds errors** (LARGE/SMALL's `k`, and similar),
+   confirm `k` against the array's actual current size — this
+   commonly breaks after rows are added or removed without the
+   formula being touched.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#NUM!` along with every
+other error type. [ERROR.TYPE](/docs/info/error-type) returns `6`
+for it specifically, while [ISERROR](/docs/info/iserror) returns
+`TRUE` for it along with every error type.
+
+## Not the same as #DIV/0! or #VALUE!
+
+`#DIV/0!` is narrower — specifically a division where the divisor is
+zero. `#NUM!` covers a much wider range of "this number is invalid"
+situations that have nothing to do with division at all (an
+impossible square root, an out-of-range date, a non-converging
+iterative solver). `#VALUE!` is different in kind: a type mismatch,
+not an invalid-but-correctly-typed number.
+
+export const faqs = [
+  {
+    question: 'Why does SQRT(-4) return #NUM! instead of an imaginary number?',
+    answer: "SQRT works only with real numbers and has no concept of imaginary results — a negative input has no valid real square root, so it returns #NUM! rather than computing anything. Excel does have separate complex-number functions (IMSQRT and the IM-prefixed family) for cases that genuinely need imaginary results.",
+  },
+  {
+    question: 'What does it mean for RATE or IRR to "not converge"?',
+    answer: "Both functions solve iteratively — they start from a guess, test it, and refine it repeatedly until the result is accurate enough or the iteration limit is reached. \"Doesn't converge\" means the refinement process never settled on a stable answer within that limit, often because the starting guess was too far from the real rate, or because the cash flows genuinely don't describe a valid scenario.",
+  },
+  {
+    question: 'Can #NUM! happen with no iterative or negative-number function involved at all?',
+    answer: "Yes — LARGE/SMALL returning #NUM! for an out-of-bounds k, or DATE returning it for a year outside Excel's 1900–9999 range, involve neither iteration nor negative numbers. The common thread across every #NUM! case is a number that's correctly typed but invalid for that specific operation.",
+  },
+  {
+    question: 'Is POWER(-8, 1/3) returning #NUM! a bug?',
+    answer: "No — it's a documented limitation of Excel's exponent algorithm, not a bug. The real cube root of -8 does mathematically exist (-2), but Excel's POWER doesn't compute negative bases with fractional exponents at all, regardless of whether a real result exists for that specific case.",
+  },
+];
+
+<Faq items={faqs} />

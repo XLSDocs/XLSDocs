@@ -1,0 +1,105 @@
+---
+title: "#VALUE!"
+description: A formula received the wrong type of input — text where a number was expected, most often.
+---
+
+`#VALUE!` means Excel understood every part of the formula, but one of
+the values it's working with is the wrong *type* for what the
+operation needs — text handed to arithmetic, an unparseable date
+string, a mismatched pair of arguments. It's the broadest of Excel's
+error types, which is also why it's the most common.
+
+export const quickAnswerFacts = [
+  { text: 'Means: a value is the wrong type, not a reference or name problem', type: 'warn' },
+  { text: 'Most common cause: text mixed into arithmetic', type: 'warn' },
+  { text: 'One error anywhere in a range can make a whole aggregate formula fail', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=A2+B2 → #VALUE! (if B2 contains text)'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**Arithmetic with a text value.** The classic case — a cell that looks
+empty or numeric actually holds text (often typed by hand, or pasted
+from somewhere that left a stray character):
+
+<ExcelCode>{`=A2+B2 → #VALUE! (B2 contains the text "N/A", not blank or 0)`}</ExcelCode>
+
+**[AVERAGE](/docs/math/average) and other aggregates: a referenced
+cell is itself an error.** The error propagates — Excel can't average
+around it:
+
+<ExcelCode>{`=AVERAGE(A1:A10) → #VALUE! (if any cell in A1:A10 already shows an error)`}</ExcelCode>
+
+**[DATEVALUE](/docs/date/datevalue): text that Excel can't parse as a
+date:**
+
+<ExcelCode>{`=DATEVALUE("not a date") → #VALUE!`}</ExcelCode>
+
+**[IMDIV](/docs/engineering/imdiv) and other complex-number
+functions: mismatched suffixes between arguments** (one uses `"i"`,
+the other `"j"`):
+
+<ExcelCode>{`=IMDIV("3+4i", "1-2j") → #VALUE!`}</ExcelCode>
+
+**[FINDB](/docs/text/findb): the search text genuinely isn't found**
+— unlike a plain missing value, FINDB's "not found" case surfaces as
+`#VALUE!` rather than a dedicated code of its own:
+
+<ExcelCode>{`=FINDB("x", A2) → #VALUE! (no "x" anywhere in A2)`}</ExcelCode>
+
+## How to fix it
+
+1. **Check the actual contents of every input cell, not just how they
+   look.** A cell that displays blank can still hold an invisible
+   space or a zero-length string from a formula; a cell that displays
+   a number can still be stored as text (often from a CSV import or a
+   paste from a web page) — `=ISNUMBER(A2)` returns `FALSE` for
+   either case even though the cell "looks" fine.
+2. **Use [VALUE](/docs/text/value) or NUMBERVALUE to force text that
+   looks numeric into a real number**, if that's specifically what's
+   wrong — don't reach for IFERROR as a first move without knowing
+   which input is actually the problem.
+3. **For an aggregate function returning `#VALUE!`**, trace which
+   individual cell in the range is itself already an error — fix that
+   cell, and the aggregate resolves on its own.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#VALUE!` along with
+every other error type. To detect it specifically,
+[ERROR.TYPE](/docs/info/error-type) returns `3` for it, while
+[ISERROR](/docs/info/iserror) returns `TRUE` for it along with every
+error type.
+
+## Not the same as #NAME? or #REF!
+
+`#NAME?` means Excel doesn't recognize part of the formula at all —
+it never gets far enough to evaluate a type. `#REF!` means a
+reference itself no longer points anywhere. `#VALUE!` is narrower
+than both: every name and reference in the formula is valid, but a
+specific value's type doesn't fit what the operation needs.
+
+export const faqs = [
+  {
+    question: 'Why does a cell that looks like a number still cause #VALUE! in a formula?',
+    answer: "It's likely stored as text, not a number — common after importing from a CSV or pasting from a webpage. ISNUMBER(cell) returns FALSE in this case even though the cell displays what looks like a plain number. VALUE() or NUMBERVALUE() converts it to a real number.",
+  },
+  {
+    question: 'Does IFERROR fix the underlying #VALUE! problem?',
+    answer: "No — it only replaces the displayed result with a fallback value you choose. The input that's the wrong type is still the wrong type; IFERROR just hides the symptom in that one cell rather than fixing the cause.",
+  },
+  {
+    question: 'Can one #VALUE! error in a single cell break formulas elsewhere?',
+    answer: "Yes, if another formula references that cell — AVERAGE, SUM, and most aggregate functions return #VALUE! themselves if any cell in their range already shows an error. Fixing the original cell resolves every formula downstream of it.",
+  },
+  {
+    question: 'Is #VALUE! the same as a #N/A from a lookup function?',
+    answer: "No — #N/A specifically means a lookup ran successfully but found no match; #VALUE! means an input's type was wrong before the formula could even get that far. A VLOOKUP with a genuinely wrong-typed argument (like a text range where a number range was expected) can still return #VALUE! instead of #N/A.",
+  },
+];
+
+<Faq items={faqs} />

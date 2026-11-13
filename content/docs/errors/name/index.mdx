@@ -1,0 +1,98 @@
+---
+title: "#NAME?"
+description: Excel doesn't recognize something in the formula — a misspelled function, missing quotes around text, or a function your Excel version doesn't have.
+---
+
+`#NAME?` means Excel ran into something in the formula it simply
+doesn't recognize — not a wrong value, a reference to nothing. It's
+one of the few errors that usually points at the formula's *text*
+itself being malformed, rather than the data it's operating on.
+
+export const quickAnswerFacts = [
+  { text: 'Means: Excel doesn\'t recognize part of the formula text', type: 'warn' },
+  { text: 'Most common cause: missing quotes around a text value', type: 'warn' },
+  { text: 'A newer function on an older Excel version also triggers it', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=SUMIF(A:A, West, B:B) → #NAME? (missing quotes around "West")'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**Text criteria written without quotes.** Excel reads an unquoted
+word as a name it should look up, not literal text:
+
+<ExcelCode>{`=SUMIF(A:A, West, B:B) → #NAME? (should be "West")`}</ExcelCode>
+
+**An unquoted text comparison**, same underlying mistake:
+
+<ExcelCode>{`=IF(A2=Yes, "OK", "No") → #NAME? (should be "Yes")`}</ExcelCode>
+
+**A misspelled function name** — the single most literal cause,
+easy to miss on a long formula:
+
+<ExcelCode>{`=VLOOKPU(A2, B:D, 2, FALSE) → #NAME? (should be VLOOKUP)`}</ExcelCode>
+
+**Using a newer function your Excel version doesn't have.**
+[XLOOKUP](/docs/lookup/xlookup) and every dynamic-array or LAMBDA-
+family function requires Excel 365 or 2021 — opening that same
+workbook in Excel 2019 or 2016 shows `#NAME?` for the formula, even
+though it's written correctly and worked fine for whoever built it.
+
+**A named range that was deleted or renamed.** This is the one case
+genuinely easy to confuse with `#REF!` — a formula referencing a cell
+range directly shows `#REF!` when that range is deleted, but a
+formula referencing a *named range* by its name shows `#NAME?`
+instead, since the name itself no longer resolves to anything.
+
+## How to fix it
+
+1. **Check function spelling first** — it's the most literal and most
+   common cause, and easy to eyeball-miss in a long nested formula.
+2. **Wrap every text literal in quotes.** Any bare word in a formula
+   that isn't a cell reference, a number, or a recognized function
+   name needs quotes around it.
+3. **If a named range is involved**, open Name Manager (Formulas tab)
+   and confirm the name still exists and still points somewhere valid.
+4. **If it's a newer function**, check which Excel version the
+   workbook will actually be opened in — a formula that's correct in
+   365 can still show `#NAME?` for a colleague on a perpetual license.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#NAME?` along with every
+other error type. [ERROR.TYPE](/docs/info/error-type) returns `5`
+for it specifically, while [ISERROR](/docs/info/iserror) returns
+`TRUE` for it along with every error type.
+
+## Not the same as #REF! or #VALUE!
+
+`#REF!` means a cell/range/sheet reference existed and then stopped
+existing. `#NAME?` means Excel never recognized the name or function
+in the first place — nothing was deleted, the formula itself
+references something that was never valid, or isn't valid in this
+specific Excel version. `#VALUE!` is different again: everything in
+the formula is recognized, but an input's type is wrong.
+
+export const faqs = [
+  {
+    question: 'Why does a formula that works for a colleague show #NAME? for me?',
+    answer: "You're likely on an older Excel version (2019, 2016, or earlier) than they are. Functions introduced with Excel 365 — XLOOKUP, dynamic arrays like FILTER and SORT, and every LAMBDA-family helper — show #NAME? on versions that don't have them, even though the formula is written correctly.",
+  },
+  {
+    question: 'Does a deleted named range cause #REF! or #NAME??',
+    answer: "#NAME? — because the formula references the name, not the cell address directly. Once the named range is deleted, that name no longer resolves to anything, which is a \"name not recognized\" failure, distinct from a direct cell reference becoming invalid (which is #REF!).",
+  },
+  {
+    question: 'Can a correctly spelled function still return #NAME??',
+    answer: "Yes, if it's a function your Excel version or build doesn't include yet — some functions roll out to Microsoft 365 subscribers gradually, so two people on nominally the same \"365\" plan can still have access to different function sets depending on their update channel.",
+  },
+  {
+    question: 'Is #NAME? only caused by typos?',
+    answer: "No — missing quotes around text and version-unavailable functions are both at least as common as a literal misspelling, and neither is a typo in the usual sense. All three produce the identical #NAME? error, so the error itself doesn't tell you which of the three it is.",
+  },
+];
+
+<Faq items={faqs} />

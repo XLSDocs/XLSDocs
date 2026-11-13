@@ -1,0 +1,99 @@
+---
+title: "#DIV/0!"
+description: A formula divides by zero — or by a blank cell, which Excel treats as zero in division.
+---
+
+`#DIV/0!` means a formula's divisor evaluated to zero. That includes
+a literal `0`, but also a **blank cell** — Excel treats an empty cell
+as `0` for the purpose of division, which is the single most common
+way this error shows up unexpectedly.
+
+export const quickAnswerFacts = [
+  { text: 'Means: the divisor evaluated to zero', type: 'warn' },
+  { text: 'A blank cell counts as zero in division', type: 'warn' },
+  { text: 'Check why the denominator is zero before reaching for IFERROR', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=B2/C2 → #DIV/0! (if C2 is 0 or blank)'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**Direct division by a blank or zero cell** — by far the most common
+case, often because a row's data hasn't been filled in yet:
+
+<ExcelCode>{`=B2/C2 → #DIV/0! (C2 is blank)`}</ExcelCode>
+
+**[MOD](/docs/math/mod): a divisor of zero:**
+
+<ExcelCode>{`=MOD(10, 0) → #DIV/0!`}</ExcelCode>
+
+**[AVERAGE](/docs/math/average): no numeric values to average** —
+an empty range, or a range of entirely text/blank cells:
+
+<ExcelCode>{`=AVERAGE(A1:A10) → #DIV/0! (no numeric values in the range)`}</ExcelCode>
+
+**[STDEV](/docs/statistical/stdev) and similar: fewer than two
+numeric values**, since sample variance is undefined for a single
+point:
+
+<ExcelCode>{`=STDEV(5) → #DIV/0!`}</ExcelCode>
+
+**Percent-of-total style formulas where the total is genuinely zero**
+— [PERCENTOF](/docs/math/percentof) and anything built on the same
+`SUM(subset)/SUM(total)` pattern returns `#DIV/0!` if `data_all`
+sums to zero, exactly like any other division.
+
+## How to fix it
+
+1. **Trace why the denominator is zero or blank** before assuming the
+   formula itself is wrong — often it means a row's data hasn't been
+   entered yet, which is useful information, not a bug to paper over.
+2. **Wrap division in `IF(denominator=0, ..., ...)`** when a zero
+   denominator is a real, expected possibility rather than a one-off
+   data-entry gap — this makes the "what happens when it's zero"
+   decision explicit instead of defaulting to IFERROR's generic
+   fallback.
+3. **For AVERAGE/STDEV-family functions**, confirm the range actually
+   contains the numeric values you expect — a range that looks
+   populated can still be entirely text if it was pasted from
+   somewhere that didn't preserve number formatting.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#DIV/0!` along with
+every other error type. [ERROR.TYPE](/docs/info/error-type) returns
+`2` for it specifically, while [ISERROR](/docs/info/iserror) returns
+`TRUE` for it along with every error type.
+
+## Not the same as #NUM! or #VALUE!
+
+`#NUM!` means a numeric operation produced a result Excel can't
+represent — out of range, or mathematically impossible, like a
+negative square root. `#DIV/0!` is narrower and more specific: the
+operation is division, and the divisor is exactly zero (or blank).
+`#VALUE!` is different in kind — a type mismatch, not a numeric
+result problem at all.
+
+export const faqs = [
+  {
+    question: 'Why does dividing by a blank cell return #DIV/0! instead of just 0?',
+    answer: "Excel treats a blank cell as the number 0 when it's used in arithmetic, and division by 0 is mathematically undefined — so the blank cell behaves exactly like typing a literal 0 into the divisor, producing #DIV/0! either way.",
+  },
+  {
+    question: 'Does IFERROR fix the zero-denominator problem, or just hide it?',
+    answer: "Just hide it, in the cell displaying the formula — the underlying reason the denominator is zero (a missing value, an empty category, a total that hasn't been calculated yet) is unchanged. IF(denominator=0, ...) makes that case an explicit, visible decision instead.",
+  },
+  {
+    question: 'Can #DIV/0! happen even when there\'s no division symbol anywhere in the formula?',
+    answer: "Yes — several statistical functions divide internally as part of their calculation (variance and standard deviation functions divide by a sample-size-minus-one term, for example), so a function call with no visible \"/\" can still return #DIV/0! if that internal denominator comes out to zero.",
+  },
+  {
+    question: 'Is a #DIV/0! from PERCENTOF the same situation as a manual SUM/SUM formula dividing by zero?',
+    answer: "Yes — PERCENTOF is logically identical to SUM(data_subset)/SUM(data_all) under the hood, so it fails the same way under the same condition: if data_all sums to zero, both return #DIV/0! for the same underlying reason.",
+  },
+];
+
+<Faq items={faqs} />

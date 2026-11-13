@@ -1,0 +1,102 @@
+---
+title: "#SPILL!"
+description: A dynamic array formula is correct, but something is blocking the cells it needs to spill its results into.
+---
+
+`#SPILL!` is different from most Excel errors in one important way:
+the formula itself is almost always correct. [FILTER](/docs/arrays/filter),
+[SORT](/docs/arrays/sort), [UNIQUE](/docs/arrays/unique), and every
+other dynamic-array function need to write their full result across
+multiple cells — `#SPILL!` means Excel knows exactly what the answer
+should be, but can't physically place it there.
+
+export const quickAnswerFacts = [
+  { text: 'Means: the result can\'t spill — something\'s blocking the destination cells', type: 'warn' },
+  { text: 'The formula is almost always correct — this is a blocked range, not a bug', type: 'check' },
+  { text: 'Clearing the blocking cells recalculates instantly, no re-entry needed', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=FILTER(A2:B10, B2:B10>100) → #SPILL! (cells below already contain data)'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**Cells in the spill range already contain data.** By far the most
+common cause — a dynamic-array formula needs every cell in its
+output range to be empty, and even one occupied cell anywhere in that
+range blocks the whole result:
+
+<ExcelCode>{`=FILTER(A2:B10, B2:B10>100) → #SPILL! (something is typed in the cells below)`}</ExcelCode>
+
+**The formula sits inside an Excel Table.** Tables manage their own
+row/column structure, which doesn't support a formula spilling
+outside its own cell the way a normal worksheet range does — a
+dynamic-array formula inside a Table typically needs to be moved
+outside it.
+
+**Merged cells anywhere in the spill range.** A merged cell can't be
+partially written to, so it blocks a spilling formula the same way an
+occupied cell does, even if the merged cell itself displays nothing.
+
+**The result is larger than it should be, usually from a formula
+mistake one step upstream** — a `SEQUENCE` or `RANDARRAY` sized far
+larger than intended, or a `UNIQUE`/`SORT` wrapped around a
+whole-column reference like `A:A` instead of a bounded range,
+producing a spill range bigger than the sheet has room for below it.
+
+## How to fix it
+
+1. **Select the formula cell and look at the highlighted outline** —
+   Excel shows exactly which range it's trying to spill into, which
+   makes it obvious what's in the way.
+2. **Clear or move whatever's occupying that range.** No need to
+   re-enter the formula — the moment the blocking cells are empty,
+   Excel recalculates the spill automatically.
+3. **If the formula is inside a Table**, move it to a normal
+   worksheet range outside the Table's boundaries.
+4. **If the spill range looks too large**, check the source range for
+   an accidental whole-column reference (`A:A`) where a bounded range
+   (`A2:A500`) was intended.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) catches `#SPILL!` along with every
+other error type, but it's worth pausing before reaching for it here
+— since the formula itself is almost always correct, suppressing the
+error hides a real, fixable blockage rather than working around an
+actual formula bug. [ERROR.TYPE](/docs/info/error-type) has no
+dedicated code for `#SPILL!` — it predates dynamic arrays and only
+covers the classic seven error types (`#NULL!` through `#N/A`).
+[ISERROR](/docs/info/iserror) still returns `TRUE` for it, same as
+any other error.
+
+## Not the same as #REF! or #VALUE!
+
+`#REF!` means a reference that existed is now gone. `#VALUE!` means
+an input's type is wrong. `#SPILL!` is different in kind from both —
+nothing is broken or invalid about the formula or its inputs; the
+calculated result is sitting there correctly, just unable to be
+written into cells that are already occupied.
+
+export const faqs = [
+  {
+    question: 'Do I need to re-enter the formula after fixing a #SPILL! error?',
+    answer: "No — clearing whatever was blocking the spill range is enough. Excel recalculates the formula automatically the moment the destination cells are free, the same way any other formula recalculates when its inputs change.",
+  },
+  {
+    question: 'Why does #SPILL! happen inside an Excel Table even with the destination cells empty?',
+    answer: "Excel Tables manage their own fixed row and column structure, which doesn't support a single formula writing results into other rows the way a spill does on a normal range. A dynamic-array formula generally needs to live outside a Table to spill at all, regardless of whether the cells below it are empty.",
+  },
+  {
+    question: 'Can a single merged cell really block an entire spill range?',
+    answer: "Yes — a dynamic-array formula needs every cell in its output range to be a normal, unmerged, empty cell. One merged cell anywhere in that range is enough to block the whole result, the same as if that cell already contained typed data.",
+  },
+  {
+    question: 'Why doesn\'t ERROR.TYPE have a code for #SPILL!?',
+    answer: "ERROR.TYPE's numbered table (1 through 7) predates dynamic arrays and #SPILL! entirely, so it was never extended to cover the newer error. ISERROR still detects #SPILL! correctly since it just checks for any error type, but ERROR.TYPE can't return a specific code for it.",
+  },
+];
+
+<Faq items={faqs} />
