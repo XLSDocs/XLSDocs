@@ -12,6 +12,27 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-11-13',
+    title: 'An errors reference, indexed by the error itself',
+    description:
+      "Seven new pages under Docs → Errors — #REF!, #VALUE!, #NAME?, #N/A, #DIV/0!, #NUM!, and #SPILL! — for starting from what's actually in the cell rather than needing to already know which function caused it. Each one explains what the error means, the real ways it happens (grounded in the function pages that already documented them — SQRT's negative input, RATE/IRR's convergence failures, FILTER/SORT's blocked spill ranges, and more), how to fix it, and how it differs from the errors people most often confuse it with.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-13',
+    title: 'Two interactive diagram tutorials: Pareto and waterfall charts',
+    description:
+      'A new tutorial format — a real, computed SVG chart with numbered callouts walking through how it works, not a static screenshot. The Pareto chart tutorial covers the 80/20 cutoff and a RANK.EQ tie-break using SORT and SCAN; the waterfall chart tutorial covers the native Excel 2016+ chart type plus the manual stacked-column technique, and the trap of computing the ending bar from its own deltas instead of an independently verified number.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-12',
+    title: '112 function pages linked from their own category page',
+    description:
+      "Found via an audit, not a bug report: 112 real, live function pages across 6 categories — 86 of them in Statistical alone — were reachable by sidebar, search, or direct link, but never added to their category page's own list of functions. Fixed across Database, Financial, Info, Logical, Lookup, and Statistical.",
+    tags: ['Improvement'],
+  },
+  {
     date: '2026-11-12',
     title: 'JIS, EUROCONVERT, CALL, and REGISTER.ID',
     description:
