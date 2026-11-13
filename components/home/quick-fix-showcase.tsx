@@ -3,7 +3,7 @@ import { ExcelCode } from '@/components/excel-code';
 
 export function QuickFixShowcase() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto w-full max-w-6xl px-6 py-20">
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div className="order-2 lg:order-1 gradient-border-card overflow-hidden rounded-xl">
           <div className="flex items-center gap-2 border-b border-fd-border px-4 py-3">

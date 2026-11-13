@@ -36,7 +36,7 @@ export const TOOLS: { href: string; label: string; description: string; icon: Lu
 
 export function ToolsShowcase() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto w-full max-w-6xl px-6 py-20">
       <div className="mb-10 text-center">
         <p className="font-mono text-xs tracking-wider text-fd-primary uppercase">
           No AI required

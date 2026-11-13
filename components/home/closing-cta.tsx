@@ -11,7 +11,7 @@ import Link from 'next/link';
 export function ClosingCta() {
   return (
     <section className="border-t border-fd-border bg-fd-card/40">
-      <div className="mx-auto max-w-6xl px-6 py-16 text-center">
+      <div className="mx-auto w-full max-w-6xl px-6 py-16 text-center">
         <span className="font-mono text-xs tracking-wider text-fd-muted-foreground uppercase">
           Get started
         </span>

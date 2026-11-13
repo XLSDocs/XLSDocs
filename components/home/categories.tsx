@@ -39,7 +39,7 @@ export function Categories({ categories }: { categories: FunctionCategory[] }) {
   const sorted = [...categories].sort((a, b) => b.functions.length - a.functions.length);
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto w-full max-w-6xl px-6 py-20">
       <div className="mb-10 text-center">
         <p className="font-mono text-xs tracking-wider text-fd-primary uppercase">
           Every angle covered

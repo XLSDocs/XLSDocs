@@ -2,7 +2,7 @@ import { Sparkles, Send } from 'lucide-react';
 
 export function AskClaudeShowcase() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto w-full max-w-6xl px-6 py-20">
       <div className="grid items-center gap-12 lg:grid-cols-2">
         <div>
           <p className="font-mono text-xs tracking-wider text-fd-primary uppercase">

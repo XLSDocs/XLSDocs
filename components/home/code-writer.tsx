@@ -194,7 +194,7 @@ export function CodeWriterSection() {
   const [speed, setSpeed] = useState<Speed>('Normal');
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
+    <section className="mx-auto w-full max-w-6xl px-6 py-20">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="mb-2 font-mono text-xs tracking-wider text-fd-primary uppercase">
