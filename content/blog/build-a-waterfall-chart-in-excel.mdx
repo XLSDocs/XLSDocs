@@ -1,0 +1,129 @@
+---
+title: "How to Build a Waterfall Chart in Excel (and Why the Ending Bar Matters Most)"
+description: "A waterfall chart shows how a starting number becomes an ending number, one step at a time. Here's how to build one, plus the trap almost everyone hits with the final bar."
+date: "2026-11-13"
+category: Tutorials
+readTime: 6 min read
+---
+
+A waterfall chart answers a different question than a bar chart. A
+bar chart says "here are five numbers." A waterfall chart says "here's
+how we got from this number to that number" — starting cash, plus
+revenue, minus costs, equals ending cash, each step shown as a bar
+that floats from where the last one left off.
+
+<WaterfallChart
+  items={[
+    { label: "Starting Cash", value: 50, type: "total" },
+    { label: "Revenue", value: 120, type: "delta" },
+    { label: "COGS", value: -45, type: "delta" },
+    { label: "Opex", value: -38, type: "delta" },
+    { label: "Taxes", value: -12, type: "delta" },
+    { label: "Ending Cash", value: 75, type: "total" },
+  ]}
+  badges={[
+    { atIndex: 0, color: "blue", note: "Total bars anchor at zero. Starting Cash and Ending Cash are both checkpoints, not deltas — they show an actual verified number, not a running calculation." },
+    { atIndex: 1, color: "teal", note: "Positive bars float upward from the previous total. Revenue adds 120 on top of the 50 starting point, reaching 170." },
+    { atIndex: 2, color: "red", note: "Negative bars float downward from the previous total. COGS subtracts 45 from 170, landing at 125 — the bar hangs below where the last one ended, not below zero." },
+    { atIndex: 4, color: "red", note: "Dashed connector lines link each bar's end to the next bar's start — that visual staircase is what makes it a waterfall chart instead of a plain bar chart." },
+    { atIndex: 5, color: "blue", note: "The ending total bar should land exactly where the running math says it should (75). If it doesn't, a delta is missing or wrong — the chart just caught a real error." },
+  ]}
+/>
+
+(All figures in $K — in thousands of dollars.)
+
+## The fast path: Excel's native Waterfall chart
+
+Since Excel 2016, **Insert → Charts → Waterfall** builds one of these
+automatically from a plain list of values. Right-click any bar you
+want treated as a running total (not a delta) and choose **Set as
+Total** — that's what tells Excel to anchor it at zero instead of
+floating it from the previous bar. For most day-to-day use, this is
+genuinely the right tool: no formulas, no stacked-column trick.
+
+The manual build below is worth knowing anyway — for versions before
+2016, for tools that don't have a native waterfall type, and because
+building it by hand is what makes the "why does the ending bar not
+match" failure mode (see below) obvious instead of mysterious.
+
+## Step 1: get the running total right
+
+Every floating bar's position depends on the running total *before*
+it, not just its own value. The classic locked-range approach:
+
+<ExcelCode>{`=SUM($B$2:B2)`}</ExcelCode>
+
+Copied down, this gives a running total after each row. The bar for
+any given row then needs to float between **yesterday's** running
+total and **today's**:
+
+<ExcelCode>{`running_before = running_total one row up
+running_after  = running_total this row`}</ExcelCode>
+
+## Step 2: separate total bars from delta bars
+
+A total bar (Starting Cash, Ending Cash) and a delta bar (Revenue,
+COGS) are drawn completely differently — one anchors at zero, one
+floats — so the data needs a column marking which is which:
+
+<ExcelCode>{`=IF(C2="total", 0, MIN(running_before, running_after))`}</ExcelCode>
+
+This is the "base" value for a stacked-column chart: for a total bar
+it's `0` (the bar starts from the bottom of the chart), for a delta
+bar it's the *lower* of the two running-total checkpoints (the bar
+starts from wherever the lower edge actually is, whether that's
+rising or falling).
+
+## Step 3: build it as a stacked column (the manual technique)
+
+Without the native chart type, a waterfall is a stacked column chart
+with three series layered on top of each other:
+
+- **Base** — the formula above, given **no fill** so it's invisible.
+  This is what pushes each visible bar up to float at the right
+  height instead of starting from zero.
+- **Increase** — `=IF(AND(C2="delta", B2>0), B2, 0)`, filled green.
+- **Decrease** — `=IF(AND(C2="delta", B2<0), [ABS](/docs/math/abs)(B2), 0)`,
+  filled red.
+
+Total bars need a fourth series the same way, filled a distinct
+color, so Starting Cash and Ending Cash read differently from the
+deltas between them.
+
+## The part that trips people up
+
+The ending total bar isn't calculated from the chart — it should be
+an **independently known, verified number**: the actual ending cash
+balance from your accounting system, not a formula that just sums the
+deltas above it. That distinction is the entire point of putting it
+on the chart at all.
+
+If you instead compute Ending Cash as `=SUM(deltas) + Starting Cash`,
+the chart can never disagree with itself — it'll always "balance,"
+even if a real expense category is missing from the list entirely.
+Pull the ending number from an independent source, and a waterfall
+chart becomes a genuine check: if the bars' running math doesn't land
+on the verified ending number, something real is unaccounted for,
+and the chart just told you before anyone had to go looking for it
+by hand.
+
+export const faqs = [
+  {
+    question: 'Do I need the manual stacked-column technique if I have Excel 2016 or later?',
+    answer: "No — the native Insert → Waterfall chart type handles the floating-bar geometry automatically, including the invisible base series. The manual technique is worth knowing for older Excel versions, tools without a native waterfall type, or when you specifically need to customize the base-bar logic beyond what the native chart exposes.",
+  },
+  {
+    question: "Why doesn't the ending bar in my chart match my running total?",
+    answer: "This almost always means a real line item is missing or wrong, not a chart bug — if the ending bar is pulled from an independently verified number (like an actual account balance) rather than calculated from the visible deltas, a mismatch means something that affected the real ending number isn't represented in your delta rows.",
+  },
+  {
+    question: 'Can a waterfall chart have more than one total/checkpoint bar in the middle, not just at the start and end?',
+    answer: "Yes — a \"Subtotal\" checkpoint partway through (e.g. \"Gross Profit\" between Revenue/COGS and Opex/Taxes) is common and works the same way as the start/end total bars: anchored at zero, marked as a total rather than a delta, and the running total afterward continues from that checkpoint rather than from the original starting bar.",
+  },
+  {
+    question: 'What happens if a delta value is exactly zero?',
+    answer: "It draws as a bar with no height at that point on the staircase — visually just a connector line with no visible green or red segment. It's not an error, just a step that happened to contribute nothing.",
+  },
+];
+
+<Faq items={faqs} />
