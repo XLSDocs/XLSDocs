@@ -1,0 +1,147 @@
+---
+title: "#REF!"
+description: A formula points to a cell, range, or sheet that no longer exists — almost always because something it depended on got deleted, moved, or renamed.
+---
+
+`#REF!` means a formula's reference is no longer valid — not "wrong
+value," but "this cell/range/sheet doesn't exist anymore." It's one of
+the few Excel errors that's usually not a typo or a logic mistake; it's
+a side effect of something else changing after the formula was
+written.
+
+export const quickAnswerFacts = [
+  { text: 'Means: a reference points to nothing', type: 'warn' },
+  { text: 'Most common cause: a deleted row, column, or sheet', type: 'warn' },
+  { text: 'Undo (Ctrl+Z) right after the delete is often the actual fix', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SUM(A2:A10) → #REF! (after row 5 was deleted)'}
+  facts={quickAnswerFacts}
+/>
+
+## What actually breaks
+
+Most Excel errors come from a formula being evaluated on bad input —
+`#VALUE!` from text where a number was expected, `#DIV/0!` from a
+zero denominator. `#REF!` is different: the formula's *reference*
+itself stops pointing anywhere. Delete a row a formula referenced,
+and Excel doesn't leave the old address behind — it rewrites the
+formula with `#REF!` in place of the cell that's gone, permanently,
+until you fix it by hand.
+
+<Callout type="warn">
+  This is the one error type where the broken part shows up inside the
+  formula itself, not just in the result. Click a cell showing `#REF!`
+  and the formula bar might literally read `=SUM(A2:#REF!)` — the
+  reference was overwritten at the moment of deletion, not
+  recalculated from an address that happens not to exist.
+</Callout>
+
+## Common causes
+
+**A row, column, or sheet a formula depended on was deleted.** By far
+the most common cause, and not specific to any one function — any
+formula referencing a cell is vulnerable if that cell's row or column
+gets deleted later:
+
+<ExcelCode>{`=A1+B1   (then column B is deleted)   →  =A1+#REF!`}</ExcelCode>
+
+**[VLOOKUP](/docs/lookup/vlookup) / [HLOOKUP](/docs/lookup/hlookup):
+`col_index_num`/`row_index_num` points past the table's actual
+width/height:**
+
+<ExcelCode>{`=VLOOKUP(A2, A1:B10, 3, FALSE) → #REF! (the table is only 2 columns wide)`}</ExcelCode>
+
+**[INDEX](/docs/lookup/index): the row or column number is outside
+the array's bounds:**
+
+<ExcelCode>{`=INDEX(A1:A5, 8) → #REF! (there are only 5 rows)`}</ExcelCode>
+
+**[OFFSET](/docs/lookup/offset): the offset moves past the edge of
+the sheet:**
+
+<ExcelCode>{`=OFFSET(A1, -5, 0) → #REF! (there's no row above row 1)`}</ExcelCode>
+
+**[INDIRECT](/docs/lookup/indirect): the text doesn't resolve to a
+real sheet or range** — usually because the sheet it names was
+renamed or deleted after the formula was written:
+
+<ExcelCode>{`=INDIRECT("Sales!A1") → #REF! (if the "Sales" sheet was renamed)`}</ExcelCode>
+
+**[GETPIVOTDATA](/docs/lookup/getpivotdata): the field/item
+combination no longer exists in the PivotTable** — often because it
+was filtered, collapsed, or the source data changed:
+
+<ExcelCode>{`=GETPIVOTDATA("Sum of Sales", A3, "Region", "West") → #REF!`}</ExcelCode>
+
+**[AGGREGATE](/docs/math/aggregate): `function_num` or `options` is
+outside its valid 1–19 / 0–7 range:**
+
+<ExcelCode>{`=AGGREGATE(25, 6, A2:A10) → #REF! (25 isn't a valid function_num)`}</ExcelCode>
+
+**[SHEET](/docs/info/sheet) / [SHEETS](/docs/info/sheets): passed an
+actual broken reference**, as opposed to a sheet name that just
+doesn't match anything (which returns `#N/A` instead):
+
+<ExcelCode>{`=SHEET(Sheet1!#REF) → #REF!`}</ExcelCode>
+
+## How to fix it
+
+1. **If you just deleted something, undo it first.** `Ctrl+Z`
+   immediately after the delete restores the row/column/sheet and
+   every formula that referenced it — faster and more reliable than
+   manually rebuilding the reference afterward.
+2. **If undo isn't available anymore**, find what the formula *should*
+   point to now and retype that part of the reference by hand. Excel
+   can't infer the original address once it's gone — the `#REF!` text
+   in the formula is a placeholder, not a clue to what used to be
+   there.
+3. **If it's coming from a function argument** (`col_index_num`,
+   `row_num`, an `OFFSET` amount, `function_num`), check that argument
+   against the table/array's actual current size — it's common for
+   this to break after rows or columns are added or removed, even
+   when the formula itself was never edited.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#REF!` along with every
+other error type, returning a fallback value instead:
+
+<ExcelCode>{`=IFERROR(VLOOKUP(A2, A1:B10, 3, FALSE), "check table range")`}</ExcelCode>
+
+To detect specifically `#REF!` rather than any error,
+[ERROR.TYPE](/docs/info/error-type) returns `4` for it (and a
+different number for every other error type), while
+[ISERROR](/docs/info/iserror) and [ISERR](/docs/info/iserr) both
+return `TRUE` for it along with every error except `#N/A`.
+
+## Not the same as #NAME? or #N/A
+
+`#NAME?` means Excel doesn't recognize something in the formula at
+all — a misspelled function name, an undefined name. `#N/A` means a
+lookup ran successfully but found no match. `#REF!` is narrower than
+both: the formula is written correctly and Excel understands every
+part of it, but a specific cell/range/sheet reference inside it no
+longer exists.
+
+export const faqs = [
+  {
+    question: 'Can #REF! be fixed automatically, or does it always need manual editing?',
+    answer: "Undo (Ctrl+Z) fixes it automatically, but only in the moment right after the delete that caused it — it restores the deleted row/column/sheet along with every formula that referenced it. Once other changes happen after the delete, undo is no longer available and the reference has to be rebuilt by hand.",
+  },
+  {
+    question: 'Why does my formula bar show #REF! inside the formula, not just in the result?',
+    answer: "Because #REF! isn't calculated from a bad value the way #VALUE! or #DIV/0! are — it's what Excel writes into the formula's text the moment a reference it depended on is deleted. The formula itself is permanently altered, not just its displayed result.",
+  },
+  {
+    question: 'Does copying a formula to a new location cause #REF!?',
+    answer: "It can, if the copy pushes a relative reference before the start of the sheet (e.g. copying =A1 one column to the left has nowhere to point and returns #REF!). This is different from the deleted-reference case — nothing was deleted, the copied formula's relative reference just has nowhere valid to land.",
+  },
+  {
+    question: "Is #REF! the same error VLOOKUP returns for a missing lookup value?",
+    answer: "No — a VLOOKUP that can't find lookup_value in the table returns #N/A, not #REF!. VLOOKUP returns #REF! specifically when col_index_num points past the table's actual width, which is a different failure (the argument is invalid) from the lookup simply not matching anything.",
+  },
+];
+
+<Faq items={faqs} />
