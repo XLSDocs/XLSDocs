@@ -2,7 +2,10 @@
 
 import type { TOCItemType } from 'fumadocs-core/toc';
 import { TOCProvider, TOCScrollArea } from 'fumadocs-ui/components/toc';
-import { TOCItem, TOCItems } from 'fumadocs-ui/components/toc/clerk';
+// 'default' (Fumadocs' own name for its plain style, confusingly not the
+// JS default export), not 'clerk' — matches the docs pages' own TOC, which
+// never opts into 'clerk' and so renders with this same plain style.
+import { TOCItem, TOCItems } from 'fumadocs-ui/components/toc/default';
 
 export function PostToc({ items }: { items: TOCItemType[] }) {
   if (items.length === 0) return null;
