@@ -1,0 +1,73 @@
+---
+title: How to remove duplicate values
+description: UNIQUE's live, formula-based list vs. the one-time Remove Duplicates command — and why they solve genuinely different problems.
+---
+
+"Remove duplicates" usually means one of two different things: get a
+clean, deduplicated **list** to work with elsewhere (without touching
+the original data), or permanently **delete** the duplicate rows from
+the data itself. Excel has a different tool for each.
+
+## A live, deduplicated list: UNIQUE
+
+<ExcelCode>{`=UNIQUE(A2:A100)`}</ExcelCode>
+
+[UNIQUE](/docs/arrays/unique) spills a list of every distinct value
+in `A2:A100` into the cells below it — automatically, and it updates
+if the source range changes. The original data in `A2:A100` is left
+completely untouched.
+
+<Callout type="idea">
+  `UNIQUE`'s third argument, `exactly_once`, means something
+  different from "distinct" — it returns only values that appear
+  **exactly one time**, excluding anything that repeats at all. Leave
+  it `FALSE` (or omitted) for the ordinary "one of each" behavior.
+</Callout>
+
+## Permanently deleting duplicate rows: Remove Duplicates
+
+For actually deleting duplicate rows from the data itself — not just
+viewing a clean list elsewhere — use the ribbon command instead of a
+formula: select the range, then **Data → Data Tools → Remove
+Duplicates**. Choose which columns define a "duplicate" (matching on
+every column, or only some of them), and Excel deletes the extra rows
+in place.
+
+<Callout type="warn">
+  **Remove Duplicates is destructive and one-time** — it deletes rows
+  immediately with no live link back to the source, and provides no
+  dynamic formula to undo later (only Ctrl+Z, immediately after).
+  UNIQUE is the safer choice whenever the original data should stay
+  intact.
+</Callout>
+
+## Counting how many times each value repeats, instead of removing anything
+
+<ExcelCode>{`=COUNTIF(A2:A100, A2)`}</ExcelCode>
+
+Sometimes the real goal is just to flag duplicates for review rather
+than remove them — [COUNTIF](/docs/math/countif) counting each row
+against the whole range shows a number greater than 1 for any value
+that repeats, without deleting or spilling anything.
+
+export const faqs = [
+  {
+    question: 'Does UNIQUE care about letter case?',
+    answer: 'No — UNIQUE treats "Apple" and "apple" as the same value, same as most other Excel text comparisons. There is no case-sensitive mode.',
+  },
+  {
+    question: 'Can Remove Duplicates check only some columns, not the whole row?',
+    answer: 'Yes — its dialog lists every column with checkboxes, and only the checked columns are compared when deciding whether two rows count as duplicates. Unchecked columns are ignored for the comparison (but still deleted along with the rest of a duplicate row).',
+  },
+  {
+    question: "What's the fastest way to just see if a list has any duplicates at all, without listing them?",
+    answer: '=COUNTA(A2:A100)-COUNTA(UNIQUE(A2:A100)) — if the result is greater than 0, the list has at least one duplicate; the number itself is how many extra (repeated) entries exist beyond one of each.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [UNIQUE](/docs/arrays/unique) — live, formula-based deduplicated list.
+- [COUNTIF](/docs/math/countif) — count occurrences without removing anything.

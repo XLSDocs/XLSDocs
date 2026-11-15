@@ -1,0 +1,77 @@
+---
+title: How to look up a value using multiple criteria
+description: Neither VLOOKUP nor a plain XLOOKUP take more than one lookup condition directly — here are the two real ways to combine criteria anyway.
+---
+
+A regular lookup matches on one column. The moment the question
+becomes "find the price for this product **in this specific region**"
+— two conditions, not one — VLOOKUP and a plain XLOOKUP call can't
+express it directly. Two techniques fix that, with the same tradeoff
+either way: readability vs. compatibility.
+
+## The XLOOKUP concatenation trick
+
+<ExcelCode>{`=XLOOKUP(G1 & G2, B2:B100 & C2:C100, D2:D100)`}</ExcelCode>
+
+[XLOOKUP](/docs/lookup/xlookup) only takes one `lookup_array`, so
+glue both criteria together with `&` on both sides — the lookup value
+becomes `G1&G2` (product and region concatenated), and the lookup
+array becomes `B2:B100&C2:C100` (the same two columns, concatenated
+row by row). Where they match exactly, XLOOKUP returns the
+corresponding row from `D2:D100`.
+
+<Callout type="warn">
+  Concatenation can produce a **false match** if the boundary between
+  values is ambiguous — `"AB" & "C"` and `"A" & "BC"` both produce
+  `"ABC"`. This is rarely a real problem with product codes or dates,
+  but worth a second look if the criteria values are short, variable-
+  length text that could collide at the seam.
+</Callout>
+
+## The INDEX/MATCH array formula
+
+<ExcelCode>{`=INDEX(D2:D100, MATCH(1, (B2:B100=G1) * (C2:C100=G2), 0))`}</ExcelCode>
+
+This works differently: `(B2:B100=G1)` produces an array of
+TRUE/FALSE for every row, same for `(C2:C100=G2)`. Multiplying two
+boolean arrays coerces them to `1`/`0` — a row is `1` only where
+**both** are TRUE. [MATCH](/docs/lookup/match) finds the position of
+that single `1`, and [INDEX](/docs/lookup/index) returns the value at
+that position in `D2:D100`.
+
+<Callout type="idea">
+  In Excel 365, this formula works entered normally — no special
+  keystroke needed. In Excel 2019 or earlier, the same formula needs
+  to be entered as a legacy **array formula** with Ctrl+Shift+Enter
+  instead of just Enter, or it returns an incorrect result instead of
+  an error.
+</Callout>
+
+## Which one to use
+
+The XLOOKUP version reads more naturally and needs nothing special to
+enter — the better default on Excel 365 or 2021. The INDEX/MATCH
+version is the one to reach for on an older, non-365 version, or in a
+workbook that needs to stay compatible with one.
+
+export const faqs = [
+  {
+    question: 'Can either technique handle more than two criteria?',
+    answer: 'Yes — the concatenation trick extends to any number of ranges joined with &, and the INDEX/MATCH version extends by multiplying in additional boolean arrays: (B2:B100=G1)*(C2:C100=G2)*(D2:D100=G3), and so on.',
+  },
+  {
+    question: 'Is there a function built specifically for multi-criteria lookups?',
+    answer: "Not a single dedicated one — XLOOKUP and INDEX/MATCH both need one of the techniques above. SUMIFS, COUNTIFS, and MAXIFS natively support multiple criteria for their specific aggregation, but they return a number, not an arbitrary looked-up value from another column.",
+  },
+  {
+    question: 'What happens if no row matches all the criteria?',
+    answer: 'XLOOKUP returns #N/A by default (or whatever its optional if_not_found argument specifies). The INDEX/MATCH version returns #N/A from the inner MATCH, since no row produces a 1 for it to find.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [XLOOKUP](/docs/lookup/xlookup) — modern lookup, Excel 365/2021 only.
+- [INDEX](/docs/lookup/index) and [MATCH](/docs/lookup/match) — the classic, version-compatible combination.

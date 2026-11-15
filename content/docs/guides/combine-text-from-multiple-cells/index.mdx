@@ -1,0 +1,73 @@
+---
+title: How to combine text from multiple cells
+description: The & operator, CONCAT, and TEXTJOIN each combine text — the real difference is what happens to separators and blank cells.
+---
+
+Combining a first and last name, or building a full address from
+separate columns, can be done three ways in Excel. They all join
+text — the differences show up around separators and blank cells.
+
+## The & operator
+
+<ExcelCode>{`=A2 & " " & B2`}</ExcelCode>
+
+The plain `&` operator joins any number of values with no function
+call at all — simple, and it works in every Excel version. Any
+separator (a space, a comma, a line break) has to be typed in by hand
+between each piece.
+
+## CONCAT
+
+<ExcelCode>{`=CONCAT(A2:C2)`}</ExcelCode>
+
+[CONCAT](/docs/text/concat) does the same join, but accepts a whole
+range directly instead of listing cells one by one with `&` — useful
+once there are more than two or three pieces to combine. It still
+inserts **no separator** between items.
+
+## TEXTJOIN
+
+<ExcelCode>{`=TEXTJOIN(", ", TRUE, A2:C2)`}</ExcelCode>
+
+[TEXTJOIN](/docs/text/textjoin) adds two things neither `&` nor
+CONCAT has: a `delimiter` inserted **between every item**, and an
+`ignore_empty` switch that skips blank cells automatically instead of
+leaving a double-comma or stray separator where one was.
+
+<Callout type="idea">
+  **TEXTJOIN's `ignore_empty` argument is the real reason to reach
+  for it** over CONCAT — joining a range where some cells are blank
+  (a missing middle name, an optional address line 2) with `&` or
+  CONCAT leaves visible gaps or doubled separators; TEXTJOIN with
+  `ignore_empty` set to `TRUE` collapses them cleanly.
+</Callout>
+
+## Which one to use
+
+- **`&`** — two or three pieces, no separator needed, maximum
+  compatibility.
+- **CONCAT** — a whole range, still no separator needed.
+- **TEXTJOIN** — a separator between items, or any blank cells that
+  need to be skipped rather than leaving a gap.
+
+export const faqs = [
+  {
+    question: 'Does CONCAT replace CONCATENATE entirely?',
+    answer: 'For new formulas, yes — CONCAT does everything CONCATENATE does plus accepts ranges directly. CONCATENATE still works for compatibility with older files, but Microsoft recommends CONCAT (or TEXTJOIN) going forward.',
+  },
+  {
+    question: "Can TEXTJOIN use a different delimiter between different items, not just one fixed one?",
+    answer: "Not directly — delimiter is a single fixed value applied between every pair of items. For genuinely different separators at different positions, build the string manually with &, or layer multiple TEXTJOIN/CONCAT calls together.",
+  },
+  {
+    question: 'Will combining text with & convert a number to text automatically?',
+    answer: 'Yes — & coerces any number it touches into its default text representation, which can occasionally produce an unwanted format (a date joined this way shows its serial number, not the displayed date). Wrap a number argument in TEXT first to control exactly how it\'s formatted: =A2 & " - " & TEXT(B2, "mm/dd/yyyy").',
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [CONCAT](/docs/text/concat) — join ranges, no separator.
+- [TEXTJOIN](/docs/text/textjoin) — join with a separator, with optional blank-skipping.

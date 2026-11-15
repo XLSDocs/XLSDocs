@@ -164,20 +164,23 @@ function getFunctionMdxFlags(
  * level deeper (`slugs.length === 2`, e.g. `.../lookup/xlookup/index.mdx`).
  * The docs root and the `test` placeholder page are excluded.
  *
- * `errors` and `shortcuts` are also excluded here even though their
- * sub-pages sit at the same `slugs.length === 2` depth
- * (`content/docs/errors/ref/index.mdx`, `content/docs/shortcuts/navigation/index.mdx`)
- * — those are error-code and keyboard-shortcut reference pages, not
- * callable Excel functions, and must never be counted toward the function
- * total or listed as a "function" on /functions. The docs sidebar, search,
- * sitemap, and llms.txt all read from `source.getPages()` directly instead
- * of this function, so both categories stay fully visible there regardless
- * of this filter.
+ * `errors`, `shortcuts`, and `guides` are also excluded here even though
+ * their sub-pages sit at the same `slugs.length === 2` depth
+ * (`content/docs/errors/ref/index.mdx`, `content/docs/shortcuts/navigation/index.mdx`,
+ * `content/docs/guides/count-cells-that-meet-a-condition/index.mdx`) —
+ * those are error-code, keyboard-shortcut, and task-based how-to pages,
+ * not callable Excel functions, and must never be counted toward the
+ * function total or listed as a "function" on /functions. The docs
+ * sidebar, search, sitemap, and llms.txt all read from `source.getPages()`
+ * directly instead of this function, so all three categories stay fully
+ * visible there regardless of this filter.
  */
+const NON_FUNCTION_CATEGORIES = new Set(['test', 'errors', 'shortcuts', 'guides']);
+
 export function getFunctionCatalog(): FunctionCategory[] {
   const pages = source.getPages();
   const categoryPages = pages.filter(
-    (p) => p.slugs.length === 1 && p.slugs[0] !== 'test' && p.slugs[0] !== 'errors' && p.slugs[0] !== 'shortcuts',
+    (p) => p.slugs.length === 1 && !NON_FUNCTION_CATEGORIES.has(p.slugs[0]),
   );
   const functionPages = pages.filter((p) => p.slugs.length === 2);
 

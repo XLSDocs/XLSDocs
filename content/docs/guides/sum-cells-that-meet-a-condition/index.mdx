@@ -1,0 +1,65 @@
+---
+title: How to sum cells that meet a condition
+description: SUMIF for a single condition, SUMIFS for one or more — and the one argument-order difference between them that trips people up.
+---
+
+Summing values only for rows that match a condition — sales in one
+region, invoices over a threshold, hours logged on a specific project
+— is SUMIF and SUMIFS territory. The logic is simple; the one real
+trap is that the two functions put their arguments in a different
+order from each other.
+
+## One condition: SUMIF
+
+<ExcelCode>{`=SUMIF(B2:B100, "West", C2:C100)`}</ExcelCode>
+
+[SUMIF](/docs/math/sumif) sums `C2:C100`, but only for rows where the
+matching cell in `B2:B100` equals `"West"`. `sum_range` comes
+**last**, and is even optional — leave it out and SUMIF sums the
+condition range itself instead.
+
+## Two or more conditions: SUMIFS
+
+<ExcelCode>{`=SUMIFS(C2:C100, B2:B100, "West", D2:D100, ">500")`}</ExcelCode>
+
+[SUMIFS](/docs/math/sumifs) sums `C2:C100` for rows where **every**
+condition is true — region is "West" **and** amount in `D2:D100` is
+over 500. Notice `sum_range` is now **first**.
+
+<Callout type="warn">
+  **SUMIF and SUMIFS put `sum_range` in opposite positions** — last in
+  SUMIF, first in SUMIFS. Switching between the two functions (adding
+  a second condition to an existing SUMIF, for instance) means
+  reordering the arguments, not just appending a new pair at the end.
+</Callout>
+
+## Summing with a numeric comparison instead of an exact match
+
+<ExcelCode>{`=SUMIF(C2:C100, ">500")`}</ExcelCode>
+
+A condition like `">500"` works directly as text in the formula —
+sums every value in `C2:C100` that's over 500, with no separate
+condition range needed since the range being summed and the range
+being tested are the same one here.
+
+export const faqs = [
+  {
+    question: "Why doesn't my SUMIF total match what I expect?",
+    answer: "Check that the condition range and sum range are the same size and properly aligned row-for-row — a common mistake is a sum_range that's shifted by a row or column relative to the condition range, which silently sums the wrong cells instead of erroring.",
+  },
+  {
+    question: 'Can I sum based on a date range, like "this month only"?',
+    answer: 'Yes — SUMIFS handles this with two conditions on the same date column: =SUMIFS(C2:C100, A2:A100, ">="&DATE(2026,1,1), A2:A100, "<"&DATE(2026,2,1)) sums everything in January 2026.',
+  },
+  {
+    question: 'Is SUMPRODUCT ever a better choice than SUMIFS?',
+    answer: "SUMPRODUCT can express OR logic and more complex conditions that SUMIFS's AND-only structure can't, at the cost of being noticeably harder to read. For anything SUMIFS can already express, SUMIFS is the clearer choice.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [SUMIF](/docs/math/sumif) — sum values matching a single condition.
+- [SUMIFS](/docs/math/sumifs) — sum values matching every one of several conditions.

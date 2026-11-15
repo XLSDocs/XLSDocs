@@ -1,0 +1,63 @@
+---
+title: How to compare two lists for differences
+description: Find what's in one list but not the other, using FILTER and COUNTIF together — plus a dragged-down formula for pre-365 Excel.
+---
+
+"Compare two lists" almost always means one specific question: which
+items are in List A but missing from List B (or the reverse)? Three
+approaches cover it, from a one-formula spilled result down to a
+version that works in every Excel release.
+
+## A live list of what's missing: FILTER + COUNTIF
+
+<ExcelCode>{`=FILTER(A2:A100, COUNTIF(B2:B100, A2:A100)=0)`}</ExcelCode>
+
+[COUNTIF](/docs/math/countif) with an entire range (`A2:A100`) as its
+criteria returns an array — one count per item in List A, counting
+how many times it appears in List B. Where that count is `0`, the
+item from List A isn't in List B at all. [FILTER](/docs/arrays/filter)
+keeps only those rows, spilling a clean list of exactly what's
+missing.
+
+Swap the two ranges to get it the other direction — items in List B
+missing from List A:
+
+<ExcelCode>{`=FILTER(B2:B100, COUNTIF(A2:A100, B2:B100)=0)`}</ExcelCode>
+
+## A per-row flag, compatible with every Excel version
+
+<ExcelCode>{`=IF(COUNTIF($B$2:$B$100, A2)=0, "Missing from List B", "Found")`}</ExcelCode>
+
+Dragged down alongside List A, this flags each row individually
+instead of spilling a separate list — works identically on every
+Excel version, including ones without dynamic arrays.
+
+## Highlighting the difference visually instead of listing it
+
+The same `COUNTIF(...)=0` logic also works directly as a Conditional
+Formatting rule (Home → Conditional Formatting → New Rule → "Use a
+formula") applied to List A, highlighting any cell with no match in
+List B in place — useful when the lists need to stay visually
+side-by-side rather than produce a separate output list.
+
+export const faqs = [
+  {
+    question: 'Does this approach care about the order of the two lists?',
+    answer: 'No — COUNTIF checks for presence anywhere in the comparison range, regardless of row position. The two lists don\'t need to be sorted or aligned row-for-row for this to work correctly.',
+  },
+  {
+    question: "What if I need to know which items are different but still present in both lists, not just what's missing?",
+    answer: "That's a different question — comparing a value in one list against the corresponding value in the other for the same key (price changed, status changed, etc.) is better handled with XLOOKUP to pull the matching row from each list side-by-side, then comparing the two results directly.",
+  },
+  {
+    question: 'Will this flag case differences, like "Apple" vs. "apple", as a mismatch?',
+    answer: 'No — COUNTIF\'s text comparison is case-insensitive, so "Apple" and "apple" count as the same value and won\'t show up as missing from either list.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [COUNTIF](/docs/math/countif) — count occurrences, the core comparison logic.
+- [FILTER](/docs/arrays/filter) — spill only the non-matching rows.

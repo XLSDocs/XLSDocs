@@ -1,0 +1,72 @@
+---
+title: How to count cells that meet a condition
+description: COUNTIF for a single condition, COUNTIFS for one or more — and why defaulting to COUNTIFS even for one condition is a reasonable habit.
+---
+
+Counting rows that match a condition — orders over $500, employees in
+a given department, cells that aren't blank — is one of the most
+common things a spreadsheet gets asked to do. Excel has two functions
+for it, and the difference between them is simpler than it looks.
+
+## One condition: COUNTIF
+
+<ExcelCode>{`=COUNTIF(B2:B100, "West")`}</ExcelCode>
+
+[COUNTIF](/docs/math/countif) counts how many cells in `B2:B100`
+equal `"West"`. It takes exactly one range and one condition — that's
+the whole function.
+
+## Two or more conditions: COUNTIFS
+
+<ExcelCode>{`=COUNTIFS(B2:B100, "West", C2:C100, ">500")`}</ExcelCode>
+
+[COUNTIFS](/docs/math/countifs) counts rows where **every** condition
+is true at once — region is "West" **and** amount is over 500. Add
+more `range, criteria` pairs for additional conditions; there's no
+hard limit on how many.
+
+<Callout type="idea">
+  **COUNTIFS also works perfectly fine with just one condition** —
+  `=COUNTIFS(B2:B100, "West")` returns exactly the same result as
+  `=COUNTIF(B2:B100, "West")`. Some people standardize on COUNTIFS
+  everywhere for this reason: one function to remember, and it's
+  already the right choice the moment a second condition shows up
+  later.
+</Callout>
+
+## A text condition that isn't an exact match
+
+Both functions accept wildcards in a text condition — `*` for any
+number of characters, `?` for exactly one:
+
+<ExcelCode>{`=COUNTIF(B2:B100, "West*")   ' matches "West", "Western", "West Coast", etc.`}</ExcelCode>
+
+## Counting non-blank cells instead of a specific value
+
+<ExcelCode>{`=COUNTIF(B2:B100, "<>")`}</ExcelCode>
+
+`"<>"` as the condition means "not blank" — a common way to count how
+many rows in a column actually have data, ignoring trailing blank
+rows in a range.
+
+export const faqs = [
+  {
+    question: 'Does COUNTIF work across multiple non-adjacent ranges?',
+    answer: 'No — a single COUNTIF or COUNTIFS call only takes one contiguous range per criteria pair. To total counts across several separate ranges, add multiple COUNTIF calls together, or restructure the data into one contiguous range if possible.',
+  },
+  {
+    question: 'Why does my COUNTIF return 0 even though I can see matching cells?',
+    answer: "The most common cause is a type mismatch — the condition is typed as text (\"500\") but the cells hold real numbers, or vice versa, or there's invisible leading/trailing whitespace in the text being compared. Wrapping the range in TRIM, or double-checking the cell type, usually resolves it.",
+  },
+  {
+    question: 'Is there a function to count based on an OR condition instead of AND?',
+    answer: 'COUNTIFS only combines conditions with AND logic. For an OR condition (count rows where region is "West" OR "East"), add separate COUNTIF calls together: =COUNTIF(B2:B100,"West")+COUNTIF(B2:B100,"East"), or use SUMPRODUCT with an array of conditions for more complex OR logic.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [COUNTIF](/docs/math/countif) — count rows matching a single condition.
+- [COUNTIFS](/docs/math/countifs) — count rows matching every one of several conditions.

@@ -1,0 +1,69 @@
+---
+title: How to split text into columns
+description: TEXTSPLIT's live formula vs. the one-time Text to Columns wizard vs. manual LEFT/RIGHT/MID/FIND — three ways to break apart a delimited string.
+---
+
+Splitting "Smith, John" into separate first- and last-name columns,
+or breaking a "City, State ZIP" string apart, comes up constantly
+with imported or pasted data. There's a modern formula, a classic
+wizard, and a manual fallback — pick based on whether the source data
+changes.
+
+## A live formula: TEXTSPLIT
+
+<ExcelCode>{`=TEXTSPLIT(A2, ", ")`}</ExcelCode>
+
+[TEXTSPLIT](/docs/text/textsplit) spills the pieces of `A2` into
+separate cells automatically, using `", "` as the delimiter. Change
+`A2` and the split result updates on its own — no re-running anything.
+
+## A one-time pass: Text to Columns
+
+For a genuinely one-time cleanup where a live formula isn't needed,
+**Data → Data Tools → Text to Columns** walks through a wizard:
+choose Delimited or Fixed Width, pick the delimiter, and Excel splits
+the selected column into however many columns the result needs —
+directly into static values, not a formula.
+
+<Callout type="warn">
+  **Text to Columns overwrites the columns to its right** unless
+  there's enough empty space already there — it isn't a formula, so
+  it doesn't ask before replacing whatever's already in those cells.
+  TEXTSPLIT, by contrast, spills into blank cells and throws a
+  catchable `#SPILL!` instead of silently overwriting anything.
+</Callout>
+
+## Manual extraction: LEFT, RIGHT, MID, and FIND
+
+Before TEXTSPLIT existed (any version before Excel 365), the manual
+equivalent combines position-finding with text extraction:
+
+<ExcelCode>{`=LEFT(A2, FIND(",", A2) - 1)          ' everything before the comma
+=TRIM(MID(A2, FIND(",", A2) + 1, 100)) ' everything after it, trimmed`}</ExcelCode>
+
+[FIND](/docs/text/find) locates the delimiter's position, and
+[LEFT](/docs/text/left) / [MID](/docs/text/mid) extract the text
+before or after it. This is the version-compatible fallback when
+TEXTSPLIT isn't available.
+
+export const faqs = [
+  {
+    question: 'Can TEXTSPLIT split on more than one possible delimiter at once?',
+    answer: 'Yes — col_delimiter accepts an array of delimiters: =TEXTSPLIT(A2, {",", ";"}) splits on either a comma or a semicolon, whichever appears.',
+  },
+  {
+    question: "Why does Text to Columns sometimes turn a column of numbers-as-text into dates unexpectedly?",
+    answer: 'Its wizard has a "Column data format" step per output column — if a column is left on "General" and the data happens to look like a date pattern, Excel can reformat it as a date during the split. Explicitly setting that column\'s format to "Text" in the wizard prevents it.',
+  },
+  {
+    question: 'Does TEXTSPLIT remove the original combined text from the source cell?',
+    answer: 'No — TEXTSPLIT spills its result into nearby blank cells, leaving the original cell with the full combined text completely untouched.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [TEXTSPLIT](/docs/text/textsplit) — live, spilled split.
+- [LEFT](/docs/text/left), [MID](/docs/text/mid) — manual, version-compatible extraction.

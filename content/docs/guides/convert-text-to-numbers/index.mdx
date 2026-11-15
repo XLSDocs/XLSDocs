@@ -1,0 +1,81 @@
+---
+title: How to convert text to real numbers
+description: A number imported as text looks identical but silently breaks SUM and sorting — four ways to fix it, from a formula to a zero-formula trick.
+---
+
+A column of "numbers" that won't SUM, sorts alphabetically instead of
+numerically, or shows a small green triangle in the corner — that's
+almost always a number stored as text, usually from a CSV import or
+a copy-paste from a web page. It looks identical to a real number but
+behaves completely differently.
+
+## The formula fix: VALUE
+
+<ExcelCode>{`=VALUE(A2)`}</ExcelCode>
+
+[VALUE](/docs/text/value) converts a number-like text string into an
+actual number. It returns `#VALUE!` if the text genuinely can't be
+parsed as a number — a useful signal that a cell isn't what it looks
+like.
+
+<Callout type="idea">
+  A plain **math operation also works** as a shortcut, with no
+  function call: `=A2*1`, `=A2+0`, or `=--A2` (double unary minus) all
+  coerce text-that-looks-like-a-number into a real number, since
+  Excel has to convert it to do the arithmetic anyway.
+</Callout>
+
+## The zero-formula fix: Paste Special → Multiply
+
+1. Put the number `1` in any empty cell and copy it.
+2. Select the range of text-numbers to fix.
+3. **Home → Paste → Paste Special → Multiply**, then OK.
+
+Excel multiplies every selected cell by 1, converting each one to a
+real number in place — no formula left behind afterward, and no
+helper column needed.
+
+## The one-click fix: the error-checking flag
+
+If Excel has flagged the cells as "Number Stored as Text" (a small
+green triangle in the corner, with a warning icon when selected),
+select the whole range, click the warning icon, and choose **Convert
+to Number** — Excel fixes every selected cell at once.
+
+<Callout type="warn">
+  This flag **doesn't always appear** — numbers imported from some
+  sources (certain CSV encodings, some database exports) are stored
+  as text without tripping Excel's error-checking heuristic at all.
+  Absence of the green triangle doesn't guarantee the values are
+  genuinely numeric; a quick `=ISNUMBER(A2)` check is more reliable.
+</Callout>
+
+## Checking whether a cell actually needs fixing
+
+<ExcelCode>{`=ISNUMBER(A2)`}</ExcelCode>
+
+Returns `FALSE` for text-that-looks-like-a-number, `TRUE` for a real
+number — the fastest way to confirm the diagnosis before applying any
+of the fixes above.
+
+export const faqs = [
+  {
+    question: 'Why does a text-number look identical to a real number in the cell?',
+    answer: 'Excel displays both the same way by default, but text is left-aligned by default and numbers are right-aligned — a quick visual tell if cell formatting hasn\'t been changed. The reliable check is ISNUMBER, not appearance.',
+  },
+  {
+    question: 'Does VALUE handle numbers formatted with a currency symbol or thousands separator?',
+    answer: 'Yes — VALUE("$1,234.56") correctly returns 1234.56; it understands the number formats Excel itself recognizes, not just plain digit strings.',
+  },
+  {
+    question: 'Will converting text to numbers change how the cell looks, like losing a leading zero?',
+    answer: "Yes, if the text held a leading zero (a ZIP code like \"02134\"), converting to a real number drops it, since 02134 and 2134 are the same number. If the leading zero needs to be preserved for display, keep the value as text and use a custom number format for display purposes instead, rather than converting it to a true number.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [VALUE](/docs/text/value) — convert text to a real number.
+- [ISNUMBER](/docs/info/isnumber) — check whether a cell already holds a real number.

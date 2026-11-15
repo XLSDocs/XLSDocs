@@ -24,13 +24,14 @@ const TAB_GROUPS: { folders: string[]; landing: string }[] = [
   { folders: ['text', 'date'], landing: '/docs/text' },
   { folders: ['financial', 'database'], landing: '/docs/financial' },
   { folders: ['arrays', 'vba', 'custom-functions', 'web'], landing: '/docs/arrays' },
-  // Their own tabs rather than folded into one of the groups above —
-  // neither Errors nor Shortcuts is a function category (see the comment
-  // on getFunctionCatalog() in lib/source.ts), so grouping either under
-  // e.g. "Lookup, Logical, Info & Errors" would mislabel a tab that's
-  // actually about functions.
+  // Their own tabs rather than folded into one of the groups above — none
+  // of Errors, Shortcuts, or Guides is a function category (see the
+  // comment on getFunctionCatalog() in lib/source.ts), so grouping any of
+  // them under e.g. "Lookup, Logical, Info & Errors" would mislabel a tab
+  // that's actually about functions.
   { folders: ['errors'], landing: '/docs/errors' },
   { folders: ['shortcuts'], landing: '/docs/shortcuts' },
+  { folders: ['guides'], landing: '/docs/guides' },
 ];
 
 // "A, B & C" — comma-separated with an ampersand before the last item,
