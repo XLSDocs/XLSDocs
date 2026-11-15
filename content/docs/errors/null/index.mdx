@@ -1,0 +1,96 @@
+---
+title: "#NULL!"
+description: Two ranges joined with a space (Excel's intersection operator) don't actually intersect — almost always a missing comma.
+---
+
+`#NULL!` is the rarest of Excel's classic error types, and almost
+always comes from one specific mistake: a space typed between two
+ranges where a comma was meant, which Excel reads not as a typo but
+as its own real operator — the **intersection operator** — asking for
+the cells the two ranges have in common.
+
+export const quickAnswerFacts = [
+  { text: 'Means: two ranges joined with a space share no cells', type: 'warn' },
+  { text: 'A space between ranges is a real operator — intersection — not a typo to Excel', type: 'warn' },
+  { text: 'The rarest classic error type; almost always a missing comma', type: 'check' },
+];
+
+<QuickAnswer
+  formula={'=SUM(A1:A5 C1:C5) → #NULL! (meant to type a comma, not a space)'}
+  facts={quickAnswerFacts}
+/>
+
+## What actually breaks
+
+<ExcelCode>{`=SUM(A1:A5 C1:C5)`}</ExcelCode>
+
+A comma between two ranges means "both of these." A space between two
+ranges means something entirely different: "only the cells common to
+both." `A1:A5` and `C1:C5` share no cells at all — different
+columns — so their intersection is empty, and `SUM` has nothing to
+add. The formula isn't malformed; it's asking a real, well-formed
+question that happens to have no answer.
+
+<Callout type="info">
+  The intersection operator is genuinely useful when the two ranges
+  **do** overlap — `=SUM(A1:C1 A1:A10)` returns the single cell `A1`,
+  the one cell common to a row and a column. `#NULL!` specifically
+  means this operator was used (intentionally or not) on two ranges
+  that share nothing.
+</Callout>
+
+## Common causes
+
+**A missing comma between function arguments** — by far the most
+common cause. A single accidental space where a comma belongs turns
+"sum these two ranges" into "sum what they have in common":
+
+<ExcelCode>{`=SUM(A1:A5, C1:C5)  → correct: adds both ranges
+=SUM(A1:A5 C1:C5)   → #NULL! (space instead of comma)`}</ExcelCode>
+
+**Referencing two genuinely non-overlapping named ranges with a
+space**, intending to combine them rather than intersect them —
+same underlying mistake, harder to spot since named ranges don't show
+their cell addresses directly in the formula.
+
+## How to fix it
+
+1. **Check every space between range references** in the formula —
+   if a comma was intended, that's the fix.
+2. **If the intersection was actually intended**, confirm the two
+   ranges really do share the cells you expect — a typo in either
+   range's bounds (wrong row or column) is enough to make an
+   intended intersection come up empty too.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#NULL!` along with every
+other error type. [ERROR.TYPE](/docs/info/error-type) returns `1`
+for it specifically — the first code in its table, reflecting how
+rarely it comes up in practice compared to the other six classic
+errors.
+
+## Not the same as #REF! or #VALUE!
+
+`#REF!` means a reference that existed is now gone. `#VALUE!` means
+an input's type is wrong. `#NULL!` is narrower and stranger than
+both: every reference in the formula is valid and correctly typed,
+but a specific *operator* — intersection — was asked to do something
+that has no answer for the ranges given.
+
+export const faqs = [
+  {
+    question: 'Why does a space between two ranges cause an error instead of just being ignored?',
+    answer: "Because a space between two ranges isn't ignored — it's Excel's intersection operator, exactly as real as + or a comma. =A1:A5 C1:C5 is a complete, valid expression asking for the cells common to both ranges; #NULL! only appears when that intersection is genuinely empty.",
+  },
+  {
+    question: 'Is the intersection operator ever useful on purpose?',
+    answer: "Yes — it's a fast way to find the single cell where a given row and column meet, such as =SUM(A1:C1 A1:A10) to get the one cell both ranges share, without writing out the explicit cell reference.",
+  },
+  {
+    question: 'Can #NULL! happen with a single range, no space at all?',
+    answer: "No — it specifically requires the intersection operator (a space between two range references) to be present and for those ranges to share no cells. A formula with no intersection operator in it cannot return #NULL!.",
+  },
+];
+
+<Faq items={faqs} />

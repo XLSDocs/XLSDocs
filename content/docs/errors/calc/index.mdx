@@ -1,0 +1,97 @@
+---
+title: "#CALC!"
+description: A dynamic-array formula tried to produce an array with nothing in it, or a LAMBDA was entered without being called.
+---
+
+`#CALC!` is specific to Excel's dynamic-array engine — it doesn't
+exist in older, pre-365 Excel at all. It almost always means a
+formula that would otherwise spill an array came up with **nothing to
+spill**, or a [LAMBDA](/docs/custom-functions/lambda) was typed into
+a cell without ever being called.
+
+export const quickAnswerFacts = [
+  { text: 'Means: a dynamic-array formula produced an empty result', type: 'warn' },
+  { text: 'Excel 365 only — this error doesn\'t exist in pre-dynamic-array Excel', type: 'warn' },
+  { text: 'A bare LAMBDA with no call also triggers it', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FILTER(A2:C10, B2:B10="Zzz") → #CALC! (no rows match)'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**[FILTER](/docs/arrays/filter): no rows match the condition**, and
+`if_empty` wasn't supplied to cover that case:
+
+<ExcelCode>{`=FILTER(A2:C10, B2:B10="Zzz") → #CALC!`}</ExcelCode>
+
+**[DROP](/docs/arrays/drop): dropping more rows or columns than the
+array actually has.** Unlike [TAKE](/docs/arrays/take), which just
+returns whatever's available, DROP errors when there's nothing left:
+
+<ExcelCode>{`=DROP(A1:A5, 10) → #CALC!`}</ExcelCode>
+
+**[SORT](/docs/arrays/sort) / [SORTBY](/docs/arrays/sortby) /
+[UNIQUE](/docs/arrays/unique): the array to operate on is empty** —
+often because it's fed by a FILTER call upstream that itself matched
+nothing, or (for UNIQUE with `exactly_once=TRUE`) every value turned
+out to be duplicated at least once.
+
+**[LAMBDA](/docs/custom-functions/lambda) entered without being
+called.** A LAMBDA isn't a value by itself — it's a function
+definition waiting for arguments:
+
+<ExcelCode>{`=LAMBDA(x, x*2) → #CALC! ("LAMBDA takes 1 argument(s)")`}</ExcelCode>
+
+Either call it directly with its arguments
+(`=LAMBDA(x, x*2)(5)`), or save it under a name in Name Manager so it
+can be reused like a built-in function.
+
+## How to fix it
+
+1. **For FILTER returning no matches**, supply an explicit `if_empty`
+   argument so a genuinely empty result is handled on purpose rather
+   than surfacing as an error:
+   <ExcelCode>{`=FILTER(A2:C10, B2:B10="Zzz", "No matches")`}</ExcelCode>
+2. **For SORT/SORTBY/UNIQUE fed by another dynamic-array formula**,
+   trace back to whichever upstream formula is actually producing the
+   empty array — the fix usually belongs there, not at the outer
+   function.
+3. **For a bare LAMBDA**, either call it in place or save it as a
+   named function — never leave one sitting uncalled in a cell.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#CALC!` along with every
+other error type. [ERROR.TYPE](/docs/info/error-type) has no
+dedicated code for it — like `#SPILL!`, it's a dynamic-array-era
+error that postdates ERROR.TYPE's original seven-code table.
+[ISERROR](/docs/info/iserror) still catches it correctly regardless.
+
+## Not the same as #SPILL! or #N/A
+
+[#SPILL!](/docs/errors/spill) means a formula calculated a real,
+non-empty result but couldn't physically write it into blocked cells.
+`#CALC!` is closer to the opposite case: the formula has nowhere to
+write *because the result itself has nothing in it*. `#N/A` means a
+single lookup found no match; `#CALC!` is about an entire array
+coming up empty, not one missing value.
+
+export const faqs = [
+  {
+    question: 'Why doesn\'t #CALC! exist in older Excel versions?',
+    answer: "Because it's specific to the dynamic-array calculation engine introduced with Excel 365 — functions like FILTER, SORT, and LAMBDA, along with the concept of an array \"spilling\" into empty cells, simply don't exist in pre-365 Excel, so there's nothing that could produce this particular failure there.",
+  },
+  {
+    question: 'Does FILTER always need an if_empty argument?',
+    answer: "Not always — only when a zero-match result is a realistic possibility you want handled gracefully. If the data guarantees at least one match, if_empty is optional. But leaving it out when zero matches IS possible means that case surfaces as #CALC! instead of a controlled fallback.",
+  },
+  {
+    question: 'Can I fix a bare LAMBDA #CALC! error by just adding parentheses?',
+    answer: "Yes, if you supply the actual arguments inside them — =LAMBDA(x, x*2)(5) calls it immediately with x=5. Empty parentheses alone won't fix it if the LAMBDA expects arguments; it needs real values matching its parameter list.",
+  },
+];
+
+<Faq items={faqs} />

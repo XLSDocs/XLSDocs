@@ -1,0 +1,91 @@
+---
+title: "#CONNECT!"
+description: A function that needs a live internet connection — TRANSLATE, DETECTLANGUAGE, IMAGE from a URL — couldn't reach the service it depends on.
+---
+
+`#CONNECT!` is one of the few Excel errors that isn't about the
+formula at all — it's a live connectivity failure at the moment of
+calculation. A handful of newer functions call out to a web service
+every time they recalculate, and `#CONNECT!` means that call didn't
+get through.
+
+export const quickAnswerFacts = [
+  { text: 'Means: a live network call failed at calculation time', type: 'warn' },
+  { text: 'Not a formula mistake — reconnecting and recalculating (F9) often fixes it', type: 'check' },
+  { text: 'Only affects service-backed functions: TRANSLATE, DETECTLANGUAGE, IMAGE from a URL', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=DETECTLANGUAGE(A1) → #CONNECT! if the device is offline'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**[DETECTLANGUAGE](/docs/text/detectlanguage) / [TRANSLATE](/docs/text/translate):
+no internet connection.** Both call Microsoft Translator over the
+network for every single calculation — there's no offline fallback
+or cached result:
+
+<ExcelCode>{`=DETECTLANGUAGE(A1) → #CONNECT! if offline
+=TRANSLATE(A1, "en", "fr") → #CONNECT! if offline`}</ExcelCode>
+
+**[IMAGE](/docs/lookup/image): the URL couldn't be reached** — a
+broken link, a server that's down, or a URL that's blocked by a
+firewall or proxy:
+
+<ExcelCode>{`=IMAGE("https://example.com/broken-link.jpg") → #CONNECT!`}</ExcelCode>
+
+This specific case reflects a live problem reaching that one server,
+not a general connectivity loss — the rest of the internet, and other
+IMAGE calls to working URLs, can be fine at the same time.
+
+## How to fix it
+
+1. **Check the actual connection first** — for DETECTLANGUAGE and
+   TRANSLATE, any loss of internet access on the device will cause
+   this; reconnect and press F9 to force a recalculation.
+2. **For IMAGE specifically**, verify the URL loads in a browser
+   before assuming the formula is broken — a dead link or a server
+   outage on the image host's side produces the identical error to a
+   genuine connectivity problem on your own machine.
+3. **Wrap calls in [IFERROR](/docs/logical/iferror)** for a workbook
+   that needs to keep functioning when offline or when a specific
+   image host is unreachable, rather than showing a raw error to
+   whoever opens the file next:
+   <ExcelCode>{`=IFERROR(TRANSLATE(A1, , "en"), A1)`}</ExcelCode>
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#CONNECT!` along with
+every other error type — the standard way to give a service-backed
+formula a sensible offline fallback, as DETECTLANGUAGE's and
+TRANSLATE's own pages both demonstrate. [ERROR.TYPE](/docs/info/error-type)
+has no dedicated code for it; like `#SPILL!` and `#CALC!`, it's a
+newer error outside the original seven-code table. `ISERROR` still
+catches it correctly regardless.
+
+## Not the same as #BLOCKED!
+
+[#BLOCKED!](/docs/errors/blocked) also affects IMAGE, but for a
+completely different reason: `#CONNECT!` means the network call
+itself failed (nothing was reachable), while `#BLOCKED!` means the
+call could have succeeded but a security or privacy setting
+prevented it on purpose.
+
+export const faqs = [
+  {
+    question: 'Does #CONNECT! mean my whole internet connection is down?',
+    answer: "Not necessarily — for IMAGE specifically, it can mean that one URL's server is unreachable while everything else works fine. For DETECTLANGUAGE and TRANSLATE, it does specifically mean Excel couldn't reach Microsoft Translator, which is a stronger signal of a genuine connectivity problem.",
+  },
+  {
+    question: 'Is there a way to make TRANSLATE or DETECTLANGUAGE work offline?',
+    answer: "No — both are service-backed functions with no offline mode or local fallback; they call Microsoft Translator fresh on every calculation. The best mitigation is wrapping them in IFERROR with a sensible fallback value for when connectivity drops.",
+  },
+  {
+    question: 'Why does recalculating with F9 sometimes fix #CONNECT! without changing anything?',
+    answer: "Because the error reflects the network's state at the exact moment of calculation, not anything in the formula or data. If the connectivity problem (device offline, server briefly down) has since resolved, the next recalculation simply succeeds.",
+  },
+];
+
+<Faq items={faqs} />

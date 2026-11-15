@@ -1,0 +1,84 @@
+---
+title: "#BLOCKED!"
+description: A security or privacy setting is intentionally preventing a formula from completing — most commonly IMAGE loading a picture from the web.
+---
+
+`#BLOCKED!` means Excel *could* technically complete the formula, but
+a security or privacy setting is deliberately stopping it. It's not a
+connectivity failure and not a formula mistake — it's a guardrail
+doing exactly what it's configured to do.
+
+export const quickAnswerFacts = [
+  { text: 'Means: a security/privacy setting is intentionally blocking the formula', type: 'warn' },
+  { text: 'Not a connection failure or a formula mistake', type: 'check' },
+  { text: 'Most common with IMAGE loading a picture from a URL', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=IMAGE("https://...") → #BLOCKED! (Linked Data Types / web image settings are restricting it)'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**[IMAGE](/docs/lookup/image): Linked Data Types or web-image
+settings are restricting the request.** This is distinct from a
+broken URL — the image source may be perfectly reachable, but a
+workbook or account-level privacy setting is stopping Excel from
+loading external content into it:
+
+<ExcelCode>{`=IMAGE("https://...") → #BLOCKED!`}</ExcelCode>
+
+**Excel for the web or mobile, with external images not yet enabled
+for that session** — some platforms require explicitly allowing
+external image loading from a notification bar before IMAGE (or a
+Linked Data Type that pulls in pictures) will complete.
+
+## How to fix it
+
+1. **Check the workbook's Linked Data Types privacy settings**
+   (File → Options → Trust Center, or the workbook's own data-type
+   privacy level) — this governs whether Excel is allowed to fetch
+   external content tied to data types at all.
+2. **On Excel for the web or mobile**, look for a business bar or
+   notification prompting to enable images for that session — the
+   block is often a one-click allow, not a configuration change.
+3. **If this is a shared workbook**, confirm the setting on the
+   machine actually opening it — privacy settings are local to the
+   installation/account, not saved inside the file, so the same
+   workbook can work for one person and show `#BLOCKED!` for another.
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) suppresses `#BLOCKED!` along with
+every other error type, though it's worth pausing before reaching for
+it here — the block is a deliberate security setting, so silently
+replacing it with a fallback value hides a configuration decision
+someone made on purpose, rather than working around a bug.
+[ERROR.TYPE](/docs/info/error-type) has no dedicated code for it,
+same as the other newer, non-classic error types.
+
+## Not the same as #CONNECT!
+
+[#CONNECT!](/docs/errors/connect) also shows up on IMAGE, but for an
+unrelated reason: it means the network call itself failed (a broken
+link, an unreachable server). `#BLOCKED!` means the call was never
+allowed to happen in the first place — the URL could be perfectly
+reachable, and the result would still be blocked.
+
+export const faqs = [
+  {
+    question: 'If I fix #BLOCKED!, will it work the same way for everyone who opens the file?',
+    answer: "Not automatically — the privacy/security setting that caused it typically lives on the device or account opening the workbook, not inside the file itself. Someone else opening the same file may see a different result depending on their own settings.",
+  },
+  {
+    question: 'Does #BLOCKED! mean the image URL is broken?',
+    answer: "No — that's #CONNECT!. #BLOCKED! means the request was intentionally stopped by a security or privacy setting, regardless of whether the underlying URL would have worked fine otherwise.",
+  },
+  {
+    question: 'Is there a universal fix for #BLOCKED!, or does it depend on the platform?',
+    answer: "It depends on the platform. Desktop Excel routes through Trust Center and Linked Data Types privacy settings; Excel for the web or mobile often just needs external images allowed from an in-app notification. There isn't one single setting that covers every case.",
+  },
+];
+
+<Faq items={faqs} />
