@@ -77,6 +77,8 @@ Unlike TAKE (which just returns what's available), DROP errors if
 asked to remove more rows or columns than actually exist — there's
 nothing left to return.
 
+See the full [#CALC! reference](/docs/errors/calc) for every way this can happen and how to catch it.
+
 ### The wrong end gets removed
 
 <ExcelCode>{`DROP(A1:A20, 5) → removes the first 5 rows, not the last 5`}</ExcelCode>

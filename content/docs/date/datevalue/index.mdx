@@ -90,6 +90,8 @@ The text has to be in a format Excel actually recognizes as a date —
 check regional date settings if a format that looks reasonable is
 still failing (day/month order varies by locale).
 
+See the full [#VALUE! reference](/docs/errors/value) for every way this can happen and how to catch it.
+
 ### Losing the time portion of a combined date-and-time string
 
 <ExcelCode>{`DATEVALUE("1/15/2026 2:30 PM") → 46037 (the date only, time is dropped)`}</ExcelCode>

@@ -75,6 +75,8 @@ same convention as COUNTIF/XLOOKUP.
 `array` happens to be duplicated at least once, leaving nothing that
 qualifies.
 
+See the full [#CALC! reference](/docs/errors/calc) for every way this can happen and how to catch it.
+
 ### Confusing exactly_once with a plain distinct list
 
 <ExcelCode>{`UNIQUE(A2:A10, FALSE, TRUE) → only values appearing once`}</ExcelCode>
@@ -89,6 +91,8 @@ of how many times it appeared), omit the third argument or pass
 
 Cells below the formula already contain data. Clear the spill range,
 or move the formula somewhere clear.
+
+See the full [#SPILL! reference](/docs/errors/spill) for every way this can happen and how to catch it.
 
 export const faqs = [
   {

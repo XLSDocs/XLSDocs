@@ -116,12 +116,16 @@ right, never to the left.
 `lookup_value` must exist in the **first column** of `table_array` —
 VLOOKUP never searches any other column.
 
+See the full [#N/A reference](/docs/errors/na) for every way this can happen and how to catch it.
+
 ### #REF! — col_index_num out of range
 
 <ExcelCode>{`VLOOKUP(A2, A1:B10, 3, FALSE) → #REF!`}</ExcelCode>
 
 `table_array` only has 2 columns here, but `col_index_num` asks for
 the 3rd.
+
+See the full [#REF! reference](/docs/errors/ref) for every way this can happen and how to catch it.
 
 ### Wrong value, no error
 

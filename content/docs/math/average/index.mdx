@@ -73,12 +73,16 @@ There's nothing to average. Wrap it in IFERROR for a fallback:
 
 <ExcelCode>{`IFERROR(AVERAGE(A1:A10), 0)`}</ExcelCode>
 
+See the full [#DIV/0! reference](/docs/errors/div-0) for every way this can happen and how to catch it.
+
 ### #VALUE! — a referenced cell contains an error
 
 <ExcelCode>{`AVERAGE(A1:A10) → #VALUE! (if any cell in A1:A10 is itself an error)`}</ExcelCode>
 
 An error value inside the range propagates, unlike text (which
 AVERAGE quietly skips).
+
+See the full [#VALUE! reference](/docs/errors/value) for every way this can happen and how to catch it.
 
 ### Unexpected average — blanks vs zeros
 

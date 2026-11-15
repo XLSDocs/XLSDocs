@@ -81,6 +81,8 @@ of a subtraction that could go either way, `SQRT(ABS(number))` at
 least avoids the error, though it changes the math (it's no longer a
 true square root of the original signed value).
 
+See the full [#NUM! reference](/docs/errors/num) for every way this can happen and how to catch it.
+
 ### Expecting both the positive and negative root
 
 <ExcelCode>{`SQRT(16) → 4 only (not also -4, even though -4 × -4 is also 16)`}</ExcelCode>

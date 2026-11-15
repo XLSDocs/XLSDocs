@@ -78,6 +78,8 @@ provided. Add a third argument for a fallback value instead:
 
 <ExcelCode>{`FILTER(A2:C10, B2:B10="Zzz", "No matches")`}</ExcelCode>
 
+See the full [#CALC! reference](/docs/errors/calc) for every way this can happen and how to catch it.
+
 ### #VALUE! — mismatched sizes
 
 <ExcelCode>{`FILTER(A2:C10, B2:B5="West") → #VALUE!`}</ExcelCode>
@@ -89,6 +91,8 @@ is 9 rows and the other is 4.
 
 Cells below the formula already contain data. Clear the spill range,
 or move the formula somewhere clear.
+
+See the full [#SPILL! reference](/docs/errors/spill) for every way this can happen and how to catch it.
 
 ### Combining multiple conditions
 

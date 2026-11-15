@@ -81,6 +81,8 @@ divide by. Wrap it in `IFERROR` for a fallback:
 
 <ExcelCode>{`IFERROR(PERCENTOF(A1:A5, B1:B10), 0)`}</ExcelCode>
 
+See the full [#DIV/0! reference](/docs/errors/div-0) for every way this can happen and how to catch it.
+
 ### Result looks like a whole number instead of a percentage
 
 <ExcelCode>{`PERCENTOF(250, 1000) → 0.25, displayed as "0.25" if the cell isn't formatted as a percentage`}</ExcelCode>

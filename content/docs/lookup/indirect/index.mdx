@@ -85,6 +85,8 @@ The text must resolve to a genuinely valid reference — a typo in a
 sheet name or cell address produces `#REF!`, not a more specific
 error pointing at the actual problem.
 
+See the full [#REF! reference](/docs/errors/ref) for every way this can happen and how to catch it.
+
 ### A renamed sheet silently breaks the formula
 
 <ExcelCode>{`INDIRECT("Sales!A1") → #REF! (if the "Sales" sheet was renamed)`}</ExcelCode>

@@ -101,6 +101,8 @@ This reflects a live connectivity problem at calculation time, not a
 formula mistake — check the URL is reachable and the internet
 connection is working, then recalculate.
 
+See the full [#CONNECT! reference](/docs/errors/connect) for every way this can happen and how to catch it.
+
 ### #BLOCKED! — security settings preventing the image
 
 <ExcelCode>{`IMAGE("https://...") → #BLOCKED! (Linked Data Types / web image settings are restricting it)`}</ExcelCode>
@@ -108,6 +110,8 @@ connection is working, then recalculate.
 Check the workbook's Linked Data Types privacy settings; in Excel
 for the web or mobile, images may also need enabling from the
 business bar at the top of the workbook.
+
+See the full [#BLOCKED! reference](/docs/errors/blocked) for every way this can happen and how to catch it.
 
 export const faqs = [
   {
