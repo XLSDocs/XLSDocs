@@ -1,0 +1,131 @@
+---
+title: "Build a Dropdown List That Updates Itself When Your Source Data Changes"
+description: "A dropdown that needs re-editing every time someone adds a new option is a maintenance problem waiting to happen. UNIQUE, SORT, and one easy-to-miss detail about the # operator fix that permanently."
+date: "2026-11-15"
+category: Tutorials
+readTime: 5 min read
+---
+
+The usual way to build a dropdown — Data Validation → List → a fixed
+range like `$A$2:$A$9` — has a quiet maintenance cost: the moment
+someone adds a tenth region to the source list, the dropdown doesn't
+know about it until someone remembers to go back and widen the range.
+A dropdown built on a dynamic array formula instead rebuilds its own
+option list every time the source changes, with nothing to remember.
+
+<PipelineDiagram
+  stages={[
+    {
+      label: "Raw source (A2:A9)",
+      color: "blue",
+      values: [
+        { text: "West" }, { text: "East" }, { text: "West", muted: true },
+        { text: "North" }, { text: "East", muted: true }, { text: "South" },
+        { text: "West", muted: true }, { text: "North", muted: true },
+      ],
+    },
+    {
+      label: "=UNIQUE(A2:A9)",
+      color: "teal",
+      values: [{ text: "West" }, { text: "East" }, { text: "North" }, { text: "South" }],
+    },
+    {
+      label: "=SORT(UNIQUE(...))",
+      color: "amber",
+      values: [{ text: "East" }, { text: "North" }, { text: "South" }, { text: "West" }],
+    },
+    {
+      label: "Data Validation",
+      color: "purple",
+      variant: "dropdown",
+      values: [{ text: "East" }, { text: "North" }, { text: "South" }, { text: "West" }],
+    },
+  ]}
+  badges={[
+    { afterIndex: 0, color: "teal", note: "UNIQUE strips the duplicates (dimmed above), keeping only the first occurrence of each region — West, East, North, South, in that order." },
+    { afterIndex: 1, color: "amber", note: "Wrapping it in SORT alphabetizes the result, which reads better in a dropdown than \"whatever order they first appeared in the data.\"" },
+    { afterIndex: 2, color: "purple", note: "Data Validation's Source field points at the formula's spill range with # — not the formula itself — so the dropdown always matches whatever UNIQUE/SORT currently produce." },
+  ]}
+/>
+
+## Step 1: put the formula in a helper cell
+
+Data Validation's Source box won't accept a formula like
+`=SORT(UNIQUE(A2:A9))` typed directly into it — that's a common first
+try that just doesn't work. The formula needs to live in an actual
+cell first:
+
+<ExcelCode>{`C2: =SORT(UNIQUE(A2:A9))`}</ExcelCode>
+
+[UNIQUE](/docs/arrays/unique) removes duplicates, keeping each value's
+first occurrence; [SORT](/docs/arrays/sort) orders the result.
+Either works alone — nested together, the dropdown gets a clean,
+alphabetized list of exactly what's currently in the source column.
+
+## Step 2: point Data Validation at the spill range, not the cell
+
+In the Source field (Data → Data Validation → List), reference `C2`
+with a `#` appended, not just `C2` alone:
+
+<ExcelCode>{`=C2#`}</ExcelCode>
+
+`#` is the spill-range operator — it means "the entire array `C2`
+spills into," not just the single cell `C2`. Excel's Source box
+doesn't autocomplete or suggest this for you, so it has to be typed by
+hand; leaving the `#` off gives a dropdown with exactly one option
+(whatever the first spilled value happens to be).
+
+## The part that trips people up
+
+<Callout type="warn">
+  If another formula or a stray value sits in the rows directly below
+  the helper cell, `SORT(UNIQUE(...))` has nowhere to spill into and
+  the helper cell itself throws [#SPILL!](/docs/errors/spill) —
+  and a dropdown pointed at a cell showing `#SPILL!` shows no options
+  at all. Keep a clear column below the helper formula, sized for
+  however large the source list could reasonably grow.
+</Callout>
+
+This is also why the helper formula usually lives on a separate,
+out-of-the-way sheet (or a far-right column) rather than directly
+next to the visible data — it needs permanent empty space below it to
+spill into, and that's easy to accidentally violate if it sits in the
+middle of an active worksheet.
+
+## Dependent dropdowns, the same technique one level deeper
+
+The identical `#` trick extends to a second dropdown that depends on
+the first — a "Category" dropdown that then filters a "Sub-category"
+dropdown to match:
+
+<ExcelCode>{`D2: =SORT(UNIQUE(FILTER(SubCategory, Category=C2)))`}</ExcelCode>
+
+[FILTER](/docs/arrays/filter) narrows to rows matching the first
+dropdown's current selection, UNIQUE removes duplicates from what's
+left, SORT orders it — then the second Data Validation list points at
+`=D2#`, exactly as before. Each dropdown only ever shows options that
+are actually valid given what's already been picked.
+
+Building either of these by hand works well for a one-off, but
+[xlsdocs' Data Validation Builder](/tools/data-validation-builder)
+generates the dependent-dropdown version (named ranges, `INDIRECT`
+wiring, and all) from a form if you'd rather not write the formulas
+yourself — the underlying `#`/spill mechanics above are what it's
+actually producing.
+
+export const faqs = [
+  {
+    question: 'Why doesn\'t typing =SORT(UNIQUE(A2:A9)) directly into the Data Validation Source box work?',
+    answer: "The Source field only accepts a cell/range reference or a literal comma-separated list — it doesn't evaluate an arbitrary formula typed directly into it. The formula has to live in a real cell first, with the Source field then pointing at that cell's spill range using #.",
+  },
+  {
+    question: 'What happens to the dropdown if the source list shrinks?',
+    answer: "The spill range shrinks with it, and the dropdown's options update to match on the next recalculation — including removing any option that's no longer in the source. Any cell that had that now-removed value already selected keeps showing it, but it would fail re-validation if re-entered.",
+  },
+  {
+    question: 'Can this dynamic-dropdown technique work in Excel versions without UNIQUE or SORT?',
+    answer: "No — both are Excel 365 functions, and the # spill operator only has meaning where dynamic arrays exist at all. On a perpetual license (2019, 2016), the dropdown has to be rebuilt manually when the source list changes, or driven by a named range with a different (non-dynamic-array) formula like OFFSET or INDEX-based range expansion.",
+  },
+];
+
+<Faq items={faqs} />

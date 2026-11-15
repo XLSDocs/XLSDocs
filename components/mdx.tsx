@@ -18,6 +18,7 @@ import { ShortcutTable } from './shortcut-table';
 import { ClaudePrompts } from './claude-prompts';
 import { ParetoChart } from './tutorial/pareto-chart';
 import { WaterfallChart } from './tutorial/waterfall-chart';
+import { PipelineDiagram } from './tutorial/pipeline-diagram';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -63,6 +64,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ClaudePrompts,
     ParetoChart,
     WaterfallChart,
+    PipelineDiagram,
     ...components,
   } satisfies MDXComponents;
 }
