@@ -10,6 +10,9 @@ export interface ShortcutGroup {
 }
 
 function Keys({ combo }: { combo: string }) {
+  if (combo === '—' || combo.trim() === '') {
+    return <span className="text-fd-muted-foreground">—</span>;
+  }
   const keys = combo.split('+');
   return (
     <span className="inline-flex flex-wrap items-center gap-1">

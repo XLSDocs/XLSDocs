@@ -1,0 +1,82 @@
+---
+title: Editing & data entry shortcuts
+description: Enter, fill, and edit cell contents faster — completing entries, filling ranges, and inserting dates without the mouse.
+---
+
+Typing and confirming values is the single most repeated action in
+Excel — these shortcuts control exactly where the cursor lands next,
+and fill, copy, or clear a whole selection in one keystroke instead
+of cell by cell.
+
+export const groups = [
+  {
+    category: 'Completing an entry',
+    shortcuts: [
+      { action: 'Edit the active cell', win: 'F2', mac: 'F2' },
+      { action: 'Complete entry and move down', win: 'Enter', mac: 'Return' },
+      { action: 'Complete entry and move up', win: 'Shift+Enter', mac: 'Shift+Return' },
+      { action: 'Complete entry and move right', win: 'Tab', mac: 'Tab' },
+      { action: 'Complete entry and move left', win: 'Shift+Tab', mac: 'Shift+Tab' },
+      { action: 'Cancel entry', win: 'Esc', mac: 'Esc' },
+      { action: 'New line within the same cell', win: 'Alt+Enter', mac: 'Option+Return' },
+    ],
+  },
+  {
+    category: 'Filling & copying',
+    shortcuts: [
+      { action: 'Fill selected range with the current entry', win: 'Ctrl+Enter', mac: '⌘+Return' },
+      { action: 'Fill down', win: 'Ctrl+D', mac: '⌘+D' },
+      { action: 'Fill right', win: 'Ctrl+R', mac: '⌘+R' },
+      { action: 'Flash Fill', win: 'Ctrl+E', mac: 'Ctrl+E' },
+      { action: 'Copy value from cell above', win: 'Ctrl+Shift+"', mac: 'Ctrl+Shift+"' },
+      { action: 'Copy formula from cell above', win: "Ctrl+'", mac: "Ctrl+'" },
+    ],
+  },
+  {
+    category: 'Clearing & deleting',
+    shortcuts: [
+      { action: 'Clear cell contents', win: 'Delete', mac: 'Delete' },
+      { action: 'Delete character left of cursor', win: 'Backspace', mac: 'Delete' },
+      { action: 'Delete character right of cursor', win: 'Delete', mac: 'Fn+Delete' },
+    ],
+  },
+  {
+    category: 'Dates, notes & toggles',
+    shortcuts: [
+      { action: 'Insert current date', win: 'Ctrl+;', mac: 'Ctrl+;' },
+      { action: 'Insert current time', win: 'Ctrl+Shift+:', mac: '⌘+;' },
+      { action: 'Insert or edit a note', win: 'Shift+F2', mac: 'Shift+F2' },
+      { action: 'Insert or reply to a threaded comment', win: 'Ctrl+Shift+F2', mac: '⌘+Shift+F2' },
+      { action: 'Toggle display of values vs. formulas', win: 'Ctrl+`', mac: 'Ctrl+`' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  **Ctrl+Enter** fills an entire selected range with whatever you
+  just typed — select 50 cells first, type a value, then press
+  Ctrl+Enter instead of Enter, and all 50 get the same value in one
+  step. It's different from Ctrl+D/Ctrl+R, which copy from an
+  existing cell rather than a fresh entry.
+</Callout>
+
+export const faqs = [
+  {
+    question: "What's the difference between Ctrl+Enter and a regular Enter?",
+    answer: "A regular Enter confirms the entry in the active cell only, then moves to the next cell. Ctrl+Enter confirms the same entry into every cell in the current selection at once — useful for filling a whole range with one value without copy-pasting.",
+  },
+  {
+    question: 'How do I start a new line inside a single cell instead of moving to the next one?',
+    answer: 'Press Alt+Enter (Option+Return on Mac) while editing the cell — it inserts a line break within the cell\'s text instead of confirming the entry, which also turns on "wrap text" automatically if it wasn\'t already on.',
+  },
+  {
+    question: 'Does Flash Fill (Ctrl+E) work the same as a formula?',
+    answer: "No — Flash Fill analyzes a pattern from an example you type and fills in static values that match it, not a live formula. If the source data changes afterward, a Flash Fill result doesn't update automatically the way a formula-based column would.",
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

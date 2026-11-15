@@ -1,0 +1,104 @@
+---
+title: Function key shortcuts (F1–F12)
+description: What each function key does on its own, and combined with Ctrl, Alt, and Shift, in Excel for Windows and Mac.
+---
+
+The F1–F12 row does more in Excel than most people realize — on its
+own, each key already has a job, and combining it with Ctrl, Alt, or
+Shift unlocks a completely different one. This page collects every
+function-key combination in one place, rather than spread across the
+task-based pages elsewhere in this section.
+
+export const groups = [
+  {
+    category: 'Windows',
+    shortcuts: [
+      { action: 'F1 — Open Help task pane', win: 'F1', mac: '—' },
+      { action: 'Ctrl+F1 — Show or hide the ribbon', win: 'Ctrl+F1', mac: '—' },
+      { action: 'F2 — Edit the active cell', win: 'F2', mac: '—' },
+      { action: 'Shift+F2 — Add or edit a cell note', win: 'Shift+F2', mac: '—' },
+      { action: 'F3 — Display Paste Name dialog', win: 'F3', mac: '—' },
+      { action: 'Shift+F3 — Display Insert Function dialog', win: 'Shift+F3', mac: '—' },
+      { action: 'F4 — Repeat last action; cycle reference type while editing a formula', win: 'F4', mac: '—' },
+      { action: 'Alt+F4 — Close Excel', win: 'Alt+F4', mac: '—' },
+      { action: 'F5 — Display Go To dialog', win: 'F5', mac: '—' },
+      { action: 'F6 / Shift+F6 — Switch focus between sheet, ribbon, and task pane', win: 'F6 or Shift+F6', mac: '—' },
+      { action: 'Ctrl+F6 — Switch between two Excel windows', win: 'Ctrl+F6', mac: '—' },
+      { action: 'F7 — Open Spelling dialog', win: 'F7', mac: '—' },
+      { action: 'F8 — Turn extend-selection mode on or off', win: 'F8', mac: '—' },
+      { action: 'Shift+F8 — Add a non-adjacent range to the selection', win: 'Shift+F8', mac: '—' },
+      { action: 'Alt+F8 — Display the Macro dialog', win: 'Alt+F8', mac: '—' },
+      { action: 'F9 — Calculate all open workbooks', win: 'F9', mac: '—' },
+      { action: 'Shift+F9 — Calculate the active worksheet only', win: 'Shift+F9', mac: '—' },
+      { action: 'Ctrl+Alt+F9 — Calculate all, regardless of what changed', win: 'Ctrl+Alt+F9', mac: '—' },
+      { action: 'F10 — Turn Key Tips on or off', win: 'F10', mac: '—' },
+      { action: 'Shift+F10 — Display right-click context menu', win: 'Shift+F10', mac: '—' },
+      { action: 'F11 — Create chart on a new Chart sheet', win: 'F11', mac: '—' },
+      { action: 'Shift+F11 — Insert a new worksheet', win: 'Shift+F11', mac: '—' },
+      { action: 'Alt+F11 — Open the Visual Basic Editor', win: 'Alt+F11', mac: '—' },
+      { action: 'F12 — Display Save As dialog', win: 'F12', mac: '—' },
+    ],
+  },
+  {
+    category: 'Mac',
+    shortcuts: [
+      { action: 'F1 — Display Help window', win: '—', mac: 'F1' },
+      { action: 'F2 — Edit selected cell', win: '—', mac: 'F2' },
+      { action: 'Shift+F2 — Insert or edit a note', win: '—', mac: 'Shift+F2' },
+      { action: 'Option+F2 — Open Save dialog', win: '—', mac: 'Option+F2' },
+      { action: 'Shift+F3 — Open Formula Builder', win: '—', mac: 'Shift+F3' },
+      { action: '⌘+F3 — Open Define Name dialog', win: '—', mac: '⌘+F3' },
+      { action: 'F4 / ⌘+T — Cycle reference type while editing a formula', win: '—', mac: 'F4 or ⌘+T' },
+      { action: '⌘+F4 — Close window or dialog', win: '—', mac: '⌘+F4' },
+      { action: 'F5 — Display Go To dialog', win: '—', mac: 'F5' },
+      { action: 'Shift+F5 — Display Find dialog', win: '—', mac: 'Shift+F5' },
+      { action: 'Ctrl+F5 — Move to Search Sheet dialog', win: '—', mac: 'Ctrl+F5' },
+      { action: 'F6 / Shift+F6 — Switch focus between sheet, ribbon, and task pane', win: '—', mac: 'F6 or Shift+F6' },
+      { action: 'F7 — Check spelling', win: '—', mac: 'F7' },
+      { action: 'Shift+F7 — Open thesaurus', win: '—', mac: 'Shift+F7' },
+      { action: 'F8 — Extend selection', win: '—', mac: 'F8' },
+      { action: 'Shift+F8 — Add to selection', win: '—', mac: 'Shift+F8' },
+      { action: 'Option+F8 — Display Macro dialog', win: '—', mac: 'Option+F8' },
+      { action: 'F9 — Calculate all open workbooks', win: '—', mac: 'F9' },
+      { action: 'Shift+F9 — Calculate active sheet', win: '—', mac: 'Shift+F9' },
+      { action: 'Ctrl+F9 — Minimize active window', win: '—', mac: 'Ctrl+F9' },
+      { action: 'Shift+F10 — Display context menu', win: '—', mac: 'Shift+F10' },
+      { action: 'Ctrl+F10 / ⌘+F10 — Maximize or restore window', win: '—', mac: 'Ctrl+F10 or ⌘+F10' },
+      { action: 'F11 — Insert new chart sheet', win: '—', mac: 'F11' },
+      { action: 'Shift+F11 — Insert new sheet', win: '—', mac: 'Shift+F11' },
+      { action: 'Option+F11 — Open Visual Basic Editor', win: '—', mac: 'Option+F11' },
+      { action: 'F12 — Display Save As dialog', win: '—', mac: 'F12' },
+      { action: '⌘+F12 — Display Open dialog', win: '—', mac: '⌘+F12' },
+      { action: 'Option+F12 — Open Power Query Editor', win: '—', mac: 'Option+F12' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="warn">
+  Windows and Mac assign **genuinely different jobs** to the same
+  function key far more often on this page than anywhere else in
+  this section — F3, F10, and F12 in particular mean something
+  unrelated on each platform. Don't assume a Windows F-key habit
+  carries over to Mac (or back) without checking.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Why do laptop function keys sometimes not work as F1–F12 in Excel?',
+    answer: 'Many laptops default the top row to media/brightness controls, requiring an Fn key to access F1–F12 directly — check the laptop manufacturer\'s settings (often a BIOS/firmware toggle for "Fn Lock" or similar) if F-keys aren\'t registering in Excel as expected.',
+  },
+  {
+    question: 'What does plain F4 do if I\'m not editing a formula?',
+    answer: "It repeats the last action or command — the same role Ctrl+Y plays. F4's reference-cycling behavior only activates while the cursor is actively in or next to a cell reference inside a formula being edited.",
+  },
+  {
+    question: 'Is there a single key that toggles the ribbon entirely?',
+    answer: 'Ctrl+F1 shows or hides the ribbon on Windows. There is no listed direct Mac equivalent — the ribbon display options live under the View menu or the small ribbon-collapse arrow instead.',
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

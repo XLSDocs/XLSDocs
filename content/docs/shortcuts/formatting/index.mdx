@@ -1,0 +1,73 @@
+---
+title: Formatting shortcuts
+description: Bold, borders, number formats, and the Format Cells dialog, from the keyboard.
+---
+
+Most number formats and text styles have a dedicated shortcut —
+faster than opening the ribbon's Home tab for something you apply
+dozens of times a day.
+
+export const groups = [
+  {
+    category: 'Text style',
+    shortcuts: [
+      { action: 'Bold', win: 'Ctrl+B', mac: '⌘+B' },
+      { action: 'Italic', win: 'Ctrl+I', mac: '⌘+I' },
+      { action: 'Underline', win: 'Ctrl+U', mac: '⌘+U' },
+      { action: 'Strikethrough', win: 'Ctrl+5', mac: 'Shift+⌘+X' },
+      { action: 'Open Format Cells dialog', win: 'Ctrl+1', mac: '⌘+1' },
+    ],
+  },
+  {
+    category: 'Number formats',
+    shortcuts: [
+      { action: 'General number format', win: 'Ctrl+Shift+~', mac: 'Ctrl+Shift+~' },
+      { action: 'Currency format', win: 'Ctrl+Shift+$', mac: 'Ctrl+Shift+$' },
+      { action: 'Percentage format', win: 'Ctrl+Shift+%', mac: 'Ctrl+Shift+%' },
+      { action: 'Scientific format', win: 'Ctrl+Shift+^', mac: 'Ctrl+Shift+^' },
+      { action: 'Date format', win: 'Ctrl+Shift+#', mac: 'Ctrl+Shift+#' },
+      { action: 'Time format', win: 'Ctrl+Shift+@', mac: 'Ctrl+Shift+@' },
+      { action: 'Number format (two decimals, thousands separator)', win: 'Ctrl+Shift+!', mac: 'Ctrl+Shift+!' },
+    ],
+  },
+  {
+    category: 'Borders & structure',
+    shortcuts: [
+      { action: 'Apply outline border', win: 'Ctrl+Shift+&', mac: '⌘+Option+0 or Ctrl+Shift+&' },
+      { action: 'Remove outline border', win: 'Ctrl+Shift+_', mac: '⌘+Option+-' },
+      { action: 'Create table', win: 'Ctrl+L or Ctrl+T', mac: '⌘+T or Ctrl+T' },
+      { action: 'Insert hyperlink', win: 'Ctrl+K', mac: '⌘+K or Ctrl+K' },
+      { action: 'Hide selected columns', win: 'Ctrl+0', mac: 'Ctrl+0' },
+      { action: 'Unhide columns', win: 'Ctrl+Shift+0', mac: 'Shift+⌘+0' },
+      { action: 'Hide selected rows', win: 'Ctrl+9', mac: 'Ctrl+9' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  The number-format shortcuts (`Ctrl+Shift+` plus a symbol) are easy
+  to forget individually, but they share a logic worth remembering
+  once: `$` for Currency, `%` for Percentage, `#` for Date — the
+  symbol is a visual hint for the format it applies.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Is there a shortcut to just clear formatting without deleting the cell contents?',
+    answer: "Not a dedicated keyboard shortcut — clearing formatting only (Home tab → Clear → Clear Formats) doesn't have its own key combo on either platform. Ctrl+Shift+~ resets the number format specifically to General, but it won't remove fonts, colors, or borders.",
+  },
+  {
+    question: 'Why does Ctrl+5 apply strikethrough instead of something else?',
+    answer: "It's simply the assigned key — Ctrl+B, Ctrl+I, and Ctrl+U cover bold/italic/underline, and Ctrl+5 was added for strikethrough since there's no obvious single letter for it (S is already used elsewhere in some locales). Windows also accepts Ctrl+2/Ctrl+3/Ctrl+4 as alternates for bold/italic/underline.",
+  },
+  {
+    question: 'Do the number-format shortcuts work the same in Excel for the web?',
+    answer: "Most of the Ctrl+Shift+ symbol shortcuts carry over, but web-based Excel has more limited keyboard support overall than the desktop apps — test a specific shortcut there before relying on it in a workflow.",
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

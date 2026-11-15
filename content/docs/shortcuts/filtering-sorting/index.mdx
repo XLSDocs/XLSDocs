@@ -1,0 +1,58 @@
+---
+title: Filtering, sorting & outline shortcuts
+description: Toggle filters, open a filter's dropdown, and work with grouped/outlined data from the keyboard.
+---
+
+Excel's native filtering and sorting is mostly dialog- and
+mouse-driven, but a handful of genuinely useful shortcuts cover
+turning filters on, opening a filter dropdown, and toggling outline
+view.
+
+export const groups = [
+  {
+    category: 'Filtering & sorting',
+    shortcuts: [
+      { action: 'Apply or remove filter arrows', win: 'Ctrl+Shift+L', mac: '⌘+Shift+F or Ctrl+Shift+L' },
+      { action: "Open a column's filter dropdown", win: 'Alt+Down arrow', mac: 'Option+Down arrow' },
+      { action: 'Open Sort dialog', win: '—', mac: '⌘+Shift+R' },
+    ],
+  },
+  {
+    category: 'Outline & grouping',
+    shortcuts: [
+      { action: 'Display or hide outline symbols', win: 'Ctrl+8', mac: 'Ctrl+8' },
+      { action: 'Group selected rows/columns', win: 'Shift+Alt+Right arrow', mac: '⌘+Shift+K' },
+      { action: 'Ungroup selected rows/columns', win: 'Shift+Alt+Left arrow', mac: '⌘+Shift+J' },
+      { action: 'Hide selected rows', win: 'Ctrl+9', mac: 'Ctrl+9' },
+      { action: 'Hide selected columns', win: 'Ctrl+0', mac: 'Ctrl+0' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  With the active cell anywhere inside a filtered column's header
+  row, **Alt+Down arrow** opens that column's filter dropdown
+  exactly as if it had been clicked — no need to reach for the mouse
+  just to change a filter.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Does Ctrl+Shift+L require a Table object, or does it work on any range?',
+    answer: "It works on any range with headers, not just a formal Table — Excel applies filter dropdown arrows to the header row either way. Pressing it again on the same range removes the filter arrows and clears any active filters.",
+  },
+  {
+    question: "Is there a keyboard shortcut to actually choose a filter option, not just open the dropdown?",
+    answer: "Alt+Down arrow opens the dropdown, and from there the arrow keys and Enter navigate and select options the same as any other menu — there isn't a single combined shortcut that opens and selects in one step.",
+  },
+  {
+    question: 'Why is there no Windows shortcut listed for the Sort dialog?',
+    answer: "Microsoft's own shortcut reference doesn't list one for Windows — Alt, A, S, S opens the Sort dialog via the ribbon's access-key sequence (Data tab → Sort), which works as a close substitute even without a dedicated single shortcut.",
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

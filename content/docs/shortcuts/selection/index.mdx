@@ -1,0 +1,71 @@
+---
+title: Selection shortcuts
+description: Select cells, rows, columns, regions, and whole sheets precisely with the keyboard.
+---
+
+Selecting the right range by dragging with a mouse gets error-prone
+once a table grows past one screen. These shortcuts select exactly
+what's needed — a whole column, a contiguous data region, or
+everything up to the last used cell — in one keystroke.
+
+export const groups = [
+  {
+    category: 'Rows, columns & whole sheet',
+    shortcuts: [
+      { action: 'Select entire column', win: 'Ctrl+Space', mac: 'Ctrl+Space' },
+      { action: 'Select entire row', win: 'Shift+Space', mac: 'Shift+Space' },
+      { action: 'Select entire worksheet', win: 'Ctrl+A or Ctrl+Shift+Space', mac: '⌘+A or ⌘+Shift+Space' },
+      { action: 'Select current region (press again to expand)', win: 'Ctrl+A or Ctrl+Shift+Space', mac: '⌘+A' },
+      { action: 'Select current region around active cell', win: 'Ctrl+Shift+*', mac: '—' },
+      { action: 'Select current and next sheet', win: 'Ctrl+Shift+Page Down', mac: '—' },
+      { action: 'Select current and previous sheet', win: 'Ctrl+Shift+Page Up', mac: '—' },
+    ],
+  },
+  {
+    category: 'Extending a selection',
+    shortcuts: [
+      { action: 'Extend selection by one cell', win: 'Shift+Arrow key', mac: 'Shift+Arrow key' },
+      { action: 'Extend to last nonblank cell in direction', win: 'Ctrl+Shift+Arrow key', mac: 'Shift+⌘+Arrow key' },
+      { action: 'Extend to last used cell', win: 'Ctrl+Shift+End', mac: 'Ctrl+Shift+End' },
+      { action: 'Extend to beginning of sheet', win: 'Ctrl+Shift+Home', mac: 'Ctrl+Shift+Home' },
+      { action: 'Extend down/up one screen', win: '—', mac: 'Shift+Page Down / Shift+Page Up' },
+      { action: 'Toggle extend mode (then use arrow keys)', win: 'F8', mac: 'F8' },
+      { action: 'Add a non-adjacent cell or range to the selection', win: 'Shift+F8', mac: 'Shift+F8' },
+    ],
+  },
+  {
+    category: 'Moving within a selection',
+    shortcuts: [
+      { action: 'Move down / up within selection', win: 'Enter / Shift+Enter', mac: 'Return / Shift+Return' },
+      { action: 'Move right / left within selection', win: 'Tab / Shift+Tab', mac: 'Tab / Shift+Tab' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  **Ctrl+Shift+End** is the fastest way to select from the active
+  cell all the way to the last used cell in the sheet — no need to
+  know in advance how many rows or columns a table has. Combine it
+  with Ctrl+Shift+Home to select the opposite direction, back to A1.
+</Callout>
+
+export const faqs = [
+  {
+    question: "What's the difference between Ctrl+A and Ctrl+Shift+Space for selecting a region?",
+    answer: "With the active cell inside a contiguous block of data, both select the current region first. Pressing either one again (with the selection already active) expands it — first to include summary rows/columns, then to the entire worksheet.",
+  },
+  {
+    question: 'How do I select two separate, non-touching ranges at once?',
+    answer: 'Select the first range normally, then press Shift+F8 to switch into "add to selection" mode, move to the second range with the arrow keys, and extend it with Shift+Arrow key. Click-and-Ctrl+click is the mouse equivalent.',
+  },
+  {
+    question: 'Does Ctrl+Space select a column on Mac too?',
+    answer: 'Yes — Ctrl+Space (not ⌘+Space, which is reserved for Spotlight) selects the entire column on Mac, identical to Windows. Shift+Space selects the entire row on both platforms as well.',
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

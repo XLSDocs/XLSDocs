@@ -1,0 +1,81 @@
+---
+title: PivotTable shortcuts
+description: The handful of keyboard shortcuts that actually apply to PivotTables, plus the separate set for Power Pivot's data-modeling grid.
+---
+
+Excel genuinely has very few PivotTable-specific keyboard shortcuts —
+most PivotTable work (dragging fields, expanding/collapsing groups,
+changing summary type) is mouse- and Field-List-driven by design.
+What does exist is worth knowing, and it's worth separating from
+**Power Pivot** — a related but distinct add-in with its own,
+Windows-only data-grid shortcuts that only apply if that add-in is
+actually in use.
+
+export const groups = [
+  {
+    category: 'Working with a PivotTable',
+    shortcuts: [
+      { action: "Open a field's filter dropdown", win: 'Alt+Down arrow', mac: 'Option+Down arrow' },
+      { action: 'Apply or remove filter arrows', win: 'Ctrl+Shift+L', mac: '⌘+Shift+F or Ctrl+Shift+L' },
+      { action: 'Refresh the current sheet\'s data', win: 'Ctrl+F5', mac: '—' },
+      { action: 'Refresh all data connections in the workbook', win: 'Ctrl+Alt+F5', mac: '—' },
+      { action: 'Display or hide outline symbols (row grouping)', win: 'Ctrl+8', mac: 'Ctrl+8' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="warn">
+  There's no dedicated shortcut to **expand/collapse a PivotTable
+  field group**, change the summary function, or move a field
+  between areas — those stay mouse- or Field-List-driven on both
+  platforms. The shortcuts above are genuinely the complete list for
+  native PivotTables; everything else below is specifically about
+  the separate Power Pivot add-in.
+</Callout>
+
+## Power Pivot (Windows only)
+
+If the Power Pivot add-in is enabled, its own data-modeling grid —
+a different interface from a regular PivotTable — has a larger set
+of Windows-only shortcuts for moving around and editing that grid
+directly:
+
+export const powerPivotGroups = [
+  {
+    category: 'Power Pivot data grid',
+    shortcuts: [
+      { action: 'Select entire table', win: 'Ctrl+A', mac: '—' },
+      { action: 'Copy selected data', win: 'Ctrl+C', mac: '—' },
+      { action: 'Move to first/last cell of the table', win: 'Ctrl+Home / Ctrl+End', mac: '—' },
+      { action: 'Move to first/last cell of the row', win: 'Ctrl+Left / Ctrl+Right arrow', mac: '—' },
+      { action: 'Move to first/last cell of the column', win: 'Ctrl+Up / Ctrl+Down arrow', mac: '—' },
+      { action: 'Move to previous/next table', win: 'Ctrl+Page Up / Ctrl+Page Down', mac: '—' },
+      { action: 'Recalculate all formulas in Power Pivot', win: 'F9', mac: '—' },
+      { action: 'Rename table', win: 'Ctrl+R', mac: '—' },
+      { action: 'Move table', win: 'Ctrl+M', mac: '—' },
+    ],
+  },
+];
+
+<ShortcutTable groups={powerPivotGroups} />
+
+export const faqs = [
+  {
+    question: 'Why are there so few PivotTable-specific shortcuts compared to everything else in Excel?',
+    answer: "PivotTables are largely built around drag-and-drop field placement and the Field List panel, which don't map cleanly onto discrete keyboard actions the way typing a formula or selecting a range does. Microsoft's own shortcut reference confirms this — Alt+Down arrow (opening a filter) is essentially the only PivotTable-specific entry it lists.",
+  },
+  {
+    question: "What's the real difference between a PivotTable and Power Pivot?",
+    answer: 'A PivotTable summarizes data already on a worksheet. Power Pivot is a separate, more powerful data-modeling add-in that can combine multiple tables with relationships and its own formula language (DAX) before a PivotTable is even built on top of it — it has its own data-grid interface with its own shortcuts, distinct from a regular worksheet.',
+  },
+  {
+    question: 'Are any Power Pivot grid shortcuts available on Mac?',
+    answer: "No — Power Pivot itself is a Windows-only add-in; it doesn't exist in Excel for Mac at all, so none of its grid shortcuts have a Mac equivalent.",
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

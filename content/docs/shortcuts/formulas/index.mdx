@@ -1,0 +1,69 @@
+---
+title: Formula & calculation shortcuts
+description: Write formulas, cycle reference types, and control when Excel recalculates — without reaching for the ribbon.
+---
+
+Writing formulas by hand means constantly toggling reference types,
+inserting functions, and occasionally forcing a recalculation —
+these shortcuts cover all three without leaving the keyboard.
+
+export const groups = [
+  {
+    category: 'Writing a formula',
+    shortcuts: [
+      { action: 'Cycle absolute/relative reference (A1 → $A$1 → A$1 → $A1)', win: 'F4', mac: '⌘+T or F4' },
+      { action: 'Insert function (Insert Function dialog)', win: 'Shift+F3', mac: 'Shift+F3' },
+      { action: 'Insert SUM formula (AutoSum)', win: 'Alt+=', mac: 'Shift+⌘+T' },
+      { action: 'Insert argument names and parentheses', win: 'Ctrl+Shift+A', mac: '—' },
+      { action: 'Paste a defined name into a formula', win: 'F3', mac: '—' },
+      { action: 'Expand or collapse the formula bar', win: 'Ctrl+Shift+U', mac: 'Ctrl+Shift+U' },
+      { action: 'Toggle formula AutoComplete tooltips', win: 'Ctrl+Alt+P', mac: 'Ctrl+Option+P' },
+    ],
+  },
+  {
+    category: 'Names',
+    shortcuts: [
+      { action: 'Define a name', win: 'Alt, M, M, D', mac: 'Ctrl+L' },
+      { action: 'Open Define Name dialog', win: '—', mac: '⌘+F3' },
+      { action: 'Open Create Names dialog', win: '—', mac: '⌘+Shift+F3' },
+    ],
+  },
+  {
+    category: 'Calculation',
+    shortcuts: [
+      { action: 'Calculate all open workbooks', win: 'F9', mac: '⌘+= or F9' },
+      { action: 'Calculate active sheet only', win: 'Shift+F9', mac: 'Shift+F9' },
+      { action: 'Calculate all, regardless of what changed', win: 'Ctrl+Alt+F9', mac: 'Ctrl+Option+F9' },
+      { action: 'Recheck dependent formulas, then calculate all', win: 'Ctrl+Alt+Shift+F9', mac: 'Ctrl+Option+Shift+F9' },
+      { action: 'Display the Error Checking menu', win: 'Alt+Shift+F10', mac: '—' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  `F4` to cycle a cell reference through `A1` → `$A$1` → `A$1` →
+  `$A1` and back is the highest-value shortcut on this entire page if
+  you write formulas by hand — no more manually typing dollar signs
+  to lock a reference before copying a formula across a range.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Why would I ever need Ctrl+Alt+F9 instead of just F9?',
+    answer: 'F9 only recalculates cells Excel has flagged as needing an update. Ctrl+Alt+F9 forces a full recalculation of every formula regardless of its flagged state — useful for the rare case where a formula shows a stale result Excel doesn\'t realize is outdated, often after a circular-reference or add-in quirk.',
+  },
+  {
+    question: 'Does F4 do the same thing everywhere in Excel?',
+    answer: 'No — F4 only cycles reference types while actively editing a formula with the cursor on or next to a cell reference. Outside that context, F4 instead repeats the last action or command, the same role Ctrl+Y plays.',
+  },
+  {
+    question: 'How do I quickly see which cells feed into a formula?',
+    answer: "There's no single keyboard shortcut for Trace Precedents/Dependents on Windows, but on Mac, Ctrl+Shift+[ selects cells directly referred to by the active formula, and Ctrl+] selects cells with formulas that refer to the active cell.",
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

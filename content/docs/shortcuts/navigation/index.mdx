@@ -1,0 +1,74 @@
+---
+title: Navigation shortcuts
+description: Move between cells, sheets, and screens in Excel without touching the mouse.
+---
+
+Moving around a large worksheet by clicking and scrolling is slow —
+these shortcuts jump directly to the edge of your data, the next
+sheet, or any screen's worth of cells in one keystroke.
+
+export const groups = [
+  {
+    category: 'Within a sheet',
+    shortcuts: [
+      { action: 'Move one cell', win: 'Arrow key', mac: 'Arrow key' },
+      { action: 'Move to edge of current data region', win: 'Ctrl+Arrow key', mac: '⌘+Arrow key' },
+      { action: 'Move to beginning of row', win: 'Home', mac: 'Home' },
+      { action: 'Move to beginning of sheet', win: 'Ctrl+Home', mac: 'Ctrl+Home' },
+      { action: 'Move to last used cell', win: 'Ctrl+End', mac: 'Ctrl+End' },
+      { action: 'Move one screen down', win: 'Page Down', mac: 'Page Down' },
+      { action: 'Move one screen up', win: 'Page Up', mac: 'Page Up' },
+      { action: 'Move one screen right', win: 'Alt+Page Down', mac: 'Option+Page Down' },
+      { action: 'Move one screen left', win: 'Alt+Page Up', mac: 'Option+Page Up' },
+      { action: 'Move one cell right (or between unlocked cells)', win: 'Tab', mac: 'Tab' },
+    ],
+  },
+  {
+    category: 'Between sheets and windows',
+    shortcuts: [
+      { action: 'Move to next sheet', win: 'Ctrl+Page Down', mac: 'Ctrl+Page Down' },
+      { action: 'Move to previous sheet', win: 'Ctrl+Page Up', mac: 'Ctrl+Page Up' },
+      { action: 'Switch between two Excel windows', win: 'Ctrl+F6', mac: '—' },
+      { action: 'Switch between all Excel windows', win: 'Ctrl+Shift+F6', mac: '—' },
+      { action: 'Switch focus among grid, ribbon, and task pane', win: 'F6 or Shift+F6', mac: 'F6 or Shift+F6' },
+    ],
+  },
+  {
+    category: 'Finding a specific place',
+    shortcuts: [
+      { action: 'Open Go To dialog', win: 'F5', mac: 'Ctrl+G or F5' },
+      { action: 'Find', win: 'Ctrl+F', mac: 'Ctrl+F or Shift+F5' },
+      { action: 'Zoom in', win: 'Ctrl+Alt+=', mac: '—' },
+      { action: 'Zoom out', win: 'Ctrl+Alt+-', mac: '—' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  **Ctrl+Arrow key** (⌘+Arrow key on Mac) is the single most useful
+  navigation shortcut on this list — it jumps straight to the last
+  cell before a gap in the current direction, the same movement
+  double-clicking a cell's border performs. Tap it repeatedly to hop
+  across an entire table column by column instead of scrolling.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'What does Ctrl+Arrow key actually do?',
+    answer: "It moves to the edge of the current block of data in that direction — stopping at the first blank cell, or the last cell with data if there's no gap. It's the keyboard equivalent of double-clicking a cell's border.",
+  },
+  {
+    question: 'How do I jump to a specific cell by name, like Z500?',
+    answer: 'Press F5 (Ctrl+G or F5 on Mac) to open the Go To dialog, type the cell reference, and press Enter. This works for named ranges too, not just raw cell addresses.',
+  },
+  {
+    question: 'Is there a way to move between open Excel windows without the mouse?',
+    answer: 'On Windows, Ctrl+F6 cycles between two open Excel windows, and Ctrl+Shift+F6 cycles through all of them. Mac does not have a direct equivalent — use Cmd+Tab to switch applications instead, since Mac treats each Excel window differently.',
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

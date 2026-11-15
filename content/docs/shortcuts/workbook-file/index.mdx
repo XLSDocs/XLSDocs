@@ -1,0 +1,69 @@
+---
+title: Workbook & file shortcuts
+description: Save, open, print, and manage the workbook itself — plus the Visual Basic Editor and Power Query Editor.
+---
+
+Shortcuts for the workbook as a whole, rather than anything inside a
+specific cell — opening and saving files, printing, refreshing data
+connections, and jumping into the VBA or Power Query editors.
+
+export const groups = [
+  {
+    category: 'Open, save & print',
+    shortcuts: [
+      { action: 'New blank workbook', win: 'Ctrl+N', mac: '⌘+N or Ctrl+N' },
+      { action: 'Open workbook', win: 'Ctrl+O', mac: '⌘+O or Ctrl+O' },
+      { action: 'Save', win: 'Ctrl+S', mac: '⌘+S or Ctrl+S' },
+      { action: 'Save As dialog', win: 'F12', mac: '⌘+Shift+S or F12' },
+      { action: 'Print', win: 'Ctrl+P', mac: '⌘+P or Ctrl+P' },
+      { action: 'Close workbook', win: 'Ctrl+W', mac: '⌘+W or Ctrl+W' },
+      { action: 'Close Excel', win: 'Alt+F4', mac: '⌘+Q' },
+    ],
+  },
+  {
+    category: 'Data connections',
+    shortcuts: [
+      { action: 'Refresh data in current sheet', win: 'Ctrl+F5', mac: '—' },
+      { action: 'Refresh all data in workbook', win: 'Ctrl+Alt+F5', mac: '—' },
+      { action: 'Stop a refresh in progress', win: 'Esc', mac: '—' },
+    ],
+  },
+  {
+    category: 'Editors & tools',
+    shortcuts: [
+      { action: 'Open Visual Basic Editor', win: 'Alt+F11', mac: 'Option+F11' },
+      { action: 'Open Power Query Editor', win: 'Alt+F12', mac: 'Option+F12' },
+      { action: 'Open Macro dialog', win: 'Alt+F8', mac: 'Option+F8' },
+      { action: 'Check spelling', win: 'F7', mac: 'F7' },
+      { action: 'Open Help', win: 'F1', mac: 'F1 or ⌘+/' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  `Alt+F11` is worth knowing even if you never write VBA by hand —
+  it's the fastest way to jump into the Visual Basic Editor to peek
+  at a workbook's macros before running an unfamiliar file someone
+  else sent you.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Is there a Mac equivalent to Ctrl+F5 for refreshing data?',
+    answer: "Microsoft's own shortcut reference doesn't list a direct Mac keyboard equivalent for refreshing a single sheet or the whole workbook's data connections — use the Data tab's Refresh All button on Mac instead.",
+  },
+  {
+    question: 'What\'s the difference between Alt+F11 and Alt+F8?',
+    answer: 'Alt+F11 opens the full Visual Basic Editor, where macro code is actually written and edited. Alt+F8 opens the simpler Macro dialog, used to run, step into, edit, or delete an existing macro without opening the full editor.',
+  },
+  {
+    question: 'Does Ctrl+S always show a Save As dialog for a brand-new, never-saved workbook?',
+    answer: "Yes — Ctrl+S behaves like Save As the very first time a new workbook is saved, since there's no existing file location yet. F12 opens that same dialog directly and explicitly, useful for saving a copy under a different name or location without overwriting the original.",
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.

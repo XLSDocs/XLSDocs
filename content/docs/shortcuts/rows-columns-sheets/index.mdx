@@ -1,0 +1,66 @@
+---
+title: Rows, columns & sheets shortcuts
+description: Insert, delete, hide, and manage rows, columns, and worksheets from the keyboard.
+---
+
+Restructuring a sheet — adding a row, hiding a column, inserting a
+new tab — happens constantly while building a workbook. These
+shortcuts cover the structural edits themselves, separate from
+selecting or formatting the cells inside them.
+
+export const groups = [
+  {
+    category: 'Insert & delete',
+    shortcuts: [
+      { action: 'Insert cells (opens Insert dialog for rows/columns/cells)', win: 'Ctrl+Shift+=', mac: 'Ctrl+Shift+=' },
+      { action: 'Delete cells (opens Delete dialog)', win: 'Ctrl+-', mac: '⌘+- or Ctrl+-' },
+      { action: 'Insert new worksheet', win: 'Alt+Shift+F1 or Shift+F11', mac: 'Shift+F11' },
+      { action: 'Insert new chart sheet', win: 'F11', mac: 'F11' },
+    ],
+  },
+  {
+    category: 'Hide & unhide',
+    shortcuts: [
+      { action: 'Hide selected rows', win: 'Ctrl+9', mac: 'Ctrl+9' },
+      { action: 'Hide selected columns', win: 'Ctrl+0', mac: 'Ctrl+0' },
+      { action: 'Unhide rows', win: 'Ctrl+Shift+(', mac: 'Ctrl+Shift+(' },
+      { action: 'Unhide columns', win: 'Ctrl+Shift+)', mac: 'Ctrl+Shift+)' },
+    ],
+  },
+  {
+    category: 'Grouping & outline',
+    shortcuts: [
+      { action: 'Group selected rows/columns', win: 'Shift+Alt+Right arrow', mac: '⌘+Shift+K' },
+      { action: 'Ungroup selected rows/columns', win: 'Shift+Alt+Left arrow', mac: '⌘+Shift+J' },
+      { action: 'Display or hide outline symbols', win: 'Ctrl+8', mac: 'Ctrl+8' },
+    ],
+  },
+];
+
+<ShortcutTable groups={groups} />
+
+<Callout type="idea">
+  Selecting **entire rows or columns** (not just a cell range) before
+  grouping skips the "Rows or Columns?" dialog entirely — the group
+  applies in one keystroke. With only a cell range selected, Excel
+  has to ask which direction you mean.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Why does Ctrl+Shift+= sometimes insert a cell and sometimes a whole row?',
+    answer: 'It opens the Insert dialog when a partial range is selected, letting you choose Shift cells right/down, or Entire row/column. If an entire row or column is already selected first, it inserts that same type immediately without the dialog.',
+  },
+  {
+    question: 'How do I quickly add a brand-new worksheet tab?',
+    answer: 'Shift+F11 inserts a new worksheet before the active one on both Windows and Mac. On Windows, Alt+Shift+F1 does the same thing as an alternate.',
+  },
+  {
+    question: "What's the difference between hiding a row/column and grouping it?",
+    answer: "Hiding (Ctrl+9 / Ctrl+0) removes a row or column from view with no visible control to bring it back except Format → Hide & Unhide. Grouping adds a clickable +/- outline control specifically so it can be collapsed and expanded repeatedly — better for data meant to be toggled, not permanently hidden.",
+  },
+];
+
+<Faq items={faqs} />
+
+Verified against [Microsoft's own keyboard shortcuts reference](https://support.microsoft.com/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f) for both platforms.
