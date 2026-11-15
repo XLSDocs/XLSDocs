@@ -1,0 +1,94 @@
+---
+title: "#BUSY!"
+description: Excel is waiting on a slow resource to finish — a live data function like RTD or STOCKHISTORY, or a Python in Excel calculation. Not a formula mistake.
+---
+
+`#BUSY!` means Excel is still waiting on something slow to finish —
+an external data source, or a heavy calculation — and hasn't given
+up on it. Unlike most error values, it's often just a temporary
+placeholder that clears on its own once the wait is over.
+
+export const quickAnswerFacts = [
+  { text: 'Means: Excel is waiting on a slow resource, not reporting a failure', type: 'warn' },
+  { text: 'Common with RTD, STOCKHISTORY, and Python in Excel calculations', type: 'check' },
+  { text: 'IFERROR and ISERROR do not reliably catch it — it is a wait state, not a true error', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=RTD("Vendor.Server", , "LAST") → #BUSY! while the RTD server is still responding'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**[RTD](/docs/lookup/rtd): the add-in server hasn't responded yet.**
+A live, push-based data source can take a moment after the workbook
+opens or recalculates before its first value arrives:
+
+<ExcelCode>{`=RTD("Vendor.RTDServer", , "LAST", "MSFT") → #BUSY! briefly, then the real value`}</ExcelCode>
+
+**[STOCKHISTORY](/docs/lookup/stockhistory): the historical-data
+service is still retrieving the requested range** — a large date
+range or a slow connection to Microsoft's financial-data service can
+leave the formula showing `#BUSY!` for several seconds:
+
+<ExcelCode>{`=STOCKHISTORY("MSFT", "2000-01-01", TODAY()) → #BUSY! while 25+ years of data is retrieved`}</ExcelCode>
+
+**Python in Excel: a `PY` formula is still calculating.** Microsoft's
+own documentation notes this can persist for up to 60 seconds before
+it's worth resetting the Python runtime from the Formulas tab.
+
+## How to fix it
+
+1. **Wait, then recalculate (F9)** — in most cases `#BUSY!` simply
+   clears once the slow resource responds; it isn't a sign that
+   anything is actually broken.
+2. **For RTD specifically**, confirm the add-in server itself hasn't
+   hung or crashed if the wait never resolves — a server that's
+   genuinely stuck looks identical to one that's merely slow.
+3. **For a large STOCKHISTORY range**, consider narrowing the date
+   range if the wait is consistently long — less data to retrieve
+   means a shorter `#BUSY!` window on every recalculation.
+4. **For Python in Excel**, reset the Python runtime (Formulas tab)
+   if the wait passes roughly 60 seconds without resolving.
+
+## Catching it in a formula
+
+<Callout type="warn">
+  Unlike every other error on this site, `#BUSY!` is **not reliably
+  caught by [IFERROR](/docs/logical/iferror) or
+  [ISERROR](/docs/info/iserror)** — it represents Excel still waiting
+  on a result, not a value that has actually failed yet. A formula
+  wrapping a busy cell in IFERROR can itself just show the fallback
+  value temporarily, or recalculate again once the real result
+  arrives, rather than cleanly suppressing it the way IFERROR
+  suppresses `#N/A` or `#DIV/0!`.
+</Callout>
+
+[ERROR.TYPE](/docs/info/error-type) has no dedicated code for
+`#BUSY!` — like `#SPILL!`, `#CALC!`, `#CONNECT!`, `#BLOCKED!`, and
+`#FIELD!`, it postdates the original seven-code table.
+
+## Not the same as #CONNECT!
+
+[#CONNECT!](/docs/errors/connect) means a network call has already
+*failed* — the service is unreachable. `#BUSY!` means the call is
+still *in progress* — Excel hasn't given up on it yet, and it may
+still resolve successfully given more time.
+
+export const faqs = [
+  {
+    question: 'Is #BUSY! a real error, or just a loading state?',
+    answer: "It's closer to a loading state than a true error — it means Excel is still waiting on a slow resource (a live data add-in, a large data retrieval, a Python calculation) and hasn't given up. It often clears on its own once the wait finishes.",
+  },
+  {
+    question: 'Why doesn\'t IFERROR catch #BUSY! the way it catches other errors?',
+    answer: "Because #BUSY! represents an in-progress wait, not a completed failure. IFERROR is designed to replace a formula's final error result — but a busy cell hasn't finished calculating yet, so wrapping it in IFERROR doesn't reliably suppress the placeholder the way it does for a genuinely failed formula.",
+  },
+  {
+    question: 'How long should I wait before assuming something is actually wrong?',
+    answer: "There's no universal number, but Microsoft's own Python in Excel guidance uses roughly 60 seconds as a threshold before suggesting a reset. For RTD or STOCKHISTORY, a #BUSY! that never clears after a normal recalculation (rather than just a few seconds) is a reasonable sign to check the underlying connection or server.",
+  },
+];
+
+<Faq items={faqs} />

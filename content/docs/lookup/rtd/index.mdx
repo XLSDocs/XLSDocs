@@ -84,6 +84,17 @@ machine running the workbook.
 Install the specific RTD server the `ProgID` refers to — this isn't
 a formula syntax problem, it's a missing external dependency.
 
+### #BUSY! — the RTD server hasn't responded yet
+
+<ExcelCode>{`RTD("Vendor.RTDServer", , "LAST", "MSFT") → #BUSY! briefly, then the real value`}</ExcelCode>
+
+This is normal, not a failure — RTD cells often show `#BUSY!` for a
+moment right after the workbook opens or recalculates, while the
+add-in server is still responding. It should clear on its own once
+the first value arrives.
+
+See the full [#BUSY! reference](/docs/errors/busy) for every way this can happen and how to catch it.
+
 ### Confusing the server argument's blank vs. quoted-blank requirement
 
 <ExcelCode>{`In a worksheet formula, leave server empty: RTD("Vendor.Server", , "LAST")`}</ExcelCode>

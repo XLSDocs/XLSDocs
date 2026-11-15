@@ -1,0 +1,88 @@
+---
+title: "#FIELD!"
+description: FIELDVALUE or the cell.field dot syntax asked for a field that doesn't exist on that Linked Data Type, or the cell isn't a Linked Data Type at all.
+---
+
+`#FIELD!` means a formula tried to pull a named field out of a
+Linked Data Type cell, and that field either doesn't exist on that
+data type or the referenced cell isn't a Linked Data Type in the
+first place. It's specific to Stocks, Geography, and similar
+data-type features — nothing else in Excel produces it.
+
+export const quickAnswerFacts = [
+  { text: 'Means: the named field doesn\'t exist on this Linked Data Type, or the cell isn\'t one at all', type: 'warn' },
+  { text: 'Only produced by FIELDVALUE and the cell.field dot syntax', type: 'check' },
+  { text: 'A misspelled field name is the single most common cause', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FIELDVALUE(A1, "Prices") → #FIELD! (the real field is named "Price")'}
+  facts={quickAnswerFacts}
+/>
+
+## Common causes
+
+**[FIELDVALUE](/docs/lookup/fieldvalue) / `cell.field` dot syntax:
+the field name is misspelled or doesn't exist** on that data type —
+by far the most common cause:
+
+<ExcelCode>{`=FIELDVALUE(A1, "Prices") → #FIELD! (should be "Price")
+=A1.Prices → #FIELD! (same mistake, dot syntax)`}</ExcelCode>
+
+**The referenced cell isn't a Linked Data Type at all** — plain text
+that merely looks like a stock ticker or place name was never
+converted:
+
+<ExcelCode>{`=FIELDVALUE(A1, "Price") → #FIELD! (A1 is still just the text "MSFT", not a converted Stocks data type)`}</ExcelCode>
+
+**A field that genuinely isn't available for that specific
+instrument or entity** — not every Stocks or Geography record carries
+every possible field; a smaller or delisted entity can simply be
+missing one.
+
+## How to fix it
+
+1. **Click the data type's card icon** in the source cell (the small
+   icon that appears after conversion) to see the exact, correctly-
+   spelled list of fields actually available for that entity.
+2. **Confirm the referenced cell is really a Linked Data Type** —
+   convert it through Data → Stocks or Data → Geography (or type the
+   entity and accept Excel's conversion prompt) if it's still just
+   text.
+3. **Wrap the formula in [IFERROR](/docs/logical/iferror)** with a
+   sensible fallback if the field is only sometimes available across
+   a column of mixed entities:
+   <ExcelCode>{`=IFERROR(FIELDVALUE(A1, "Price"), "N/A")`}</ExcelCode>
+
+## Catching it in a formula
+
+[IFERROR](/docs/logical/iferror) and [ISERROR](/docs/info/iserror)
+both catch `#FIELD!` the same as any other error value.
+[ERROR.TYPE](/docs/info/error-type) has no dedicated code for it — it
+postdates the original seven-code table, same as `#SPILL!`, `#CALC!`,
+`#CONNECT!`, and `#BLOCKED!`.
+
+## Not the same as #NAME?
+
+[#NAME?](/docs/errors/name) also shows up when Excel doesn't
+recognize something written in a formula, but for an unrelated
+reason — a misspelled *function* name, not a misspelled *field* name
+inside an already-valid FIELDVALUE call. `#FIELD!` only ever comes
+from the Linked Data Type field-extraction mechanism specifically.
+
+export const faqs = [
+  {
+    question: 'What functions or syntax can produce #FIELD!?',
+    answer: 'Only FIELDVALUE and the cell.field dot syntax (like =A1.Price) — both extract a named field from a Linked Data Type cell, and #FIELD! means that extraction failed. No other Excel function produces this error.',
+  },
+  {
+    question: 'How do I find the correct field names for a Linked Data Type?',
+    answer: "Click the small data-type card icon that appears in the cell after conversion — it opens a card showing every field actually available for that specific entity, with the exact spelling to use.",
+  },
+  {
+    question: 'Can a valid field be missing for some rows but not others?',
+    answer: "Yes — not every Stocks or Geography record carries every possible field (a smaller or delisted stock, for instance, may lack a field a larger one has). Wrapping the formula in IFERROR handles this gracefully across a mixed column.",
+  },
+];
+
+<Faq items={faqs} />

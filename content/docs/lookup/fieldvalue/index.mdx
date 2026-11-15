@@ -1,0 +1,168 @@
+---
+title: FIELDVALUE
+description: Extract one named field from a Linked Data Type cell — the function form of the dot-reference syntax.
+---
+
+Pull **one named field** out of a cell holding a Linked Data Type
+(Stocks, Geography, and similar) — the function form of Excel's
+`cell.field` dot syntax, usable anywhere a formula argument is
+expected instead of only inline.
+
+export const quickAnswerFacts = [
+  { text: 'value must be a cell already holding a Linked Data Type, not plain text', type: 'warn' },
+  { text: 'field_name is case-insensitive and can come from a cell reference, not just a literal string', type: 'check' },
+  { text: 'A misspelled or unavailable field name returns #FIELD!', type: 'warn' },
+];
+
+<QuickAnswer
+  formula={'=FIELDVALUE(value, field_name)'}
+  facts={quickAnswerFacts}
+/>
+
+## Syntax
+
+<ExcelCode>{`=FIELDVALUE(value, field_name)`}</ExcelCode>
+
+## Parameters
+
+export const parameters = [
+  {
+    name: 'value',
+    type: 'any',
+    required: true,
+    description: 'A cell reference already holding a Linked Data Type (Stocks, Geography, and similar).',
+  },
+  {
+    name: 'field_name',
+    type: 'text',
+    required: true,
+    description: 'The name of the field to extract, in quotation marks or as a cell reference. Case-insensitive.',
+  },
+];
+
+<ParametersTable items={parameters} />
+
+## Return value
+
+The value of `field_name` for the Linked Data Type in `value` —
+whatever type that field actually holds (a number for a stock's
+price, text for a country's capital, and so on).
+
+## Description
+
+A Linked Data Type cell (created through Data → Stocks or Data →
+Geography, or by typing a recognized entity and letting Excel convert
+it) carries far more information than the text shown in the cell
+itself — a stock ticker also carries price, market cap, and dozens of
+other fields; a country name also carries population, capital, and
+currency. The `cell.field` dot syntax (`=A1.Price`) is the fastest way
+to pull one of those fields out, but it only works typed directly
+into a formula. FIELDVALUE does the same extraction as a real
+function call, so it also works as an argument passed into another
+function — `field_name` taken from a cell reference instead of typed
+literally, for instance, which the dot syntax can't do.
+
+<Callout type="warn">
+  **`value` has to already be a Linked Data Type**, not plain text
+  that merely looks like a stock ticker or place name. Typing `MSFT`
+  into a cell doesn't make it one — it has to be converted through
+  Data → Stocks (or Geography), or by typing the name and accepting
+  Excel's data-type conversion prompt, first.
+</Callout>
+
+## Common errors
+
+### #FIELD! — the field name doesn't exist on this data type
+
+<ExcelCode>{`FIELDVALUE(A1, "Prices") → #FIELD! (the real field is named "Price", not "Prices")`}</ExcelCode>
+
+A misspelled field name is the most common cause — check the exact
+spelling of the field (click the data type's card icon in the cell to
+see every available field name), or reference a cell that already
+shows the correct name instead of retyping it.
+
+See the full [#FIELD! reference](/docs/errors/field) for every way this can happen and how to catch it.
+
+### #FIELD! — the referenced cell isn't a Linked Data Type at all
+
+<ExcelCode>{`FIELDVALUE(A1, "Price") → #FIELD! (A1 is plain text, not a converted Stocks data type)`}</ExcelCode>
+
+Convert the cell through Data → Stocks or Data → Geography (or type
+the entity and accept Excel's conversion prompt) before extracting a
+field from it — FIELDVALUE has nothing to extract from an ordinary
+text cell.
+
+### #UNKNOWN! — opened on a version without Linked Data Types
+
+<ExcelCode>{`FIELDVALUE(A1, "Price") → #UNKNOWN! on Excel 2016 (a perpetual-license version)`}</ExcelCode>
+
+FIELDVALUE depends on Linked Data Types, which don't exist on Excel
+2016/2019/2021 — opening a workbook that uses it on one of those
+versions, or while signed out of a qualifying Microsoft 365 account,
+shows `#UNKNOWN!` instead of a result.
+
+See the full [#UNKNOWN! reference](/docs/errors/unknown) for every way this can happen and how to catch it.
+
+export const faqs = [
+  {
+    question: 'How is FIELDVALUE different from the cell.field dot syntax?',
+    answer: 'They extract the exact same data — =FIELDVALUE(A1,"Price") and =A1.Price return the same result. FIELDVALUE exists as a real function call so it can be used as an argument inside another function, and so field_name can come from a cell reference instead of being typed literally, neither of which the dot syntax supports.',
+  },
+  {
+    question: 'Why does FIELDVALUE return #FIELD! even though I spelled the field name right?',
+    answer: "Check that the referenced cell is actually a converted Linked Data Type, not plain text that merely looks like a ticker or place name — FIELDVALUE (and the dot syntax) only works on a cell that's gone through Data → Stocks, Data → Geography, or Excel's own typed-entity conversion.",
+  },
+  {
+    question: 'Is field_name case-sensitive?',
+    answer: 'No — "price", "Price", and "PRICE" all match the same field.',
+  },
+];
+
+<Faq items={faqs} />
+
+## Working with FIELDVALUE from code
+
+<CodeBlockTabs defaultValue="Excel">
+  <CodeBlockTabsList>
+    <CodeBlockTabsTrigger value="Excel">Excel</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="VBA">VBA</CodeBlockTabsTrigger>
+    <CodeBlockTabsTrigger value="Python">Python</CodeBlockTabsTrigger>
+  </CodeBlockTabsList>
+  <CodeBlockTab value="Excel">
+    <ExcelCode>{`=FIELDVALUE(A1, "Price")`}</ExcelCode>
+  </CodeBlockTab>
+  <CodeBlockTab value="VBA">
+    ```vb lineNumbers
+    ' VBA has no built-in FIELDVALUE — calling the worksheet function from VBA is the usual approach
+    Dim result As Variant
+    result = Application.WorksheetFunction.FieldValue(Range("A1").Value, "Price")
+    ```
+  </CodeBlockTab>
+  <CodeBlockTab value="Python">
+    ```python lineNumbers
+    # Linked Data Types are an Excel-only, live-service-backed feature —
+    # openpyxl/pandas have no equivalent concept to extract a field from
+    ```
+  </CodeBlockTab>
+</CodeBlockTabs>
+
+## Compatibility
+
+export const compatibility = [
+  { label: '365', supported: true },
+  { label: '2021', supported: false },
+  { label: '2019', supported: false },
+  { label: '2016', supported: false },
+  { label: 'Web', supported: true },
+];
+
+<Compatibility items={compatibility} />
+
+## Related functions
+
+- [STOCKHISTORY](/docs/lookup/stockhistory) — another function built
+  on the same live Linked Data Type connection, retrieving historical
+  price data instead of a single current field.
+- [XLOOKUP](/docs/lookup/xlookup) — commonly paired with FIELDVALUE
+  to look up which cell holds the right Linked Data Type before
+  extracting a field from it.
