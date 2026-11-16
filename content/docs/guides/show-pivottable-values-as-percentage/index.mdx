@@ -1,0 +1,72 @@
+---
+title: How to show PivotTable values as a percentage
+description: Turn raw totals into % of grand total, % of column total, or % of parent total — without changing the summary function or the source data.
+---
+
+A PivotTable showing raw sales totals per region answers "how much."
+The same PivotTable showing **% of grand total** instead answers "how
+big a share" — a completely different question, from the same data,
+with no new formula and no change to the source.
+
+## Switching to a percentage view
+
+1. Click any value inside the PivotTable's Values area.
+2. Right-click it → **Show Values As** → pick an option (or
+   right-click the field in the **Values** area of the PivotTable
+   Fields pane → **Value Field Settings** → **Show Values As** tab,
+   which offers the same list with a live preview).
+3. Click **OK** — every value in that field switches to the chosen
+   percentage, instantly, with no formula visible anywhere.
+
+## The options that actually matter
+
+- **% of Grand Total** — each value as a share of the single overall
+  total across the whole PivotTable.
+- **% of Column Total** — each value as a share of its own column's
+  total, not the whole table's.
+- **% of Row Total** — each value as a share of its own row's total.
+- **% of Parent Total** — each value as a share of the next level up
+  in a multi-level row/column hierarchy (a city's share of its own
+  state, for instance, rather than the whole report).
+
+<Callout type="idea">
+  **Showing the raw total and the percentage side by side** needs
+  the same field dragged into the Values area **twice** — once left
+  as a plain Sum, once switched to a percentage via Show Values As.
+  There's no option to display both from a single value field.
+</Callout>
+
+## Switching back to raw numbers
+
+Same path — **Show Values As** → **No Calculation** — restores the
+field to its original summary values (whatever summary function was
+set before, typically Sum or Count), with the percentage view removed.
+
+<Callout type="warn">
+  Excel for Mac's **Show Values As** right-click menu doesn't list
+  every option that Excel for Windows does. If the one you need isn't
+  there, choose **More Options** from the same menu to see the full
+  list.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Does switching to a percentage change the underlying summary function?',
+    answer: 'No — Show Values As is a display transformation applied on top of whatever summary function (Sum, Count, Average, etc.) the field already uses. Switching to a percentage and back to No Calculation returns to the exact same underlying summarized values.',
+  },
+  {
+    question: 'Can I show a percentage change from the previous month or year, instead of a share of a total?',
+    answer: 'Yes — that\'s a different Show Values As option, "% Difference From," which compares each value to a chosen base item (like the previous month) rather than a total. It needs a date or sequence field in the Rows/Columns area to compare against.',
+  },
+  {
+    question: 'Why do my percentages not add up to exactly 100% across a row?',
+    answer: "Rounding display settings can make percentages that mathematically sum to 100% appear to round to, say, 99.9% or 100.1% when displayed with fewer decimal places. Increasing the decimal places shown (via Value Field Settings → Number Format) usually resolves the apparent discrepancy.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Related
+
+- [How to group dates in a PivotTable](/docs/guides/group-dates-in-a-pivottable) — another common PivotTable display adjustment.
+- [PivotTable keyboard shortcuts](/docs/shortcuts/pivot-tables) — the handful that exist, plus Power Pivot's separate set.

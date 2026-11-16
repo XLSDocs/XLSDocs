@@ -1,0 +1,114 @@
+---
+title: How to create and use named ranges
+description: Replace cell references like B2:B50 with a readable name — plus the one way to make a named range expand automatically as data grows.
+---
+
+A formula like `=SUM(Sales)` reads better than `=SUM(B2:B50)`, and
+keeps working correctly if a row gets inserted in the middle of that
+range. Named ranges are Excel's way of giving a cell, range, or
+formula a readable name used in place of its address.
+
+## Creating a named range
+
+Select the range, then either:
+
+- Type a name directly into the **Name Box** (the box to the left of
+  the formula bar, which normally shows the active cell's address)
+  and press Enter, or
+- **Formulas → Defined Names → Define Name**, which opens a dialog
+  with a **Scope** dropdown (see below) and a **Comment** field.
+
+A name can't contain spaces or start with a number — use an
+underscore instead of a space (`Monthly_Sales`, not `Monthly Sales`).
+
+## Workbook scope vs. worksheet scope
+
+Every name has a **scope** — either the whole **Workbook** (usable
+from any sheet, the default) or a single **Worksheet** (usable only
+on the sheet it was created on, unless qualified with the sheet name
+first). Two different sheets can each have their own worksheet-scoped
+name that happens to be spelled the same, without conflicting — a
+genuinely useful escape hatch for a template with repeated per-sheet
+ranges like "Totals" on every monthly tab.
+
+<Callout type="warn">
+  Excel has **no direct way to change an existing name's scope** —
+  there's no dropdown to flip it after the fact. Delete the name in
+  Name Manager and recreate it with the scope set correctly the
+  second time.
+</Callout>
+
+## Viewing and managing every name at once
+
+<ExcelCode>{`Ctrl+F3 (or Ctrl+L on Mac) opens Name Manager`}</ExcelCode>
+
+Name Manager lists every named range in the workbook — its scope,
+what it currently refers to, and lets you edit or delete it. This is
+the first place to check when a formula referencing a name shows
+`#NAME?` — the name may have been deleted, or its target range may
+have been deleted out from under it.
+
+## Using a name in a formula
+
+<ExcelCode>{`=SUM(Sales)
+=AVERAGEIF(Region, "West", Sales)`}</ExcelCode>
+
+A named range drops into a formula exactly where a regular cell
+reference would go — Excel's AutoComplete suggests existing names as
+a formula is typed, the same way it suggests function names.
+
+## Making a named range grow automatically
+
+A named range created the ordinary way points at a **fixed** address
+— add new rows below it, and the name doesn't expand to include them
+on its own. Two techniques fix that.
+
+**The modern way (Excel 365): the spilled-range operator.** If the
+data comes from a dynamic-array formula (like `UNIQUE` or `SORT`),
+point the name at the formula's anchor cell with `#` appended:
+
+<ExcelCode>{`Refers to: =Sheet1!$B$2#`}</ExcelCode>
+
+The name then always covers the formula's entire current spill
+range, however large it grows or shrinks.
+
+**The classic way (every version): OFFSET + COUNTA.** For a plain
+typed column of data, not a spilled formula:
+
+<ExcelCode>{`Refers to: =OFFSET(Sheet1!$A$2, 0, 0, COUNTA(Sheet1!$A:$A)-1, 1)`}</ExcelCode>
+
+[COUNTA](/docs/math/counta) counts how many non-blank cells are in
+column A (minus 1, for the header in `A1`), and
+[OFFSET](/docs/lookup/offset) uses that count as the range's height
+— so the named range always covers exactly as many rows as currently
+have data, growing automatically as new rows are added.
+
+<Callout type="idea">
+  The `#` spill technique is simpler and recalculates instantly with
+  no volatility concerns. OFFSET works everywhere, including
+  pre-365, but is a **volatile function** — it recalculates on every
+  single sheet change, not just when its own inputs change, which can
+  slow down a very large workbook with many OFFSET-based names.
+</Callout>
+
+export const faqs = [
+  {
+    question: 'Why does my formula show #NAME? after I renamed a named range?',
+    answer: 'Any formula still referencing the old name breaks the moment that name is renamed or deleted — Excel does not automatically update formulas elsewhere to the new name. Check Name Manager (Ctrl+F3) to confirm what the current name actually is, then fix the formula to match.',
+  },
+  {
+    question: 'Can a named range refer to a constant value or a formula, not just a cell range?',
+    answer: 'Yes — the "Refers to" field in Define Name accepts any formula, not only a cell reference. A name like TaxRate could refer to =0.0825 directly, with no cell backing it at all, then be used in formulas exactly like any other name.',
+  },
+  {
+    question: "Do named ranges survive being copied to a new workbook?",
+    answer: "Workbook-scoped names do, along with the data they reference, as long as the whole sheet (or the cells the name refers to) is copied along with it. Worksheet-scoped names only survive if the specific sheet they're scoped to is the one being copied.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Functions used in this guide
+
+- [OFFSET](/docs/lookup/offset) and [COUNTA](/docs/math/counta) — the classic dynamic named-range technique.
+- See [#NAME?](/docs/errors/name) for what happens when a formula references a name that no longer exists.

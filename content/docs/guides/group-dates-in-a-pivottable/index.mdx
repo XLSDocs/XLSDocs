@@ -1,0 +1,69 @@
+---
+title: How to group dates in a PivotTable
+description: Collapse a column of daily dates into months, quarters, or years — and the one grouping mistake that silently merges different years together.
+---
+
+A PivotTable built from raw daily dates shows one row per date by
+default — hundreds of rows for a year of data. Grouping collapses
+them into months, quarters, or years, directly inside the PivotTable,
+with no change to the underlying source data.
+
+## Grouping a date field
+
+Right-click any date cell inside the PivotTable's row or column area,
+choose **Group**, and a dialog lets you pick one or more units —
+Years, Quarters, Months, Days, or a custom number of days.
+
+<Callout type="warn">
+  **Selecting only "Months" without also selecting "Years" merges
+  every year together** — January 2026 and January 2027 both collapse
+  into a single "January" row, combining data across years that may
+  have been meant to stay separate. Select **both Months and Years**
+  in the same dialog for a normal "month within each year" breakdown.
+</Callout>
+
+## A weekly grouping instead
+
+The Group dialog's "Number of days" option only becomes available
+once Months, Quarters, and Years are all deselected — leaving only
+Days checked. Set **Number of days to 7** for weekly buckets instead
+of calendar months.
+
+## Removing a grouping
+
+Right-click any grouped date cell and choose **Ungroup** — this
+reverts to the original, ungrouped daily dates without affecting the
+source data (which the grouping never touched in the first place).
+Ctrl+Z also undoes a grouping immediately after applying it.
+
+## If Group is greyed out
+
+A date field sometimes can't be grouped — the most common cause is
+that the column isn't actually stored as real dates. Any row where
+that column holds text, a blank cell, or an error value anywhere in
+the source range breaks Excel's ability to treat the whole column as
+dates. Fix any non-date entries in the source data (an `=ISNUMBER()`
+check column finds them quickly), then refresh the PivotTable and
+try grouping again.
+
+export const faqs = [
+  {
+    question: 'Does grouping dates in a PivotTable change my source data?',
+    answer: 'No — grouping is entirely a PivotTable display feature. The underlying worksheet data keeps its original daily dates untouched; only the PivotTable\'s own rows or columns show the grouped version.',
+  },
+  {
+    question: 'Can I group by both month and quarter at the same time?',
+    answer: 'Yes — select multiple units in the Group dialog (for instance Years, Quarters, and Months together) and Excel adds each as its own level, letting you expand/collapse from year down to quarter down to month.',
+  },
+  {
+    question: 'Why does grouping sometimes affect every PivotTable in the workbook, not just the one I\'m editing?',
+    answer: "If multiple PivotTables share the same underlying Pivot Cache (built from the same source data range), grouping a date field in one can apply the same grouping to every PivotTable sharing that cache. Building separate PivotTables from independent data ranges avoids this.",
+  },
+];
+
+<Faq items={faqs} />
+
+## Related
+
+- [How to show PivotTable values as a percentage](/docs/guides/show-pivottable-values-as-percentage) — another common PivotTable display adjustment.
+- [PivotTable keyboard shortcuts](/docs/shortcuts/pivot-tables) — the handful that exist, plus Power Pivot's separate set.
