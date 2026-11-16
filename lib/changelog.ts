@@ -5,6 +5,11 @@ export interface ChangelogEntry {
   title: string;
   description: string;
   tags: ChangelogTag[];
+  /** Optional link to the page the entry is about — a category/section
+   * index for an entry spanning several pages, a specific page for a
+   * single-page entry. Omitted for entries with no one page to point at
+   * (a cross-cutting fix, a homepage change). */
+  href?: string;
 }
 
 // Meaningful, user-facing updates only — internal refactors and one-off bug
@@ -17,6 +22,7 @@ const entries: ChangelogEntry[] = [
     description:
       "Three more how-to guides: using named ranges (creating them, workbook vs. worksheet scope, and the modern spilled-range-operator trick for a range that grows on its own, alongside the classic OFFSET+COUNTA technique for older Excel), grouping dates in a PivotTable (including the real gotcha of grouping by Months without also selecting Years, which silently merges every year's January together), and showing PivotTable values as a percentage of grand, column, row, or parent total.",
     tags: ['Feature'],
+    href: '/docs/guides/use-named-ranges',
   },
   {
     date: '2026-11-15',
@@ -24,6 +30,7 @@ const entries: ChangelogEntry[] = [
     description:
       "A new Docs → Guides section for the moment you know what you're trying to do but not which function does it: counting or summing cells on a condition, looking up a value with multiple criteria, removing duplicates, comparing two lists, combining or splitting text, and converting text to numbers. Each guide compares the real competing approaches — COUNTIFS vs. COUNTIF, XLOOKUP's concatenation trick vs. INDEX/MATCH's array formula, UNIQUE vs. the Remove Duplicates command — rather than just restating one function's own page.",
     tags: ['Feature'],
+    href: '/docs/guides',
   },
   {
     date: '2026-11-15',
@@ -31,6 +38,7 @@ const entries: ChangelogEntry[] = [
     description:
       'Ten pages under Docs → Shortcuts, organized by task — navigation, selection, formatting, editing, formulas, rows/columns/sheets, workbook/file actions, filtering/sorting, every function key, and PivotTables — with Windows and Mac side by side throughout, pulled directly from a full pass over keyboard shortcuts in Excel.',
     tags: ['Feature'],
+    href: '/docs/shortcuts',
   },
   {
     date: '2026-11-15',
@@ -38,6 +46,7 @@ const entries: ChangelogEntry[] = [
     description:
       'Added the last three error codes — #FIELD!, #BUSY!, and #UNKNOWN! — after first building a FIELDVALUE function page to ground #FIELD! in something real, and adding the #BUSY!/#UNKNOWN! behaviors RTD and STOCKHISTORY already have. That brings every documented Excel error code to 14 of 14. Separately, 37 of the highest-traffic function pages (VLOOKUP, FILTER, SQRT, and more) now link back to their matching error page, so the reference works from either direction instead of only error-to-function.',
     tags: ['Milestone', 'New functions'],
+    href: '/docs/errors',
   },
   {
     date: '2026-11-15',
@@ -45,6 +54,7 @@ const entries: ChangelogEntry[] = [
     description:
       "A self-updating dropdown list, built from UNIQUE and SORT feeding a Data Validation list through the spill (#) operator — the third tutorial in this format, and the first one that's a plain HTML/flexbox diagram instead of an SVG chart.",
     tags: ['Feature'],
+    href: '/blog/dynamic-self-updating-dropdown-in-excel',
   },
   {
     date: '2026-11-15',
@@ -52,6 +62,7 @@ const entries: ChangelogEntry[] = [
     description:
       'Expanding the errors reference from 7 to 11 pages — the intersection-operator mix-up behind #NULL!, the empty dynamic-array/un-called-LAMBDA cases behind #CALC!, the live-connectivity failures behind #CONNECT! (TRANSLATE, DETECTLANGUAGE, IMAGE), and the security/privacy blocks behind #BLOCKED!.',
     tags: ['Feature'],
+    href: '/docs/errors',
   },
   {
     date: '2026-11-13',
@@ -59,6 +70,7 @@ const entries: ChangelogEntry[] = [
     description:
       "Found while investigating a visual report that one section looked narrower than its neighbors: a layout bug where a section's max-width cap wasn't being reliably filled, letting it shrink-wrap to its content's natural width instead. Affected three sections to different degrees (one was rendering at 744px against a 1152px cap) — fixed across every homepage section, not just the one that was visibly off.",
     tags: ['Improvement'],
+    href: '/',
   },
   {
     date: '2026-11-13',
@@ -66,6 +78,7 @@ const entries: ChangelogEntry[] = [
     description:
       "Seven new pages under Docs → Errors — #REF!, #VALUE!, #NAME?, #N/A, #DIV/0!, #NUM!, and #SPILL! — for starting from what's actually in the cell rather than needing to already know which function caused it. Each one explains what the error means, the real ways it happens (grounded in the function pages that already documented them — SQRT's negative input, RATE/IRR's convergence failures, FILTER/SORT's blocked spill ranges, and more), how to fix it, and how it differs from the errors people most often confuse it with.",
     tags: ['Feature'],
+    href: '/docs/errors',
   },
   {
     date: '2026-11-13',
@@ -73,6 +86,7 @@ const entries: ChangelogEntry[] = [
     description:
       'A new tutorial format — a real, computed SVG chart with numbered callouts walking through how it works, not a static screenshot. The Pareto chart tutorial covers the 80/20 cutoff and a RANK.EQ tie-break using SORT and SCAN; the waterfall chart tutorial covers the native Excel 2016+ chart type plus the manual stacked-column technique, and the trap of computing the ending bar from its own deltas instead of an independently verified number.',
     tags: ['Feature'],
+    href: '/blog/build-a-pareto-chart-in-excel',
   },
   {
     date: '2026-11-12',
