@@ -12,6 +12,55 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-11-16',
+    title: 'Named ranges and PivotTable guides',
+    description:
+      "Three more how-to guides: using named ranges (creating them, workbook vs. worksheet scope, and the modern spilled-range-operator trick for a range that grows on its own, alongside the classic OFFSET+COUNTA technique for older Excel), grouping dates in a PivotTable (including the real gotcha of grouping by Months without also selecting Years, which silently merges every year's January together), and showing PivotTable values as a percentage of grand, column, row, or parent total.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-15',
+    title: 'A how-to guides section, organized by task instead of function name',
+    description:
+      "A new Docs → Guides section for the moment you know what you're trying to do but not which function does it: counting or summing cells on a condition, looking up a value with multiple criteria, removing duplicates, comparing two lists, combining or splitting text, and converting text to numbers. Each guide compares the real competing approaches — COUNTIFS vs. COUNTIF, XLOOKUP's concatenation trick vs. INDEX/MATCH's array formula, UNIQUE vs. the Remove Duplicates command — rather than just restating one function's own page.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-15',
+    title: 'A full keyboard shortcuts reference',
+    description:
+      'Ten pages under Docs → Shortcuts, organized by task — navigation, selection, formatting, editing, formulas, rows/columns/sheets, workbook/file actions, filtering/sorting, every function key, and PivotTables — with Windows and Mac side by side throughout, pulled directly from a full pass over keyboard shortcuts in Excel.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-15',
+    title: 'The errors reference is now complete, in both directions',
+    description:
+      'Added the last three error codes — #FIELD!, #BUSY!, and #UNKNOWN! — after first building a FIELDVALUE function page to ground #FIELD! in something real, and adding the #BUSY!/#UNKNOWN! behaviors RTD and STOCKHISTORY already have. That brings every documented Excel error code to 14 of 14. Separately, 37 of the highest-traffic function pages (VLOOKUP, FILTER, SQRT, and more) now link back to their matching error page, so the reference works from either direction instead of only error-to-function.',
+    tags: ['Milestone', 'New functions'],
+  },
+  {
+    date: '2026-11-15',
+    title: 'A third annotated-diagram tutorial: a dynamic dropdown',
+    description:
+      "A self-updating dropdown list, built from UNIQUE and SORT feeding a Data Validation list through the spill (#) operator — the third tutorial in this format, and the first one that's a plain HTML/flexbox diagram instead of an SVG chart.",
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-15',
+    title: 'Four more error codes: #NULL!, #CALC!, #CONNECT!, and #BLOCKED!',
+    description:
+      'Expanding the errors reference from 7 to 11 pages — the intersection-operator mix-up behind #NULL!, the empty dynamic-array/un-called-LAMBDA cases behind #CALC!, the live-connectivity failures behind #CONNECT! (TRANSLATE, DETECTLANGUAGE, IMAGE), and the security/privacy blocks behind #BLOCKED!.',
+    tags: ['Feature'],
+  },
+  {
+    date: '2026-11-13',
+    title: 'Every homepage section now actually fills its own width',
+    description:
+      "Found while investigating a visual report that one section looked narrower than its neighbors: a layout bug where a section's max-width cap wasn't being reliably filled, letting it shrink-wrap to its content's natural width instead. Affected three sections to different degrees (one was rendering at 744px against a 1152px cap) — fixed across every homepage section, not just the one that was visibly off.",
+    tags: ['Improvement'],
+  },
+  {
     date: '2026-11-13',
     title: 'An errors reference, indexed by the error itself',
     description:
