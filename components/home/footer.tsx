@@ -25,6 +25,7 @@ const FOOTER_COLUMNS = [
     links: [
       { href: '/blog', label: 'Blog' },
       { href: '/docs', label: 'Docs' },
+      { href: '/templates', label: 'Templates' },
       { href: '/changelog', label: 'Changelog' },
       { href: '/faq', label: 'FAQ' },
     ],

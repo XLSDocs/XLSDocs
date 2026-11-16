@@ -19,6 +19,7 @@ import { ClaudePrompts } from './claude-prompts';
 import { ParetoChart } from './tutorial/pareto-chart';
 import { WaterfallChart } from './tutorial/waterfall-chart';
 import { PipelineDiagram } from './tutorial/pipeline-diagram';
+import { TemplateDownload } from './template-download';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -65,6 +66,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ParetoChart,
     WaterfallChart,
     PipelineDiagram,
+    TemplateDownload,
     ...components,
   } satisfies MDXComponents;
 }
