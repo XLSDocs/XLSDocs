@@ -8,6 +8,8 @@ items are in List A but missing from List B (or the reverse)? Three
 approaches cover it, from a one-formula spilled result down to a
 version that works in every Excel release.
 
+<TemplateDownload slug="compare-two-lists-for-differences" />
+
 ## A live list of what's missing: FILTER + COUNTIF
 
 <ExcelCode>{`=FILTER(A2:A100, COUNTIF(B2:B100, A2:A100)=0)`}</ExcelCode>

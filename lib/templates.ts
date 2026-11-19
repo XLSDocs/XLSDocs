@@ -69,6 +69,78 @@ const templates: Template[] = [
     relatedHref: '/blog/dynamic-self-updating-dropdown-in-excel',
     relatedLabel: 'Build a Dropdown List That Updates Itself',
   },
+  {
+    slug: 'count-cells-that-meet-a-condition',
+    title: 'Count cells that meet a condition',
+    description:
+      '15 sample orders with COUNTIF (single condition) and COUNTIFS (two conditions) already built, side by side.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/count-cells-that-meet-a-condition',
+    relatedLabel: 'How to count cells that meet a condition',
+  },
+  {
+    slug: 'sum-cells-that-meet-a-condition',
+    title: 'Sum cells that meet a condition',
+    description:
+      '15 sample orders with SUMIF (single condition) and SUMIFS (two conditions) already built, showing the argument-order difference between them.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/sum-cells-that-meet-a-condition',
+    relatedLabel: 'How to sum cells that meet a condition',
+  },
+  {
+    slug: 'lookup-with-multiple-criteria',
+    title: 'Lookup with multiple criteria',
+    description:
+      'A 12-row price list with the INDEX/MATCH boolean-array formula already built — change the product or region inputs and watch it find the matching price.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/lookup-with-multiple-criteria',
+    relatedLabel: 'How to look up a value using multiple criteria',
+  },
+  {
+    slug: 'remove-duplicate-values',
+    title: 'Remove duplicate values',
+    description:
+      'A 15-row customer list with a COUNTIF-based "times repeated" column already built, to flag duplicates before deciding how to handle them.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/remove-duplicate-values',
+    relatedLabel: 'How to remove duplicate values',
+  },
+  {
+    slug: 'compare-two-lists-for-differences',
+    title: 'Compare two lists for differences',
+    description:
+      'Two 10-item lists with a dragged-down COUNTIF flag formula already built on each side, showing exactly what\'s missing from the other.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/compare-two-lists-for-differences',
+    relatedLabel: 'How to compare two lists for differences',
+  },
+  {
+    slug: 'combine-text-from-multiple-cells',
+    title: 'Combine text from multiple cells',
+    description:
+      '10 first/last name pairs with the & operator and CONCATENATE already built side by side, both producing the same combined result.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/combine-text-from-multiple-cells',
+    relatedLabel: 'How to combine text from multiple cells',
+  },
+  {
+    slug: 'split-text-into-columns',
+    title: 'Split text into columns',
+    description:
+      '10 "Last, First" combined names with the manual LEFT/MID/FIND splitting formulas already built — works on every Excel version.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/split-text-into-columns',
+    relatedLabel: 'How to split text into columns',
+  },
+  {
+    slug: 'convert-text-to-numbers',
+    title: 'Convert text to real numbers',
+    description:
+      '10 numbers stored as text, with ISNUMBER, VALUE, and the *1 coercion trick already built side by side so you can see each one fix it.',
+    fileSize: '8 KB',
+    relatedHref: '/docs/guides/convert-text-to-numbers',
+    relatedLabel: 'How to convert text to real numbers',
+  },
 ];
 
 export function getTemplates(): Template[] {
