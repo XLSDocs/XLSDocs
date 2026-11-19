@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: '/blog', label: 'Blog' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/docs', label: 'Docs' },
+  { href: '/templates', label: 'Templates' },
 ];
 
 // Mobile has no hover dropdown — list every tool individually instead.
@@ -25,6 +26,7 @@ const MOBILE_LINKS = [
   { href: '/tools/large-file-viewer', label: 'Large File Viewer' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/docs', label: 'Docs' },
+  { href: '/templates', label: 'Templates' },
 ];
 
 export function HomeNav() {
@@ -40,7 +42,7 @@ export function HomeNav() {
             <Logo />
           </Link>
         </div>
-        <nav className="hidden items-center gap-8 text-sm text-fd-muted-foreground md:flex">
+        <nav className="hidden items-center gap-6 text-sm text-fd-muted-foreground md:flex lg:gap-8">
           <Link href={NAV_LINKS[0].href} className="transition-colors hover:text-fd-foreground">
             {NAV_LINKS[0].label}
           </Link>
@@ -53,6 +55,9 @@ export function HomeNav() {
           </Link>
           <Link href={NAV_LINKS[3].href} className="transition-colors hover:text-fd-foreground">
             {NAV_LINKS[3].label}
+          </Link>
+          <Link href={NAV_LINKS[4].href} className="transition-colors hover:text-fd-foreground">
+            {NAV_LINKS[4].label}
           </Link>
         </nav>
         <div className="flex items-center gap-2">
