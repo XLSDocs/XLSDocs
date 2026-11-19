@@ -18,6 +18,14 @@ export interface ChangelogEntry {
 const entries: ChangelogEntry[] = [
   {
     date: '2026-11-16',
+    title: 'Downloadable Excel templates',
+    description:
+      "Five free starter workbooks under a new Templates page, no email required — one matching each of the Pareto chart, waterfall chart, and self-updating dropdown tutorials, a named-ranges starter with workbook- and worksheet-scoped ranges already set up, and 180 rows of practice data for the PivotTable guides. Every formula in them sticks to classic, pre-2007 Excel so they open cleanly on any version — the newer techniques each tutorial covers are explained inline for anyone on Excel 365 who wants to try them live.",
+    tags: ['Feature'],
+    href: '/templates',
+  },
+  {
+    date: '2026-11-16',
     title: 'Named ranges and PivotTable guides',
     description:
       "Three more how-to guides: using named ranges (creating them, workbook vs. worksheet scope, and the modern spilled-range-operator trick for a range that grows on its own, alongside the classic OFFSET+COUNTA technique for older Excel), grouping dates in a PivotTable (including the real gotcha of grouping by Months without also selecting Years, which silently merges every year's January together), and showing PivotTable values as a percentage of grand, column, row, or parent total.",
