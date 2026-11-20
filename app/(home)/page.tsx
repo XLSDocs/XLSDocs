@@ -12,6 +12,7 @@ import { LlmsShowcase } from '@/components/home/llms-showcase';
 import { ClosingCta } from '@/components/home/closing-cta';
 import { AskClaude } from '@/components/ask-claude';
 import { getFunctionCatalog } from '@/lib/source';
+import { getTemplates } from '@/lib/templates';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   const categories = getFunctionCatalog();
   const functionCount = categories.reduce((sum, cat) => sum + cat.functions.length, 0);
+  const templateCount = getTemplates().length;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -37,7 +39,7 @@ export default function HomePage() {
       <FunctionDiagramShowcase />
       <AskClaudeShowcase />
       <QuickFixShowcase />
-      <FreeSection functionCount={functionCount} categoryCount={categories.length} />
+      <FreeSection functionCount={functionCount} categoryCount={categories.length} templateCount={templateCount} />
       <ToolsShowcase />
       <LlmsShowcase />
       <ClosingCta />

@@ -1,19 +1,29 @@
 import Link from 'next/link';
-import { Lock } from 'lucide-react';
+import { Lock, Lightbulb, Keyboard, OctagonAlert, FileSpreadsheet } from 'lucide-react';
 import { StatDots } from './stat-dots';
 import { TOOLS } from './tools-showcase';
+
+const ALSO_FREE = [
+  { href: '/docs/guides', label: 'Guides', icon: Lightbulb },
+  { href: '/docs/shortcuts', label: 'Shortcuts', icon: Keyboard },
+  { href: '/docs/errors', label: 'Errors', icon: OctagonAlert },
+  { href: '/templates', label: 'Templates', icon: FileSpreadsheet },
+];
 
 export function FreeSection({
   functionCount,
   categoryCount,
+  templateCount,
 }: {
   functionCount: number;
   categoryCount: number;
+  templateCount: number;
 }) {
   const stats = [
     { value: String(functionCount), caption: 'functions, VBA calls, and LAMBDAs documented' },
     { value: String(TOOLS.length), caption: 'generators, free and unlimited' },
     { value: String(categoryCount), caption: 'categories, from Math to Custom Functions' },
+    { value: String(templateCount), caption: 'downloadable templates, no email required' },
   ];
 
   return (
@@ -28,10 +38,11 @@ export function FreeSection({
             Free <span className="font-serif text-fd-primary italic">from day one</span>
           </h2>
           <p className="mt-4 max-w-md text-fd-muted-foreground">
-            Every function page, tutorial, and how-it-works diagram is free
-            to read, and all {TOOLS.length} generators are free to use as
-            often as you like — no account, no trial clock. The tools run
-            in your browser, so nothing you paste ever leaves it.
+            Every function page, guide, shortcut, and how-it-works diagram is
+            free to read, all {TOOLS.length} generators are free to use as
+            often as you like, and every template downloads straight away —
+            no account, no trial clock, no email. The tools run in your
+            browser, so nothing you paste ever leaves it.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link
@@ -46,6 +57,21 @@ export function FreeSection({
             >
               Try a free tool
             </Link>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium tracking-wide text-fd-muted-foreground uppercase">
+              Also free
+            </span>
+            {ALSO_FREE.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className="inline-flex items-center gap-1.5 rounded-full border border-fd-border px-3 py-1 text-xs font-medium text-fd-muted-foreground transition-colors hover:border-fd-primary/40 hover:text-fd-primary"
+              >
+                <Icon className="size-3" />
+                {label}
+              </Link>
+            ))}
           </div>
         </div>
 
