@@ -9,7 +9,13 @@
 export function truncateOgText(text: string, maxChars: number): string {
   const clean = text.trim();
   if (clean.length <= maxChars) return clean;
-  return `${clean.slice(0, maxChars - 1).trimEnd()}…`;
+  const sliced = clean.slice(0, maxChars - 1);
+  // Cut at the last word boundary within the slice instead of mid-word
+  // ("...using mult..." for "multiple") — falls back to the hard cut only
+  // if there's no space at all (one absurdly long first word).
+  const lastSpace = sliced.lastIndexOf(' ');
+  const safe = lastSpace > 0 ? sliced.slice(0, lastSpace) : sliced;
+  return `${safe.trimEnd()}…`;
 }
 
 export const OG_TITLE_MAX = 34;
