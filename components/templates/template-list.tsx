@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Download, FileSpreadsheet } from 'lucide-react';
 import type { Template } from '@/lib/templates';
+import { SpreadsheetPreview } from './spreadsheet-preview';
 
 export function TemplateList({ templates }: { templates: Template[] }) {
   return (
@@ -13,7 +14,10 @@ export function TemplateList({ templates }: { templates: Template[] }) {
             </span>
             <h2 className="font-medium text-fd-card-foreground">{t.title}</h2>
           </div>
-          <p className="mt-3 flex-1 text-sm text-fd-muted-foreground">{t.description}</p>
+          <p className="mt-3 text-sm text-fd-muted-foreground">{t.description}</p>
+          <div className="mt-4">
+            <SpreadsheetPreview {...t.preview} />
+          </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <a
               href={`/templates/${t.slug}.xlsx`}

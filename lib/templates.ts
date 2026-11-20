@@ -1,3 +1,10 @@
+export interface TemplatePreview {
+  headers: string[];
+  rows: (string | number)[][];
+  /** [row, col] pairs (0-indexed into `rows`) rendered as formula text in a distinct style. */
+  formulaCells?: [number, number][];
+}
+
 export interface Template {
   slug: string;
   title: string;
@@ -6,6 +13,8 @@ export interface Template {
   /** The tutorial or guide page this template is built to accompany. */
   relatedHref: string;
   relatedLabel: string;
+  /** A few real rows/formulas from the actual file, for a thumbnail preview. */
+  preview: TemplatePreview;
 }
 
 // Generated once via a one-off script using exceljs (see package.json
@@ -23,6 +32,10 @@ export interface Template {
 // dropdown's SORT(UNIQUE())+# technique), the file instead uses a classic
 // equivalent and a text note pointing back to the article for the modern
 // version, rather than risk it again.
+//
+// Each `preview` below is real data pulled straight from the actual
+// generated file (not invented for display) — kept in sync by hand since
+// the generator script lives in the session scratchpad, not this repo.
 const templates: Template[] = [
   {
     slug: 'named-ranges-starter',
@@ -32,6 +45,15 @@ const templates: Template[] = [
     fileSize: '24 KB',
     relatedHref: '/docs/guides/use-named-ranges',
     relatedLabel: 'How to use named ranges',
+    preview: {
+      headers: ['Month', 'Sales'],
+      rows: [
+        ['Jan', 4200],
+        ['Feb', 3900],
+        ['Total', '=SUM(Sales)'],
+      ],
+      formulaCells: [[2, 1]],
+    },
   },
   {
     slug: 'pivottable-practice-data',
@@ -41,6 +63,14 @@ const templates: Template[] = [
     fileSize: '12 KB',
     relatedHref: '/docs/guides/group-dates-in-a-pivottable',
     relatedLabel: 'How to group dates in a PivotTable',
+    preview: {
+      headers: ['Date', 'Region', 'Product', 'Amount'],
+      rows: [
+        ['2026-11-14', 'North', 'Widget D', 3508.64],
+        ['2027-02-15', 'North', 'Widget C', 801.53],
+        ['2026-01-27', 'West', 'Widget B', 4985.31],
+      ],
+    },
   },
   {
     slug: 'pareto-chart',
@@ -50,6 +80,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/blog/build-a-pareto-chart-in-excel',
     relatedLabel: 'How to Build a Pareto Chart in Excel',
+    preview: {
+      headers: ['Cause', 'Tickets', 'Rank'],
+      rows: [
+        ['Login failures', 70, '=RANK(B4,$B$4:$B$12,0)'],
+        ['Slow page loads', 48, 2],
+        ['Billing errors', 30, 3],
+      ],
+      formulaCells: [[0, 2]],
+    },
   },
   {
     slug: 'waterfall-chart',
@@ -59,6 +98,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/blog/build-a-waterfall-chart-in-excel',
     relatedLabel: 'How to Build a Waterfall Chart in Excel',
+    preview: {
+      headers: ['Label', 'Value', 'Running Total'],
+      rows: [
+        ['Starting Cash', 50, '=SUM($B$4:B4)'],
+        ['Revenue', 120, 170],
+        ['COGS', -45, 125],
+      ],
+      formulaCells: [[0, 2]],
+    },
   },
   {
     slug: 'dynamic-dropdown',
@@ -68,6 +116,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/blog/dynamic-self-updating-dropdown-in-excel',
     relatedLabel: 'Build a Dropdown List That Updates Itself',
+    preview: {
+      headers: ['Region (raw)', 'Dropdown source'],
+      rows: [
+        ['West', '=OFFSET($A$4,0,0,COUNTA($A:$A)-1,1)'],
+        ['East', ''],
+        ['West', ''],
+      ],
+      formulaCells: [[0, 1]],
+    },
   },
   {
     slug: 'count-cells-that-meet-a-condition',
@@ -77,6 +134,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/count-cells-that-meet-a-condition',
     relatedLabel: 'How to count cells that meet a condition',
+    preview: {
+      headers: ['Region', 'Amount'],
+      rows: [
+        ['West', 420],
+        ['East', 180],
+        ['Count "West"', '=COUNTIF(A4:A18,"West")'],
+      ],
+      formulaCells: [[2, 1]],
+    },
   },
   {
     slug: 'sum-cells-that-meet-a-condition',
@@ -86,6 +152,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/sum-cells-that-meet-a-condition',
     relatedLabel: 'How to sum cells that meet a condition',
+    preview: {
+      headers: ['Region', 'Status', 'Amount'],
+      rows: [
+        ['West', 'Paid', 420],
+        ['East', 'Unpaid', 180],
+        ['Total "West"', '', '=SUMIF(A4:A18,"West",C4:C18)'],
+      ],
+      formulaCells: [[2, 2]],
+    },
   },
   {
     slug: 'lookup-with-multiple-criteria',
@@ -95,6 +170,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/lookup-with-multiple-criteria',
     relatedLabel: 'How to look up a value using multiple criteria',
+    preview: {
+      headers: ['Product', 'Region', 'Price'],
+      rows: [
+        ['Widget A', 'West', 12.5],
+        ['Widget A', 'East', 13.0],
+        ['Price (B, East)', '', '=INDEX(C4:C15,MATCH(1,…))'],
+      ],
+      formulaCells: [[2, 2]],
+    },
   },
   {
     slug: 'remove-duplicate-values',
@@ -104,6 +188,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/remove-duplicate-values',
     relatedLabel: 'How to remove duplicate values',
+    preview: {
+      headers: ['Customer', 'Times in list'],
+      rows: [
+        ['Acme Corp', '=COUNTIF($A$4:$A$18,A4)'],
+        ['Beta LLC', 3],
+        ['Acme Corp', 2],
+      ],
+      formulaCells: [[0, 1]],
+    },
   },
   {
     slug: 'compare-two-lists-for-differences',
@@ -113,6 +206,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/compare-two-lists-for-differences',
     relatedLabel: 'How to compare two lists for differences',
+    preview: {
+      headers: ['List A', 'In List B?'],
+      rows: [
+        ['Apple', '=IF(COUNTIF($C$4:$C$13,A4)=0,"Missing","Found")'],
+        ['Banana', 'Found'],
+        ['Cherry', 'Found'],
+      ],
+      formulaCells: [[0, 1]],
+    },
   },
   {
     slug: 'combine-text-from-multiple-cells',
@@ -122,6 +224,15 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/combine-text-from-multiple-cells',
     relatedLabel: 'How to combine text from multiple cells',
+    preview: {
+      headers: ['First', 'Last', 'Combined'],
+      rows: [
+        ['John', 'Smith', '=A4&" "&B4'],
+        ['Maria', 'Garcia', 'Maria Garcia'],
+        ['Wei', 'Chen', 'Wei Chen'],
+      ],
+      formulaCells: [[0, 2]],
+    },
   },
   {
     slug: 'split-text-into-columns',
@@ -131,6 +242,17 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/split-text-into-columns',
     relatedLabel: 'How to split text into columns',
+    preview: {
+      headers: ['Combined', 'Last', 'First'],
+      rows: [
+        ['Smith, John', '=LEFT(A4,FIND(",",A4)-1)', '=TRIM(MID(A4,FIND(",",A4)+1,100))'],
+        ['Garcia, Maria', 'Garcia', 'Maria'],
+      ],
+      formulaCells: [
+        [0, 1],
+        [0, 2],
+      ],
+    },
   },
   {
     slug: 'convert-text-to-numbers',
@@ -140,6 +262,17 @@ const templates: Template[] = [
     fileSize: '8 KB',
     relatedHref: '/docs/guides/convert-text-to-numbers',
     relatedLabel: 'How to convert text to real numbers',
+    preview: {
+      headers: ['Text', 'ISNUMBER', 'VALUE'],
+      rows: [
+        ['1234', '=ISNUMBER(A4)', '=VALUE(A4)'],
+        ['1,234.56', 'FALSE', 1234.56],
+      ],
+      formulaCells: [
+        [0, 1],
+        [0, 2],
+      ],
+    },
   },
 ];
 
