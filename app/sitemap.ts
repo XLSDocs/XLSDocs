@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/tools/conditional-format-builder`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/tools/data-validation-builder`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${siteUrl}/blog`, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${siteUrl}/templates`, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${siteUrl}/changelog`, changeFrequency: 'weekly', priority: 0.5 },
     { url: `${siteUrl}/faq`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${siteUrl}/about`, changeFrequency: 'monthly', priority: 0.5 },
