@@ -12,6 +12,9 @@ import { countif } from './countif';
 import { averageif } from './averageif';
 import { maxifs } from './maxifs';
 import { minifs } from './minifs';
+import { xmatch } from './xmatch';
+import { sumproduct } from './sumproduct';
+import { filterFn } from './filter';
 
 /** Keyed by lowercase function name. Add one line per new spec file. */
 export const diagrams: Record<string, DiagramSpec> = {
@@ -28,4 +31,7 @@ export const diagrams: Record<string, DiagramSpec> = {
   averageif,
   maxifs,
   minifs,
+  xmatch,
+  sumproduct,
+  filter: filterFn,
 };
