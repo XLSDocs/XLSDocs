@@ -41,8 +41,9 @@ export function FreeSection({
             Every function page, guide, shortcut, and how-it-works diagram is
             free to read, all {TOOLS.length} generators are free to use as
             often as you like, and every template downloads straight away —
-            no account, no trial clock, no email. The tools run in your
-            browser, so nothing you paste ever leaves it.
+            no account, no trial clock, no email. The generators run
+            entirely in your browser, so nothing you paste into one of them
+            ever leaves it.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link
