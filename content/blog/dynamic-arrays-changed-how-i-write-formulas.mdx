@@ -29,12 +29,13 @@ row-by-row mechanics of how to get there.
 
 ## Three functions, one habit change
 
-**FILTER** replaced most of what I used to reach for AutoFilter or a
-helper column for. **SORT** and **SORTBY** replaced manually
-re-sorting a range and hoping nothing downstream depended on the old
-row order. **UNIQUE** replaced Remove Duplicates as a *formula*
-instead of a one-time destructive action — the distinct list now
-stays live as source data changes.
+**[FILTER](/docs/arrays/filter)** replaced most of what I used to
+reach for AutoFilter or a helper column for. **[SORT](/docs/arrays/sort)**
+and **[SORTBY](/docs/arrays/sortby)** replaced manually re-sorting a
+range and hoping nothing downstream depended on the old row order.
+**[UNIQUE](/docs/arrays/unique)** replaced Remove Duplicates as a
+*formula* instead of a one-time destructive action — the distinct
+list now stays live as source data changes.
 
 ## The habit that actually changed
 
@@ -58,7 +59,8 @@ Nesting three or four dynamic array functions inside each other
 (`SORT(FILTER(UNIQUE(...)))`) is powerful but genuinely hard to debug
 — when something's wrong, you can't easily tell which layer produced
 the wrong result. Breaking a long chain into two or three named
-LAMBDA-backed helper formulas, or even just intermediate cells, pays
+[LAMBDA](/docs/custom-functions/lambda)-backed helper formulas, or
+even just intermediate cells, pays
 for itself the first time you have to fix one at 5pm on a Friday.
 
 ## Worth the relearn

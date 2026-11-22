@@ -7,10 +7,13 @@ author: Marcus Webb
 readTime: 5 min read
 ---
 
-Every "switch to XLOOKUP" post reads like VLOOKUP is a mistake from
-the past. It isn't. It's just older, and older means it has real
-constraints XLOOKUP doesn't. Here's an honest comparison, not a
-victory lap.
+Every "switch to [XLOOKUP](/docs/lookup/xlookup)" post reads like
+[VLOOKUP](/docs/lookup/vlookup) is a mistake from the past. It isn't.
+It's just older, and older means it has real constraints XLOOKUP
+doesn't. Here's an honest comparison, not a victory lap. (If you're
+migrating an existing formula rather than just deciding, the
+[VLOOKUP → XLOOKUP Converter](/tools/vlookup-converter) does the
+mechanical part for you.)
 
 ## Where XLOOKUP genuinely wins
 
@@ -22,7 +25,7 @@ relative to the lookup range.
 
 If `Name` sits to the *left* of `SKU` in the table, that formula still
 works. The equivalent VLOOKUP would need the columns physically
-reordered, or an INDEX/MATCH instead.
+reordered, or an [INDEX](/docs/lookup/index)/[MATCH](/docs/lookup/match) instead.
 
 **Error handling.** XLOOKUP's fourth argument replaces a
 `IFERROR(VLOOKUP(...), "fallback")` wrapper with one native argument.
