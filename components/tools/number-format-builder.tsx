@@ -16,6 +16,7 @@ import {
   type Scale,
 } from '@/lib/number-format';
 import { Field, PillGroup, Select } from '@/components/tools/form-controls';
+import { RelatedLinks } from './related-links';
 
 const KIND_LABELS: Record<FormatKind, string> = {
   number: 'Number',
@@ -275,6 +276,14 @@ export function NumberFormatBuilder() {
             </Link>
             .
           </p>
+
+          <RelatedLinks
+            links={[
+              { href: '/docs/text/text', label: 'TEXT' },
+              { href: '/docs/math/round', label: 'ROUND' },
+              { href: '/docs/guides/convert-text-to-numbers', label: 'Convert text to numbers guide' },
+            ]}
+          />
         </div>
       </div>
     </div>

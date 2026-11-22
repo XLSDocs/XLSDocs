@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Sparkles, Loader2, Sparkle } from 'lucide-react';
 import { ExcelCode } from '@/components/excel-code';
 import { CodeRainBackground } from '@/components/shared/code-rain';
+import { RelatedLinks } from './related-links';
 
 const MAX_LENGTH = 400;
 
@@ -345,6 +346,16 @@ export function FormulaBuilder() {
             </div>
           </div>
         </aside>
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-6 pb-20">
+        <RelatedLinks
+          links={[
+            { href: '/docs/guides', label: 'How-to guides' },
+            { href: '/functions', label: 'Function index' },
+            { href: '/docs/errors', label: 'Errors reference' },
+          ]}
+        />
       </div>
     </section>
   );

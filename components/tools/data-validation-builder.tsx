@@ -10,6 +10,7 @@ import {
   type RuleType,
 } from '@/lib/data-validation';
 import { Field, PillGroup, TextInput } from '@/components/tools/form-controls';
+import { RelatedLinks } from './related-links';
 
 const RULE_GROUPS: { label: string; rules: RuleType[] }[] = [
   { label: 'Dropdown lists', rules: ['dropdownList', 'dropdownRange', 'dependentDropdown'] },
@@ -193,6 +194,15 @@ export function DataValidationBuilder() {
             </Link>
             .
           </p>
+
+          <RelatedLinks
+            links={[
+              { href: '/blog/dynamic-self-updating-dropdown-in-excel', label: 'Self-updating dropdown tutorial' },
+              { href: '/docs/guides/use-named-ranges', label: 'Named ranges guide' },
+              { href: '/docs/lookup/offset', label: 'OFFSET' },
+              { href: '/docs/math/countif', label: 'COUNTIF' },
+            ]}
+          />
         </div>
       </div>
     </div>

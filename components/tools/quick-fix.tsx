@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Wrench, Loader2, Sparkle } from 'lucide-react';
 import { ExcelCode } from '@/components/excel-code';
 import { CodeRainBackground } from '@/components/shared/code-rain';
+import { RelatedLinks } from './related-links';
 
 const MAX_LENGTH = 500;
 
@@ -360,6 +361,17 @@ export function QuickFix() {
             </div>
           </div>
         </aside>
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-6xl px-6 pb-20">
+        <RelatedLinks
+          links={[
+            { href: '/docs/errors', label: 'Errors reference' },
+            { href: '/docs/errors/ref', label: '#REF!' },
+            { href: '/docs/errors/value', label: '#VALUE!' },
+            { href: '/docs/errors/na', label: '#N/A' },
+          ]}
+        />
       </div>
     </section>
   );

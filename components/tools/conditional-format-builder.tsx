@@ -11,6 +11,7 @@ import {
   type ComparisonOp,
 } from '@/lib/conditional-format';
 import { Field, PillGroup, Select, TextInput } from '@/components/tools/form-controls';
+import { RelatedLinks } from './related-links';
 
 const RULE_GROUPS: { label: string; rules: RuleType[] }[] = [
   { label: 'Values', rules: ['duplicates', 'unique', 'comparison', 'textContains', 'blank', 'isFormula'] },
@@ -228,6 +229,15 @@ export function ConditionalFormatBuilder() {
             </Link>
             .
           </p>
+
+          <RelatedLinks
+            links={[
+              { href: '/docs/math/countif', label: 'COUNTIF' },
+              { href: '/docs/guides/remove-duplicate-values', label: 'Remove duplicates guide' },
+              { href: '/docs/math/large', label: 'LARGE' },
+              { href: '/docs/date/today', label: 'TODAY' },
+            ]}
+          />
         </div>
       </div>
     </div>

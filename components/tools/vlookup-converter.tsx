@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { convertVlookup } from '@/lib/vlookup-converter';
+import { RelatedLinks } from './related-links';
 
 const EXAMPLES = [
   { label: 'Exact match', formula: '=VLOOKUP(A2, Sheet1!B2:D100, 3, FALSE)' },
@@ -120,6 +121,15 @@ export function VlookupConverter() {
         those can&apos;t be converted automatically — the tool will say so
         rather than guess.
       </div>
+
+      <RelatedLinks
+        links={[
+          { href: '/docs/lookup/vlookup', label: 'VLOOKUP' },
+          { href: '/docs/lookup/xlookup', label: 'XLOOKUP' },
+          { href: '/docs/lookup/index', label: 'INDEX' },
+          { href: '/docs/lookup/match', label: 'MATCH' },
+        ]}
+      />
     </div>
   );
 }
