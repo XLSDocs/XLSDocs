@@ -17,6 +17,28 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-11-24',
+    title: 'Function, tool, and blog pages now link to each other',
+    description:
+      "A cross-linking pass across the whole site: all 7 tools now point back to the docs/guides/blog content they relate to, every blog post links to at least one real function or docs page it's grounded in, and — closing the loop the other way — function pages now link out to the comparison posts and tutorials that cover them (SUMIF/SUMIFS, RANK.EQ/RANK.AVG, NPV/IRR, PMT/IPMT/PPMT, and a dozen more). Previously several dozen pages across all three content types existed with zero connection to the others.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-11-21',
+    title: '3 more interactive function diagrams, and some missing-page fixes',
+    description:
+      "XMATCH, SUMPRODUCT, and FILTER joined the \"how it works\" diagram library, now 16 functions deep. Also fixed three places where a newly-added page wasn't fully wired in: /templates and 5 of the 7 tool pages were missing from Ctrl+K search, /templates was missing from the sitemap entirely, and longer page titles in social-share images were getting cut off mid-word instead of at a word boundary.",
+    tags: ['Improvement'],
+  },
+  {
+    date: '2026-11-19',
+    title: 'Templates expanded to 13 files, added to the main nav',
+    description:
+      "8 more downloadable templates — now one for every Guides page, not just the first 5 — plus a permanent corruption-safety check added to how they're built after an early version shipped with a formula that didn't survive opening in Excel. Templates also moved from a footer-only link into the main navbar, and the homepage's \"Free from day one\" section now actually mentions Guides, Shortcuts, Errors, and Templates instead of none of them.",
+    tags: ['Feature'],
+    href: '/templates',
+  },
+  {
     date: '2026-11-16',
     title: 'Downloadable Excel templates',
     description:
