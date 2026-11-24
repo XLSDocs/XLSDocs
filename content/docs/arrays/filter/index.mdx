@@ -180,7 +180,9 @@ export const compatibility = [
 ## Related functions
 
 - See the [How to compare two lists for differences](/docs/guides/compare-two-lists-for-differences)
-  guide for pairing FILTER with COUNTIF to spill only the non-matching rows.
+  guide for pairing FILTER with COUNTIF to spill only the non-matching rows,
+  or [Why AND() and OR() Don't Work Inside FILTER](/blog/why-and-or-dont-work-inside-filter)
+  for the array-vs-scalar mismatch that breaks naive multi-condition filters.
 - [SORT](/docs/arrays/sort) — often wrapped around FILTER to sort the
   filtered results.
 - [UNIQUE](/docs/arrays/unique) — returns the distinct values from a

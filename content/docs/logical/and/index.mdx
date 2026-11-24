@@ -153,6 +153,8 @@ export const compatibility = [
 
 - [OR](/docs/logical/or) — TRUE if **any** condition is true, instead
   of requiring all of them.
+- See [Why AND() and OR() Don't Work Inside FILTER](/blog/why-and-or-dont-work-inside-filter)
+  for the array-vs-scalar mismatch that breaks this inside FILTER.
 - [NOT](/docs/logical/not) — reverses a single TRUE/FALSE result.
 - [IF](/docs/logical/if) — most commonly wraps AND to branch on
   multiple conditions at once.
