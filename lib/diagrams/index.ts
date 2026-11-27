@@ -15,6 +15,9 @@ import { minifs } from './minifs';
 import { xmatch } from './xmatch';
 import { sumproduct } from './sumproduct';
 import { filterFn } from './filter';
+import { unique } from './unique';
+import { sortFn } from './sort';
+import { textjoin } from './textjoin';
 
 /** Keyed by lowercase function name. Add one line per new spec file. */
 export const diagrams: Record<string, DiagramSpec> = {
@@ -34,4 +37,7 @@ export const diagrams: Record<string, DiagramSpec> = {
   xmatch,
   sumproduct,
   filter: filterFn,
+  unique,
+  sort: sortFn,
+  textjoin,
 };
