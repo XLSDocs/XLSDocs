@@ -17,6 +17,14 @@ export interface ChangelogEntry {
 // so entry order in this file doesn't have to be kept perfectly chronological.
 const entries: ChangelogEntry[] = [
   {
+    date: '2026-11-27',
+    title: '3 more interactive function diagrams: UNIQUE, SORT, TEXTJOIN',
+    description:
+      "The \"how it works\" diagram library is now 19 functions deep, moving past lookup/aggregation functions into dynamic arrays and text: UNIQUE shows duplicates collapsing into a distinct list, SORT shows a table physically reordering by a chosen column, and TEXTJOIN shows a blank cell getting skipped instead of adding an empty separator.",
+    tags: ['Improvement'],
+    href: '/docs/arrays/unique',
+  },
+  {
     date: '2026-11-24',
     title: 'Function, tool, and blog pages now link to each other',
     description:
